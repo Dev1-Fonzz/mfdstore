@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MFD Store Panel</title>
+  <style>
+    :root { --primary: #d32f2f; --light: #f5f5f5; --dark: #333; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body { background: var(--light); color: var(--dark); padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .hidden { display: none; }
+    button { background: var(--primary); color: white; border: none; padding: 10px 16px; border-radius: 4px; cursor: pointer; }
+    input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 4px; }
+    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+    .product-card { background: white; border-radius: 8px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .product-img { width: 100%; height: 200px; object-fit: cover; border-radius: 4px; }
+    .section { margin: 30px 0; }
+    nav { display: flex; gap: 16px; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>MFD Store Showcase</h1>
+
+    <!-- Auth -->
+    <div id="authSection">
+      <div id="loginForm">
+        <h2>Login</h2>
+        <input type="text" id="loginPhone" placeholder="Phone Number (e.g. +60123456789)" />
+        <input type="password" id="loginPassword" placeholder="Password" />
+        <button onclick="login()">Login</button>
+        <p>Don't have an account? <a href="#" onclick="showRegister()">Register</a></p>
+      </div>
+
+      <div id="registerForm" class="hidden">
+        <h2>Register</h2>
+        <input type="text" id="regPhone" placeholder="Phone Number (required)" />
+        <input type="password" id="regPassword" placeholder="Password (required)" />
+        <input type="email" id="regEmail" placeholder="Email (optional)" />
+        <input type="text" id="regUsername" placeholder="Username (optional)" />
+        <button onclick="register()">Register</button>
+        <p>Already have an account? <a href="#" onclick="showLogin()">Login</a></p>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden">
+      <nav>
+        <button onclick="showSection('catalog')">Catalog</button>        <button onclick="showSection('account')">Account</button>
+        <button onclick="showSection('orders')">Orders</button>
+        <button onclick="logout()">Logout</button>
+      </nav>
+
+      <!-- Catalog -->
+      <div id="catalogSection" class="section">
+        <h2>Products</h2>
+        <div class="product-grid" id="productList"></div>
+      </div>
+
+      <!-- Account -->
+      <div id="accountSection" class="section hidden">
+        <h2>Account Information</h2>
+        <p><strong>UAC:</strong> <span id="accUAC"></span></p>
+        <p><strong>Username:</strong> <span id="accUsername"></span></p>
+        <p><strong>Phone:</strong> <span id="accPhone"></span></p>
+        <p><strong>Email:</strong> <span id="accEmail"></span></p>
+        <h3>Shipping Addresses</h3>
+        <div id="addressList"></div>
+        <button onclick="addAddress()">Add Address</button>
+        <br><br>
+        <button style="background:#b71c1c;" onclick="deleteAccount()">Delete Account</button>
+      </div>
+
+      <!-- Orders -->
+      <div id="ordersSection" class="section hidden">
+        <h2>Order History</h2>
+        <div id="orderHistory"></div>
+      </div>
+    </div>
+
+    <!-- Checkout Modal (Simple) -->
+    <div id="checkoutModal" class="hidden">
+      <div style="background:white; padding:20px; border-radius:8px; max-width:500px;">
+        <h2>Checkout</h2>
+        <div id="checkoutItems"></div>
+        <p><strong>Total:</strong> RM<span id="checkoutTotal"></span></p>
+        <select id="paymentMethod">
+          <option value="sociabuzz">Online Payment (Sociabuzz)</option>
+          <option value="tng">Touch 'n Go E-Wallet</option>
+        </select>
+        <br><br>
+        <button onclick="confirmOrder()">Confirm Order</button>
+        <button onclick="closeCheckout()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>    // 🔗 Gantikan dengan Web App URL kamu
+    const API_URL = "https://script.google.com/macros/s/AKfycbxoBicXth9HmFJRRHzMS1hJhiDAVA2uAW7uyJwIDhsNor27UZuDr2abBQ9nCJ3YLsUE/exec";
+
+    let currentUser = null;
+    let cart = JSON.parse(localStorage.getItem("mfd_cart")) || [];
+
+    // 🎯 Auth
+    function showRegister() {
+      document.getElementById("loginForm").classList.add("hidden");
+      document.getElementById("registerForm").classList.remove("hidden");
+    }
+    function showLogin() {
+      document.getElementById("registerForm").classList.add("hidden");
+      document.getElementById("loginForm").classList.remove("hidden");
+    }
+
+    async function register() {
+      const phone = document.getElementById("regPhone").value;
+      const password = document.getElementById("regPassword").value;
+      const email = document.getElementById("regEmail").value;
+      const username = document.getElementById("regUsername").value;
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "register", phone, password, email, username })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert("Registration successful! Please login.");
+        showLogin();
+      } else {
+        alert("Error: " + (data.error || "Unknown"));
+      }
+    }
+
+    async function login() {
+      const phone = document.getElementById("loginPhone").value;
+      const password = document.getElementById("loginPassword").value;
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "login", phone, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        currentUser = { uac: data.uac, username: data.username };
+        localStorage.setItem("mfd_uac", data.uac);
+        loadDashboard();
+      } else {
+        alert("Login failed: " + (data.error || "Invalid credentials"));      }
+    }
+
+    function logout() {
+      currentUser = null;
+      localStorage.removeItem("mfd_uac");
+      document.getElementById("dashboard").classList.add("hidden");
+      document.getElementById("authSection").classList.remove("hidden");
+    }
+
+    // 🖥️ Dashboard
+    function loadDashboard() {
+      document.getElementById("authSection").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
+      loadAccount();
+      loadProducts();
+      showSection("catalog");
+    }
+
+    function showSection(section) {
+      document.querySelectorAll("#catalogSection, #accountSection, #ordersSection").forEach(el => el.classList.add("hidden"));
+      document.getElementById(section + "Section").classList.remove("hidden");
+    }
+
+    // 🛍️ Products
+    async function loadProducts() {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "getProducts" })
+      });
+      const products = await res.json();
+      const list = document.getElementById("productList");
+      list.innerHTML = "";
+      products.forEach(p => {
+        const price = p.SalePrice !== null ? `RM${p.SalePrice}` : `RM${p.Price}`;
+        list.innerHTML += `
+          <div class="product-card">
+            <img src="${p.ImageURL}" class="product-img" onerror="this.src='https://via.placeholder.com/250?text=No+Image'">
+            <h3>${p.Name}</h3>
+            <p>${price} ${p.SalePrice !== null ? `<s>RM${p.Price}</s>` : ''}</p>
+            <p>⭐ ${p.Rating} | Sold: ${p.TotalSold}</p>
+            <button onclick='addToCart("${p.ItemID}", "${p.Name}", ${p.SalePrice !== null ? p.SalePrice : p.Price})'>Add to Cart</button>
+          </div>
+        `;
+      });
+    }
+
+    function addToCart(id, name, price) {
+      const qty = prompt(`How many ${name}? (1-100)`, "1");
+      if (!qty || isNaN(qty) || qty < 1 || qty > 100) return;      cart.push({ item_id: id, name, price: parseFloat(price), qty: parseInt(qty) });
+      localStorage.setItem("mfd_cart", JSON.stringify(cart));
+      alert(`${name} added to cart!`);
+    }
+
+    // 👤 Account
+    async function loadAccount() {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "getAccount", uac: currentUser.uac })
+      });
+      const acc = await res.json();
+      document.getElementById("accUAC").textContent = acc.UAC;
+      document.getElementById("accUsername").textContent = acc.Username;
+      document.getElementById("accPhone").textContent = acc.Phone;
+      document.getElementById("accEmail").textContent = acc.Email || "-";
+
+      // Alamat
+      const addrDiv = document.getElementById("addressList");
+      addrDiv.innerHTML = "";
+      acc.ShippingAddresses.forEach((addr, i) => {
+        addrDiv.innerHTML += `
+          <div style="border:1px solid #eee; padding:10px; margin:10px 0;">
+            <strong>${addr.label || "Address"}:</strong> ${addr.full_name}, ${addr.phone}<br>
+            ${addr.house_no}, ${addr.street}, Unit ${addr.unit_no}, ${addr.postal_code}
+          </div>
+        `;
+      });
+    }
+
+    function addAddress() {
+      alert("Alamat boleh ditambah melalui form lanjutan (untuk MVP, simpan di localStorage atau tambah manual dalam sheet).");
+    }
+
+    function deleteAccount() {
+      if (confirm("Are you sure? This will deactivate your account permanently.")) {
+        // In real system: call updateAccount with status = INACTIVE
+        alert("Account deletion simulated. In production, this would update your status to INACTIVE.");
+        logout();
+      }
+    }
+
+    // 📦 Checkout
+    function openCheckout() {
+      if (cart.length === 0) { alert("Cart is empty!"); return; }
+      let html = "";
+      let total = 0;
+      cart.forEach(item => {
+        const subtotal = item.price * item.qty;
+        total += subtotal;        html += `<p>${item.name} x${item.qty} = RM${subtotal.toFixed(2)}</p>`;
+      });
+      document.getElementById("checkoutItems").innerHTML = html;
+      document.getElementById("checkoutTotal").textContent = total.toFixed(2);
+      document.getElementById("checkoutModal").classList.remove("hidden");
+    }
+
+    async function confirmOrder() {
+      const method = document.getElementById("paymentMethod").value;
+      const paymentMethod = method === "sociabuzz" 
+        ? "Online payment: https://sociabuzz.com/fareezonzz_019/give" 
+        : "Touch N’Go E-Wallet: 161489981218";
+
+      const res = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "saveOrder",
+          uac: currentUser.uac,
+          items: cart,
+          totalAmount: cart.reduce((sum, i) => sum + i.price * i.qty, 0),
+          paymentMethod
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        alert(`Order placed! Order ID: ${data.orderId}\n\nPlease complete payment as instructed.`);
+        if (method === "tng") {
+          alert("Bayar tepat jumlah di atas ke 161489981218.\nHantar bukti ke WhatsApp +60145400413.");
+        }
+        cart = [];
+        localStorage.setItem("mfd_cart", "[]");
+        closeCheckout();
+      } else {
+        alert("Order failed: " + (data.error || "Unknown"));
+      }
+    }
+
+    function closeCheckout() {
+      document.getElementById("checkoutModal").classList.add("hidden");
+    }
+
+    // 🚀 Auto-login if UAC exists
+    window.onload = () => {
+      const savedUAC = localStorage.getItem("mfd_uac");
+      if (savedUAC) {
+        currentUser = { uac: savedUAC };
+        loadDashboard();
+      }
+    };
+    // Tambah butang checkout di navbar (opsional)
+    const nav = document.querySelector("nav");
+    const checkoutBtn = document.createElement("button");
+    checkoutBtn.textContent = "🛒 Cart (" + cart.length + ")";
+    checkoutBtn.onclick = openCheckout;
+    nav.appendChild(checkoutBtn);
+  </script>
+</body>
+</html>
