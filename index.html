@@ -14,7 +14,6 @@
       --text: #f0f0f0;
       --text-muted: #aaa;
       --primary: #d32f2f;
-      --success: #4caf50;
       --border: #333;
       --shadow: rgba(0,0,0,0.4);
     }
@@ -47,8 +46,8 @@
 
     h1 {
       font-size: 2.2rem;
-      font-weight: 700;      background: linear-gradient(90deg, #fff, #d32f2f);
-      -webkit-background-clip: text;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff, #d32f2f);      -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
       margin-bottom: 8px;
@@ -77,10 +76,9 @@
       display: block;
       margin-bottom: 6px;
       font-weight: 500;
-      color: var(--text);
     }
 
-    input, select, textarea, button {
+    input, select, button {
       width: 100%;
       padding: 12px;
       border-radius: 8px;
@@ -96,9 +94,9 @@
 
     button {
       background: var(--primary);
-      color: white;      border: none;
-      font-weight: 600;
-      cursor: pointer;
+      color: white;
+      border: none;
+      font-weight: 600;      cursor: pointer;
       transition: opacity 0.2s;
     }
 
@@ -117,13 +115,6 @@
       gap: 12px;
       margin-bottom: 24px;
       flex-wrap: wrap;
-    }
-
-    .nav-tabs button {
-      flex: 1;
-      min-width: 120px;
-      padding: 10px;
-      font-size: 0.95rem;
     }
 
     .product-grid {
@@ -137,216 +128,6 @@
       background: #252525;
       border-radius: 10px;
       overflow: hidden;
-      transition: transform 0.2s;
-    }
-
-    .product-card:hover {
-      transform: translateY(-4px);
-    }
-
-    .product-img {
-      width: 100%;      height: 200px;
-      object-fit: cover;
-      background: #333;
-    }
-
-    .product-info {
-      padding: 16px;
-    }
-
-    .product-title {
-      font-weight: 600;
-      margin-bottom: 8px;
-      font-size: 1.1rem;
-    }
-
-    .product-price {
-      font-size: 1.2rem;
-      color: var(--primary);
-Terima kasih kerana memberitahu isu ini — **ini adalah isu kritikal** yang perlu dibaiki segera.
-
-### ❌ Masalah Sebenar:
-> **"Buka HTML terus keluar payment method"**  
-→ Ini bermaksud **modal checkout muncul secara automatik** walaupun pengguna belum log masuk atau tambah barang ke troli.
-
-Dan lebih penting:  
-> **"Notis paksa"**  
-→ Kemungkinan besar disebabkan oleh **panggilan `alert()` atau `prompt()` yang dijalankan tanpa syarat**, atau **logik troli/cart tidak disemak dengan betul**.
-
----
-
-## 🔍 Punca Utama (Berdasarkan Kod Sebelum Ini)
-
-Dalam `index.html` versi sebelumnya, ada **dua isu utama**:
-
-### 1. **Troli (`cart`) diambil dari `localStorage` dan terus dipanggil `openCheckout()` jika ada item**
-Tetapi **tidak disemak sama ada pengguna sudah log masuk**.
-
-### 2. **Butang "Cart" dalam navbar memanggil `openCheckout()` secara langsung**
-Dan jika `cart.length > 0`, ia akan tunjuk modal — **walaupun pengguna belum log masuk!**
-
-Ini menyebabkan:
-- Pengguna **guest** (belum login) → buka laman → ada item dalam `localStorage` → modal checkout muncul
-- Sistem cuba hantar pesanan **tanpa UAC** → error di backend → frontend tunjuk notis
-
----
-
-## ✅ Penyelesaian: **Logik yang Betul & Selamat**
-
-Kita perlu pastikan:
-1. **Checkout hanya boleh dibuka jika pengguna sudah log masuk**2. **Jika guest ada item dalam troli, biarkan sahaja — jangan auto-buka checkout**
-3. **Semua panggilan ke backend mesti sertakan UAC (untuk logged-in user sahaja)**
-
----
-
-## 🛠️ BAIKI `index.html` – Versi Diperbetulkan
-
-Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>MFD Store • Showcase Panel</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #121212;
-      --card-bg: #1e1e1e;
-      --text: #f0f0f0;
-      --text-muted: #aaa;
-      --primary: #d32f2f;
-      --success: #4caf50;
-      --border: #333;
-      --shadow: rgba(0,0,0,0.4);
-    }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      line-height: 1.6;
-      padding: 20px;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    header {
-      text-align: center;
-      margin-bottom: 32px;
-      padding: 20px 0;
-    }
-
-    h1 {
-      font-size: 2.2rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, #fff, #d32f2f);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      margin-bottom: 8px;
-    }
-
-    .subtitle {
-      color: var(--text-muted);
-      font-size: 1rem;
-    }
-
-    .hidden { display: none; }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 12px var(--shadow);
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 500;
-      color: var(--text);
-    }
-
-    input, select, textarea, button {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: #2a2a2a;
-      color: var(--text);      font-size: 1rem;
-    }
-
-    input:focus, select:focus {
-      outline: 2px solid var(--primary);
-    }
-
-    button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-
-    button:hover {
-      opacity: 0.9;
-    }
-
-    button.secondary {
-      background: transparent;
-      border: 1px solid var(--primary);
-      color: var(--primary);
-    }
-
-    .nav-tabs {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-
-    .nav-tabs button {
-      flex: 1;
-      min-width: 120px;
-      padding: 10px;
-      font-size: 0.95rem;
-    }
-
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 24px;
-      margin-top: 16px;
-    }
-
-    .product-card {
-      background: #252525;
-      border-radius: 10px;      overflow: hidden;
-      transition: transform 0.2s;
-    }
-
-    .product-card:hover {
-      transform: translateY(-4px);
     }
 
     .product-img {
@@ -363,37 +144,11 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
     .product-title {
       font-weight: 600;
       margin-bottom: 8px;
-      font-size: 1.1rem;
     }
-
     .product-price {
       font-size: 1.2rem;
       color: var(--primary);
       margin: 8px 0;
-    }
-
-    .product-old-price {
-      text-decoration: line-through;
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-left: 8px;
-    }
-
-    .rating {
-      color: gold;
-      margin: 6px 0;
-    }
-
-    .address-item {
-      background: #2a2a2a;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 12px;
-    }
-    .order-item {
-      border-left: 3px solid var(--primary);
-      padding-left: 16px;
-      margin-bottom: 16px;
     }
 
     .toast {
@@ -422,15 +177,6 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
       color: var(--text-muted);
       font-size: 0.9rem;
     }
-
-    @media (max-width: 600px) {
-      .nav-tabs {
-        flex-direction: column;
-      }
-      h1 {
-        font-size: 1.8rem;
-      }
-    }
   </style>
 </head>
 <body>
@@ -439,16 +185,16 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
       <h1>MFD Store</h1>
       <p class="subtitle">Your premium showcase panel • Powered by Google Sheets</p>
     </header>
+
     <!-- Auth Section -->
     <div id="authSection">
       <div class="card" id="loginForm">
-        <h2 style="margin-bottom:16px;">Login to Your Account</h2>
+        <h2>Login to Your Account</h2>
         <div class="form-group">
-          <label for="loginPhone">Phone Number</label>
+          <label>Phone Number</label>
           <input type="text" id="loginPhone" placeholder="+60123456789" />
         </div>
-        <div class="form-group">
-          <label for="loginPassword">Password</label>
+        <div class="form-group">          <label>Password</label>
           <input type="password" id="loginPassword" placeholder="••••••••" />
         </div>
         <button onclick="login()">Login</button>
@@ -458,21 +204,21 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
       </div>
 
       <div class="card hidden" id="registerForm">
-        <h2 style="margin-bottom:16px;">Create New Account</h2>
+        <h2>Create New Account</h2>
         <div class="form-group">
-          <label for="regPhone">Phone Number (required)</label>
+          <label>Phone Number (required)</label>
           <input type="text" id="regPhone" placeholder="+60123456789" />
         </div>
         <div class="form-group">
-          <label for="regPassword">Password (min 6 characters)</label>
+          <label>Password (min 6 characters)</label>
           <input type="password" id="regPassword" placeholder="••••••••" />
         </div>
         <div class="form-group">
-          <label for="regEmail">Email (optional)</label>
+          <label>Email (optional)</label>
           <input type="email" id="regEmail" placeholder="you@example.com" />
         </div>
         <div class="form-group">
-          <label for="regUsername">Username (optional)</label>
+          <label>Username (optional)</label>
           <input type="text" id="regUsername" placeholder="e.g. ali_mfd" />
         </div>
         <button onclick="register()">Register Account</button>
@@ -488,47 +234,29 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
         <button onclick="showSection('catalog')">🛍️ Catalog</button>
         <button onclick="showSection('account')">👤 Account</button>
         <button onclick="showSection('orders')">📦 Orders</button>
-        <button class="secondary" onclick="logout()">🚪 Logout</button>        <button onclick="openCheckout()" id="cartBtn">🛒 Cart (<span id="cartCount">0</span>)</button>
+        <button class="secondary" onclick="logout()">🚪 Logout</button>
+        <button onclick="openCheckout()">🛒 Cart (<span id="cartCount">0</span>)</button>
       </div>
 
-      <!-- Catalog -->
-      <div id="catalogSection" class="section">
-        <div class="card">
-          <h2>Product Showcase</h2>
-          <p style="color:var(--text-muted); margin:8px 0;">All items are verified and ready for purchase.</p>
-          <div class="product-grid" id="productList">
-            <p>Loading products...</p>
-          </div>
+      <div id="catalogSection" class="card">
+        <h2>Product Showcase</h2>
+        <div class="product-grid" id="productList">
+          <p>Loading products...</p>
         </div>
       </div>
-
-      <!-- Account -->
-      <div id="accountSection" class="section hidden">
-        <div class="card">
-          <h2>Account Information</h2>
-          <p><strong>UAC:</strong> <span id="accUAC"></span></p>
-          <p><strong>Username:</strong> <span id="accUsername"></span></p>
-          <p><strong>Phone:</strong> <span id="accPhone"></span></p>
-          <p><strong>Email:</strong> <span id="accEmail">-</span></p>
-          
-          <h3 style="margin-top:24px;">Shipping Addresses</h3>
-          <div id="addressList">
-            <p>No saved addresses.</p>
-          </div>
-          <button class="secondary" style="margin-top:12px;" onclick="alert('Address management coming soon!')">+ Add Address</button>
-          
-          <button style="background:#b71c1c; margin-top:24px;" onclick="deleteAccount()">⚠️ Delete Account Permanently</button>
-        </div>
+      <div id="accountSection" class="card hidden">
+        <h2>Account Information</h2>
+        <p><strong>UAC:</strong> <span id="accUAC">-</span></p>
+        <p><strong>Username:</strong> <span id="accUsername">-</span></p>
+        <p><strong>Phone:</strong> <span id="accPhone">-</span></p>
+        <p><strong>Email:</strong> <span id="accEmail">-</span></p>
+        <button class="secondary" style="margin-top:16px;" onclick="alert('Address management coming soon!')">+ Add Address</button>
+        <button style="background:#b71c1c; margin-top:16px;" onclick="deleteAccount()">⚠️ Delete Account</button>
       </div>
 
-      <!-- Orders -->
-      <div id="ordersSection" class="section hidden">
-        <div class="card">
-          <h2>Order History</h2>
-          <div id="orderHistory">
-            <p>No orders yet.</p>
-          </div>
-        </div>
+      <div id="ordersSection" class="card hidden">
+        <h2>Order History</h2>
+        <div id="orderHistory">No orders yet.</div>
       </div>
     </div>
 
@@ -536,8 +264,8 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
     <div id="checkoutModal" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:1000;">
       <div class="card" style="max-width:500px; width:90%;">
         <h2>Confirm Order</h2>
-        <div id="checkoutItems" style="margin:16px 0;"></div>
-        <p><strong>Total Amount:</strong> RM<span id="checkoutTotal">0.00</span></p>        
+        <div id="checkoutItems"></div>
+        <p><strong>Total Amount:</strong> RM<span id="checkoutTotal">0.00</span></p>
         <div class="form-group">
           <label>Payment Method</label>
           <select id="paymentMethod">
@@ -545,7 +273,6 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
             <option value="tng">Touch 'n Go E-Wallet</option>
           </select>
         </div>
-        
         <div style="display:flex; gap:12px; margin-top:20px;">
           <button onclick="confirmOrder()">✅ Confirm Order</button>
           <button class="secondary" onclick="closeCheckout()">❌ Cancel</button>
@@ -553,7 +280,6 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
       </div>
     </div>
 
-    <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
     <footer>
@@ -566,9 +292,7 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
     const API_URL = "https://script.google.com/macros/s/AKfycbxoBicXth9HmFJRRHzMS1hJhiDAVA2uAW7uyJwIDhsNor27UZuDr2abBQ9nCJ3YLsUE/exec";
 
     let currentUser = null;
-    let cart = JSON.parse(localStorage.getItem("mfd_cart")) || [];
-
-    // Utility: Show toast message
+    let cart = [];
     function showToast(message, isError = false) {
       const toast = document.getElementById("toast");
       toast.textContent = message;
@@ -577,7 +301,6 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
       setTimeout(() => toast.classList.remove("show"), 3000);
     }
 
-    // Auth UI
     function showRegister() {
       document.getElementById("loginForm").classList.add("hidden");
       document.getElementById("registerForm").classList.remove("hidden");
@@ -586,41 +309,57 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
       document.getElementById("registerForm").classList.add("hidden");
       document.getElementById("loginForm").classList.remove("hidden");
     }
-    // Auth Logic
+
+    // ✅ Tidak ada auto-load cart dari localStorage sehingga login
+    function loadCart() {
+      if (currentUser) {
+        const saved = localStorage.getItem("mfd_cart_" + currentUser.uac);
+        cart = saved ? JSON.parse(saved) : [];
+        updateCartCount();
+      }
+    }
+
+    function saveCart() {
+      if (currentUser) {
+        localStorage.setItem("mfd_cart_" + currentUser.uac, JSON.stringify(cart));
+        updateCartCount();
+      }
+    }
+
+    function updateCartCount() {
+      document.getElementById("cartCount").textContent = cart.length;
+    }
+
     async function register() {
       const phone = document.getElementById("regPhone").value.trim();
       const password = document.getElementById("regPassword").value;
       const email = document.getElementById("regEmail").value.trim();
       const username = document.getElementById("regUsername").value.trim();
 
-      if (!phone || !password) return showToast("Phone and password are required.", true);
+      if (!phone || !password) return showToast("Phone and password required.", true);
       if (password.length < 6) return showToast("Password must be at least 6 characters.", true);
 
       try {
         const res = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+          method: "POST",          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "register", phone, password, email, username })
         });
         const data = await res.json();
-        
         if (data.success) {
-          showToast("Account created successfully! Please login.");
+          showToast("Account created! Please login.");
           showLogin();
         } else {
           showToast(data.error || "Registration failed.", true);
         }
       } catch (err) {
-        console.error(err);
-        showToast("Network error. Please try again.", true);
+        showToast("Network error.", true);
       }
     }
 
     async function login() {
       const phone = document.getElementById("loginPhone").value.trim();
       const password = document.getElementById("loginPassword").value;
-
-      if (!phone || !password) return showToast("Please fill in all fields.", true);
+      if (!phone || !password) return showToast("Please fill all fields.", true);
 
       try {
         const res = await fetch(API_URL, {
@@ -629,44 +368,35 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
           body: JSON.stringify({ action: "login", phone, password })
         });
         const data = await res.json();
-        
         if (data.success) {
           currentUser = { uac: data.uac, username: data.username };
-          localStorage.setItem("mfd_uac", data.uac);
-          loadDashboard();
+          loadCart(); // ✅ Baru muat troli selepas login
+          document.getElementById("authSection").classList.add("hidden");
+          document.getElementById("dashboard").classList.remove("hidden");
+          loadProducts();
+          showSection('catalog');
           showToast("Welcome back, " + data.username + "!");
-        } else {          showToast(data.error || "Login failed.", true);
+        } else {
+          showToast(data.error || "Login failed.", true);
         }
       } catch (err) {
-        console.error(err);
-        showToast("Failed to connect to server.", true);
+        showToast("Failed to connect.", true);
       }
     }
 
     function logout() {
       currentUser = null;
-      localStorage.removeItem("mfd_uac");
+      cart = [];
       document.getElementById("dashboard").classList.add("hidden");
       document.getElementById("authSection").classList.remove("hidden");
-      showToast("You have been logged out.");
-    }
-
-    // Dashboard
-    function loadDashboard() {
-      document.getElementById("authSection").classList.add("hidden");
-      document.getElementById("dashboard").classList.remove("hidden");
       updateCartCount();
-      loadAccount();
-      loadProducts();
-      showSection("catalog");
-    }
+      showToast("Logged out.");    }
 
     function showSection(section) {
       document.querySelectorAll("#catalogSection, #accountSection, #ordersSection").forEach(el => el.classList.add("hidden"));
       document.getElementById(section + "Section").classList.remove("hidden");
     }
 
-    // Products
     async function loadProducts() {
       try {
         const res = await fetch(API_URL, {
@@ -676,30 +406,20 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
         });
         const products = await res.json();
         const list = document.getElementById("productList");
-        
-        if (!Array.isArray(products)) {
-          list.innerHTML = `<p style="color:#f44336;">Error loading products.</p>`;
+        if (!Array.isArray(products) || products.length === 0) {
+          list.innerHTML = "<p>No products available.</p>";
           return;
         }
-
-        if (products.length === 0) {
-          list.innerHTML = `<p>No products available at the moment.</p>`;
-          return;        }
-
         list.innerHTML = products.map(p => {
           const price = p.SalePrice !== null ? p.SalePrice : p.Price;
           const displayPrice = `RM${price.toFixed(2)}`;
-          const oldPrice = p.SalePrice !== null ? `<span class="product-old-price">RM${p.Price.toFixed(2)}</span>` : '';
-          const ratingStars = "★".repeat(Math.floor(p.Rating)) + "☆".repeat(5 - Math.floor(p.Rating));
-
+          const oldPrice = p.SalePrice !== null ? `<span style="text-decoration:line-through;color:#aaa;">RM${p.Price.toFixed(2)}</span>` : '';
           return `
             <div class="product-card">
               <img src="${p.ImageURL || 'https://via.placeholder.com/240x200?text=No+Image'}" class="product-img" onerror="this.src='https://via.placeholder.com/240x200?text=No+Image'">
               <div class="product-info">
                 <div class="product-title">${p.Name}</div>
                 <div class="product-price">${displayPrice} ${oldPrice}</div>
-                <div class="rating">${ratingStars} (${p.Rating})</div>
-                <div style="color:var(--text-muted); font-size:0.9rem;">Sold: ${p.TotalSold}</div>
                 <button onclick='addToCart("${p.ItemID}", "${p.Name.replace(/"/g, '\\"')}", ${price})' 
                         style="margin-top:12px; background:#333; width:auto; padding:8px 16px;">
                   ➕ Add to Cart
@@ -709,103 +429,73 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
           `;
         }).join('');
       } catch (err) {
-        console.error(err);
-        document.getElementById("productList").innerHTML = `<p style="color:#f44336;">Failed to load products.</p>`;
+        document.getElementById("productList").innerHTML = "<p style='color:#f44336;'>Failed to load products.</p>";
       }
     }
 
     function addToCart(id, name, price) {
-      const qtyStr = prompt(`How many units of "${name}"?\n(Min: 1, Max: 100)`, "1");
-      const qty = parseInt(qtyStr);
-      if (!qtyStr || isNaN(qty) || qty < 1 || qty > 100) return;
+      if (!currentUser) {
+        showToast("Please log in to add items to cart.", true);
+        return;
+      }
+      const qtyStr = prompt(`How many units of "${name}"? (1-100)`, "1");
+      const qty = parseInt(qtyStr);      if (!qtyStr || isNaN(qty) || qty < 1 || qty > 100) return;
       
       cart.push({ item_id: id, name, price: parseFloat(price), qty });
-      localStorage.setItem("mfd_cart", JSON.stringify(cart));
-      updateCartCount();
+      saveCart();
       showToast(`${name} added to cart!`);
     }
 
-    function updateCartCount() {
-      document.getElementById("cartCount").textContent = cart.length;
-    }
-
-    // ✅ PERBAIKAN UTAMA: Hanya boleh buka checkout jika logged in
+    // ✅ INI ADALAH KUNCI: Hanya boleh dibuka jika logged in & ada item
     function openCheckout() {
-      if (!currentUser) {
-        showToast("Please log in to proceed with checkout.", true);
-        return;      }
+      if (!currentUser) return;
       if (cart.length === 0) {
-        showToast("Your cart is empty.", true);
+        showToast("Your cart is empty.");
         return;
       }
-      
+
+      // Validasi item
+      const validCart = cart.filter(item => 
+        item.item_id && 
+        typeof item.name === 'string' && 
+        item.price > 0 && 
+        Number.isInteger(item.qty) && 
+        item.qty >= 1
+      );
+
+      if (validCart.length === 0) {
+        cart = [];
+        saveCart();
+        showToast("Cart cleared due to invalid items.");
+        return;
+      }
+
       let html = "";
       let total = 0;
-      cart.forEach(item => {
+      validCart.forEach(item => {
         const subtotal = item.price * item.qty;
         total += subtotal;
         html += `<p>${item.name} × ${item.qty} = RM${subtotal.toFixed(2)}</p>`;
       });
-      
+
       document.getElementById("checkoutItems").innerHTML = html;
       document.getElementById("checkoutTotal").textContent = total.toFixed(2);
       document.getElementById("checkoutModal").classList.remove("hidden");
     }
 
-    // Account
-    async function loadAccount() {
-      if (!currentUser) return;
-      try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ action: "getAccount", uac: currentUser.uac })
-        });
-        const acc = await res.json();
-        
-        document.getElementById("accUAC").textContent = acc.UAC || "-";
-        document.getElementById("accUsername").textContent = acc.Username || "-";
-        document.getElementById("accPhone").textContent = acc.Phone || "-";
-        document.getElementById("accEmail").textContent = acc.Email || "-";
-
-        const addrDiv = document.getElementById("addressList");
-        if (acc.ShippingAddresses && acc.ShippingAddresses.length > 0) {
-          addrDiv.innerHTML = acc.ShippingAddresses.map(addr => `
-            <div class="address-item">
-              <strong>${addr.label || "Address"}:</strong> ${addr.full_name}<br>
-              ${addr.house_no}, ${addr.street}, Unit ${addr.unit_no}, ${addr.postal_code}<br>
-              Phone: ${addr.phone}
-            </div>
-          `).join('');
-        } else {
-          addrDiv.innerHTML = "<p>No saved addresses.</p>";
-        }
-      } catch (err) {
-        console.error(err);
-        showToast("Failed to load account info.", true);      }
-    }
-
-    function deleteAccount() {
-      if (confirm("⚠️ This will permanently deactivate your account.\nAre you sure?")) {
-        showToast("Account deletion simulated. In production, this would deactivate your profile.");
-        logout();
-      }
-    }
-
-    // ✅ PERBAIKAN: Pastikan hanya logged-in user boleh confirm order
     async function confirmOrder() {
       if (!currentUser) {
         closeCheckout();
         showToast("Session expired. Please log in again.", true);
         return;
       }
-
       const method = document.getElementById("paymentMethod").value;
       const paymentMethod = method === "sociabuzz" 
         ? "Online payment: https://sociabuzz.com/fareezonzz_019/give" 
         : "Touch 'n Go E-Wallet: 161489981218";
 
       try {
+        const total = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
         const res = await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -813,7 +503,7 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
             action: "saveOrder",
             uac: currentUser.uac,
             items: cart,
-            totalAmount: cart.reduce((sum, i) => sum + i.price * i.qty, 0),
+            totalAmount: total,
             paymentMethod
           })
         });
@@ -821,19 +511,16 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
         
         if (data.success) {
           cart = [];
-          localStorage.setItem("mfd_cart", "[]");
-          updateCartCount();
+          saveCart();
           closeCheckout();
-          
           if (method === "tng") {
-            alert("❗ Please pay EXACTLY the amount above to:\n\nTouch 'n Go: 161489981218\n\nThen send proof to WhatsApp: +60145400413");
+            alert("❗ Pay EXACTLY to:\nTNG: 161489981218\nThen send proof to WhatsApp: +60145400413");
           }
-          
-          showToast("Order placed successfully! Check your order history.");
+          showToast("Order placed successfully!");
         } else {
-          showToast(data.error || "Order failed.", true);        }
+          showToast(data.error || "Order failed.", true);
+        }
       } catch (err) {
-        console.error(err);
         showToast("Failed to place order.", true);
       }
     }
@@ -842,11 +529,18 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
       document.getElementById("checkoutModal").classList.add("hidden");
     }
 
-    // Auto-login on load
-    window.onload = () => {
+    function deleteAccount() {
+      if (confirm("⚠️ This will deactivate your account permanently.\nAre you sure?")) {
+        showToast("Account deletion simulated.");
+        logout();
+      }
+    }
+
+    // ✅ TIADA auto-checkout, TIADA auto-load troli untuk guest
+    window.onload = () => {      // Hanya cuba auto-login jika ada UAC
       const savedUAC = localStorage.getItem("mfd_uac");
       if (savedUAC) {
-        // Validate session by fetching account
+        // Validate via API
         fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -856,16 +550,18 @@ Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
         .then(data => {
           if (data.UAC) {
             currentUser = { uac: data.UAC, username: data.Username };
-            loadDashboard();
+            loadCart();
+            document.getElementById("authSection").classList.add("hidden");
+            document.getElementById("dashboard").classList.remove("hidden");
+            loadProducts();
+            showSection('catalog');
           } else {
             localStorage.removeItem("mfd_uac");
           }
         })
-        .catch(() => {
-          localStorage.removeItem("mfd_uac");
-        });
+        .catch(() => localStorage.removeItem("mfd_uac"));
       }
-      updateCartCount();
+      // Jangan updateCartCount di sini untuk guest
     };
   </script>
 </body>
