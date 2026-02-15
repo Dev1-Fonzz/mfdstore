@@ -163,6 +163,212 @@
     .product-price {
       font-size: 1.2rem;
       color: var(--primary);
+Terima kasih kerana memberitahu isu ini — **ini adalah isu kritikal** yang perlu dibaiki segera.
+
+### ❌ Masalah Sebenar:
+> **"Buka HTML terus keluar payment method"**  
+→ Ini bermaksud **modal checkout muncul secara automatik** walaupun pengguna belum log masuk atau tambah barang ke troli.
+
+Dan lebih penting:  
+> **"Notis paksa"**  
+→ Kemungkinan besar disebabkan oleh **panggilan `alert()` atau `prompt()` yang dijalankan tanpa syarat**, atau **logik troli/cart tidak disemak dengan betul**.
+
+---
+
+## 🔍 Punca Utama (Berdasarkan Kod Sebelum Ini)
+
+Dalam `index.html` versi sebelumnya, ada **dua isu utama**:
+
+### 1. **Troli (`cart`) diambil dari `localStorage` dan terus dipanggil `openCheckout()` jika ada item**
+Tetapi **tidak disemak sama ada pengguna sudah log masuk**.
+
+### 2. **Butang "Cart" dalam navbar memanggil `openCheckout()` secara langsung**
+Dan jika `cart.length > 0`, ia akan tunjuk modal — **walaupun pengguna belum log masuk!**
+
+Ini menyebabkan:
+- Pengguna **guest** (belum login) → buka laman → ada item dalam `localStorage` → modal checkout muncul
+- Sistem cuba hantar pesanan **tanpa UAC** → error di backend → frontend tunjuk notis
+
+---
+
+## ✅ Penyelesaian: **Logik yang Betul & Selamat**
+
+Kita perlu pastikan:
+1. **Checkout hanya boleh dibuka jika pengguna sudah log masuk**2. **Jika guest ada item dalam troli, biarkan sahaja — jangan auto-buka checkout**
+3. **Semua panggilan ke backend mesti sertakan UAC (untuk logged-in user sahaja)**
+
+---
+
+## 🛠️ BAIKI `index.html` – Versi Diperbetulkan
+
+Gantikan **keseluruhan kod `index.html`** dengan versi di bawah:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MFD Store • Showcase Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #121212;
+      --card-bg: #1e1e1e;
+      --text: #f0f0f0;
+      --text-muted: #aaa;
+      --primary: #d32f2f;
+      --success: #4caf50;
+      --border: #333;
+      --shadow: rgba(0,0,0,0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+      padding: 20px 0;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #fff, #d32f2f);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .hidden { display: none; }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    input, select, textarea, button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #2a2a2a;
+      color: var(--text);      font-size: 1rem;
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid var(--primary);
+    }
+
+    button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button.secondary {
+      background: transparent;
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .nav-tabs button {
+      flex: 1;
+      min-width: 120px;
+      padding: 10px;
+      font-size: 0.95rem;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .product-card {
+      background: #252525;
+      border-radius: 10px;      overflow: hidden;
+      transition: transform 0.2s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .product-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      background: #333;
+    }
+
+    .product-info {
+      padding: 16px;
+    }
+
+    .product-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 1.1rem;
+    }
+
+    .product-price {
+      font-size: 1.2rem;
+      color: var(--primary);
       margin: 8px 0;
     }
 
@@ -184,7 +390,6 @@
       border-radius: 8px;
       margin-bottom: 12px;
     }
-
     .order-item {
       border-left: 3px solid var(--primary);
       padding-left: 16px;
@@ -194,7 +399,8 @@
     .toast {
       position: fixed;
       bottom: 20px;
-      right: 20px;      background: var(--primary);
+      right: 20px;
+      background: var(--primary);
       color: white;
       padding: 12px 20px;
       border-radius: 8px;
@@ -233,7 +439,6 @@
       <h1>MFD Store</h1>
       <p class="subtitle">Your premium showcase panel • Powered by Google Sheets</p>
     </header>
-
     <!-- Auth Section -->
     <div id="authSection">
       <div class="card" id="loginForm">
@@ -243,7 +448,8 @@
           <input type="text" id="loginPhone" placeholder="+60123456789" />
         </div>
         <div class="form-group">
-          <label for="loginPassword">Password</label>          <input type="password" id="loginPassword" placeholder="••••••••" />
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" />
         </div>
         <button onclick="login()">Login</button>
         <p style="margin-top:16px; text-align:center;">
@@ -282,8 +488,7 @@
         <button onclick="showSection('catalog')">🛍️ Catalog</button>
         <button onclick="showSection('account')">👤 Account</button>
         <button onclick="showSection('orders')">📦 Orders</button>
-        <button class="secondary" onclick="logout()">🚪 Logout</button>
-        <button onclick="openCheckout()" id="cartBtn">🛒 Cart (<span id="cartCount">0</span>)</button>
+        <button class="secondary" onclick="logout()">🚪 Logout</button>        <button onclick="openCheckout()" id="cartBtn">🛒 Cart (<span id="cartCount">0</span>)</button>
       </div>
 
       <!-- Catalog -->
@@ -292,7 +497,8 @@
           <h2>Product Showcase</h2>
           <p style="color:var(--text-muted); margin:8px 0;">All items are verified and ready for purchase.</p>
           <div class="product-grid" id="productList">
-            <p>Loading products...</p>          </div>
+            <p>Loading products...</p>
+          </div>
         </div>
       </div>
 
@@ -331,8 +537,7 @@
       <div class="card" style="max-width:500px; width:90%;">
         <h2>Confirm Order</h2>
         <div id="checkoutItems" style="margin:16px 0;"></div>
-        <p><strong>Total Amount:</strong> RM<span id="checkoutTotal">0.00</span></p>
-        
+        <p><strong>Total Amount:</strong> RM<span id="checkoutTotal">0.00</span></p>        
         <div class="form-group">
           <label>Payment Method</label>
           <select id="paymentMethod">
@@ -341,7 +546,8 @@
           </select>
         </div>
         
-        <div style="display:flex; gap:12px; margin-top:20px;">          <button onclick="confirmOrder()">✅ Confirm Order</button>
+        <div style="display:flex; gap:12px; margin-top:20px;">
+          <button onclick="confirmOrder()">✅ Confirm Order</button>
           <button class="secondary" onclick="closeCheckout()">❌ Cancel</button>
         </div>
       </div>
@@ -380,7 +586,6 @@
       document.getElementById("registerForm").classList.add("hidden");
       document.getElementById("loginForm").classList.remove("hidden");
     }
-
     // Auth Logic
     async function register() {
       const phone = document.getElementById("regPhone").value.trim();
@@ -390,6 +595,7 @@
 
       if (!phone || !password) return showToast("Phone and password are required.", true);
       if (password.length < 6) return showToast("Password must be at least 6 characters.", true);
+
       try {
         const res = await fetch(API_URL, {
           method: "POST",
@@ -429,8 +635,7 @@
           localStorage.setItem("mfd_uac", data.uac);
           loadDashboard();
           showToast("Welcome back, " + data.username + "!");
-        } else {
-          showToast(data.error || "Login failed.", true);
+        } else {          showToast(data.error || "Login failed.", true);
         }
       } catch (err) {
         console.error(err);
@@ -439,7 +644,8 @@
     }
 
     function logout() {
-      currentUser = null;      localStorage.removeItem("mfd_uac");
+      currentUser = null;
+      localStorage.removeItem("mfd_uac");
       document.getElementById("dashboard").classList.add("hidden");
       document.getElementById("authSection").classList.remove("hidden");
       showToast("You have been logged out.");
@@ -478,8 +684,7 @@
 
         if (products.length === 0) {
           list.innerHTML = `<p>No products available at the moment.</p>`;
-          return;
-        }
+          return;        }
 
         list.innerHTML = products.map(p => {
           const price = p.SalePrice !== null ? p.SalePrice : p.Price;
@@ -488,7 +693,8 @@
           const ratingStars = "★".repeat(Math.floor(p.Rating)) + "☆".repeat(5 - Math.floor(p.Rating));
 
           return `
-            <div class="product-card">              <img src="${p.ImageURL || 'https://via.placeholder.com/240x200?text=No+Image'}" class="product-img" onerror="this.src='https://via.placeholder.com/240x200?text=No+Image'">
+            <div class="product-card">
+              <img src="${p.ImageURL || 'https://via.placeholder.com/240x200?text=No+Image'}" class="product-img" onerror="this.src='https://via.placeholder.com/240x200?text=No+Image'">
               <div class="product-info">
                 <div class="product-title">${p.Name}</div>
                 <div class="product-price">${displayPrice} ${oldPrice}</div>
@@ -523,6 +729,29 @@
       document.getElementById("cartCount").textContent = cart.length;
     }
 
+    // ✅ PERBAIKAN UTAMA: Hanya boleh buka checkout jika logged in
+    function openCheckout() {
+      if (!currentUser) {
+        showToast("Please log in to proceed with checkout.", true);
+        return;      }
+      if (cart.length === 0) {
+        showToast("Your cart is empty.", true);
+        return;
+      }
+      
+      let html = "";
+      let total = 0;
+      cart.forEach(item => {
+        const subtotal = item.price * item.qty;
+        total += subtotal;
+        html += `<p>${item.name} × ${item.qty} = RM${subtotal.toFixed(2)}</p>`;
+      });
+      
+      document.getElementById("checkoutItems").innerHTML = html;
+      document.getElementById("checkoutTotal").textContent = total.toFixed(2);
+      document.getElementById("checkoutModal").classList.remove("hidden");
+    }
+
     // Account
     async function loadAccount() {
       if (!currentUser) return;
@@ -538,6 +767,7 @@
         document.getElementById("accUsername").textContent = acc.Username || "-";
         document.getElementById("accPhone").textContent = acc.Phone || "-";
         document.getElementById("accEmail").textContent = acc.Email || "-";
+
         const addrDiv = document.getElementById("addressList");
         if (acc.ShippingAddresses && acc.ShippingAddresses.length > 0) {
           addrDiv.innerHTML = acc.ShippingAddresses.map(addr => `
@@ -552,8 +782,7 @@
         }
       } catch (err) {
         console.error(err);
-        showToast("Failed to load account info.", true);
-      }
+        showToast("Failed to load account info.", true);      }
     }
 
     function deleteAccount() {
@@ -563,30 +792,21 @@
       }
     }
 
-    // Checkout
-    function openCheckout() {
-      if (cart.length === 0) return showToast("Your cart is empty.", true);
-      
-      let html = "";
-      let total = 0;
-      cart.forEach(item => {
-        const subtotal = item.price * item.qty;
-        total += subtotal;
-        html += `<p>${item.name} × ${item.qty} = RM${subtotal.toFixed(2)}</p>`;
-      });
-      
-      document.getElementById("checkoutItems").innerHTML = html;
-      document.getElementById("checkoutTotal").textContent = total.toFixed(2);
-      document.getElementById("checkoutModal").classList.remove("hidden");
-    }
-
+    // ✅ PERBAIKAN: Pastikan hanya logged-in user boleh confirm order
     async function confirmOrder() {
+      if (!currentUser) {
+        closeCheckout();
+        showToast("Session expired. Please log in again.", true);
+        return;
+      }
+
       const method = document.getElementById("paymentMethod").value;
       const paymentMethod = method === "sociabuzz" 
         ? "Online payment: https://sociabuzz.com/fareezonzz_019/give" 
         : "Touch 'n Go E-Wallet: 161489981218";
 
-      try {        const res = await fetch(API_URL, {
+      try {
+        const res = await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -610,10 +830,8 @@
           }
           
           showToast("Order placed successfully! Check your order history.");
-          loadAccount(); // Refresh orders
         } else {
-          showToast(data.error || "Order failed.", true);
-        }
+          showToast(data.error || "Order failed.", true);        }
       } catch (err) {
         console.error(err);
         showToast("Failed to place order.", true);
@@ -628,8 +846,24 @@
     window.onload = () => {
       const savedUAC = localStorage.getItem("mfd_uac");
       if (savedUAC) {
-        currentUser = { uac: savedUAC };
-        loadDashboard();
+        // Validate session by fetching account
+        fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "getAccount", uac: savedUAC })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.UAC) {
+            currentUser = { uac: data.UAC, username: data.Username };
+            loadDashboard();
+          } else {
+            localStorage.removeItem("mfd_uac");
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem("mfd_uac");
+        });
       }
       updateCartCount();
     };
