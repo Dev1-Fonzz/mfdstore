@@ -10,7 +10,6 @@
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            --purple-pink: linear-gradient(135deg, #9D50BB 0%, #6E48AA 50%, #E8CBC0 100%);
             --glass-bg: rgba(255, 255, 255, 0.75);
             --glass-border: rgba(255, 255, 255, 0.6);
             --text-dark: #2d3748;
@@ -47,8 +46,8 @@
             background-size: 300% auto;
             animation: shine 4s linear infinite;
             font-weight: 800;
-        }        @keyframes shine { to { background-position: 300% center; } }
-        .btn-glitter {
+        }
+        @keyframes shine { to { background-position: 300% center; } }        .btn-glitter {
             background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2);
             background-size: 300% 300%;
             animation: gradientMove 4s ease infinite;
@@ -96,10 +95,11 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
         ::-webkit-scrollbar-thumb { background: #9D50BB; border-radius: 3px; }
-        .fade-in { animation: fadeIn 0.5s ease-in; }        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .tab-active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .error-box { background: #fed7d7; border: 2px solid #fc8181; color: #c53030; padding: 15px; border-radius: 10px; margin: 10px 0; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }        .error-box { background: #fed7d7; border: 2px solid #fc8181; color: #c53030; padding: 15px; border-radius: 10px; margin: 10px 0; }
         .success-box { background: #c6f6d5; border: 2px solid #68d391; color: #22543d; padding: 15px; border-radius: 10px; margin: 10px 0; }
+        .delete-btn { background: #fed7d7; color: #c53030; padding: 5px 10px; border-radius: 5px; font-size: 0.65rem; font-weight: bold; cursor: pointer; }
+        .delete-btn:hover { background: #fc8181; color: white; }
     </style>
 </head>
 <body class="p-0 md:p-4">
@@ -188,7 +188,7 @@
             </div>
         </section>
 
-        <!-- 3. USER DASHBOARD (FIXED) -->
+        <!-- 3. USER DASHBOARD -->
         <section id="view-dashboard" class="hidden-section">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
                 <div class="glass-panel p-4 md:p-6 lg:col-span-1 h-fit">
@@ -216,8 +216,7 @@
                         <span>My Orders</span>
                         <span class="text-[10px] bg-purple-100 text-purple-600 px-2 py-1 rounded-full animate-pulse">Live Update</span>
                     </h3>
-                    
-                    <!-- Order Status Tabs -->
+                    <div id="dashboard-message"></div>
                     <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar">
                         <button onclick="filterOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 transition">All</button>
                         <button onclick="filterOrders('To Pay')" class="px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200 transition">To Pay</button>
@@ -227,11 +226,6 @@
                         <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200 transition">Return</button>
                         <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200 transition">Cancelled</button>
                     </div>
-
-                    <!-- Error/Success Messages -->
-                    <div id="dashboard-message"></div>
-
-                    <!-- Order Table -->
                     <div class="table-container">
                         <table class="custom-table">
                             <thead>
@@ -243,13 +237,13 @@
                                     <th>Qty</th>
                                     <th>Harga</th>
                                     <th>Payment</th>
-                                    <th>Status</th>                                    <th>Tracking No</th>
+                                    <th>Status</th>
+                                    <th>Tracking No</th>
                                     <th>ID Pesanan</th>
                                     <th>Rating</th>
                                     <th>Tindakan</th>
                                 </tr>
-                            </thead>
-                            <tbody id="user-order-history">
+                            </thead>                            <tbody id="user-order-history">
                                 <tr><td colspan="12" class="text-center py-8 text-gray-500">Memuatkan data pesanan...</td></tr>
                             </tbody>
                         </table>
@@ -257,7 +251,6 @@
                     <div id="no-orders-msg" class="hidden-section text-center py-8 text-gray-500">
                         <i class="fas fa-inbox text-4xl mb-2 opacity-50"></i>
                         <p>Belum ada sejarah pesanan.</p>
-                        <p class="text-xs mt-2">Jika anda baru membuat pesanan, sila refresh page.</p>
                     </div>
                 </div>
             </div>
@@ -292,14 +285,14 @@
                         <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
                         <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
                         <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
-                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg"><i class="fas fa-paper-plane"></i></button>                    </div>
+                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg"><i class="fas fa-paper-plane"></i></button>
+                    </div>
                     <div class="text-[10px] text-gray-400 mt-1 text-center">Auto-update 1 detik • Sound Effects Enabled</div>
                 </div>
             </div>
         </section>
 
-        <!-- 5. ADMIN DASHBOARD -->
-        <section id="view-admin" class="hidden-section">
+        <!-- 5. ADMIN DASHBOARD -->        <section id="view-admin" class="hidden-section">
             <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white shadow-xl rounded-2xl">
                 <div class="flex justify-between items-center">
                     <div>
@@ -341,14 +334,14 @@
                     </select>
                     <input type="url" id="prod-img-url" placeholder="Paste Image URL Here (https://...)" class="md:col-span-2">
                     <textarea id="prod-desc" placeholder="Deskripsi Item" class="md:col-span-2"></textarea>
-                </div>                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
+                </div>
+                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
                 <h3 class="font-bold mt-8 mb-4 text-purple-700">Senarai Produk Dilancarkan</h3>
                 <div class="table-container">
                     <table class="custom-table">
                         <thead>
                             <tr><th>BIL</th><th>GAMBAR</th><th>NAMA ITEM</th><th>HARGA JUALAN</th><th>RATING</th><th>STATUS</th><th>TOTAL SOLD</th><th>EDIT</th></tr>
-                        </thead>
-                        <tbody id="admin-prod-list"></tbody>
+                        </thead>                        <tbody id="admin-prod-list"></tbody>
                     </table>
                 </div>
             </div>
@@ -390,14 +383,14 @@
                         <textarea id="admin-msg-input" rows="1" class="m-0 flex-1 text-sm" placeholder="Reply to customer..."></textarea>
                         <button onclick="sendAdminMessage()" class="btn-glitter px-4 rounded-lg text-sm">Send</button>
                     </div>
-                </div>            </div>
+                </div>
+            </div>
         </section>
 
     </main>
 
     <!-- CART MODAL -->
-    <div id="modal-cart" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
+    <div id="modal-cart" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">        <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
             <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500 transition">&times;</button>
             <h2 class="text-2xl font-bold mb-4 glitter-text">Checkout Station</h2>
             <div id="cart-items" class="space-y-3 mb-6"></div>
@@ -419,7 +412,7 @@
         </div>
     </div>
 
-    <!-- FIREBASE LOGIC (FIXED) -->
+    <!-- FIREBASE LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
@@ -439,29 +432,26 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
+
         let currentUser = null;
         let userData = {};
         let cart = [];
         let allProducts = [];
         let allUserOrders = [];
         let currentChatPartner = null;
-        let unsubscribeChat = null;
-        let unsubscribeOrders = null;
+        let unsubscribeChat = null;        let unsubscribeOrders = null;
 
-        // Sound Effects
         window.playSound = (type) => {
             const sounds = { 'click': document.getElementById('snd-click'), 'success': document.getElementById('snd-success'), 'error': document.getElementById('snd-error'), 'msg': document.getElementById('snd-msg') };
             if(sounds[type]) { sounds[type].currentTime = 0; sounds[type].play().catch(()=>{}); }
         };
 
-        // Show Dashboard Message
         function showDashboardMessage(message, type = 'success') {
             const msgBox = document.getElementById('dashboard-message');
             msgBox.innerHTML = `<div class="${type === 'error' ? 'error-box' : 'success-box'}">${message}</div>`;
             setTimeout(() => { msgBox.innerHTML = ''; }, 5000);
         }
 
-        // Navigation
         window.navTo = (viewId) => {
             playSound('click');
             document.querySelectorAll('section').forEach(el => el.classList.add('hidden-section'));
@@ -484,11 +474,11 @@
             m.classList.contains('hidden-section') ? (renderCartItems(), m.classList.remove('hidden-section')) : m.classList.add('hidden-section');
         };
 
-        // Authentication
         window.doRegister = async () => {
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
-            const phone = document.getElementById('reg-phone').value;            if(!email || !pass) return alert("Email & Password diperlukan");
+            const phone = document.getElementById('reg-phone').value;
+            if(!email || !pass) return alert("Email & Password diperlukan");
             try {
                 const cred = await createUserWithEmailAndPassword(auth, email, pass);
                 const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
@@ -498,7 +488,6 @@
                 playSound('success'); alert("Berjaya didaftarkan! Sila login."); navTo('login');
             } catch(e) { playSound('error'); alert(e.message); }
         };
-
         window.doLogin = async () => {
             try {
                 await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value);
@@ -517,7 +506,6 @@
             }
         };
 
-        // Products
         async function loadProducts() {
             try {
                 const snap = await getDocs(collection(db, "products"));
@@ -537,7 +525,8 @@
             if(sort === 'highest') filtered.sort((a,b) => (b.totalSold || 0) - (a.totalSold || 0));
             if(sort === 'event') filtered = filtered.filter(p => p.event);
             if(filtered.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Tiada produk dijumpai.</div>`; return; }
-            grid.innerHTML = filtered.map(p => `                <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition">
+            grid.innerHTML = filtered.map(p => `
+                <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition">
                     <img src="${p.imageUrl||'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg mb-2 bg-gray-200" onerror="this.src='https://via.placeholder.com/150?text=Error'">
                     <h3 class="font-bold text-sm text-gray-800 leading-tight">${p.name}</h3>
                     ${p.event ? `<span class="text-[10px] text-pink-600 font-bold">#${p.event}</span>` : ''}
@@ -549,7 +538,6 @@
                     <button onclick="addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2 shadow">Add to Cart</button>
                 </div>`).join('');
         };
-
         window.addToCart = (id) => { cart.push(allProducts.find(x=>x.id===id)); document.getElementById('cart-count').innerText=cart.length; playSound('success'); };
 
         function renderCartItems() {
@@ -563,7 +551,6 @@
             document.getElementById('cart-total').innerText = "RM "+total.toFixed(2);
         }
 
-        // Submit Order (FIXED)
         window.submitOrder = async () => {
             if(!currentUser) return alert("Sila login dahulu");
             if(cart.length===0) return alert("Cart kosong");
@@ -586,7 +573,8 @@
                     address: userData.address,
                     trackingNo: tracking, 
                     orderId: orderId, 
-                    paymentMethod: "Manual Transfer (TNG/Sociabuzz)",                     paymentStatus: "Not Verified", 
+                    paymentMethod: "Manual Transfer (TNG/Sociabuzz)", 
+                    paymentStatus: "Not Verified", 
                     status: "To Pay", 
                     adminNote: "", 
                     userRating: null, 
@@ -598,12 +586,10 @@
                 await addDoc(collection(db, "orders"), orderData);
                 
                 cart=[]; 
-                document.getElementById('cart-count').innerText=0; 
-                toggleCartModal(); 
+                document.getElementById('cart-count').innerText=0;                 toggleCartModal(); 
                 playSound('success'); 
                 showDashboardMessage("✅ Pesanan berjaya dibuat! Sila buat pembayaran dan rujuk tab 'To Pay'.", 'success');
                 
-                // Force reload orders
                 setTimeout(() => {
                     loadUserData();
                     navTo('dashboard');
@@ -616,17 +602,12 @@
             }
         };
 
-        // Load User Data (FIXED WITH FALLBACK)
         async function loadUserData() {
-            if(!currentUser) {
-                console.log("No current user");
-                return;
-            }
+            if(!currentUser) { console.log("No current user"); return; }
             
             console.log("Loading user data for:", currentUser.uid);
             showDashboardMessage("🔄 Memuatkan data...", 'success');
 
-            // Load Profile
             try {
                 onSnapshot(doc(db, "users", currentUser.uid), (d)=>{ 
                     if(d.exists()){ 
@@ -635,19 +616,17 @@
                         console.log("User data loaded:", userData);
                     } else {
                         console.error("User document missing!");
-                        showDashboardMessage("❌ Data pengguna tidak dijumpai!", 'error');                    }
+                        showDashboardMessage("❌ Data pengguna tidak dijumpai!", 'error');
+                    }
                 });
             } catch(e) {
                 console.error("Error loading profile:", e);
                 showDashboardMessage("❌ Error loading profile: " + e.message, 'error');
             }
 
-            // Cancel previous listener
             if(unsubscribeOrders) unsubscribeOrders();
 
-            // Load Orders with FALLBACK query
             try {
-                // Try indexed query first
                 const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
                 
                 console.log("Setting up order listener with index...");
@@ -656,8 +635,7 @@
                     allUserOrders = []; 
                     snap.forEach(d => {
                         const orderData = d.data();
-                        allUserOrders.push({id:d.id, ...orderData});
-                    });
+                        allUserOrders.push({id:d.id, ...orderData});                    });
                     console.log("All user orders:", allUserOrders);
                     filterOrders('all');
                     if(snap.size > 0) {
@@ -667,7 +645,6 @@
                     console.error("Error getting orders with index:", error);
                     console.error("Error code:", error.code);
                     
-                    // Fallback: Try without orderBy if index missing
                     if(error.code === 'failed-precondition' || error.code === 'permission-denied') {
                         console.log("Trying fallback query without orderBy...");
                         loadOrdersFallback();
@@ -681,10 +658,10 @@
             }
         }
 
-        // Fallback function to load orders without orderBy
         async function loadOrdersFallback() {
             try {
-                console.log("Using fallback query...");                const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid));
+                console.log("Using fallback query...");
+                const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid));
                 const snapshot = await getDocs(q);
                 
                 allUserOrders = [];
@@ -692,7 +669,6 @@
                     allUserOrders.push({id:d.id, ...d.data()});
                 });
                 
-                // Sort manually by createdAt
                 allUserOrders.sort((a, b) => {
                     const aTime = a.createdAt?.toDate?.() || a.createdAt || 0;
                     const bTime = b.createdAt?.toDate?.() || b.createdAt || 0;
@@ -708,8 +684,7 @@
                     showDashboardMessage('ℹ️ Belum ada pesanan', 'success');
                 }
             } catch(e) {
-                console.error("Fallback query failed:", e);
-                showDashboardMessage("❌ Error loading orders: " + e.message, 'error');
+                console.error("Fallback query failed:", e);                showDashboardMessage("❌ Error loading orders: " + e.message, 'error');
                 document.getElementById('user-order-history').innerHTML = `<tr><td colspan="12" class="text-center text-red-500 py-8">Error: ${e.message}</td></tr>`;
             }
         }
@@ -733,9 +708,9 @@
             } catch(e) {
                 playSound('error');
                 showDashboardMessage("❌ Error: " + e.message, 'error');
-            }        };
+            }
+        };
 
-        // Filter Orders
         window.filterOrders = (status) => {
             const tbody = document.getElementById('user-order-history');
             const noMsg = document.getElementById('no-orders-msg');
@@ -758,8 +733,7 @@
                 if(o.status==='To Ship') badgeClass='badge-to-ship';
                 else if(o.status==='To Receive') badgeClass='badge-to-receive';
                 else if(o.status==='Completed') badgeClass='badge-completed';
-                else if(o.status==='Cancelled') badgeClass='badge-cancelled';
-                else if(o.status==='Return/Refund') badgeClass='badge-refund';
+                else if(o.status==='Cancelled') badgeClass='badge-cancelled';                else if(o.status==='Return/Refund') badgeClass='badge-refund';
                 let actions = '';
                 if(o.status==='To Pay') actions = `<button onclick="cancelOrder('${o.id}')" class="text-red-600 font-bold text-[10px] hover:underline border border-red-200 px-1 py-0.5 rounded bg-red-50">Cancel</button>`;
                 if(o.status==='To Receive') actions = `<button onclick="completeOrder('${o.id}')" class="text-green-600 font-bold text-[10px] hover:underline border border-green-200 px-1 py-0.5 rounded bg-green-50">Received</button>`;
@@ -782,14 +756,14 @@
                     <td class="text-center">${o.userRating ? '⭐'+o.userRating : '-'}</td>
                     <td class="text-center">${actions}</td>
                 </tr>`;
-            }).join('');        };
+            }).join('');
+        };
 
         window.cancelOrder = async (id) => { if(confirm("Batal pesanan?")) { await updateDoc(doc(db,"orders",id), {status:'Cancelled'}); playSound('error'); showDashboardMessage("❌ Pesanan dibatalkan", 'error'); } };
         window.completeOrder = async (id) => { await updateDoc(doc(db,"orders",id), {status:'Completed'}); playSound('success'); showDashboardMessage("✅ Pesanan selesai!", 'success'); };
         window.rateOrder = async (id) => { const r=prompt("Berikan rating (1-5):","5"); if(r) { await updateDoc(doc(db,"orders",id),{userRating:parseInt(r)}); playSound('success'); showDashboardMessage("⭐ Rating dihantar!", 'success'); } };
         window.reorder = (id) => { const order = allUserOrders.find(o => o.id === id); if(order) { cart = [...cart, ...order.items]; document.getElementById('cart-count').innerText = cart.length; playSound('success'); showDashboardMessage("🛒 Item ditambah ke cart!", 'success'); } };
 
-        // Chat Functions
         async function loadChatList() {
             if(!currentUser) return navTo('login');
             const listEl = document.getElementById('chat-list-view');
@@ -808,8 +782,7 @@
                                 listEl.innerHTML += `<div onclick="openChat('${partnerId}', '${p.username}')" class="p-3 bg-white/50 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition shadow-sm">
                                     <div class="flex items-center gap-3"><div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">${p.username[0]}</div>
                                     <div><h4 class="font-bold text-sm">${p.username}</h4><p class="text-xs text-gray-500 truncate w-40">${data.lastMessage || "Mula perbualan"}</p></div></div>
-                                    <span class="text-[10px] text-gray-400">${data.lastTime ? new Date(data.lastTime.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span></div>`;
-                            }
+                                    <span class="text-[10px] text-gray-400">${data.lastTime ? new Date(data.lastTime.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span></div>`;                            }
                         });
                     });
                 });
@@ -831,7 +804,8 @@
             currentChatPartner = partnerId;
             document.getElementById('chat-list-view').classList.add('hidden-section');
             document.getElementById('active-chat-view').classList.remove('hidden-section');
-            document.getElementById('chat-partner-name').innerText = partnerName;            const chatId = [currentUser.uid, partnerId].sort().join('_');
+            document.getElementById('chat-partner-name').innerText = partnerName;
+            const chatId = [currentUser.uid, partnerId].sort().join('_');
             const msgContainer = document.getElementById('chat-messages');
             msgContainer.innerHTML = '<div class="text-center text-xs text-gray-500 mt-4">Memuatkan mesej...</div>';
             if(unsubscribeChat) unsubscribeChat();
@@ -857,8 +831,7 @@
 
         window.sendMessage = async () => { const input = document.getElementById('msg-input'); const text = input.value.trim(); if(!text || !currentChatPartner) return; await saveMessage(text, 'text'); input.value = ''; };
 
-        async function saveMessage(text, type, url = null, address = null) {
-            const chatId = [currentUser.uid, currentChatPartner].sort().join('_');
+        async function saveMessage(text, type, url = null, address = null) {            const chatId = [currentUser.uid, currentChatPartner].sort().join('_');
             await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, text: text, type: type, url: url, address: address, timestamp: serverTimestamp(), read: false, isPinned: false });
             await setDoc(doc(db, "chats", chatId), { participants: [currentUser.uid, currentChatPartner], lastMessage: type==='text'?text:'[Image]', lastTime: serverTimestamp() }, {merge:true});
             playSound('msg');
@@ -880,7 +853,8 @@
         window.handleAdminFileUpload = async (input) => {
             const file = input.files[0];
             if(!file || !currentChatPartner) return;
-            try {                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
+            try {
+                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
                 await uploadBytes(storageRef, file);
                 const url = await getDownloadURL(storageRef);
                 await saveMessage('', 'image', url);
@@ -891,7 +865,6 @@
 
         window.sendLocation = async () => { const addr = prompt("Masukkan alamat atau nama lokasi:"); if(addr) { await saveMessage('', 'location', null, addr); } };
 
-        // Admin Functions
         window.loadAdminData = async () => {
             if(userData.role !== 'admin') return navTo('home');
             const ordSnap = await getDocs(query(collection(db, "orders"), orderBy("createdAt","desc")));
@@ -907,8 +880,7 @@
             document.getElementById('admin-user-list').innerHTML = users.filter(u=>u.status!=='BLOCKED').map(u=>`<tr><td class="font-mono text-[10px]">${u.uac}</td><td class="font-bold text-xs">${u.username}</td><td class="text-[10px] text-gray-400">******</td><td class="text-xs">${u.phone}</td><td class="text-[10px] max-w-xs truncate">${u.address||'-'}</td><td><span class="badge badge-active">${u.status}</span></td><td>-</td><td><button onclick="blockUser('${u.id}')" class="text-red-500 text-[10px] font-bold hover:underline">Block</button></td></tr>`).join('');
             document.getElementById('admin-blacklist-list').innerHTML = users.filter(u=>u.status==='BLOCKED').map(u=>`<tr><td class="font-mono text-[10px]">${u.uac}</td><td class="font-bold text-red-600 text-xs">${u.username}</td><td><span class="badge badge-blocked">BLOCKED</span></td><td class="text-[10px]">${u.logCache?new Date(u.logCache.toDate()).toLocaleString():'-'}</td><td><button onclick="unblockUser('${u.id}')" class="text-green-500 text-[10px] font-bold hover:underline">Unblock</button></td></tr>`).join('');
             const prodSnap = await getDocs(collection(db, "products"));
-            document.getElementById('admin-prod-list').innerHTML = prodSnap.docs.map((d,i)=>{ const p=d.data(); return `<tr><td>${i+1}</td><td><img src="${p.imageUrl}" class="w-8 h-8 rounded object-cover" onerror="this.src='https://via.placeholder.com/30'"></td><td class="font-bold text-xs">${p.name}</td><td class="text-xs">RM ${p.price}</td><td class="text-xs">⭐ ${p.rating||5.0}</td><td><span class="badge ${p.status==='Public'?'badge-active':'badge-cancelled'}">${p.status}</span></td><td class="text-xs">${p.totalSold||0}</td><td><button onclick="editProduct('${d.id}')" class="text-blue-500 text-[10px] mr-1">Edit</button><button onclick="deleteProduct('${d.id}')" class="text-red-500 text-[10px]">Del</button></td></tr>`; }).join('');
-            loadChatList();
+            document.getElementById('admin-prod-list').innerHTML = prodSnap.docs.map((d,i)=>{ const p=d.data(); return `<tr><td>${i+1}</td><td><img src="${p.imageUrl}" class="w-8 h-8 rounded object-cover" onerror="this.src='https://via.placeholder.com/30'"></td><td class="font-bold text-xs">${p.name}</td><td class="text-xs">RM ${p.price}</td><td class="text-xs">⭐ ${p.rating||5.0}</td><td><span class="badge ${p.status==='Public'?'badge-active':'badge-cancelled'}">${p.status}</span></td><td class="text-xs">${p.totalSold||0}</td><td><button onclick="editProduct('${d.id}')" class="text-blue-500 text-[10px] mr-1">Edit</button><button onclick="deleteProduct('${d.id}')" class="text-red-500 text-[10px]">Del</button></td></tr>`; }).join('');            loadChatList();
         };
 
         window.updateOrderStatus = async (id, field, val) => { await updateDoc(doc(db, "orders", id), {[field]: val, currentStatus: field==='status'?val:undefined}); if(field==='status' && val==='Cancelled') playSound('error'); else playSound('success'); loadAdminData(); };
@@ -924,12 +896,12 @@
         window.copyChatID = () => { navigator.clipboard.writeText(currentChatPartner); playSound('success'); alert("ID copied!"); };
         window.blockContact = async () => { if(confirm("Block contact ini?")) { await updateDoc(doc(db, "users", currentChatPartner), {status: 'BLOCKED'}); playSound('error'); closeChat(); } };
 
-        // Auth State Listener
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if(user) {
                 document.getElementById('auth-nav').classList.add('hidden-section');
-                document.getElementById('user-nav').classList.remove('hidden-section');                const snap = await getDoc(doc(db, "users", user.uid));
+                document.getElementById('user-nav').classList.remove('hidden-section');
+                const snap = await getDoc(doc(db, "users", user.uid));
                 if(snap.exists()) {
                     userData = snap.data();
                     if(userData.status === 'BLOCKED') { playSound('error'); alert("Akaun anda telah diblokir."); signOut(auth); return; }
