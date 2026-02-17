@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MFD Store Ultimate - Live & Shop</title>
+    <title>MFD Store Ultimate - Free Edition</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
@@ -78,7 +78,6 @@
         .msg-me { align-self: flex-end; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom-right-radius: 2px; margin-left: auto; }
         .msg-other { align-self: flex-start; background: white; color: #333; border-bottom-left-radius: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; cursor: pointer; display: block; }
-        .msg-audio { width: 200px; margin-top: 5px; }
         .msg-location { background: #e2e8f0; padding: 10px; border-radius: 10px; margin-top: 5px; font-size: 0.8rem; }
         .msg-pin { background: #fffacd; border: 1px solid #ffd700; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; margin-top: 5px; display: inline-block; }
         .msg-edited { font-size: 0.6rem; opacity: 0.7; font-style: italic; }
@@ -96,8 +95,8 @@
         .hidden-section { display: none !important; }
         input, select, textarea {
             background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748;
-            border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;        }
-        input:focus, textarea:focus { outline: none; border-color: #ec008c; box-shadow: 0 0 0 3px rgba(236, 0, 140, 0.1); }
+            border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
+        }        input:focus, textarea:focus { outline: none; border-color: #ec008c; box-shadow: 0 0 0 3px rgba(236, 0, 140, 0.1); }
         
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; }
         .badge-to-pay { background: #feebc8; color: #744210; }
@@ -145,8 +144,8 @@
             
             <!-- Auth Buttons -->
             <div id="auth-nav">
-                <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-pink-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register</button>
-            </div>
+                <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-pink-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>
+                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register</button>            </div>
 
             <!-- User Menu -->
             <div id="user-nav" class="hidden-section flex items-center gap-2 md:gap-3">
@@ -194,8 +193,8 @@
         <section id="view-login" class="hidden-section max-w-md mx-auto mt-10">
             <div class="glass-panel p-8">
                 <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Login Account</h2>
-                <input type="email" id="login-email" placeholder="Email Address">                <input type="password" id="login-pass" placeholder="Password">
-                <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">LOGIN NOW</button>
+                <input type="email" id="login-email" placeholder="Email Address">
+                <input type="password" id="login-pass" placeholder="Password">                <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">LOGIN NOW</button>
                 <p class="text-center mt-6 text-sm text-gray-600">New here? <span class="text-pink-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('register')">Register Account</span></p>
             </div>
         </section>
@@ -243,8 +242,8 @@
                         <span>My Orders</span>
                         <span class="text-[10px] bg-pink-100 text-pink-600 px-2 py-1 rounded-full animate-pulse">Live Update</span>
                     </h3>
-                                        <!-- Tabs Navigation -->
-                    <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar">
+                    
+                    <!-- Tabs Navigation -->                    <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar">
                         <button onclick="filterOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 transition">All</button>
                         <button onclick="filterOrders('To Pay')" class="px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200 transition">To Pay</button>
                         <button onclick="filterOrders('To Ship')" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200 transition">To Ship</button>
@@ -285,15 +284,15 @@
             </div>
         </section>
 
-        <!-- 4. LIVE CHAT SYSTEM (ADVANCED) -->
+        <!-- 4. LIVE CHAT SYSTEM (TEXT & IMAGE URL ONLY) -->
         <section id="view-chat-list" class="hidden-section">
             <div class="glass-panel p-4 h-[80vh] flex flex-col">
                 <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2">
                     <i class="fas fa-headset"></i> Live Agent Support
                 </h2>
                 
-                <!-- Chat List View -->                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
-                    <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>
+                <!-- Chat List View -->
+                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">                    <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>
                 </div>
 
                 <!-- Active Chat View -->
@@ -309,7 +308,6 @@
                         <div class="flex gap-1">
                             <button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded transition" title="Copy Chat ID"><i class="fas fa-copy"></i> ID</button>
                             <button onclick="blockContact()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded transition" title="Block Contact"><i class="fas fa-ban"></i></button>
-                            <!-- Admin Only Options could go here -->
                         </div>
                     </div>
 
@@ -319,20 +317,15 @@
 
                     <!-- Message Input Area -->
                     <div class="flex gap-2 items-end bg-white/50 p-2 rounded-xl">
-                        <button onclick="document.getElementById('file-input').click()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Upload Image"><i class="fas fa-paperclip text-gray-600"></i></button>
-                        <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
-                        
-                        <button id="record-btn" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition active:scale-95" title="Hold to Record Voice"><i class="fas fa-microphone text-gray-600"></i></button>
+                        <!-- Button to Paste Image URL instead of Upload -->
+                        <button onclick="promptImageUrl()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Paste Image URL"><i class="fas fa-image text-gray-600"></i></button>
                         
                         <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
                         
                         <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg hover:shadow-xl transition"><i class="fas fa-paper-plane"></i></button>
                     </div>
-                    <div id="recording-indicator" class="hidden-section text-red-500 text-[10px] mt-1 font-bold animate-pulse flex items-center gap-1"><i class="fas fa-circle text-[8px]"></i> Recording... Release to send</div>
-                    
-                    <!-- Chat Options (Pin, Edit, Delete etc would be context menu on messages) -->
                     <div class="text-[10px] text-gray-400 mt-1 text-center">
-                        Auto-update enabled • Messages encrypted
+                        Auto-update enabled • Free Mode (Text & Image Links Only)
                     </div>
                 </div>
             </div>
@@ -341,14 +334,14 @@
         <!-- 5. ADMIN DASHBOARD -->
         <section id="view-admin" class="hidden-section">
             <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl rounded-2xl">
-                <div class="flex justify-between items-center">                    <div>
+                <div class="flex justify-between items-center">
+                    <div>
                         <h2 class="text-2xl md:text-3xl font-bold">ADMIN COMMAND CENTER</h2>
                         <p class="text-white/80 text-xs md:text-sm">Urus Pesanan, Pelanggan, Produk & Live Chat</p>
                     </div>
                     <i class="fas fa-shield-alt text-4xl md:text-5xl opacity-50"></i>
                 </div>
             </div>
-
             <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
                 <button onclick="showAdminTab('tab-orders')" class="px-4 py-2 bg-white/80 rounded-xl text-indigo-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-receipt mr-1"></i> Orders</button>
                 <button onclick="showAdminTab('tab-products')" class="px-4 py-2 bg-white/80 rounded-xl text-indigo-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-box mr-1"></i> Products</button>
@@ -383,18 +376,21 @@
 
             <!-- Tab: Products -->
             <div id="tab-products" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4 text-indigo-700">Tambah Produk Baharu</h3>
+                <h3 class="font-bold mb-4 text-indigo-700">Tambah Produk Baharu (Free Mode)</h3>
+                <div class="bg-blue-50 p-3 rounded-lg mb-4 text-xs border border-blue-200">
+                    <i class="fas fa-info-circle"></i> <strong>PENTING:</strong> Untuk jimatkan kos, sila upload gambar ke laman web luar (contoh: Postimages.org, Imgur) dan <strong>Copy Direct Link</strong> kemudian Paste di bawah.
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white/30 p-4 rounded-xl">
                     <input type="text" id="prod-name" placeholder="Nama Item">
                     <input type="number" id="prod-price" placeholder="Harga Jualan (RM)">
                     <input type="text" id="prod-variation" placeholder="Variasi (Size/Color)">
                     <input type="text" id="prod-country" placeholder="Negara Asal">
                     <input type="text" id="prod-event" placeholder="Label Event">
-                    <select id="prod-status" class="m-0">                        <option value="Public">✅ Public</option>
+                    <select id="prod-status" class="m-0">
+                        <option value="Public">✅ Public</option>
                         <option value="Private">🔒 Private</option>
                         <option value="Out of Stock">❌ Out of Stock</option>
-                    </select>
-                    <input type="url" id="prod-img-url" placeholder="Paste Image URL (https://...)" class="md:col-span-2">
+                    </select>                    <input type="url" id="prod-img-url" placeholder="Paste Image URL Here (https://...)" class="md:col-span-2">
                     <textarea id="prod-desc" placeholder="Deskripsi Item" class="md:col-span-2"></textarea>
                 </div>
                 <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
@@ -403,7 +399,7 @@
                 <div class="table-container">
                     <table class="custom-table">
                         <thead>
-                            <tr><th>Bil</th><th>Gambar</th><th>Nama Item</th><th>Harga</th><th>Total Sold</th><th>Rating</th><th>Status</th><th>Tindakan</th></tr>
+                            <tr><th>Bil</th><th>Gambar</th><th>Nama Item</th><th>Harga</th><th>Total Sold</th><th>Rating</th><th>Status</th><th>Edit/Delete</th></tr>
                         </thead>
                         <tbody id="admin-prod-list"></tbody>
                     </table>
@@ -439,15 +435,16 @@
                 <div id="admin-chat-list" class="flex-1 overflow-y-auto space-y-2 mb-4 border rounded-lg p-2 bg-white/30">
                     <!-- Customer list for admin -->
                     <div class="text-center text-gray-500 mt-10">Loading contacts...</div>
-                </div>                <!-- Reuse active chat structure for admin -->
+                </div>
+                <!-- Reuse active chat structure for admin -->
                 <div id="admin-active-chat" class="hidden-section flex-1 flex flex-col">
                      <div class="flex items-center justify-between border-b pb-2 mb-2">
-                        <button onclick="closeAdminChat()" class="text-sm text-gray-600 hover:text-pink-600"><i class="fas fa-arrow-left"></i> Back to List</button>
-                        <span class="font-bold text-indigo-700" id="admin-chat-target">Customer</span>
+                        <button onclick="closeAdminChat()" class="text-sm text-gray-600 hover:text-pink-600"><i class="fas fa-arrow-left"></i> Back to List</button>                        <span class="font-bold text-indigo-700" id="admin-chat-target">Customer</span>
                         <button onclick="deleteConversation()" class="text-xs text-red-500 hover:underline">Delete Conversation</button>
                     </div>
                     <div id="admin-chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 flex-1 overflow-y-auto"></div>
                     <div class="flex gap-2">
+                         <button onclick="promptImageUrl()" class="p-2 bg-gray-200 rounded-full"><i class="fas fa-image"></i></button>
                         <textarea id="admin-msg-input" rows="1" class="m-0 flex-1 text-sm" placeholder="Reply to customer..."></textarea>
                         <button onclick="sendAdminMessage()" class="btn-glitter px-4 rounded-lg text-sm">Send</button>
                     </div>
@@ -488,10 +485,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        // Storage import removed as we are not using it
 
-        // --- FIREBASE CONFIGURATION ---
-        const firebaseConfig = {
+        // --- FIREBASE CONFIGURATION ---        const firebaseConfig = {
             apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
             authDomain: "mfd-store.firebaseapp.com",
             projectId: "mfd-store",
@@ -503,7 +500,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const storage = getStorage(app);
+        // Storage init removed
 
         let currentUser = null;
         let userData = {};
@@ -512,8 +509,6 @@
         let allUserOrders = [];
         let currentChatPartner = null;
         let unsubscribeChat = null;
-        let mediaRecorder;
-        let audioChunks = [];
 
         // --- SOUND EFFECTS ---
         window.playSound = (type) => {
@@ -537,12 +532,12 @@
             window.scrollTo(0,0);
             if(viewId === 'home') renderCatalog();
             if(viewId === 'dashboard') loadUserData();
-            if(viewId === 'admin') loadAdminData();            if(viewId === 'chat-list') loadChatList();
+            if(viewId === 'admin') loadAdminData();
+            if(viewId === 'chat-list') loadChatList();
         };
 
         window.showAdminTab = (id) => {
-            document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden-section'));
-            document.getElementById(id).classList.remove('hidden-section');
+            document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden-section'));            document.getElementById(id).classList.remove('hidden-section');
         };
 
         window.toggleCartModal = () => {
@@ -586,12 +581,12 @@
                 alert("Login Gagal: " + e.message); 
             }
         };
+
         window.logout = () => { 
             signOut(auth); 
             playSound('click'); 
             navTo('home'); 
         };
-
         window.deleteAccount = async () => {
             if(confirm("Adakah anda pasti? Status akaun akan ditukar kepada INACTIVE.")) {
                 await updateDoc(doc(db, "users", currentUser.uid), { status: 'INACTIVE' });
@@ -635,12 +630,12 @@
         window.addToCart = (id) => { 
             cart.push(allProducts.find(x=>x.id===id)); 
             document.getElementById('cart-count').innerText=cart.length; 
-            playSound('success');         };
+            playSound('success'); 
+        };
 
         function renderCartItems() {
             const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
-            if(cart.length===0) {
-                document.getElementById('cart-items').innerHTML = "<p class='text-center text-gray-500'>Cart kosong.</p>";
+            if(cart.length===0) {                document.getElementById('cart-items').innerHTML = "<p class='text-center text-gray-500'>Cart kosong.</p>";
                 document.getElementById('cart-total').innerText = "RM 0.00";
                 return;
             }
@@ -684,12 +679,12 @@
                     paymentStatus: "Not Verified", 
                     status: "To Pay", 
                     adminNote: "",
-                    userRating: null,                    createdAt: serverTimestamp()
+                    userRating: null,
+                    createdAt: serverTimestamp()
                 });
                 
                 cart=[]; 
-                document.getElementById('cart-count').innerText=0; 
-                toggleCartModal(); 
+                document.getElementById('cart-count').innerText=0;                 toggleCartModal(); 
                 playSound('success'); 
                 alert("Pesanan berjaya dibuat! Sila buat pembayaran dan rujuk tab 'To Pay'.");
                 loadUserData(); 
@@ -733,12 +728,12 @@
             s.className = `badge ${userData.status==='ACTIVE'?'badge-active':userData.status==='BLOCKED'?'badge-blocked':'badge-cancelled'}`;
         }
 
-        window.updateProfile = async () => {            await updateDoc(doc(db, "users", currentUser.uid), { 
+        window.updateProfile = async () => {
+            await updateDoc(doc(db, "users", currentUser.uid), { 
                 address: document.getElementById('dash-address').value,
                 logCache: serverTimestamp()
             });
-            playSound('success'); 
-            alert("Alamat dikemaskini!");
+            playSound('success');             alert("Alamat dikemaskini!");
         };
 
         window.filterOrders = (status) => {
@@ -782,12 +777,12 @@
                     <td class="text-center text-xs">${totalQty}</td>
                     <td class="font-bold text-pink-600 text-xs">RM ${o.total}</td>
                     <td class="text-[10px]">${o.paymentMethod||'Manual'}</td>
-                    <td><span class="badge ${badgeClass}">${o.paymentStatus}</span></td>                    <td class="font-mono text-[10px]">${o.trackingNo||'-'}</td>
+                    <td><span class="badge ${badgeClass}">${o.paymentStatus}</span></td>
+                    <td class="font-mono text-[10px]">${o.trackingNo||'-'}</td>
                     <td class="font-mono text-[10px] text-gray-500">${o.orderId}</td>
                     <td class="text-center">${o.userRating ? '⭐'+o.userRating : '-'}</td>
                     <td class="text-center">${actions}</td>
-                </tr>`;
-            }).join('');
+                </tr>`;            }).join('');
         };
 
         window.cancelOrder = async (id) => { 
@@ -810,17 +805,15 @@
         window.reorder = (id) => {
             alert("Item ditambah ke cart (Simulasi Reorder)");
             playSound('click');
-            // Logic to add items back to cart would go here
         };
 
-        // --- LIVE CHAT SYSTEM (ADVANCED REAL-TIME) ---
+        // --- LIVE CHAT SYSTEM (TEXT & IMAGE URL ONLY) ---
         async function loadChatList() {
             if(!currentUser) return navTo('login');
             const listEl = document.getElementById('chat-list-view');
             listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div></div>';
 
             if(userData.role === 'admin') {
-                // Admin sees all users who have chatted
                 const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
                 onSnapshot(q, (snap) => {
                     listEl.innerHTML = "";
@@ -831,14 +824,14 @@
                         getDoc(doc(db, "users", partnerId)).then(pSnap => {
                             if(pSnap.exists()) {
                                 const p = pSnap.data();
-                                listEl.innerHTML += `                                <div onclick="openChat('${partnerId}', '${p.username}')" class="p-3 bg-white/50 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition shadow-sm">
+                                listEl.innerHTML += `
+                                <div onclick="openChat('${partnerId}', '${p.username}')" class="p-3 bg-white/50 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition shadow-sm">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">${p.username[0]}</div>
                                         <div>
                                             <h4 class="font-bold text-sm">${p.username}</h4>
                                             <p class="text-xs text-gray-500 truncate w-40">${data.lastMessage || "Mula perbualan"}</p>
-                                        </div>
-                                    </div>
+                                        </div>                                    </div>
                                     <span class="text-[10px] text-gray-400">${data.lastTime ? new Date(data.lastTime.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span>
                                 </div>`;
                             }
@@ -846,7 +839,6 @@
                     });
                 });
             } else {
-                // Customer sees only Admin
                 const adminQuery = query(collection(db, "users"), where("role", "==", "admin"), limit(1));
                 const adminSnap = await getDocs(adminQuery);
                 if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500 mt-10'>Tiada Admin Online.</p>"; return; }
@@ -880,19 +872,18 @@
 
             if(unsubscribeChat) unsubscribeChat();
             const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
-                        unsubscribeChat = onSnapshot(q, (snap) => {
+            
+            unsubscribeChat = onSnapshot(q, (snap) => {
                 msgContainer.innerHTML = "";
                 snap.forEach(d => {
                     const m = d.data();
                     const isMe = m.senderId === currentUser.uid;
                     let content = '';
                     
-                    if(m.type === 'text') {
-                        content = `<p class="text-sm">${m.text}</p>`;
+                    if(m.type === 'text') {                        content = `<p class="text-sm">${m.text}</p>`;
                         if(m.isPinned) content += `<div class="msg-pin"><i class="fas fa-thumbtack"></i> Pinned</div>`;
                     }
                     else if(m.type === 'image') content = `<img src="${m.url}" class="msg-img" onclick="window.open(this.src)">`;
-                    else if(m.type === 'audio') content = `<audio controls src="${m.url}" class="msg-audio"></audio>`;
                     else if(m.type === 'location') content = `<div class="msg-location"><i class="fas fa-map-marker-alt"></i> ${m.address}</div>`;
                     
                     if(m.isEdited) content += `<div class="msg-edited">(edited)</div>`;
@@ -929,7 +920,8 @@
             const text = input.value.trim();
             if(!text || !currentChatPartner) return;
             await saveMessage(text, 'text');
-            input.value = '';        };
+            input.value = '';
+        };
 
         async function saveMessage(text, type, url = null, address = null) {
             const chatId = [currentUser.uid, currentChatPartner].sort().join('_');
@@ -937,8 +929,7 @@
                 senderId: currentUser.uid,
                 text: text,
                 type: type,
-                url: url,
-                address: address,
+                url: url,                address: address,
                 timestamp: serverTimestamp(),
                 read: false,
                 isPinned: false,
@@ -946,49 +937,22 @@
             });
             await setDoc(doc(db, "chats", chatId), {
                 participants: [currentUser.uid, currentChatPartner],
-                lastMessage: type==='text'?text:'[Media]',
+                lastMessage: type==='text'?text:'[Image]',
                 lastTime: serverTimestamp()
             }, {merge:true});
             playSound('msg');
         }
 
-        // File Upload
-        window.handleFileUpload = async (input) => {
-            const file = input.files[0];
-            if(!file || !currentChatPartner) return;
-            try {
-                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
-                await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(storageRef);
-                await saveMessage('', 'image', url);
-            } catch(e) { alert("Upload gagal. Pastikan Storage diaktifkan."); console.error(e); }
-            input.value = '';
-        };
-
-        // Voice Recording
-        window.startRecording = async () => {
-            if(!navigator.mediaDevices || !currentChatPartner) return alert("Mic tidak disokong atau tiada chat dipilih");
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    try {
-                        const storageRef = ref(storage, `chat_audio/${Date.now()}.webm`);
-                        await uploadBytes(storageRef, audioBlob);
-                        const url = await getDownloadURL(storageRef);                        await saveMessage('', 'audio', url);
-                    } catch(e) { alert("Upload audio gagal."); }
-                };
-                mediaRecorder.start();
-                document.getElementById('recording-indicator').classList.remove('hidden-section');
-            } catch(e) { alert("Kebenaran mikrofon ditolak"); }
-        };
-        window.stopRecording = () => {
-            if(mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                document.getElementById('recording-indicator').classList.add('hidden-section');
+        // Prompt for Image URL (Free Mode)
+        window.promptImageUrl = async () => {
+            const url = prompt("Sila Paste Direct Image URL (Contoh: https://i.imgur.com/xyz.jpg):");
+            if(url) {
+                // Simple validation
+                if(url.match(/\.(jpeg|jpg|gif|png)$/) != null) {
+                    await saveMessage('', 'image', url);
+                } else {
+                    alert("Link tidak sah. Pastikan ia adalah direct link gambar (berakhir dengan .jpg, .png, dll).");
+                }
             }
         };
 
@@ -1014,8 +978,7 @@
                         <select onchange="updateOrderStatus('${d.id}','paymentStatus',this.value)" class="text-[10px] p-1 rounded border ${o.paymentStatus==='Verified'?'bg-green-100':'bg-yellow-100'}">
                             <option value="Not Verified" ${o.paymentStatus==='Not Verified'?'selected':''}>Not Verified</option>
                             <option value="Verified" ${o.paymentStatus==='Verified'?'selected':''}>Verified</option>
-                        </select>
-                    </td>
+                        </select>                    </td>
                     <td><input value="${o.trackingNo||''}" onchange="updateOrderStatus('${d.id}','trackingNo',this.value)" class="text-[10px] p-1 w-20 border rounded font-mono"></td>
                     <td class="font-mono text-[10px]">${o.orderId}</td>
                     <td><button onclick="updateOrderStatus('${d.id}','status','Cancelled')" class="text-red-500 text-[10px] font-bold hover:underline">Cancel</button></td>
@@ -1027,7 +990,8 @@
             const users = usrSnap.docs.map(d=>({id:d.id, ...d.data()}));
             
             document.getElementById('admin-user-list').innerHTML = users.filter(u=>u.status!=='BLOCKED').map(u=>`
-                <tr>                    <td class="font-mono text-[10px]">${u.uac}</td>
+                <tr>
+                    <td class="font-mono text-[10px]">${u.uac}</td>
                     <td class="font-bold text-xs">${u.username}</td>
                     <td class="text-[10px] text-gray-400">******</td>
                     <td class="text-xs">${u.phone}</td>
@@ -1060,10 +1024,9 @@
                     <td class="text-xs">${p.totalSold||0}</td>
                     <td class="text-xs">⭐ ${p.rating||5.0}</td>
                     <td><span class="badge ${p.status==='Public'?'badge-active':'badge-cancelled'}">${p.status}</span></td>
-                    <td><button onclick="deleteProduct('${d.id}')" class="text-red-500 text-[10px]">Del</button></td>
+                    <td><button onclick="editProduct('${d.id}')" class="text-blue-500 text-[10px] mr-1">Edit</button><button onclick="deleteProduct('${d.id}')" class="text-red-500 text-[10px]">Del</button></td>
                 </tr>`;
             }).join('');
-
             // Load Admin Chat List
             loadChatList();
         };
@@ -1076,7 +1039,8 @@
         };
 
         window.blockUser = async (uid) => {
-            if(confirm("Block pengguna ini?")) {                await updateDoc(doc(db, "users", uid), {status: 'BLOCKED'});
+            if(confirm("Block pengguna ini?")) {
+                await updateDoc(doc(db, "users", uid), {status: 'BLOCKED'});
                 playSound('error');
                 loadAdminData();
             }
@@ -1110,6 +1074,16 @@
             loadProducts();
             document.querySelectorAll('#tab-products input, #tab-products textarea').forEach(i=>i.value='');
         };
+        
+        window.editProduct = async (id) => {
+            const newPrice = prompt("Masukkan harga baru:");            if(newPrice) {
+                await updateDoc(doc(db, "products", id), {price: newPrice});
+                playSound('success');
+                loadAdminData();
+                loadProducts();
+            }
+        };
+
         window.deleteProduct = async (id) => {
             if(confirm("Padam produk?")) {
                 await deleteDoc(doc(db, "products", id));
@@ -1125,11 +1099,11 @@
             const text = input.value.trim();
             if(!text || !currentChatPartner) return;
             await saveMessage(text, 'text');
-            input.value = '';        };
+            input.value = '';
+        };
         window.deleteConversation = async () => {
             if(confirm("Padam perbualan ini secara kekal?")) {
-                // Logic to delete chat subcollection would go here (complex in client-side, usually done via Cloud Functions)
-                alert("Fitur padam perbualan memerlukan fungsi backend. Untuk demo, sila padam manual di Console.");
+                alert("Untuk padam sepenuhnya, sila buang manual di Firebase Console (Collection: chats).");
             }
         };
 
@@ -1151,8 +1125,7 @@
                     if(userData.role === 'admin') navTo('admin');
                     else navTo('dashboard');
                 }
-            } else {
-                document.getElementById('auth-nav').classList.remove('hidden-section');
+            } else {                document.getElementById('auth-nav').classList.remove('hidden-section');
                 document.getElementById('user-nav').classList.add('hidden-section');
                 navTo('home');
             }
