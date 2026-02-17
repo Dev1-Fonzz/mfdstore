@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MFD Store Ultimate + Live Chat</title>
+    <title>MFD Store Ultimate - Live & Shop</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* TEMA: CERAH, GRADIENT, GLITTER */
+        /* TEMA: GRADIENT CERAH & GLITTER */
         :root {
             --primary-gradient: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 20%, #a18cd1 40%, #fbc2eb 60%, #8fd3f4 100%);
             --glass-bg: rgba(255, 255, 255, 0.75);
@@ -36,7 +36,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* GLASSMORPHISM */
+        /* GLASSMORPHISM PANEL */
         .glass-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(20px);
@@ -46,7 +46,7 @@
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
         }
 
-        /* GLITTER TEXT */
+        /* GLITTER TEXT EFFECT */
         .glitter-text {            background: linear-gradient(to right, #ec008c, #fc6767, #ec008c);
             -webkit-background-clip: text;
             background-clip: text;
@@ -72,39 +72,50 @@
         @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
 
         /* CHAT STYLES */
-        .chat-container { display: flex; flex-direction: column; height: calc(100vh - 200px); }
+        .chat-container { display: flex; flex-direction: column; height: calc(100vh - 220px); }
         .chat-messages { flex: 1; overflow-y: auto; padding: 15px; scroll-behavior: smooth; }
-        .message-bubble { max-width: 75%; padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .message-bubble { max-width: 80%; padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); word-wrap: break-word; }
         .msg-me { align-self: flex-end; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom-right-radius: 2px; margin-left: auto; }
         .msg-other { align-self: flex-start; background: white; color: #333; border-bottom-left-radius: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; cursor: pointer; }
-        .msg-audio { width: 200px; }
+        .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; cursor: pointer; display: block; }
+        .msg-audio { width: 200px; margin-top: 5px; }
+        .msg-location { background: #e2e8f0; padding: 10px; border-radius: 10px; margin-top: 5px; font-size: 0.8rem; }
+        .msg-pin { background: #fffacd; border: 1px solid #ffd700; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; margin-top: 5px; display: inline-block; }
+        .msg-edited { font-size: 0.6rem; opacity: 0.7; font-style: italic; }
+        
         @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 
         /* TABLES */
         .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 800px; font-size: 0.8rem; }
-        .custom-table th { background: rgba(255,255,255,0.9); padding: 12px; text-align: left; font-weight: 700; border-bottom: 2px solid #e2e8f0; }
-        .custom-table td { padding: 10px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.4); vertical-align: middle; }
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; font-size: 0.75rem; }
+        .custom-table th { background: rgba(255,255,255,0.9); padding: 12px; text-align: left; font-weight: 700; border-bottom: 2px solid #e2e8f0; color: #4a5568; }
+        .custom-table td { padding: 10px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.4); vertical-align: middle; color: #2d3748; }
         .custom-table tr:hover td { background: rgba(255,255,255,0.8); }
 
         /* UTILS */
         .hidden-section { display: none !important; }
         input, select, textarea {
             background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748;
-            border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
-        }
+            border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;        }
         input:focus, textarea:focus { outline: none; border-color: #ec008c; box-shadow: 0 0 0 3px rgba(236, 0, 140, 0.1); }
         
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }        .badge-to-pay { background: #feebc8; color: #744210; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; }
+        .badge-to-pay { background: #feebc8; color: #744210; }
         .badge-to-ship { background: #bee3f8; color: #2a4365; }
         .badge-to-receive { background: #c6f6d5; color: #22543d; }
         .badge-completed { background: #9ae6b4; color: #22543d; }
         .badge-cancelled { background: #fed7d7; color: #822727; }
         .badge-refund { background: #faf089; color: #744210; }
+        .badge-active { background: #c6f6d5; color: #22543d; }
+        .badge-blocked { background: #fed7d7; color: #822727; }
 
         .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #ec008c; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
+        ::-webkit-scrollbar-thumb { background: #ec008c; border-radius: 3px; }
     </style>
 </head>
 <body class="p-0 md:p-4">
@@ -116,35 +127,39 @@
     <audio id="snd-msg" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3"></audio>
 
     <!-- NAVBAR -->
-    <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 md:p-4 flex justify-between items-center flex-wrap gap-3">
+    <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 md:p-4 flex justify-between items-center flex-wrap gap-3 shadow-lg">
         <div class="text-xl md:text-2xl font-bold glitter-text cursor-pointer flex items-center gap-2" onclick="navTo('home')">
             <i class="fas fa-gem"></i> MFD STORE
         </div>
-        <div class="flex items-center gap-3 md:gap-4">
-            <button onclick="playSound('click'); navTo('chat-list')" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition">
-                <i class="fas fa-comments text-purple-600 text-lg"></i>
-                <span id="chat-notif" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden">!</span>
+        <div class="flex items-center gap-2 md:gap-4">
+            <!-- Chat Button -->
+            <button onclick="playSound('click'); navTo('chat-list')" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group">
+                <i class="fas fa-comments text-purple-600 text-lg group-hover:scale-110 transition"></i>
+                <span id="chat-notif" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden animate-pulse">!</span>
             </button>
-            <button onclick="playSound('click'); toggleCartModal()" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition">
-                <i class="fas fa-shopping-cart text-pink-600 text-lg"></i>
+            <!-- Cart Button -->
+            <button onclick="playSound('click'); toggleCartModal()" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group">
+                <i class="fas fa-shopping-cart text-pink-600 text-lg group-hover:scale-110 transition"></i>
                 <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">0</span>
             </button>
             
+            <!-- Auth Buttons -->
             <div id="auth-nav">
-                <button onclick="playSound('click'); navTo('login')" class="px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-pink-600 font-bold text-sm transition">Login</button>
-                <button onclick="playSound('click'); navTo('register')" class="px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-sm">Register</button>
+                <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-pink-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register</button>
             </div>
 
+            <!-- User Menu -->
             <div id="user-nav" class="hidden-section flex items-center gap-2 md:gap-3">
                 <div class="text-right hidden md:block">
                     <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>
                     <div id="nav-uac" class="text-[10px] text-pink-500 font-mono"></div>
                 </div>
-                <button onclick="playSound('click'); navTo('dashboard')" class="px-3 md:px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600 transition text-sm"><i class="fas fa-user"></i></button>
-                <button onclick="playSound('click'); logout()" class="px-3 md:px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition text-sm"><i class="fas fa-sign-out-alt"></i></button>
+                <button onclick="playSound('click'); navTo('dashboard')" class="px-3 md:px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600 transition text-xs md:text-sm"><i class="fas fa-user"></i></button>
+                <button onclick="playSound('click'); logout()" class="px-3 md:px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition text-xs md:text-sm"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </nav>
+
     <!-- MAIN CONTENT -->
     <main class="container mx-auto p-2 md:p-4 pb-20">
 
@@ -178,25 +193,25 @@
         <!-- 2. AUTH PAGES -->
         <section id="view-login" class="hidden-section max-w-md mx-auto mt-10">
             <div class="glass-panel p-8">
-                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Login</h2>
-                <input type="email" id="login-email" placeholder="Email Address">
-                <input type="password" id="login-pass" placeholder="Password">
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Login Account</h2>
+                <input type="email" id="login-email" placeholder="Email Address">                <input type="password" id="login-pass" placeholder="Password">
                 <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">LOGIN NOW</button>
-                <p class="text-center mt-6 text-sm text-gray-600">New? <span class="text-pink-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('register')">Register</span></p>
+                <p class="text-center mt-6 text-sm text-gray-600">New here? <span class="text-pink-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('register')">Register Account</span></p>
             </div>
         </section>
 
         <section id="view-register" class="hidden-section max-w-md mx-auto mt-10">
             <div class="glass-panel p-8">
-                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Register</h2>
-                <input type="text" id="reg-phone" placeholder="Phone Number">
-                <input type="email" id="reg-email" placeholder="Email Address">
-                <input type="password" id="reg-pass" placeholder="Password">
-                <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">REGISTER</button>
-                <p class="text-center mt-6 text-sm text-gray-600">Have account? <span class="text-pink-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('login')">Login</span></p>
-            </div>        </section>
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Register Account</h2>
+                <input type="text" id="reg-phone" placeholder="Phone Number (Active)">
+                <input type="email" id="reg-email" placeholder="Email Address (Optional)">
+                <input type="password" id="reg-pass" placeholder="Create Password">
+                <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">REGISTER FREE</button>
+                <p class="text-center mt-6 text-sm text-gray-600">Have account? <span class="text-pink-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('login')">Login Here</span></p>
+            </div>
+        </section>
 
-        <!-- 3. USER DASHBOARD (ORDER STATUS TABS) -->
+        <!-- 3. USER DASHBOARD (COMPLETE ORDER STATUS) -->
         <section id="view-dashboard" class="hidden-section">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
                 <!-- Profile Sidebar -->
@@ -209,90 +224,116 @@
                         <p class="text-xs text-pink-500 font-mono" id="dash-uac-display">...</p>
                     </div>
                     <div class="space-y-2 text-xs md:text-sm">
-                        <div class="bg-white/50 p-2 rounded"><strong>Status:</strong> <span id="dash-status" class="badge badge-to-ship">ACTIVE</span></div>
+                        <div class="bg-white/50 p-2 rounded"><strong>Status:</strong> <span id="dash-status" class="badge badge-active">ACTIVE</span></div>
                         <div class="bg-white/50 p-2 rounded"><strong>Phone:</strong> <span id="dash-phone">-</span></div>
-                        <label class="block mt-3 font-bold text-gray-700">📍 Address</label>
-                        <textarea id="dash-address" rows="3" class="text-xs"></textarea>
-                        <button onclick="updateProfile()" class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs w-full">Save</button>
-                        <button onclick="deleteAccount()" class="bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs w-full mt-2">Delete Account</button>
+                        <label class="block mt-3 font-bold text-gray-700">📍 Shipping Address</label>
+                        <textarea id="dash-address" rows="3" class="text-xs" placeholder="House No, Street, Unit, Postal Code..."></textarea>
+                        <div class="flex gap-2 mb-2">
+                            <label class="text-[10px] flex items-center gap-1"><input type="checkbox" class="w-3 h-3 accent-pink-500"> Frequent</label>
+                            <select class="w-auto py-0 px-1 text-[10px] m-0 bg-white"><option>Home</option><option>Work</option></select>
+                        </div>
+                        <button onclick="updateProfile()" class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs w-full shadow hover:bg-blue-600 transition">Save Changes</button>
+                        <button onclick="deleteAccount()" class="bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs w-full mt-2 hover:bg-red-200 transition">Delete Account Permanently</button>
                     </div>
                 </div>
 
                 <!-- Order Tabs -->
                 <div class="glass-panel p-4 md:p-6 lg:col-span-3">
-                    <h3 class="text-lg md:text-xl font-bold mb-4">My Orders</h3>
-                    
-                    <!-- Tabs Navigation -->
+                    <h3 class="text-lg md:text-xl font-bold mb-4 flex justify-between items-center">
+                        <span>My Orders</span>
+                        <span class="text-[10px] bg-pink-100 text-pink-600 px-2 py-1 rounded-full animate-pulse">Live Update</span>
+                    </h3>
+                                        <!-- Tabs Navigation -->
                     <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar">
-                        <button onclick="filterOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-xs font-bold whitespace-nowrap hover:bg-gray-300">All</button>
-                        <button onclick="filterOrders('To Pay')" class="px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200">To Pay</button>
-                        <button onclick="filterOrders('To Ship')" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200">To Ship</button>
-                        <button onclick="filterOrders('To Receive')" class="px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200">To Receive</button>
-                        <button onclick="filterOrders('Completed')" class="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200">Completed</button>
-                        <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200">Return</button>
-                        <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200">Cancelled</button>
+                        <button onclick="filterOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 transition">All</button>
+                        <button onclick="filterOrders('To Pay')" class="px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200 transition">To Pay</button>
+                        <button onclick="filterOrders('To Ship')" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200 transition">To Ship</button>
+                        <button onclick="filterOrders('To Receive')" class="px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200 transition">To Receive</button>
+                        <button onclick="filterOrders('Completed')" class="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200 transition">Completed</button>
+                        <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200 transition">Return</button>
+                        <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200 transition">Cancelled</button>
                     </div>
 
                     <div class="table-container">
                         <table class="custom-table">
                             <thead>
                                 <tr>
-                                    <th>Item</th>
-                                    <th>Kode</th>
-                                    <th>Total</th>
+                                    <th>Username</th>
+                                    <th>Nama Item</th>
+                                    <th>Kode Unik</th>
+                                    <th>Destination Address</th>
+                                    <th>Qty</th>
+                                    <th>Harga</th>
+                                    <th>Payment</th>
                                     <th>Status</th>
-                                    <th>Tracking</th>
-                                    <th>Actions</th>
-                                </tr>                            </thead>
+                                    <th>Tracking No</th>
+                                    <th>ID Pesanan</th>
+                                    <th>Rating</th>
+                                    <th>Tindakan</th>
+                                </tr>
+                            </thead>
                             <tbody id="user-order-history">
-                                <tr><td colspan="6" class="text-center py-4">Loading orders...</td></tr>
+                                <tr><td colspan="12" class="text-center py-8 text-gray-500">Memuatkan data pesanan...</td></tr>
                             </tbody>
                         </table>
+                    </div>
+                    <div id="no-orders-msg" class="hidden-section text-center py-8 text-gray-500">
+                        <i class="fas fa-inbox text-4xl mb-2 opacity-50"></i>
+                        <p>Belum ada sejarah pesanan.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 4. LIVE CHAT SYSTEM -->
+        <!-- 4. LIVE CHAT SYSTEM (ADVANCED) -->
         <section id="view-chat-list" class="hidden-section">
             <div class="glass-panel p-4 h-[80vh] flex flex-col">
-                <h2 class="text-xl font-bold glitter-text mb-4">Live Agent Support</h2>
+                <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2">
+                    <i class="fas fa-headset"></i> Live Agent Support
+                </h2>
                 
-                <!-- Chat List View -->
-                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
-                    <!-- List of conversations will appear here -->
-                    <div class="text-center text-gray-500 mt-10">Loading conversations...</div>
+                <!-- Chat List View -->                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
+                    <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>
                 </div>
 
-                <!-- Active Chat View (Hidden by default) -->
+                <!-- Active Chat View -->
                 <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
-                    <div class="flex items-center justify-between border-b pb-2 mb-2">
+                    <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2">
                         <div class="flex items-center gap-2">
-                            <button onclick="closeChat()" class="text-gray-500"><i class="fas fa-arrow-left"></i></button>
+                            <button onclick="closeChat()" class="text-gray-500 hover:text-pink-600 transition"><i class="fas fa-arrow-left"></i></button>
                             <div>
-                                <h3 id="chat-partner-name" class="font-bold text-sm">Customer Name</h3>
-                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold">● Online</span>
+                                <h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3>
+                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
                             </div>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="copyChatID()" class="text-xs bg-gray-200 px-2 py-1 rounded"><i class="fas fa-copy"></i> ID</button>
-                            <button onclick="blockContact()" class="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">Block</button>
+                        <div class="flex gap-1">
+                            <button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded transition" title="Copy Chat ID"><i class="fas fa-copy"></i> ID</button>
+                            <button onclick="blockContact()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded transition" title="Block Contact"><i class="fas fa-ban"></i></button>
+                            <!-- Admin Only Options could go here -->
                         </div>
                     </div>
 
-                    <div id="chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2">
-                        <!-- Messages go here -->
+                    <div id="chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 border border-white/50">
+                        <!-- Messages go here dynamically -->
                     </div>
 
-                    <div class="flex gap-2 items-end">
-                        <button onclick="document.getElementById('file-input').click()" class="p-3 bg-gray-200 rounded-full hover:bg-gray-300"><i class="fas fa-paperclip"></i></button>
+                    <!-- Message Input Area -->
+                    <div class="flex gap-2 items-end bg-white/50 p-2 rounded-xl">
+                        <button onclick="document.getElementById('file-input').click()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Upload Image"><i class="fas fa-paperclip text-gray-600"></i></button>
                         <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
                         
-                        <button id="record-btn" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()" class="p-3 bg-gray-200 rounded-full hover:bg-gray-300"><i class="fas fa-microphone"></i></button>
+                        <button id="record-btn" onmousedown="startRecording()" onmouseup="stopRecording()" ontouchstart="startRecording()" ontouchend="stopRecording()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition active:scale-95" title="Hold to Record Voice"><i class="fas fa-microphone text-gray-600"></i></button>
                         
-                        <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
-                        <button onclick="sendMessage()" class="p-3 btn-glitter rounded-full"><i class="fas fa-paper-plane"></i></button>
-                    </div>                    <div id="recording-indicator" class="hidden-section text-red-500 text-xs mt-1 font-bold animate-pulse"><i class="fas fa-circle"></i> Recording... Release to send</div>
+                        <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
+                        
+                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg hover:shadow-xl transition"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <div id="recording-indicator" class="hidden-section text-red-500 text-[10px] mt-1 font-bold animate-pulse flex items-center gap-1"><i class="fas fa-circle text-[8px]"></i> Recording... Release to send</div>
+                    
+                    <!-- Chat Options (Pin, Edit, Delete etc would be context menu on messages) -->
+                    <div class="text-[10px] text-gray-400 mt-1 text-center">
+                        Auto-update enabled • Messages encrypted
+                    </div>
                 </div>
             </div>
         </section>
@@ -300,24 +341,40 @@
         <!-- 5. ADMIN DASHBOARD -->
         <section id="view-admin" class="hidden-section">
             <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl rounded-2xl">
-                <h2 class="text-2xl md:text-3xl font-bold">ADMIN COMMAND CENTER</h2>
-                <p class="text-white/80 text-sm">Urus Pesanan, Pelanggan & Live Chat</p>
+                <div class="flex justify-between items-center">                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold">ADMIN COMMAND CENTER</h2>
+                        <p class="text-white/80 text-xs md:text-sm">Urus Pesanan, Pelanggan, Produk & Live Chat</p>
+                    </div>
+                    <i class="fas fa-shield-alt text-4xl md:text-5xl opacity-50"></i>
+                </div>
             </div>
 
             <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
-                <button onclick="showAdminTab('tab-orders')" class="px-4 py-2 bg-white/80 rounded-xl text-indigo-600 font-bold text-sm whitespace-nowrap">Orders</button>
-                <button onclick="showAdminTab('tab-products')" class="px-4 py-2 bg-white/80 rounded-xl text-indigo-600 font-bold text-sm whitespace-nowrap">Products</button>
-                <button onclick="showAdminTab('tab-users')" class="px-4 py-2 bg-white/80 rounded-xl text-indigo-600 font-bold text-sm whitespace-nowrap">Users</button>
-                <button onclick="showAdminTab('tab-chat')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-sm whitespace-nowrap"><i class="fas fa-headset"></i> Live Chat</button>
+                <button onclick="showAdminTab('tab-orders')" class="px-4 py-2 bg-white/80 rounded-xl text-indigo-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-receipt mr-1"></i> Orders</button>
+                <button onclick="showAdminTab('tab-products')" class="px-4 py-2 bg-white/80 rounded-xl text-indigo-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-box mr-1"></i> Products</button>
+                <button onclick="showAdminTab('tab-users')" class="px-4 py-2 bg-white/80 rounded-xl text-indigo-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-users mr-1"></i> Users</button>
+                <button onclick="showAdminTab('tab-chat')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-headset mr-1"></i> Live Chat</button>
             </div>
 
             <!-- Tab: Orders -->
             <div id="tab-orders" class="admin-tab glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4">All Orders Management</h3>
+                <h3 class="font-bold mb-4 text-indigo-700">Jadual Pengesahan & Urusan Pesanan</h3>
                 <div class="table-container">
                     <table class="custom-table">
                         <thead>
-                            <tr><th>User</th><th>Item</th><th>Total</th><th>Status</th><th>Payment</th><th>Tracking</th><th>Action</th></tr>
+                            <tr>
+                                <th>UAC</th>
+                                <th>Username</th>
+                                <th>Nama Item & Kode</th>
+                                <th>Destination Address</th>
+                                <th>Qty</th>
+                                <th>Harga</th>
+                                <th>Payment Method</th>
+                                <th>Payment Status</th>
+                                <th>Tracking No</th>
+                                <th>ID Pesanan</th>
+                                <th>Tindakan</th>
+                            </tr>
                         </thead>
                         <tbody id="admin-order-list"></tbody>
                     </table>
@@ -326,44 +383,73 @@
 
             <!-- Tab: Products -->
             <div id="tab-products" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4">Add Product</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <input type="text" id="prod-name" placeholder="Name">
-                    <input type="number" id="prod-price" placeholder="Price">
-                    <input type="text" id="prod-img-url" placeholder="Image URL">
-                    <textarea id="prod-desc" placeholder="Desc" class="md:col-span-2"></textarea>
+                <h3 class="font-bold mb-4 text-indigo-700">Tambah Produk Baharu</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white/30 p-4 rounded-xl">
+                    <input type="text" id="prod-name" placeholder="Nama Item">
+                    <input type="number" id="prod-price" placeholder="Harga Jualan (RM)">
+                    <input type="text" id="prod-variation" placeholder="Variasi (Size/Color)">
+                    <input type="text" id="prod-country" placeholder="Negara Asal">
+                    <input type="text" id="prod-event" placeholder="Label Event">
+                    <select id="prod-status" class="m-0">                        <option value="Public">✅ Public</option>
+                        <option value="Private">🔒 Private</option>
+                        <option value="Out of Stock">❌ Out of Stock</option>
+                    </select>
+                    <input type="url" id="prod-img-url" placeholder="Paste Image URL (https://...)" class="md:col-span-2">
+                    <textarea id="prod-desc" placeholder="Deskripsi Item" class="md:col-span-2"></textarea>
                 </div>
-                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-2">Launch</button>
+                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
                 
-                <h3 class="font-bold mt-6 mb-2">Product List</h3>
+                <h3 class="font-bold mt-8 mb-4 text-indigo-700">Senarai Produk Dilancarkan</h3>
                 <div class="table-container">
-                    <table class="custom-table"><thead><tr><th>Name</th><th>Price</th><th>Sold</th><th>Action</th></tr></thead><tbody id="admin-prod-list"></tbody></table>
+                    <table class="custom-table">
+                        <thead>
+                            <tr><th>Bil</th><th>Gambar</th><th>Nama Item</th><th>Harga</th><th>Total Sold</th><th>Rating</th><th>Status</th><th>Tindakan</th></tr>
+                        </thead>
+                        <tbody id="admin-prod-list"></tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- Tab: Users -->            <div id="tab-users" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4">User Database</h3>
+            <!-- Tab: Users -->
+            <div id="tab-users" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
+                <h3 class="font-bold mb-4 text-indigo-700">Jadual Database Pelanggan</h3>
                 <div class="table-container">
-                    <table class="custom-table"><thead><tr><th>UAC</th><th>User</th><th>Status</th><th>Action</th></tr></thead><tbody id="admin-user-list"></tbody></table>
+                    <table class="custom-table">
+                        <thead>
+                            <tr><th>UAC</th><th>Username</th><th>Password</th><th>Phone</th><th>Shipping Address</th><th>Status</th><th>Total Order</th><th>Tindakan</th></tr>
+                        </thead>
+                        <tbody id="admin-user-list"></tbody>
+                    </table>
+                </div>
+                
+                <h3 class="font-bold mt-8 mb-4 text-red-600">Senarai Hitam (Blacklist)</h3>
+                <div class="table-container border-2 border-red-100">
+                    <table class="custom-table">
+                        <thead>
+                            <tr><th>UAC</th><th>Username</th><th>Status</th><th>Log Cache</th><th>Tindakan</th></tr>
+                        </thead>
+                        <tbody id="admin-blacklist-list"></tbody>
+                    </table>
                 </div>
             </div>
 
             <!-- Tab: Admin Chat -->
             <div id="tab-chat" class="admin-tab hidden-section glass-panel p-4 md:p-6 h-[70vh] flex flex-col">
-                <h3 class="font-bold mb-4">Live Agent Dashboard</h3>
+                <h3 class="font-bold mb-4 text-purple-700">Live Agent Dashboard (Owner)</h3>
                 <div id="admin-chat-list" class="flex-1 overflow-y-auto space-y-2 mb-4 border rounded-lg p-2 bg-white/30">
                     <!-- Customer list for admin -->
-                </div>
-                <!-- Reuse active chat view structure but hidden/controlled differently if needed, for simplicity we reuse logic -->
+                    <div class="text-center text-gray-500 mt-10">Loading contacts...</div>
+                </div>                <!-- Reuse active chat structure for admin -->
                 <div id="admin-active-chat" class="hidden-section flex-1 flex flex-col">
                      <div class="flex items-center justify-between border-b pb-2 mb-2">
-                        <button onclick="closeAdminChat()" class="text-sm text-gray-600"><i class="fas fa-arrow-left"></i> Back to List</button>
-                        <span class="font-bold" id="admin-chat-target"></span>
+                        <button onclick="closeAdminChat()" class="text-sm text-gray-600 hover:text-pink-600"><i class="fas fa-arrow-left"></i> Back to List</button>
+                        <span class="font-bold text-indigo-700" id="admin-chat-target">Customer</span>
+                        <button onclick="deleteConversation()" class="text-xs text-red-500 hover:underline">Delete Conversation</button>
                     </div>
                     <div id="admin-chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 flex-1 overflow-y-auto"></div>
                     <div class="flex gap-2">
-                        <textarea id="admin-msg-input" rows="1" class="m-0 flex-1" placeholder="Reply..."></textarea>
-                        <button onclick="sendAdminMessage()" class="btn-glitter px-4 rounded-lg">Send</button>
+                        <textarea id="admin-msg-input" rows="1" class="m-0 flex-1 text-sm" placeholder="Reply to customer..."></textarea>
+                        <button onclick="sendAdminMessage()" class="btn-glitter px-4 rounded-lg text-sm">Send</button>
                     </div>
                 </div>
             </div>
@@ -374,26 +460,37 @@
     <!-- CART MODAL -->
     <div id="modal-cart" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-2xl">&times;</button>
-            <h2 class="text-2xl font-bold mb-4 glitter-text">Checkout</h2>
-            <div id="cart-items" class="space-y-3 mb-4"></div>
-            <div class="font-bold text-xl text-right">Total: <span id="cart-total" class="text-pink-600">RM 0.00</span></div>
-            <div class="mt-4 bg-white/50 p-3 rounded text-xs">
-                <p class="font-bold">Payment:</p>
-                <p>1. Sociabuzz: <a href="https://sociabuzz.com/fareezonzz_019/give" class="text-blue-500 underline">Link</a></p>
-                <p>2. TNG: <strong>161489981218</strong></p>
-                <p class="text-red-500 mt-1">Send receipt to WhatsApp: +60145400413</p>
+            <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500 transition">&times;</button>
+            <h2 class="text-2xl font-bold mb-4 glitter-text">Checkout Station</h2>
+            
+            <div id="cart-items" class="space-y-3 mb-6"></div>
+            <div class="border-t-2 border-dashed border-gray-300 pt-4 flex justify-between items-center">
+                <span class="font-bold text-lg text-gray-700">Jumlah Keseluruhan:</span>
+                <span id="cart-total" class="text-2xl font-bold text-pink-600">RM 0.00</span>
             </div>
-            <button onclick="submitOrder()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4">CONFIRM ORDER</button>
+
+            <div class="mt-6 bg-gradient-to-br from-indigo-50 to-pink-50 p-5 rounded-xl border border-indigo-100">
+                <p class="font-bold text-indigo-700 mb-3 flex items-center gap-2"><i class="fas fa-credit-card"></i> Payment Method</p>
+                <ol class="list-decimal pl-5 text-sm space-y-2 text-gray-700">
+                    <li>Online Payment: <a href="https://sociabuzz.com/fareezonzz_019/give" target="_blank" class="text-blue-500 underline hover:text-blue-700 font-bold">Sociabuzz Link</a></li>
+                    <li>Touch N’Go E-Wallet: <strong class="font-mono bg-white px-2 py-0.5 rounded border">161489981218</strong> (Copy & Paste)</li>
+                    <li class="text-red-500 font-semibold text-xs bg-red-50 p-2 rounded mt-2 border border-red-100">
+                        <i class="fas fa-exclamation-triangle"></i> PERINGATAN: Sila bayar jumlah tepat. Hantar bukti pembayaran ke WhatsApp <strong>+60145400413</strong>. Pesanan akan digantung dan dibatalkan jika tidak disahkan.
+                    </li>
+                </ol>
+            </div>
+
+            <button onclick="submitOrder()" class="btn-glitter w-full py-4 rounded-xl font-bold mt-6 shadow-xl text-lg"><i class="fas fa-check-circle mr-2"></i>KONFIRM PESANAN</button>
         </div>
     </div>
 
     <!-- FIREBASE LOGIC -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit, startAfter } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
+        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
             authDomain: "mfd-store.firebaseapp.com",
@@ -412,26 +509,35 @@
         let userData = {};
         let cart = [];
         let allProducts = [];
+        let allUserOrders = [];
         let currentChatPartner = null;
         let unsubscribeChat = null;
         let mediaRecorder;
         let audioChunks = [];
 
-        // Sound Effects
+        // --- SOUND EFFECTS ---
         window.playSound = (type) => {
-            const sounds = { 'click': document.getElementById('snd-click'), 'success': document.getElementById('snd-success'), 'error': document.getElementById('snd-error'), 'msg': document.getElementById('snd-msg') };
-            if(sounds[type]) { sounds[type].currentTime = 0; sounds[type].play().catch(()=>{}); }
+            const sounds = { 
+                'click': document.getElementById('snd-click'), 
+                'success': document.getElementById('snd-success'), 
+                'error': document.getElementById('snd-error'), 
+                'msg': document.getElementById('snd-msg') 
+            };
+            if(sounds[type]) { 
+                sounds[type].currentTime = 0; 
+                sounds[type].play().catch(()=>{}); 
+            }
         };
 
-        // Navigation
+        // --- NAVIGATION ---
         window.navTo = (viewId) => {
             playSound('click');
             document.querySelectorAll('section').forEach(el => el.classList.add('hidden-section'));
             document.getElementById(`view-${viewId}`).classList.remove('hidden-section');
+            window.scrollTo(0,0);
             if(viewId === 'home') renderCatalog();
             if(viewId === 'dashboard') loadUserData();
-            if(viewId === 'admin') loadAdminData();
-            if(viewId === 'chat-list') loadChatList();
+            if(viewId === 'admin') loadAdminData();            if(viewId === 'chat-list') loadChatList();
         };
 
         window.showAdminTab = (id) => {
@@ -439,177 +545,322 @@
             document.getElementById(id).classList.remove('hidden-section');
         };
 
-        window.toggleCartModal = () => {            const m = document.getElementById('modal-cart');
+        window.toggleCartModal = () => {
+            const m = document.getElementById('modal-cart');
             m.classList.contains('hidden-section') ? (renderCartItems(), m.classList.remove('hidden-section')) : m.classList.add('hidden-section');
         };
 
-        // Auth
+        // --- AUTHENTICATION ---
         window.doRegister = async () => {
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
             const phone = document.getElementById('reg-phone').value;
-            if(!email || !pass) return alert("Email & Pass required");
+            if(!email || !pass) return alert("Email & Password diperlukan");
             try {
                 const cred = await createUserWithEmailAndPassword(auth, email, pass);
                 const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
                 await setDoc(doc(db, "users", cred.user.uid), {
-                    username: "User_"+uac.split('-')[1], email, phone, uac, role: 'customer', status: 'ACTIVE', address: '', createdAt: serverTimestamp()
+                    username: "User_"+uac.split('-')[1], 
+                    email, phone, uac, 
+                    role: 'customer', 
+                    status: 'ACTIVE', 
+                    address: '', 
+                    createdAt: serverTimestamp(),
+                    logCache: serverTimestamp()
                 });
-                playSound('success'); alert("Registered! Login now."); navTo('login');
-            } catch(e) { playSound('error'); alert(e.message); }
+                playSound('success'); 
+                alert("Berjaya didaftarkan! Sila login."); 
+                navTo('login');
+            } catch(e) { 
+                playSound('error'); 
+                alert(e.message); 
+            }
         };
 
         window.doLogin = async () => {
             try {
                 await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value);
                 playSound('success');
-            } catch(e) { playSound('error'); alert(e.message); }
+            } catch(e) { 
+                playSound('error'); 
+                alert("Login Gagal: " + e.message); 
+            }
+        };
+        window.logout = () => { 
+            signOut(auth); 
+            playSound('click'); 
+            navTo('home'); 
         };
 
-        window.logout = () => { signOut(auth); playSound('click'); navTo('home'); };
         window.deleteAccount = async () => {
-            if(confirm("Delete account?")) { await updateDoc(doc(db, "users", currentUser.uid), { status: 'INACTIVE' }); signOut(auth); alert("Deactivated."); }
+            if(confirm("Adakah anda pasti? Status akaun akan ditukar kepada INACTIVE.")) {
+                await updateDoc(doc(db, "users", currentUser.uid), { status: 'INACTIVE' });
+                signOut(auth);
+                playSound('success');
+                alert("Akaun dinyahaktifkan.");
+            }
         };
 
-        // Products
+        // --- PRODUCTS & CATALOG ---
         async function loadProducts() {
             const snap = await getDocs(collection(db, "products"));
-            allProducts = []; snap.forEach(d => allProducts.push({id: d.id, ...d.data()}));
+            allProducts = []; 
+            snap.forEach(d => allProducts.push({id: d.id, ...d.data()}));
             renderCatalog();
         }
+
         window.renderCatalog = () => {
             const search = document.getElementById('search-bar').value.toLowerCase();
+            const sort = document.getElementById('filter-sort').value;
             const grid = document.getElementById('product-grid');
-            const filtered = allProducts.filter(p => p.status === 'Public' && p.name.toLowerCase().includes(search));
+            
+            let filtered = allProducts.filter(p => p.status === 'Public' && p.name.toLowerCase().includes(search));
+            if(sort === 'highest') filtered.sort((a,b) => (b.totalSold || 0) - (a.totalSold || 0));
+            if(sort === 'event') filtered = filtered.filter(p => p.event);
+
             grid.innerHTML = filtered.map(p => `
-                <div class="glass-panel p-3 flex flex-col">
-                    <img src="${p.imageUrl||'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg mb-2">
-                    <h3 class="font-bold text-sm">${p.name}</h3>
-                    <div class="flex justify-between items-center mt-1">
+                <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition">
+                    <img src="${p.imageUrl||'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg mb-2 bg-gray-200">
+                    <h3 class="font-bold text-sm text-gray-800 leading-tight">${p.name}</h3>
+                    ${p.event ? `<span class="text-[10px] text-pink-600 font-bold">#${p.event}</span>` : ''}
+                    <p class="text-[10px] text-gray-500 line-clamp-2 my-1 flex-grow">${p.description}</p>
+                    <div class="flex justify-between items-center mt-2">
                         <span class="text-pink-600 font-bold text-sm">RM ${p.price}</span>
-                        <button onclick="addToCart('${p.id}')" class="bg-pink-500 text-white text-xs px-2 py-1 rounded">Add</button>
-                    </div>                </div>`).join('');
-        };
-        window.addToCart = (id) => { cart.push(allProducts.find(x=>x.id===id)); document.getElementById('cart-count').innerText=cart.length; playSound('success'); };
-        function renderCartItems() {
-            const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
-            document.getElementById('cart-items').innerHTML = cart.map((i,idx)=>`<div class="flex justify-between"><span>${i.name}</span><span>RM ${i.price} <i onclick="cart.splice(${idx},1);renderCartItems();document.getElementById('cart-count').innerText=cart.length" class="fas fa-trash text-red-500 cursor-pointer"></i></span></div>`).join('');
-            document.getElementById('cart-total').innerText = "RM "+total.toFixed(2);
-        }
-        window.submitOrder = async () => {
-            if(!currentUser) return alert("Login first");
-            if(!userData.address) return alert("Set address first");
-            const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
-            await addDoc(collection(db, "orders"), {
-                userId: currentUser.uid, uac: userData.uac, username: userData.username, items: cart, total, address: userData.address,
-                trackingNo: "TRK-"+Date.now().toString().substr(-6), orderId: "ORD-"+Date.now().toString().substr(-6),
-                paymentStatus: "Not Verified", status: "To Pay", createdAt: serverTimestamp()
-            });
-            cart=[]; document.getElementById('cart-count').innerText=0; toggleCartModal(); playSound('success'); alert("Order placed! Go to 'To Pay' tab.");
-            loadUserData();
+                        <span class="text-[10px] bg-gray-100 px-1 rounded">${p.country||'-'}</span>
+                    </div>
+                    <button onclick="addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2 shadow">Add to Cart</button>
+                </div>`).join('');
         };
 
-        // Dashboard Orders (Real-time)
-        let allUserOrders = [];
+        window.addToCart = (id) => { 
+            cart.push(allProducts.find(x=>x.id===id)); 
+            document.getElementById('cart-count').innerText=cart.length; 
+            playSound('success');         };
+
+        function renderCartItems() {
+            const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
+            if(cart.length===0) {
+                document.getElementById('cart-items').innerHTML = "<p class='text-center text-gray-500'>Cart kosong.</p>";
+                document.getElementById('cart-total').innerText = "RM 0.00";
+                return;
+            }
+            document.getElementById('cart-items').innerHTML = cart.map((i,idx)=>`
+                <div class="flex justify-between items-center bg-white/60 p-2 rounded">
+                    <div class="text-xs">
+                        <div class="font-bold">${i.name}</div>
+                        <div class="text-[10px] text-gray-500">Kode: ${i.uniqueCode||'N/A'}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-pink-600 text-xs">RM ${i.price}</span>
+                        <button onclick="cart.splice(${idx},1);renderCartItems();document.getElementById('cart-count').innerText=cart.length" class="text-red-500"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`).join('');
+            document.getElementById('cart-total').innerText = "RM "+total.toFixed(2);
+        }
+
+        window.submitOrder = async () => {
+            if(!currentUser) return alert("Sila login dahulu");
+            if(cart.length===0) return alert("Cart kosong");
+            if(!userData.address) return alert("Sila masukkan alamat penghantaran di Dashboard dahulu");
+
+            const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
+            const tracking = "TRK-"+Date.now().toString().substr(-8);
+            const orderId = "ORD-"+Date.now().toString().substr(-6);
+            const itemCounts = {};
+            cart.forEach(i => { itemCounts[i.id] = (itemCounts[i.id] || 0) + 1; });
+
+            try {
+                await addDoc(collection(db, "orders"), {
+                    userId: currentUser.uid, 
+                    uac: userData.uac, 
+                    username: userData.username, 
+                    items: cart, 
+                    itemCounts: itemCounts,
+                    total: total, 
+                    address: userData.address,
+                    trackingNo: tracking, 
+                    orderId: orderId,
+                    paymentMethod: "Manual Transfer (TNG/Sociabuzz)",
+                    paymentStatus: "Not Verified", 
+                    status: "To Pay", 
+                    adminNote: "",
+                    userRating: null,                    createdAt: serverTimestamp()
+                });
+                
+                cart=[]; 
+                document.getElementById('cart-count').innerText=0; 
+                toggleCartModal(); 
+                playSound('success'); 
+                alert("Pesanan berjaya dibuat! Sila buat pembayaran dan rujuk tab 'To Pay'.");
+                loadUserData(); 
+            } catch(e) { 
+                playSound('error');
+                alert("Ralat: " + e.message); 
+            }
+        };
+
+        // --- USER DASHBOARD & ORDERS (REAL-TIME) ---
         async function loadUserData() {
             if(!currentUser) return;
-            onSnapshot(doc(db, "users", currentUser.uid), (d)=>{ if(d.exists()){ userData=d.data(); updateDashUI(); }});
-            onSnapshot(query(collection(db, "orders"), where("userId","==",currentUser.uid), orderBy("createdAt","desc")), (snap)=>{
-                allUserOrders = []; snap.forEach(d=>allUserOrders.push({id:d.id, ...d.data()}));
+            
+            // Load Profile Real-time
+            onSnapshot(doc(db, "users", currentUser.uid), (d)=>{ 
+                if(d.exists()){ 
+                    userData=d.data(); 
+                    updateDashUI(); 
+                }
+            });
+
+            // Load Orders Real-time
+            const q = query(collection(db, "orders"), where("userId","==",currentUser.uid), orderBy("createdAt","desc"));
+            onSnapshot(q, (snap)=>{
+                allUserOrders = []; 
+                snap.forEach(d=>allUserOrders.push({id:d.id, ...d.data()}));
                 filterOrders('all');
             });
         }
+
         function updateDashUI() {
             document.getElementById('nav-username').innerText = userData.username;
+            document.getElementById('nav-uac').innerText = userData.uac;
             document.getElementById('dash-user-display').innerText = userData.username;
             document.getElementById('dash-uac-display').innerText = userData.uac;
             document.getElementById('dash-phone').innerText = userData.phone;
             document.getElementById('dash-address').value = userData.address||"";
-            const s = document.getElementById('dash-status'); s.innerText = userData.status;
-            s.className = `badge ${userData.status==='ACTIVE'?'badge-to-ship':'badge-cancelled'}`;
+            
+            const s = document.getElementById('dash-status'); 
+            s.innerText = userData.status;
+            s.className = `badge ${userData.status==='ACTIVE'?'badge-active':userData.status==='BLOCKED'?'badge-blocked':'badge-cancelled'}`;
         }
-        window.updateProfile = async () => {
-            await updateDoc(doc(db, "users", currentUser.uid), { address: document.getElementById('dash-address').value });
-            playSound('success'); alert("Saved");
+
+        window.updateProfile = async () => {            await updateDoc(doc(db, "users", currentUser.uid), { 
+                address: document.getElementById('dash-address').value,
+                logCache: serverTimestamp()
+            });
+            playSound('success'); 
+            alert("Alamat dikemaskini!");
         };
+
         window.filterOrders = (status) => {
             const tbody = document.getElementById('user-order-history');
+            const noMsg = document.getElementById('no-orders-msg');
             const filtered = status === 'all' ? allUserOrders : allUserOrders.filter(o=>o.status===status);
-            if(filtered.length===0) { tbody.innerHTML="<tr><td colspan='6' class='text-center'>No orders</td></tr>"; return; }
+            
+            if(filtered.length===0) { 
+                tbody.innerHTML=""; 
+                noMsg.classList.remove('hidden-section'); 
+                return; 
+            }
+            noMsg.classList.add('hidden-section');
+
             tbody.innerHTML = filtered.map(o=>{
-                const badgeClass = o.status==='To Pay'?'badge-to-pay':o.status==='To Ship'?'badge-to-ship':o.status==='Completed'?'badge-completed':'badge-cancelled';                let actions = '';
-                if(o.status==='To Pay') actions = `<button onclick="cancelOrder('${o.id}')" class="text-red-500 text-xs">Cancel</button>`;
-                if(o.status==='To Receive') actions = `<button onclick="completeOrder('${o.id}')" class="text-green-500 text-xs">Received</button>`;
-                if(o.status==='Completed' && !o.rating) actions = `<button onclick="rateOrder('${o.id}')" class="text-yellow-500 text-xs">Rate</button>`;
+                const itemNames = o.items.map(i=>i.name).join(", ");
+                const itemCodes = o.items.map(i=>i.uniqueCode||'N/A').join(", ");
+                const totalQty = Object.values(o.itemCounts||{}).reduce((a,b)=>a+b,0) || o.items.length;
+                
+                let badgeClass = 'badge-to-pay';
+                if(o.status==='To Ship') badgeClass='badge-to-ship';
+                else if(o.status==='To Receive') badgeClass='badge-to-receive';
+                else if(o.status==='Completed') badgeClass='badge-completed';
+                else if(o.status==='Cancelled') badgeClass='badge-cancelled';
+                else if(o.status==='Return/Refund') badgeClass='badge-refund';
+
+                let actions = '';
+                if(o.status==='To Pay') actions = `<button onclick="cancelOrder('${o.id}')" class="text-red-600 font-bold text-[10px] hover:underline border border-red-200 px-1 py-0.5 rounded bg-red-50">Cancel</button>`;
+                if(o.status==='To Receive') actions = `<button onclick="completeOrder('${o.id}')" class="text-green-600 font-bold text-[10px] hover:underline border border-green-200 px-1 py-0.5 rounded bg-green-50">Received</button>`;
+                if(o.status==='Completed') {
+                    if(!o.userRating) actions += ` <button onclick="rateOrder('${o.id}')" class="text-yellow-600 font-bold text-[10px] hover:underline border border-yellow-200 px-1 py-0.5 rounded bg-yellow-50">Rate</button>`;
+                    else actions += ` <span class="text-yellow-500 text-[10px]">⭐ ${o.userRating}</span>`;
+                    actions += ` <button onclick="reorder('${o.id}')" class="text-blue-600 font-bold text-[10px] hover:underline border border-blue-200 px-1 py-0.5 rounded bg-blue-50 ml-1">Reorder</button>`;
+                }
+
                 return `<tr>
-                    <td class="font-bold text-xs">${o.items.map(i=>i.name).join(', ')}</td>
-                    <td class="text-xs font-mono">${o.items[0]?.uniqueCode||'-'}</td>
-                    <td class="font-bold text-pink-600">RM ${o.total}</td>
-                    <td><span class="badge ${badgeClass}">${o.status}</span></td>
-                    <td class="text-xs">${o.trackingNo||'-'}</td>
-                    <td>${actions}</td>
+                    <td class="font-bold text-xs">${o.username}</td>
+                    <td class="max-w-xs truncate" title="${itemNames}">${itemNames}</td>
+                    <td class="font-mono text-[10px] text-gray-500">${itemCodes}</td>
+                    <td class="max-w-xs truncate text-[10px]" title="${o.address}">${o.address}</td>
+                    <td class="text-center text-xs">${totalQty}</td>
+                    <td class="font-bold text-pink-600 text-xs">RM ${o.total}</td>
+                    <td class="text-[10px]">${o.paymentMethod||'Manual'}</td>
+                    <td><span class="badge ${badgeClass}">${o.paymentStatus}</span></td>                    <td class="font-mono text-[10px]">${o.trackingNo||'-'}</td>
+                    <td class="font-mono text-[10px] text-gray-500">${o.orderId}</td>
+                    <td class="text-center">${o.userRating ? '⭐'+o.userRating : '-'}</td>
+                    <td class="text-center">${actions}</td>
                 </tr>`;
             }).join('');
         };
-        window.cancelOrder = async (id) => { await updateDoc(doc(db,"orders",id), {status:'Cancelled'}); playSound('error'); };
-        window.completeOrder = async (id) => { await updateDoc(doc(db,"orders",id), {status:'Completed'}); playSound('success'); };
-        window.rateOrder = async (id) => { const r=prompt("Rating 1-5?"); if(r) { await updateDoc(doc(db,"orders",id),{rating:r}); playSound('success'); }};
 
-        // --- LIVE CHAT SYSTEM (REAL-TIME) ---
+        window.cancelOrder = async (id) => { 
+            if(confirm("Batal pesanan?")) {
+                await updateDoc(doc(db,"orders",id), {status:'Cancelled'}); 
+                playSound('error'); 
+            }
+        };
+        window.completeOrder = async (id) => { 
+            await updateDoc(doc(db,"orders",id), {status:'Completed'}); 
+            playSound('success'); 
+        };
+        window.rateOrder = async (id) => { 
+            const r=prompt("Berikan rating (1-5):","5"); 
+            if(r) { 
+                await updateDoc(doc(db,"orders",id),{userRating:parseInt(r)}); 
+                playSound('success'); 
+            }
+        };
+        window.reorder = (id) => {
+            alert("Item ditambah ke cart (Simulasi Reorder)");
+            playSound('click');
+            // Logic to add items back to cart would go here
+        };
+
+        // --- LIVE CHAT SYSTEM (ADVANCED REAL-TIME) ---
         async function loadChatList() {
             if(!currentUser) return navTo('login');
             const listEl = document.getElementById('chat-list-view');
             listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div></div>';
 
-            // Logic: If Admin, show all users who have messages. If User, show 'Customer Service'
             if(userData.role === 'admin') {
-                // Get all conversations where admin is involved (simplified: query orders or a chats collection)
-                // For this demo, we query 'chats' collection grouped by participant IDs
+                // Admin sees all users who have chatted
                 const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
                 onSnapshot(q, (snap) => {
                     listEl.innerHTML = "";
-                    if(snap.empty) { listEl.innerHTML = "<p class='text-center text-gray-500 mt-10'>No active conversations.</p>"; return; }
+                    if(snap.empty) { listEl.innerHTML = "<p class='text-center text-gray-500 mt-10'>Tiada perbualan aktif.</p>"; return; }
                     snap.forEach(docSnap => {
                         const data = docSnap.data();
                         const partnerId = data.participants.find(id => id !== currentUser.uid);
-                        // Fetch partner details
                         getDoc(doc(db, "users", partnerId)).then(pSnap => {
                             if(pSnap.exists()) {
                                 const p = pSnap.data();
-                                listEl.innerHTML += `
-                                <div onclick="openChat('${partnerId}', '${p.username}')" class="p-3 bg-white/50 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition">
+                                listEl.innerHTML += `                                <div onclick="openChat('${partnerId}', '${p.username}')" class="p-3 bg-white/50 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition shadow-sm">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">${p.username[0]}</div>
                                         <div>
                                             <h4 class="font-bold text-sm">${p.username}</h4>
-                                            <p class="text-xs text-gray-500 truncate w-40">${data.lastMessage || "Start conversation"}</p>
+                                            <p class="text-xs text-gray-500 truncate w-40">${data.lastMessage || "Mula perbualan"}</p>
                                         </div>
                                     </div>
                                     <span class="text-[10px] text-gray-400">${data.lastTime ? new Date(data.lastTime.toDate()).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : ''}</span>
-                                </div>`;                            }
+                                </div>`;
+                            }
                         });
                     });
                 });
             } else {
-                // Customer View: Only chat with "System/Admin"
-                // We create a virtual chat ID based on user ID + "ADMIN_UID" (Assume Admin UID is known or query users with role admin)
-                // For simplicity, we hardcode looking for an admin or create a general support chat
+                // Customer sees only Admin
                 const adminQuery = query(collection(db, "users"), where("role", "==", "admin"), limit(1));
                 const adminSnap = await getDocs(adminQuery);
-                if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500 mt-10'>No Admin Online.</p>"; return; }
+                if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500 mt-10'>Tiada Admin Online.</p>"; return; }
                 const adminDoc = adminSnap.docs[0];
                 const adminId = adminDoc.id;
                 const adminName = adminDoc.data().username;
                 
-                // Check if chat exists
-                const chatId = [currentUser.uid, adminId].sort().join('_');
                 listEl.innerHTML = `
-                <div onclick="openChat('${adminId}', '${adminName}')" class="p-4 bg-white/80 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center shadow-sm">
+                <div onclick="openChat('${adminId}', '${adminName}')" class="p-4 bg-white/80 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center shadow-sm border-l-4 border-purple-500">
                     <div class="flex items-center gap-3">
                         <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xl"><i class="fas fa-headset"></i></div>
                         <div>
                             <h4 class="font-bold text-lg">MFD Support (${adminName})</h4>
-                            <p class="text-xs text-green-600 font-bold">● Online Now</p>
+                            <p class="text-xs text-green-600 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online Now</p>
                         </div>
                     </div>
                     <i class="fas fa-chevron-right text-gray-400"></i>
@@ -625,28 +876,38 @@
             
             const chatId = [currentUser.uid, partnerId].sort().join('_');
             const msgContainer = document.getElementById('chat-messages');
-            msgContainer.innerHTML = '<div class="text-center text-xs text-gray-500 mt-4">Loading messages...</div>';
+            msgContainer.innerHTML = '<div class="text-center text-xs text-gray-500 mt-4">Memuatkan mesej...</div>';
 
             if(unsubscribeChat) unsubscribeChat();
             const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
-            
-            unsubscribeChat = onSnapshot(q, (snap) => {
+                        unsubscribeChat = onSnapshot(q, (snap) => {
                 msgContainer.innerHTML = "";
                 snap.forEach(d => {
                     const m = d.data();
                     const isMe = m.senderId === currentUser.uid;
-                    let content = '';                    if(m.type === 'text') content = `<p>${m.text}</p>`;
+                    let content = '';
+                    
+                    if(m.type === 'text') {
+                        content = `<p class="text-sm">${m.text}</p>`;
+                        if(m.isPinned) content += `<div class="msg-pin"><i class="fas fa-thumbtack"></i> Pinned</div>`;
+                    }
                     else if(m.type === 'image') content = `<img src="${m.url}" class="msg-img" onclick="window.open(this.src)">`;
                     else if(m.type === 'audio') content = `<audio controls src="${m.url}" class="msg-audio"></audio>`;
+                    else if(m.type === 'location') content = `<div class="msg-location"><i class="fas fa-map-marker-alt"></i> ${m.address}</div>`;
                     
+                    if(m.isEdited) content += `<div class="msg-edited">(edited)</div>`;
+
                     msgContainer.innerHTML += `
                     <div class="message-bubble ${isMe?'msg-me':'msg-other'}">
                         ${content}
-                        <div class="text-[9px] opacity-70 text-right mt-1">${m.timestamp ? new Date(m.timestamp.toDate()).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : ''} ${isMe?(m.read?'✓✓':'✓'):''}</div>
+                        <div class="text-[9px] opacity-70 text-right mt-1 flex justify-end gap-1">
+                            ${m.timestamp ? new Date(m.timestamp.toDate()).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : ''} 
+                            ${isMe?(m.read?'<span class="text-blue-200">✓✓</span>':'<span>✓</span>'):''}
+                        </div>
                     </div>`;
                 });
                 msgContainer.scrollTop = msgContainer.scrollHeight;
-                if(snap.size > 0) playSound('msg');
+                if(snap.size > 0 && !document.getElementById('active-chat-view').classList.contains('hidden-section')) playSound('msg');
             });
         };
 
@@ -657,7 +918,6 @@
             currentChatPartner = null;
         };
         
-        // Admin specific close
         window.closeAdminChat = () => {
              if(unsubscribeChat) unsubscribeChat();
              document.getElementById('admin-active-chat').classList.add('hidden-section');
@@ -669,28 +929,30 @@
             const text = input.value.trim();
             if(!text || !currentChatPartner) return;
             await saveMessage(text, 'text');
-            input.value = '';
-        };
+            input.value = '';        };
 
-        async function saveMessage(text, type, url = null) {
+        async function saveMessage(text, type, url = null, address = null) {
             const chatId = [currentUser.uid, currentChatPartner].sort().join('_');
             await addDoc(collection(db, `chats/${chatId}/messages`), {
                 senderId: currentUser.uid,
                 text: text,
                 type: type,
                 url: url,
+                address: address,
                 timestamp: serverTimestamp(),
-                read: false
+                read: false,
+                isPinned: false,
+                isEdited: false
             });
-            // Update last message in chat doc
             await setDoc(doc(db, "chats", chatId), {
-                participants: [currentUser.uid, currentChatPartner],                lastMessage: type==='text'?text:'[Media]',
+                participants: [currentUser.uid, currentChatPartner],
+                lastMessage: type==='text'?text:'[Media]',
                 lastTime: serverTimestamp()
             }, {merge:true});
             playSound('msg');
         }
 
-        // File Upload (Image)
+        // File Upload
         window.handleFileUpload = async (input) => {
             const file = input.files[0];
             if(!file || !currentChatPartner) return;
@@ -699,13 +961,13 @@
                 await uploadBytes(storageRef, file);
                 const url = await getDownloadURL(storageRef);
                 await saveMessage('', 'image', url);
-            } catch(e) { alert("Upload failed. Ensure Storage is enabled."); console.error(e); }
+            } catch(e) { alert("Upload gagal. Pastikan Storage diaktifkan."); console.error(e); }
             input.value = '';
         };
 
         // Voice Recording
         window.startRecording = async () => {
-            if(!navigator.mediaDevices || !currentChatPartner) return alert("Mic not supported or no chat selected");
+            if(!navigator.mediaDevices || !currentChatPartner) return alert("Mic tidak disokong atau tiada chat dipilih");
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
@@ -716,13 +978,12 @@
                     try {
                         const storageRef = ref(storage, `chat_audio/${Date.now()}.webm`);
                         await uploadBytes(storageRef, audioBlob);
-                        const url = await getDownloadURL(storageRef);
-                        await saveMessage('', 'audio', url);
-                    } catch(e) { alert("Audio upload failed. Check Storage."); }
+                        const url = await getDownloadURL(storageRef);                        await saveMessage('', 'audio', url);
+                    } catch(e) { alert("Upload audio gagal."); }
                 };
                 mediaRecorder.start();
                 document.getElementById('recording-indicator').classList.remove('hidden-section');
-            } catch(e) { alert("Mic permission denied"); }
+            } catch(e) { alert("Kebenaran mikrofon ditolak"); }
         };
         window.stopRecording = () => {
             if(mediaRecorder && mediaRecorder.state !== 'inactive') {
@@ -731,70 +992,148 @@
             }
         };
 
-        // Admin Chat Logic (Simplified re-use)
+        // --- ADMIN FUNCTIONS ---
         window.loadAdminData = async () => {
-            if(userData.role !== 'admin') return navTo('home');            // Load Orders
+            if(userData.role !== 'admin') return navTo('home');
+            
+            // Load Orders
             const ordSnap = await getDocs(query(collection(db, "orders"), orderBy("createdAt","desc")));
             document.getElementById('admin-order-list').innerHTML = ordSnap.docs.map(d=>{
                 const o=d.data();
-                return `<tr><td>${o.username}</td><td class="text-xs">${o.items.map(i=>i.name).join(',')}</td><td>RM ${o.total}</td>
-                <td><span class="badge badge-to-pay">${o.status}</span></td>
-                <td><select onchange="updateStatus('${d.id}','paymentStatus',this.value)" class="text-xs"><option ${o.paymentStatus==='Verified'?'selected':''}>Verified</option><option ${o.paymentStatus==='Not Verified'?'selected':''}>Not Verified</option></select></td>
-                <td><input value="${o.trackingNo}" onchange="updateStatus('${d.id}','trackingNo',this.value)" class="text-xs w-20"></td>
-                <td><button onclick="updateStatus('${d.id}','status','Cancelled')" class="text-red-500 text-xs">Cancel</button></td></tr>`;
+                const itemDetail = o.items.map(i => `${i.name} (${i.uniqueCode})`).join("<br>");
+                const totalQty = Object.values(o.itemCounts||{}).reduce((a,b)=>a+b,0) || o.items.length;
+                return `<tr>
+                    <td class="font-mono text-[10px]">${o.uac}</td>
+                    <td class="font-bold text-xs">${o.username}</td>
+                    <td class="text-[10px]">${itemDetail}</td>
+                    <td class="text-[10px] max-w-xs truncate">${o.address}</td>
+                    <td class="text-center text-xs">${totalQty}</td>
+                    <td class="font-bold text-pink-600 text-xs">RM ${o.total}</td>
+                    <td class="text-[10px]">${o.paymentMethod}</td>
+                    <td>
+                        <select onchange="updateOrderStatus('${d.id}','paymentStatus',this.value)" class="text-[10px] p-1 rounded border ${o.paymentStatus==='Verified'?'bg-green-100':'bg-yellow-100'}">
+                            <option value="Not Verified" ${o.paymentStatus==='Not Verified'?'selected':''}>Not Verified</option>
+                            <option value="Verified" ${o.paymentStatus==='Verified'?'selected':''}>Verified</option>
+                        </select>
+                    </td>
+                    <td><input value="${o.trackingNo||''}" onchange="updateOrderStatus('${d.id}','trackingNo',this.value)" class="text-[10px] p-1 w-20 border rounded font-mono"></td>
+                    <td class="font-mono text-[10px]">${o.orderId}</td>
+                    <td><button onclick="updateOrderStatus('${d.id}','status','Cancelled')" class="text-red-500 text-[10px] font-bold hover:underline">Cancel</button></td>
+                </tr>`;
             }).join('');
             
             // Load Users
             const usrSnap = await getDocs(collection(db, "users"));
-            document.getElementById('admin-user-list').innerHTML = usrSnap.docs.map(d=>{
-                const u=d.data();
-                return `<tr><td>${u.uac}</td><td>${u.username}</td><td>${u.status}</td><td><button onclick="toggleBlock('${d.id}')" class="text-red-500 text-xs">Block</button></td></tr>`;
-            }).join('');
+            const users = usrSnap.docs.map(d=>({id:d.id, ...d.data()}));
+            
+            document.getElementById('admin-user-list').innerHTML = users.filter(u=>u.status!=='BLOCKED').map(u=>`
+                <tr>                    <td class="font-mono text-[10px]">${u.uac}</td>
+                    <td class="font-bold text-xs">${u.username}</td>
+                    <td class="text-[10px] text-gray-400">******</td>
+                    <td class="text-xs">${u.phone}</td>
+                    <td class="text-[10px] max-w-xs truncate">${u.address||'-'}</td>
+                    <td><span class="badge badge-active">${u.status}</span></td>
+                    <td>-</td>
+                    <td><button onclick="blockUser('${u.id}')" class="text-red-500 text-[10px] font-bold hover:underline">Block</button></td>
+                </tr>
+            `).join('');
+
+            document.getElementById('admin-blacklist-list').innerHTML = users.filter(u=>u.status==='BLOCKED').map(u=>`
+                <tr>
+                    <td class="font-mono text-[10px]">${u.uac}</td>
+                    <td class="font-bold text-red-600 text-xs">${u.username}</td>
+                    <td><span class="badge badge-blocked">BLOCKED</span></td>
+                    <td class="text-[10px]">${u.logCache?new Date(u.logCache.toDate()).toLocaleString():'-'}</td>
+                    <td><button onclick="unblockUser('${u.id}')" class="text-green-500 text-[10px] font-bold hover:underline">Unblock</button></td>
+                </tr>
+            `).join('');
 
             // Load Products
             const prodSnap = await getDocs(collection(db, "products"));
-            document.getElementById('admin-prod-list').innerHTML = prodSnap.docs.map(d=>{
+            document.getElementById('admin-prod-list').innerHTML = prodSnap.docs.map((d,i)=>{
                 const p=d.data();
-                return `<tr><td>${p.name}</td><td>RM ${p.price}</td><td>${p.totalSold||0}</td><td><button onclick="deleteDoc(doc(db,'products','${d.id}')).then(loadAdminData)" class="text-red-500">Del</button></td></tr>`;
+                return `<tr>
+                    <td>${i+1}</td>
+                    <td><img src="${p.imageUrl}" class="w-8 h-8 rounded object-cover"></td>
+                    <td class="font-bold text-xs">${p.name}</td>
+                    <td class="text-xs">RM ${p.price}</td>
+                    <td class="text-xs">${p.totalSold||0}</td>
+                    <td class="text-xs">⭐ ${p.rating||5.0}</td>
+                    <td><span class="badge ${p.status==='Public'?'badge-active':'badge-cancelled'}">${p.status}</span></td>
+                    <td><button onclick="deleteProduct('${d.id}')" class="text-red-500 text-[10px]">Del</button></td>
+                </tr>`;
             }).join('');
 
-            // Load Admin Chat List (Same as user but reversed logic handled in loadChatList)
-            loadChatList(); 
+            // Load Admin Chat List
+            loadChatList();
         };
 
-        window.updateStatus = async (id, field, val) => {
+        window.updateOrderStatus = async (id, field, val) => {
             await updateDoc(doc(db, "orders", id), {[field]: val});
             if(field==='status' && val==='Cancelled') playSound('error');
             else playSound('success');
             loadAdminData();
         };
-        window.toggleBlock = async (id) => {
-            const u = await getDoc(doc(db, "users", id));
-            const newStatus = u.data().status === 'BLOCKED' ? 'ACTIVE' : 'BLOCKED';
-            await updateDoc(doc(db, "users", id), {status: newStatus});
+
+        window.blockUser = async (uid) => {
+            if(confirm("Block pengguna ini?")) {                await updateDoc(doc(db, "users", uid), {status: 'BLOCKED'});
+                playSound('error');
+                loadAdminData();
+            }
+        };
+        window.unblockUser = async (uid) => {
+            await updateDoc(doc(db, "users", uid), {status: 'ACTIVE'});
+            playSound('success');
             loadAdminData();
         };
+
         window.addProduct = async () => {
+            const imgUrl = document.getElementById('prod-img-url').value;
+            if(!imgUrl) return alert("Sila paste Image URL");
             await addDoc(collection(db, "products"), {
                 name: document.getElementById('prod-name').value,
                 price: document.getElementById('prod-price').value,
-                imageUrl: document.getElementById('prod-img-url').value,
                 description: document.getElementById('prod-desc').value,
-                status: 'Public', totalSold: 0, uniqueCode: 'ITEM-'+Math.random().toString(36).substr(2,6).toUpperCase(),
+                imageUrl: imgUrl,
+                status: document.getElementById('prod-status').value,
+                country: document.getElementById('prod-country').value,
+                event: document.getElementById('prod-event').value,
+                variation: document.getElementById('prod-variation').value,
+                uniqueCode: "ITEM-"+Math.random().toString(36).substr(2,6).toUpperCase(),
+                totalSold: 0,
+                rating: 5.0,
                 createdAt: serverTimestamp()
-            });            playSound('success'); alert("Added"); loadAdminData(); loadProducts();
+            });
+            playSound('success');
+            alert("Produk dilancarkan!");
+            loadAdminData();
+            loadProducts();
+            document.querySelectorAll('#tab-products input, #tab-products textarea').forEach(i=>i.value='');
+        };
+        window.deleteProduct = async (id) => {
+            if(confirm("Padam produk?")) {
+                await deleteDoc(doc(db, "products", id));
+                playSound('click');
+                loadAdminData();
+                loadProducts();
+            }
         };
 
-        // Admin Chat Specifics
+        // Admin Chat Functions
         window.sendAdminMessage = async () => {
             const input = document.getElementById('admin-msg-input');
             const text = input.value.trim();
             if(!text || !currentChatPartner) return;
             await saveMessage(text, 'text');
-            input.value = '';
+            input.value = '';        };
+        window.deleteConversation = async () => {
+            if(confirm("Padam perbualan ini secara kekal?")) {
+                // Logic to delete chat subcollection would go here (complex in client-side, usually done via Cloud Functions)
+                alert("Fitur padam perbualan memerlukan fungsi backend. Untuk demo, sila padam manual di Console.");
+            }
         };
-        
-        // Init
+
+        // --- INIT AUTH LISTENER ---
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if(user) {
@@ -803,7 +1142,12 @@
                 const snap = await getDoc(doc(db, "users", user.uid));
                 if(snap.exists()) {
                     userData = snap.data();
-                    if(userData.status === 'BLOCKED') { alert("Blocked"); signOut(auth); return; }
+                    if(userData.status === 'BLOCKED') { 
+                        playSound('error');
+                        alert("Akaun anda telah diblokir."); 
+                        signOut(auth); 
+                        return; 
+                    }
                     if(userData.role === 'admin') navTo('admin');
                     else navTo('dashboard');
                 }
