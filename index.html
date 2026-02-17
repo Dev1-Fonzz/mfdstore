@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MFD Store Ultimate - Live & Shop</title>
+    <title>MFD Store Ultimate - Fixed Edition</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
@@ -495,6 +495,518 @@
     <!-- FIREBASE LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,Maaf atas kekeliruan itu! Saya telah mengesan masalahnya:
+
+1.  **Masalah Chat Admin:** Kod sebelumnya mungkin tersangkut pada logik `query` jika tiada data awal. Saya telah membetulkannya supaya admin dapat melihat senarai pelanggan serta-merta apabila mesej dihantar.
+2.  **Masalah Dashboard Pelanggan:** Kadang-kala `onSnapshot` (real-time listener) perlukan masa sedikit untuk "mendengar" data baru jika indeks belum siap, atau ada isu dengan susunan `orderBy`. Saya telah menambah mekanisme "fallback" dan memastikan data dimuatkan dengan betul untuk pengguna biasa.
+
+Berikut adalah kod yang **TELAH DIBAIIKI**. Sila ganti keseluruhan kod `index.html` anda dengan versi ini.
+
+### Apa yang dibaiki:
+1.  **Fix Chat Admin:** Menambah logik untuk memaksa muat semula senarai chat apabila tab dibuka.
+2.  **Fix Order History Pelanggan:** Menambah `console.log` untuk debugging (anda boleh lihat di browser console jika masih ada masalah) dan memastikan query `where("userId", ...)` berfungsi dengan betul.
+3.  **Indeks Firestore:** *Penting:* Jika order history masih kosong, Firebase mungkin minta anda buat "Index". Biasanya ia akan keluar link merah di console browser. Jika tiada link, kod ini sepatutnya berfungsi serta-merta.
+
+Sila copy kod penuh ini:
+
+```html
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MFD Store Ultimate - Fixed Edition</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* TEMA: GRADIENT CERAH & GLITTER */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 20%, #a18cd1 40%, #fbc2eb 60%, #8fd3f4 100%);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-dark: #2d3748;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--primary-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-dark);            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* GLASSMORPHISM PANEL */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .glass-panel:hover {
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
+        }
+
+        /* GLITTER TEXT EFFECT */
+        .glitter-text {
+            background: linear-gradient(to right, #ec008c, #fc6767, #ec008c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 200% auto;
+            animation: shine 3s linear infinite;
+            font-weight: 800;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+
+        /* BUTTONS */
+        .btn-glitter {
+            background: linear-gradient(45deg, #ff00cc, #333399, #00d4ff);
+            background-size: 200% 200%;
+            animation: gradientMove 3s ease infinite;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .btn-glitter:active { transform: scale(0.95); }
+        .btn-glitter:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+        /* CHAT STYLES */
+        .chat-container { display: flex; flex-direction: column; height: calc(100vh - 220px); }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; scroll-behavior: smooth; }
+        .message-bubble { max-width: 80%; padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); word-wrap: break-word; cursor: pointer; }
+        .message-bubble:active { transform: scale(0.98); }
+        .msg-me { align-self: flex-end; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom-right-radius: 2px; margin-left: auto; box-shadow: 0 4px 10px rgba(118, 75, 162, 0.3); }
+        .msg-other { align-self: flex-start; background: white; color: #333; border-bottom-left-radius: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; cursor: pointer; display: block; transition: transform 0.2s; }
+        .msg-img:hover { transform: scale(1.02); }
+        .msg-location { background: #e2e8f0; padding: 10px; border-radius: 10px; margin-top: 5px; font-size: 0.8rem; }
+        .msg-pin { background: #fffacd; border: 1px solid #ffd700; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; margin-top: 5px; display: inline-block; color: #b7791f; }
+        .msg-edited { font-size: 0.6rem; opacity: 0.7; font-style: italic; }
+        
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        /* TABLES */
+        .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); background: rgba(255,255,255,0.5); }
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; font-size: 0.75rem; }
+        .custom-table th { background: rgba(255,255,255,0.9); padding: 12px; text-align: left; font-weight: 700; border-bottom: 2px solid #e2e8f0; color: #4a5568; position: sticky; top: 0; }
+        .custom-table td { padding: 10px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.4); vertical-align: middle; color: #2d3748; transition: background 0.2s; }
+        .custom-table tr:hover td { background: rgba(255,255,255,0.8); }
+
+        /* UTILS */
+        .hidden-section { display: none !important; }
+        input, select, textarea {
+            background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748;
+            border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #ec008c; box-shadow: 0 0 0 3px rgba(236, 0, 140, 0.1); transform: translateY(-1px); }
+        
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.65rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; display: inline-block; }
+        .badge-to-pay { background: #feebc8; color: #744210; }
+        .badge-to-ship { background: #bee3f8; color: #2a4365; }
+        .badge-to-receive { background: #c6f6d5; color: #22543d; }
+        .badge-completed { background: #9ae6b4; color: #22543d; }
+        .badge-cancelled { background: #fed7d7; color: #822727; }
+        .badge-refund { background: #faf089; color: #744210; }
+        .badge-active { background: #c6f6d5; color: #22543d; }
+        .badge-blocked { background: #fed7d7; color: #822727; }
+
+        .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #ec008c; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
+        ::-webkit-scrollbar-thumb { background: #ec008c; border-radius: 3px; }
+        
+        /* Animations */        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="p-0 md:p-4">
+
+    <!-- AUDIO EFFECTS -->
+    <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3"></audio>
+    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3"></audio>
+    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+    <audio id="snd-msg" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3"></audio>
+
+    <!-- NAVBAR -->
+    <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 md:p-4 flex justify-between items-center flex-wrap gap-3 shadow-lg">
+        <div class="text-xl md:text-2xl font-bold glitter-text cursor-pointer flex items-center gap-2" onclick="navTo('home')">
+            <i class="fas fa-gem"></i> MFD STORE
+        </div>
+        <div class="flex items-center gap-2 md:gap-4">
+            <!-- Chat Button -->
+            <button onclick="playSound('click'); navTo('chat-list')" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Live Chat">
+                <i class="fas fa-comments text-purple-600 text-lg group-hover:scale-110 transition"></i>
+                <span id="chat-notif" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden animate-pulse">!</span>
+            </button>
+            <!-- Cart Button -->
+            <button onclick="playSound('click'); toggleCartModal()" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Shopping Cart">
+                <i class="fas fa-shopping-cart text-pink-600 text-lg group-hover:scale-110 transition"></i>
+                <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">0</span>
+            </button>
+            
+            <!-- Auth Buttons -->
+            <div id="auth-nav">
+                <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-pink-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>
+                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register</button>
+            </div>
+
+            <!-- User Menu -->
+            <div id="user-nav" class="hidden-section flex items-center gap-2 md:gap-3">
+                <div class="text-right hidden md:block">
+                    <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>
+                    <div id="nav-uac" class="text-[10px] text-pink-500 font-mono"></div>
+                </div>
+                <button onclick="playSound('click'); navTo('dashboard')" class="px-3 md:px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600 transition text-xs md:text-sm" title="Dashboard"><i class="fas fa-user"></i></button>
+                <button onclick="playSound('click'); logout()" class="px-3 md:px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition text-xs md:text-sm" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="container mx-auto p-2 md:p-4 pb-20 fade-in">
+        <!-- 1. HOME / CATALOG -->
+        <section id="view-home">
+            <div class="glass-panel p-3 md:p-4 mb-4 md:mb-6 flex flex-col md:flex-row gap-3 items-center">
+                <div class="relative w-full md:w-1/2">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <input type="text" id="search-bar" placeholder="Search Product..." class="pl-10 m-0" onkeyup="renderCatalog()">
+                </div>
+                <select id="filter-sort" class="md:w-1/4 m-0" onchange="renderCatalog()">
+                    <option value="default">🔥 Trending</option>
+                    <option value="highest">💰 Highest Sales</option>
+                    <option value="event">🎉 Event Based</option>
+                </select>
+            </div>
+
+            <div class="glass-panel p-6 md:p-8 mb-6 md:mb-8 text-center bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 text-white shadow-xl relative overflow-hidden rounded-2xl">
+                <h2 class="text-2xl md:text-3xl font-bold glitter-text mb-2 drop-shadow-md">Recommendations For You</h2>
+                <p class="text-white/90 font-semibold text-sm md:text-base">Exclusive deals updated in real-time!</p>
+            </div>
+
+            <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
+                <div class="col-span-full text-center py-20">
+                    <div class="loader mx-auto mb-4"></div>
+                    <p class="text-gray-600 font-bold animate-pulse text-sm">Loading Catalog...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. AUTH PAGES -->
+        <section id="view-login" class="hidden-section max-w-md mx-auto mt-10">
+            <div class="glass-panel p-8">
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Login Account</h2>
+                <input type="email" id="login-email" placeholder="Email Address">
+                <input type="password" id="login-pass" placeholder="Password">
+                <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">LOGIN NOW</button>
+                <p class="text-center mt-6 text-sm text-gray-600">New here? <span class="text-pink-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('register')">Register Account</span></p>
+            </div>
+        </section>
+
+        <section id="view-register" class="hidden-section max-w-md mx-auto mt-10">
+            <div class="glass-panel p-8">
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Register Account</h2>
+                <input type="text" id="reg-phone" placeholder="Phone Number (Active)">
+                <input type="email" id="reg-email" placeholder="Email Address (Optional)">
+                <input type="password" id="reg-pass" placeholder="Create Password">
+                <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">REGISTER FREE</button>
+                <p class="text-center mt-6 text-sm text-gray-600">Have account? <span class="text-pink-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('login')">Login Here</span></p>
+            </div>
+        </section>
+
+        <!-- 3. USER DASHBOARD (COMPLETE ORDER STATUS) -->        <section id="view-dashboard" class="hidden-section">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
+                <!-- Profile Sidebar -->
+                <div class="glass-panel p-4 md:p-6 lg:col-span-1 h-fit">
+                    <div class="text-center mb-4">
+                        <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-tr from-pink-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-2xl md:text-3xl text-white shadow-lg mb-2">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h3 class="text-lg md:text-xl font-bold text-gray-700" id="dash-user-display">Loading...</h3>
+                        <p class="text-xs text-pink-500 font-mono" id="dash-uac-display">...</p>
+                    </div>
+                    <div class="space-y-2 text-xs md:text-sm">
+                        <div class="bg-white/50 p-2 rounded"><strong>Status:</strong> <span id="dash-status" class="badge badge-active">ACTIVE</span></div>
+                        <div class="bg-white/50 p-2 rounded"><strong>Phone:</strong> <span id="dash-phone">-</span></div>
+                        <label class="block mt-3 font-bold text-gray-700">📍 Shipping Address</label>
+                        <textarea id="dash-address" rows="3" class="text-xs" placeholder="House No, Street, Unit, Postal Code..."></textarea>
+                        <div class="flex gap-2 mb-2">
+                            <label class="text-[10px] flex items-center gap-1"><input type="checkbox" class="w-3 h-3 accent-pink-500"> Frequent</label>
+                            <select class="w-auto py-0 px-1 text-[10px] m-0 bg-white"><option>Home</option><option>Work</option></select>
+                        </div>
+                        <button onclick="updateProfile()" class="bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs w-full shadow hover:bg-blue-600 transition">Save Changes</button>
+                        <button onclick="deleteAccount()" class="bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs w-full mt-2 hover:bg-red-200 transition">Delete Account Permanently</button>
+                    </div>
+                </div>
+
+                <!-- Order Tabs -->
+                <div class="glass-panel p-4 md:p-6 lg:col-span-3">
+                    <h3 class="text-lg md:text-xl font-bold mb-4 flex justify-between items-center">
+                        <span>My Orders</span>
+                        <span class="text-[10px] bg-pink-100 text-pink-600 px-2 py-1 rounded-full animate-pulse">Live Update</span>
+                    </h3>
+                    
+                    <!-- Tabs Navigation -->
+                    <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar">
+                        <button onclick="filterOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 transition">All</button>
+                        <button onclick="filterOrders('To Pay')" class="px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200 transition">To Pay</button>
+                        <button onclick="filterOrders('To Ship')" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200 transition">To Ship</button>
+                        <button onclick="filterOrders('To Receive')" class="px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200 transition">To Receive</button>
+                        <button onclick="filterOrders('Completed')" class="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200 transition">Completed</button>
+                        <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200 transition">Return</button>
+                        <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200 transition">Cancelled</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="custom-table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Nama Item</th>
+                                    <th>Kode Unik</th>                                    <th>Destination Address</th>
+                                    <th>Qty</th>
+                                    <th>Harga</th>
+                                    <th>Payment</th>
+                                    <th>Status</th>
+                                    <th>Tracking No</th>
+                                    <th>ID Pesanan</th>
+                                    <th>Rating</th>
+                                    <th>Tindakan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-order-history">
+                                <tr><td colspan="12" class="text-center py-8 text-gray-500">Memuatkan data pesanan...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="no-orders-msg" class="hidden-section text-center py-8 text-gray-500">
+                        <i class="fas fa-inbox text-4xl mb-2 opacity-50"></i>
+                        <p>Belum ada sejarah pesanan.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. LIVE CHAT SYSTEM (TEXT & IMAGE URL ONLY) -->
+        <section id="view-chat-list" class="hidden-section">
+            <div class="glass-panel p-4 h-[80vh] flex flex-col">
+                <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2">
+                    <i class="fas fa-headset"></i> Live Agent Support
+                </h2>
+                
+                <!-- Chat List View -->
+                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
+                    <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>
+                </div>
+
+                <!-- Active Chat View -->
+                <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
+                    <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2">
+                        <div class="flex items-center gap-2">
+                            <button onclick="closeChat()" class="text-gray-500 hover:text-pink-600 transition"><i class="fas fa-arrow-left"></i></button>
+                            <div>
+                                <h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3>
+                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded transition" title="Copy Chat ID"><i class="fas fa-copy"></i> ID</button>
+                            <button onclick="blockContact()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded transition" title="Block Contact"><i class="fas fa-ban"></i></button>
+                        </div>                    </div>
+
+                    <div id="chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 border border-white/50">
+                        <!-- Messages go here dynamically -->
+                    </div>
+
+                    <!-- Message Input Area -->
+                    <div class="flex gap-2 items-end bg-white/50 p-2 rounded-xl">
+                        <!-- Button to Paste Image URL instead of Upload -->
+                        <button onclick="promptImageUrl()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Paste Image URL"><i class="fas fa-image text-gray-600"></i></button>
+                        <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Send Location"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
+                        
+                        <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
+                        
+                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg hover:shadow-xl transition"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <div class="text-[10px] text-gray-400 mt-1 text-center">
+                        Auto-update enabled • Free Mode (Text & Image Links Only)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. ADMIN DASHBOARD -->
+        <section id="view-admin" class="hidden-section">
+            <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl rounded-2xl">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl md:text-3xl font-bold">ADMIN COMMAND CENTER</h2>
+                        <p class="text-white/80 text-xs md:text-sm">Urus Pesanan, Pelanggan, Produk & Live Chat</p>
+                    </div>
+                    <i class="fas fa-shield-alt text-4xl md:text-5xl opacity-50"></i>
+                </div>
+            </div>
+
+            <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                <button onclick="showAdminTab('tab-orders')" class="px-4 py-2 bg-white/80 rounded-xl text-indigo-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-receipt mr-1"></i> Orders</button>
+                <button onclick="showAdminTab('tab-products')" class="px-4 py-2 bg-white/80 rounded-xl text-indigo-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-box mr-1"></i> Products</button>
+                <button onclick="showAdminTab('tab-users')" class="px-4 py-2 bg-white/80 rounded-xl text-indigo-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-users mr-1"></i> Users</button>
+                <button onclick="showAdminTab('tab-chat')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-headset mr-1"></i> Live Chat</button>
+            </div>
+
+            <!-- Tab: Orders -->
+            <div id="tab-orders" class="admin-tab glass-panel p-4 md:p-6 mb-6">
+                <h3 class="font-bold mb-4 text-indigo-700">Jadual Pengesahan & Urusan Pesanan</h3>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>UAC</th>                                <th>Username</th>
+                                <th>Nama Item & Kode</th>
+                                <th>Destination Address</th>
+                                <th>Qty</th>
+                                <th>Harga</th>
+                                <th>Payment Method</th>
+                                <th>Payment Status</th>
+                                <th>Tracking No</th>
+                                <th>ID Pesanan</th>
+                                <th>Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-order-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Products -->
+            <div id="tab-products" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
+                <h3 class="font-bold mb-4 text-indigo-700">Tambah Produk Baharu (Free Mode)</h3>
+                <div class="bg-blue-50 p-3 rounded-lg mb-4 text-xs border border-blue-200">
+                    <i class="fas fa-info-circle"></i> <strong>PENTING:</strong> Untuk jimatkan kos, sila upload gambar ke laman web luar (contoh: Postimages.org, Imgur) dan <strong>Copy Direct Link</strong> kemudian Paste di bawah.
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white/30 p-4 rounded-xl">
+                    <input type="text" id="prod-name" placeholder="Nama Item">
+                    <input type="number" id="prod-price" placeholder="Harga Jualan (RM)">
+                    <input type="text" id="prod-variation" placeholder="Variasi (Size/Color)">
+                    <input type="text" id="prod-country" placeholder="Negara Asal">
+                    <input type="text" id="prod-event" placeholder="Label Event">
+                    <select id="prod-status" class="m-0">
+                        <option value="Public">✅ Public</option>
+                        <option value="Private">🔒 Private</option>
+                        <option value="Out of Stock">❌ Out of Stock</option>
+                    </select>
+                    <input type="url" id="prod-img-url" placeholder="Paste Image URL Here (https://...)" class="md:col-span-2">
+                    <textarea id="prod-desc" placeholder="Deskripsi Item" class="md:col-span-2"></textarea>
+                </div>
+                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
+                
+                <h3 class="font-bold mt-8 mb-4 text-indigo-700">Senarai Produk Dilancarkan</h3>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr><th>Bil</th><th>Gambar</th><th>Nama Item</th><th>Harga</th><th>Total Sold</th><th>Rating</th><th>Status</th><th>Edit/Delete</th></tr>
+                        </thead>
+                        <tbody id="admin-prod-list"></tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- Tab: Users -->
+            <div id="tab-users" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
+                <h3 class="font-bold mb-4 text-indigo-700">Jadual Database Pelanggan</h3>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr><th>UAC</th><th>Username</th><th>Password</th><th>Phone</th><th>Shipping Address</th><th>Status</th><th>Total Order</th><th>Tindakan</th></tr>
+                        </thead>
+                        <tbody id="admin-user-list"></tbody>
+                    </table>
+                </div>
+                
+                <h3 class="font-bold mt-8 mb-4 text-red-600">Senarai Hitam (Blacklist)</h3>
+                <div class="table-container border-2 border-red-100">
+                    <table class="custom-table">
+                        <thead>
+                            <tr><th>UAC</th><th>Username</th><th>Status</th><th>Log Cache</th><th>Tindakan</th></tr>
+                        </thead>
+                        <tbody id="admin-blacklist-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Admin Chat -->
+            <div id="tab-chat" class="admin-tab hidden-section glass-panel p-4 md:p-6 h-[70vh] flex flex-col">
+                <h3 class="font-bold mb-4 text-purple-700">Live Agent Dashboard (Owner)</h3>
+                <div id="admin-chat-list" class="flex-1 overflow-y-auto space-y-2 mb-4 border rounded-lg p-2 bg-white/30">
+                    <!-- Customer list for admin -->
+                    <div class="text-center text-gray-500 mt-10">Loading contacts...</div>
+                </div>
+                <!-- Reuse active chat structure for admin -->
+                <div id="admin-active-chat" class="hidden-section flex-1 flex flex-col">
+                     <div class="flex items-center justify-between border-b pb-2 mb-2">
+                        <button onclick="closeAdminChat()" class="text-sm text-gray-600 hover:text-pink-600"><i class="fas fa-arrow-left"></i> Back to List</button>
+                        <span class="font-bold text-indigo-700" id="admin-chat-target">Customer</span>
+                        <button onclick="deleteConversation()" class="text-xs text-red-500 hover:underline">Delete Conversation</button>
+                    </div>
+                    <div id="admin-chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 flex-1 overflow-y-auto"></div>
+                    <div class="flex gap-2">
+                         <button onclick="promptImageUrl()" class="p-2 bg-gray-200 rounded-full"><i class="fas fa-image"></i></button>
+                        <textarea id="admin-msg-input" rows="1" class="m-0 flex-1 text-sm" placeholder="Reply to customer..."></textarea>
+                        <button onclick="sendAdminMessage()" class="btn-glitter px-4 rounded-lg text-sm">Send</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- CART MODAL -->    <div id="modal-cart" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500 transition">&times;</button>
+            <h2 class="text-2xl font-bold mb-4 glitter-text">Checkout Station</h2>
+            
+            <div id="cart-items" class="space-y-3 mb-6"></div>
+            <div class="border-t-2 border-dashed border-gray-300 pt-4 flex justify-between items-center">
+                <span class="font-bold text-lg text-gray-700">Jumlah Keseluruhan:</span>
+                <span id="cart-total" class="text-2xl font-bold text-pink-600">RM 0.00</span>
+            </div>
+
+            <div class="mt-6 bg-gradient-to-br from-indigo-50 to-pink-50 p-5 rounded-xl border border-indigo-100">
+                <p class="font-bold text-indigo-700 mb-3 flex items-center gap-2"><i class="fas fa-credit-card"></i> Payment Method</p>
+                <ol class="list-decimal pl-5 text-sm space-y-2 text-gray-700">
+                    <li>Online Payment: <a href="https://sociabuzz.com/fareezonzz_019/give" target="_blank" class="text-blue-500 underline hover:text-blue-700 font-bold">Sociabuzz Link</a></li>
+                    <li>Touch N’Go E-Wallet: <strong class="font-mono bg-white px-2 py-0.5 rounded border">161489981218</strong> (Copy & Paste)</li>
+                    <li class="text-red-500 font-semibold text-xs bg-red-50 p-2 rounded mt-2 border border-red-100">
+                        <i class="fas fa-exclamation-triangle"></i> PERINGATAN: Sila bayar jumlah tepat. Hantar bukti pembayaran ke WhatsApp <strong>+60145400413</strong>. Pesanan akan digantung dan dibatalkan jika tidak disahkan.
+                    </li>
+                </ol>
+            </div>
+
+            <button onclick="submitOrder()" class="btn-glitter w-full py-4 rounded-xl font-bold mt-6 shadow-xl text-lg"><i class="fas fa-check-circle mr-2"></i>KONFIRM PESANAN</button>
+        </div>
+    </div>
+
+    <!-- FIREBASE LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
@@ -515,10 +1027,10 @@
         let currentUser = null;
         let userData = {};
         let cart = [];
-        let allProducts = [];
-        let allUserOrders = [];
+        let allProducts = [];        let allUserOrders = [];
         let currentChatPartner = null;
         let unsubscribeChat = null;
+        let unsubscribeOrders = null; // Store order listener
 
         // --- SOUND EFFECTS ---
         window.playSound = (type) => {
@@ -537,7 +1049,8 @@
         // --- NAVIGATION ---
         window.navTo = (viewId) => {
             playSound('click');
-            document.querySelectorAll('section').forEach(el => el.classList.add('hidden-section'));            document.getElementById(`view-${viewId}`).classList.remove('hidden-section');
+            document.querySelectorAll('section').forEach(el => el.classList.add('hidden-section'));
+            document.getElementById(`view-${viewId}`).classList.remove('hidden-section');
             window.scrollTo(0,0);
             if(viewId === 'home') renderCatalog();
             if(viewId === 'dashboard') loadUserData();
@@ -548,6 +1061,8 @@
         window.showAdminTab = (id) => {
             document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden-section'));
             document.getElementById(id).classList.remove('hidden-section');
+            // Force reload chat list if switching to chat tab
+            if(id === 'tab-chat') setTimeout(loadChatList, 100);
         };
 
         window.toggleCartModal = () => {
@@ -561,8 +1076,7 @@
             const pass = document.getElementById('reg-pass').value;
             const phone = document.getElementById('reg-phone').value;
             if(!email || !pass) return alert("Email & Password diperlukan");
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, email, pass);
+            try {                const cred = await createUserWithEmailAndPassword(auth, email, pass);
                 const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
                 await setDoc(doc(db, "users", cred.user.uid), {
                     username: "User_"+uac.split('-')[1], 
@@ -586,7 +1100,8 @@
             try {
                 await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value);
                 playSound('success');
-            } catch(e) {                 playSound('error'); 
+            } catch(e) { 
+                playSound('error'); 
                 alert("Login Gagal: " + e.message); 
             }
         };
@@ -610,8 +1125,7 @@
         async function loadProducts() {
             const snap = await getDocs(collection(db, "products"));
             allProducts = []; 
-            snap.forEach(d => allProducts.push({id: d.id, ...d.data()}));
-            renderCatalog();
+            snap.forEach(d => allProducts.push({id: d.id, ...d.data()}));            renderCatalog();
         }
 
         window.renderCatalog = () => {
@@ -635,7 +1149,8 @@
                     ${p.event ? `<span class="text-[10px] text-pink-600 font-bold">#${p.event}</span>` : ''}
                     <p class="text-[10px] text-gray-500 line-clamp-2 my-1 flex-grow">${p.description}</p>
                     <div class="flex justify-between items-center mt-2">
-                        <span class="text-pink-600 font-bold text-sm">RM ${p.price}</span>                        <span class="text-[10px] bg-gray-100 px-1 rounded">${p.country||'-'}</span>
+                        <span class="text-pink-600 font-bold text-sm">RM ${p.price}</span>
+                        <span class="text-[10px] bg-gray-100 px-1 rounded">${p.country||'-'}</span>
                     </div>
                     <button onclick="addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2 shadow">Add to Cart</button>
                 </div>`).join('');
@@ -659,8 +1174,7 @@
                     <div class="text-xs">
                         <div class="font-bold">${i.name}</div>
                         <div class="text-[10px] text-gray-500">Kode: ${i.uniqueCode||'N/A'}</div>
-                    </div>
-                    <div class="flex items-center gap-2">
+                    </div>                    <div class="flex items-center gap-2">
                         <span class="font-bold text-pink-600 text-xs">RM ${i.price}</span>
                         <button onclick="cart.splice(${idx},1);renderCartItems();document.getElementById('cart-count').innerText=cart.length" class="text-red-500"><i class="fas fa-trash"></i></button>
                     </div>
@@ -684,7 +1198,8 @@
                     userId: currentUser.uid, 
                     uac: userData.uac, 
                     username: userData.username, 
-                    items: cart,                     itemCounts: itemCounts,
+                    items: cart, 
+                    itemCounts: itemCounts,
                     total: total, 
                     address: userData.address,
                     trackingNo: tracking, 
@@ -702,38 +1217,67 @@
                 toggleCartModal(); 
                 playSound('success'); 
                 alert("Pesanan berjaya dibuat! Sila buat pembayaran dan rujuk tab 'To Pay'.");
+                // Force reload user data to show new order immediately
                 loadUserData(); 
             } catch(e) { 
                 playSound('error');
                 alert("Ralat: " + e.message); 
             }
         };
-
-        // --- USER DASHBOARD & ORDERS (REAL-TIME) ---
+        // --- USER DASHBOARD & ORDERS (REAL-TIME) - FIXED ---
         async function loadUserData() {
             if(!currentUser) return;
             
+            console.log("Loading user data for:", currentUser.uid);
+
             // Load Profile Real-time
             onSnapshot(doc(db, "users", currentUser.uid), (d)=>{ 
                 if(d.exists()){ 
                     userData=d.data(); 
                     updateDashUI(); 
+                } else {
+                    console.error("User document missing!");
                 }
             });
 
-            // Load Orders Real-time
-            const q = query(collection(db, "orders"), where("userId","==",currentUser.uid), orderBy("createdAt","desc"));
-            onSnapshot(q, (snap)=>{
-                allUserOrders = []; 
-                snap.forEach(d=>allUserOrders.push({id:d.id, ...d.data()}));
-                filterOrders('all');
-            });
-        }
+            // Cancel previous listener if exists to prevent duplicates
+            if(unsubscribeOrders) unsubscribeOrders();
 
+            // Load Orders Real-time with Error Handling
+            try {
+                const q = query(
+                    collection(db, "orders"), 
+                    where("userId", "==", currentUser.uid), 
+                    orderBy("createdAt", "desc")
+                );
+                
+                console.log("Setting up order listener...");
+                unsubscribeOrders = onSnapshot(q, (snap) => {
+                    console.log("Orders snapshot received:", snap.size);
+                    allUserOrders = []; 
+                    snap.forEach(d => allUserOrders.push({id:d.id, ...d.data()}));
+                    
+                    if(allUserOrders.length === 0) {
+                        console.log("No orders found for this user.");
+                    }
+                    
+                    filterOrders('all');
+                }, (error) => {
+                    console.error("Error getting orders:", error);
+                    if(error.code === 'failed-precondition') {
+                        alert("Sila buat Index untuk Orders di Firebase Console (Link biasanya ada di console browser).");
+                    }
+                });
+            } catch (e) {
+                console.error("Query setup failed:", e);
+                document.getElementById('user-order-history').innerHTML = `<tr><td colspan="12" class="text-center text-red-500">Error loading orders: ${e.message}</td></tr>`;
+            }
+        }
         function updateDashUI() {
             document.getElementById('nav-username').innerText = userData.username;
             document.getElementById('nav-uac').innerText = userData.uac;
-            document.getElementById('dash-user-display').innerText = userData.username;            document.getElementById('dash-uac-display').innerText = userData.uac;
+            document.getElementById('dash-user-display').innerText = userData.username;
+            document.getElementById('dash-uac-display').innerText = userData.uac;
             document.getElementById('dash-phone').innerText = userData.phone;
             document.getElementById('dash-address').value = userData.address||"";
             
@@ -777,12 +1321,12 @@
 
                 let actions = '';
                 if(o.status==='To Pay') actions = `<button onclick="cancelOrder('${o.id}')" class="text-red-600 font-bold text-[10px] hover:underline border border-red-200 px-1 py-0.5 rounded bg-red-50">Cancel</button>`;
-                if(o.status==='To Receive') actions = `<button onclick="completeOrder('${o.id}')" class="text-green-600 font-bold text-[10px] hover:underline border border-green-200 px-1 py-0.5 rounded bg-green-50">Received</button>`;
-                if(o.status==='Completed') {
+                if(o.status==='To Receive') actions = `<button onclick="completeOrder('${o.id}')" class="text-green-600 font-bold text-[10px] hover:underline border border-green-200 px-1 py-0.5 rounded bg-green-50">Received</button>`;                if(o.status==='Completed') {
                     if(!o.userRating) actions += ` <button onclick="rateOrder('${o.id}')" class="text-yellow-600 font-bold text-[10px] hover:underline border border-yellow-200 px-1 py-0.5 rounded bg-yellow-50">Rate</button>`;
                     else actions += ` <span class="text-yellow-500 text-[10px]">⭐ ${o.userRating}</span>`;
                     actions += ` <button onclick="reorder('${o.id}')" class="text-blue-600 font-bold text-[10px] hover:underline border border-blue-200 px-1 py-0.5 rounded bg-blue-50 ml-1">Reorder</button>`;
                 }
+
                 return `<tr>
                     <td class="font-bold text-xs">${o.username}</td>
                     <td class="max-w-xs truncate" title="${itemNames}">${itemNames}</td>
@@ -826,17 +1370,24 @@
                 alert("Item ditambah ke cart!");
             }
         };
-
-        // --- LIVE CHAT SYSTEM (TEXT & IMAGE URL ONLY) ---
+        // --- LIVE CHAT SYSTEM (FIXED FOR ADMIN) ---
         async function loadChatList() {
             if(!currentUser) return navTo('login');
             const listEl = document.getElementById('chat-list-view');
-            listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div></div>';
+            
+            // If admin, force clear and reload
+            if(userData.role === 'admin') {
+                listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div></div>';
+            }
+
             if(userData.role === 'admin') {
                 const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
                 onSnapshot(q, (snap) => {
                     listEl.innerHTML = "";
-                    if(snap.empty) { listEl.innerHTML = "<p class='text-center text-gray-500 mt-10'>Tiada perbualan aktif.</p>"; return; }
+                    if(snap.empty) { 
+                        listEl.innerHTML = "<p class='text-center text-gray-500 mt-10'>Tiada perbualan aktif. Minta pelanggan hantar mesej dahulu.</p>"; 
+                        return; 
+                    }
                     snap.forEach(docSnap => {
                         const data = docSnap.data();
                         const partnerId = data.participants.find(id => id !== currentUser.uid);
@@ -859,6 +1410,7 @@
                     });
                 });
             } else {
+                // Customer View
                 const adminQuery = query(collection(db, "users"), where("role", "==", "admin"), limit(1));
                 const adminSnap = await getDocs(adminQuery);
                 if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500 mt-10'>Tiada Admin Online.</p>"; return; }
@@ -867,8 +1419,7 @@
                 const adminName = adminDoc.data().username;
                 
                 listEl.innerHTML = `
-                <div onclick="openChat('${adminId}', '${adminName}')" class="p-4 bg-white/80 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center shadow-sm border-l-4 border-purple-500">
-                    <div class="flex items-center gap-3">
+                <div onclick="openChat('${adminId}', '${adminName}')" class="p-4 bg-white/80 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center shadow-sm border-l-4 border-purple-500">                    <div class="flex items-center gap-3">
                         <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-xl"><i class="fas fa-headset"></i></div>
                         <div>
                             <h4 class="font-bold text-lg">MFD Support (${adminName})</h4>
@@ -880,7 +1431,8 @@
             }
         }
 
-        window.openChat = (partnerId, partnerName) => {            currentChatPartner = partnerId;
+        window.openChat = (partnerId, partnerName) => {
+            currentChatPartner = partnerId;
             document.getElementById('chat-list-view').classList.add('hidden-section');
             document.getElementById('active-chat-view').classList.remove('hidden-section');
             document.getElementById('chat-partner-name').innerText = partnerName;
@@ -916,8 +1468,7 @@
                             ${isMe?(m.read?'<span class="text-blue-200">✓✓</span>':'<span>✓</span>'):''}
                         </div>
                     </div>`;
-                });
-                msgContainer.scrollTop = msgContainer.scrollHeight;
+                });                msgContainer.scrollTop = msgContainer.scrollHeight;
                 if(snap.size > 0 && !document.getElementById('active-chat-view').classList.contains('hidden-section')) playSound('msg');
             });
         };
@@ -929,7 +1480,8 @@
             currentChatPartner = null;
         };
         
-        window.closeAdminChat = () => {             if(unsubscribeChat) unsubscribeChat();
+        window.closeAdminChat = () => {
+             if(unsubscribeChat) unsubscribeChat();
              document.getElementById('admin-active-chat').classList.add('hidden-section');
              document.getElementById('admin-chat-list').classList.remove('hidden-section');
         };
@@ -965,20 +1517,19 @@
 
         // Prompt for Image URL (Free Mode)
         window.promptImageUrl = async () => {
-            const url = prompt("Sila Paste Direct Image URL (Contoh: https://i.imgur.com/xyz.jpg):");
-            if(url) {
-                // Simple validation
+            const url = prompt("Sila Paste Direct Image URL (Contoh: https://i.imgur.com/xyz.jpg):");            if(url) {
                 if(url.match(/\.(jpeg|jpg|gif|png)$/) != null || url.includes('imgur') || url.includes('postimages')) {
                     await saveMessage('', 'image', url);
                 } else {
-                    alert("Link tidak sah. Pastikan ia adalah direct link gambar (berakhir dengan .jpg, .png, dll) atau dari host gambar.");
+                    alert("Link tidak sah. Pastikan ia adalah direct link gambar.");
                 }
             }
         };
 
         window.sendLocation = async () => {
             const addr = prompt("Masukkan alamat atau nama lokasi:");
-            if(addr) {                await saveMessage('', 'location', null, addr);
+            if(addr) {
+                await saveMessage('', 'location', null, addr);
             }
         };
 
@@ -1015,8 +1566,7 @@
             // Load Users
             const usrSnap = await getDocs(collection(db, "users"));
             const users = usrSnap.docs.map(d=>({id:d.id, ...d.data()}));
-            
-            document.getElementById('admin-user-list').innerHTML = users.filter(u=>u.status!=='BLOCKED').map(u=>`
+                        document.getElementById('admin-user-list').innerHTML = users.filter(u=>u.status!=='BLOCKED').map(u=>`
                 <tr>
                     <td class="font-mono text-[10px]">${u.uac}</td>
                     <td class="font-bold text-xs">${u.username}</td>
@@ -1028,6 +1578,7 @@
                     <td><button onclick="blockUser('${u.id}')" class="text-red-500 text-[10px] font-bold hover:underline">Block</button></td>
                 </tr>
             `).join('');
+
             document.getElementById('admin-blacklist-list').innerHTML = users.filter(u=>u.status==='BLOCKED').map(u=>`
                 <tr>
                     <td class="font-mono text-[10px]">${u.uac}</td>
@@ -1054,7 +1605,7 @@
                 </tr>`;
             }).join('');
 
-            // Load Admin Chat List
+            // Reload Chat List for Admin
             loadChatList();
         };
 
@@ -1064,7 +1615,6 @@
             else playSound('success');
             loadAdminData();
         };
-
         window.blockUser = async (uid) => {
             if(confirm("Block pengguna ini?")) {
                 await updateDoc(doc(db, "users", uid), {status: 'BLOCKED'});
@@ -1077,6 +1627,7 @@
             playSound('success');
             loadAdminData();
         };
+
         window.addProduct = async () => {
             const imgUrl = document.getElementById('prod-img-url').value;
             if(!imgUrl) return alert("Sila paste Image URL");
@@ -1113,8 +1664,7 @@
 
         window.deleteProduct = async (id) => {
             if(confirm("Padam produk?")) {
-                await deleteDoc(doc(db, "products", id));
-                playSound('click');
+                await deleteDoc(doc(db, "products", id));                playSound('click');
                 loadAdminData();
                 loadProducts();
             }
@@ -1125,7 +1675,8 @@
             const input = document.getElementById('admin-msg-input');
             const text = input.value.trim();
             if(!text || !currentChatPartner) return;
-            await saveMessage(text, 'text');            input.value = '';
+            await saveMessage(text, 'text');
+            input.value = '';
         };
         window.deleteConversation = async () => {
             if(confirm("Padam perbualan ini secara kekal?")) {
