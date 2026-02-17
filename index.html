@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MFD Store Showcase</title>
+    <title>MFD Store Ultimate Showcase</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
-        /* TEMA GRADIENT & GLITTER */
+        /* VISUAL TEMA: CERAH, GRADIENT, GLITTER */
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #141E30);
+            background: linear-gradient(135deg, #FF9A9E 0%, #FECFEF 20%, #a18cd1 40%, #fbc2eb 60%, #8fd3f4 100%);
             background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: #fff;
+            animation: gradientBG 10s ease infinite;
+            color: #2d3748;
             min-height: 100vh;
         }
 
@@ -26,81 +28,116 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* GLASSMORPHISM PANEL */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            transition: transform 0.3s ease;
         }
 
+        .glass-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.25);
+        }
+
+        /* GLITTER TEXT EFFECT */
         .glitter-text {
-            background: linear-gradient(to right, #fff, #a5f3fc, #fff);
-            -webkit-background-clip: text;
-            background-clip: text;
+            background: linear-gradient(to right, #ec008c, #fc6767, #ec008c);
+            -webkit-background-clip: text;            background-clip: text;
             color: transparent;
-            text-shadow: 0 0 10px rgba(165, 243, 252, 0.5);
-            animation: shimmer 3s infinite linear;
             background-size: 200% auto;
+            animation: shine 3s linear infinite;
+            font-weight: 800;
         }
 
-        @keyframes shimmer {
+        @keyframes shine {
             to { background-position: 200% center; }
         }
+
+        /* BUTTONS */
         .btn-glitter {
             background: linear-gradient(45deg, #ff00cc, #333399, #00d4ff);
             background-size: 200% 200%;
             animation: gradientMove 3s ease infinite;
-            transition: transform 0.2s;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         
-        .btn-glitter:hover { transform: scale(1.05); filter: brightness(1.2); }
+        .btn-glitter:active { transform: scale(0.95); }
+        .btn-glitter:hover { filter: brightness(1.2); box-shadow: 0 6px 20px rgba(0,212,255,0.4); }
+        
         @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
 
-        /* Table Styling */
-        .custom-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .custom-table th { background: rgba(255,255,255,0.1); padding: 10px; text-align: left; }
-        .custom-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .custom-table tr:hover { background: rgba(255,255,255,0.05); }
+        /* TABLES */
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.85rem; overflow: hidden; border-radius: 10px; }
+        .custom-table th { background: rgba(255,255,255,0.8); padding: 12px; text-align: left; color: #4a5568; font-weight: 600; }
+        .custom-table td { padding: 12px; border-bottom: 1px solid rgba(0,0,0,0.05); background: rgba(255,255,255,0.4); }
+        .custom-table tr:last-child td { border-bottom: none; }
+        .custom-table tr:hover td { background: rgba(255,255,255,0.8); }
 
-        /* Utilities */
+        /* UTILS */
         .hidden-section { display: none !important; }
         input, select, textarea {
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: white;
-            border-radius: 8px;
+            background: rgba(255,255,255,0.8);
+            border: 2px solid transparent;
+            color: #2d3748;
+            border-radius: 10px;
             padding: 10px;
             width: 100%;
             margin-bottom: 10px;
+            transition: all 0.3s;
         }
-        input::placeholder { color: rgba(255,255,255,0.5); }
-        option { background: #333; color: white; }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #ec008c;
+            background: white;            box-shadow: 0 0 10px rgba(236, 0, 140, 0.2);
+        }
         
-        .loader { border: 4px solid rgba(255,255,255,0.1); border-left-color: #00d4ff; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #ec008c; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
+        ::-webkit-scrollbar-thumb { background: #ec008c; border-radius: 4px; }
     </style>
 </head>
 <body class="p-0 md:p-4">
 
+    <!-- AUDIO EFFECTS (Hidden) -->
+    <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3"></audio>
+    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3"></audio>
+    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+
     <!-- NAVBAR -->
     <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-4 flex justify-between items-center flex-wrap gap-4">
-        <div class="text-2xl font-bold glitter-text cursor-pointer" onclick="navTo('home')">MFD STORE</div>
+        <div class="text-2xl font-bold glitter-text cursor-pointer flex items-center gap-2" onclick="navTo('home')">
+            <i class="fas fa-gem"></i> MFD STORE
+        </div>
         <div class="flex items-center gap-4">
-            <button onclick="toggleCartModal()" class="relative p-2 hover:bg-white/10 rounded-full">
-                <i class="fas fa-shopping-cart"></i>
-                <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-xs w-5 h-5 flex items-center justify-center rounded-full">0</span>
+            <button onclick="playSound('click'); toggleCartModal()" class="relative p-3 hover:bg-white/40 rounded-full transition">
+                <i class="fas fa-shopping-cart text-pink-600"></i>
+                <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full shadow-lg animate-bounce">0</span>
             </button>
             
             <div id="auth-nav">
-                <button onclick="navTo('login')" class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20">Login</button>
-                <button onclick="navTo('register')" class="px-4 py-2 rounded-lg btn-glitter ml-2">Register</button>
+                <button onclick="playSound('click'); navTo('login')" class="px-5 py-2 rounded-xl bg-white/60 hover:bg-white text-pink-600 font-bold transition shadow-sm">Login</button>
+                <button onclick="playSound('click'); navTo('register')" class="px-5 py-2 rounded-xl btn-glitter ml-2 shadow-lg">Register</button>
             </div>
+
             <div id="user-nav" class="hidden-section flex items-center gap-3">
-                <span id="nav-username" class="font-semibold text-sm hidden md:block"></span>
-                <button onclick="navTo('dashboard')" class="px-3 py-1 bg-blue-600 rounded text-sm">Dashboard</button>
-                <button onclick="logout()" class="px-3 py-1 bg-red-600 rounded text-sm"><i class="fas fa-sign-out-alt"></i></button>
+                <div class="text-right hidden md:block">
+                    <div id="nav-username" class="font-bold text-sm text-gray-700"></div>
+                    <div id="nav-uac" class="text-xs text-pink-500 font-mono"></div>
+                </div>
+                <button onclick="playSound('click'); navTo('dashboard')" class="px-4 py-2 bg-blue-500 text-white rounded-xl shadow hover:bg-blue-600 transition"><i class="fas fa-user"></i></button>
+                <button onclick="playSound('click'); logout()" class="px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </nav>
@@ -108,49 +145,56 @@
     <!-- MAIN CONTENT -->
     <main class="container mx-auto p-4 pb-20">
 
-        <!-- 1. HOME / CATALOG -->
-        <section id="view-home">
+        <!-- 1. HOME / CATALOG -->        <section id="view-home">
             <!-- Search & Filter -->
-            <div class="glass-panel p-4 mb-6 flex flex-col md:flex-row gap-4">
-                <input type="text" id="search-bar" placeholder="Search Product..." class="md:w-1/2 m-0" onkeyup="renderCatalog()">
+            <div class="glass-panel p-4 mb-6 flex flex-col md:flex-row gap-4 items-center">
+                <div class="relative w-full md:w-1/2">
+                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    <input type="text" id="search-bar" placeholder="Search Product..." class="pl-10 m-0" onkeyup="renderCatalog()">
+                </div>
                 <select id="filter-sort" class="md:w-1/4 m-0" onchange="renderCatalog()">
-                    <option value="default">Default</option>
-                    <option value="highest">Highest Purchase</option>
-                    <option value="event">Event Based</option>
+                    <option value="default">🔥 Trending</option>
+                    <option value="highest">💰 Highest Sales</option>
+                    <option value="event">🎉 Event Based</option>
+                    <option value="newest">✨ Newest</option>
                 </select>
             </div>
 
             <!-- Recommendations Banner -->
-            <div class="glass-panel p-6 mb-6 text-center bg-gradient-to-r from-purple-600 to-blue-600">
-                <h2 class="text-2xl font-bold glitter-text">Recommendations For You</h2>
-                <p class="text-sm opacity-80">Based on trending items</p>
+            <div class="glass-panel p-8 mb-8 text-center bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 text-white shadow-xl relative overflow-hidden group">
+                <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition"></div>
+                <h2 class="text-3xl font-bold glitter-text mb-2 drop-shadow-md">Recommendations For You</h2>
+                <p class="text-white/90 font-semibold">Exclusive deals updated in real-time!</p>
             </div>
 
             <!-- Product Grid -->
             <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <!-- Products injected here -->
-                <div class="col-span-full text-center py-10"><div class="loader mx-auto"></div><p class="mt-2">Loading Catalog...</p></div>
+                <div class="col-span-full text-center py-20">
+                    <div class="loader mx-auto mb-4"></div>
+                    <p class="text-gray-600 font-bold animate-pulse">Loading Magical Catalog...</p>
+                </div>
             </div>
         </section>
 
         <!-- 2. AUTH PAGES -->
         <section id="view-login" class="hidden-section max-w-md mx-auto mt-10">
-            <div class="glass-panel p-8">
-                <h2 class="text-2xl font-bold text-center mb-6 glitter-text">Login Account</h2>
+            <div class="glass-panel p-8 relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-pink-400 rounded-full blur-3xl opacity-30"></div>
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Welcome Back</h2>
                 <input type="email" id="login-email" placeholder="Email Address">
                 <input type="password" id="login-pass" placeholder="Password">
-                <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-lg font-bold mt-4">LOGIN</button>
-                <p class="text-center mt-4 text-sm">No account? <span class="text-blue-400 cursor-pointer underline" onclick="navTo('register')">Register</span></p>
+                <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg transform active:scale-95">LOGIN NOW</button>
+                <p class="text-center mt-6 text-sm text-gray-600">New here? <span class="text-pink-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('register')">Create Account</span></p>
             </div>
         </section>
 
         <section id="view-register" class="hidden-section max-w-md mx-auto mt-10">
-            <div class="glass-panel p-8">                <h2 class="text-2xl font-bold text-center mb-6 glitter-text">Register Account</h2>
+            <div class="glass-panel p-8">
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Join MFD Family</h2>
                 <input type="text" id="reg-phone" placeholder="Phone Number (Active)">
-                <input type="email" id="reg-email" placeholder="Email Address (Optional)">
+                <input type="email" id="reg-email" placeholder="Email Address">
                 <input type="password" id="reg-pass" placeholder="Create Password">
-                <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-lg font-bold mt-4">REGISTER</button>
-                <p class="text-center mt-4 text-sm">Have account? <span class="text-blue-400 cursor-pointer underline" onclick="navTo('login')">Login</span></p>
+                <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">REGISTER FREE</button>                <p class="text-center mt-6 text-sm text-gray-600">Already a member? <span class="text-pink-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('login')">Login</span></p>
             </div>
         </section>
 
@@ -159,42 +203,57 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Profile -->
                 <div class="glass-panel p-6 lg:col-span-1">
-                    <h3 class="text-xl font-bold border-b border-white/20 pb-2 mb-4">Personal Info</h3>
-                    <div class="space-y-2 text-sm">
-                        <p><strong>UAC:</strong> <span id="dash-uac" class="text-yellow-400 font-mono"></span></p>
-                        <p><strong>Status:</strong> <span id="dash-status" class="px-2 py-0.5 rounded bg-green-500/20 text-green-400"></span></p>
-                        <p><strong>Username:</strong> <span id="dash-user"></span></p>
-                        <p><strong>Phone:</strong> <span id="dash-phone"></span></p>
-                        
-                        <label class="block mt-4 font-bold">Shipping Address</label>
-                        <textarea id="dash-address" rows="4" placeholder="House No, Street, Unit, Postal Code..."></textarea>
-                        <div class="flex gap-2 mb-2">
-                            <label class="text-xs"><input type="checkbox" class="w-auto mr-1"> Mark as Frequent</label>
-                            <select class="w-auto py-0 px-2 text-xs m-0"><option>Home</option><option>Work</option></select>
+                    <div class="text-center mb-6">
+                        <div class="w-20 h-20 bg-gradient-to-tr from-pink-500 to-purple-500 rounded-full mx-auto flex items-center justify-center text-3xl text-white shadow-lg mb-2">
+                            <i class="fas fa-user"></i>
                         </div>
-                        <button onclick="updateProfile()" class="bg-blue-600 px-4 py-2 rounded text-sm w-full">Save Changes</button>
+                        <h3 class="text-xl font-bold text-gray-700" id="dash-user-display"></h3>
+                        <p class="text-xs text-pink-500 font-mono" id="dash-uac-display"></p>
+                    </div>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="bg-white/50 p-3 rounded-lg">
+                            <label class="block text-xs font-bold text-gray-500 uppercase">Status</label>
+                            <span id="dash-status" class="inline-block px-3 py-1 rounded-full bg-green-100 text-green-600 font-bold text-xs mt-1">ACTIVE</span>
+                        </div>
+                        <div class="bg-white/50 p-3 rounded-lg">
+                            <label class="block text-xs font-bold text-gray-500 uppercase">Phone</label>
+                            <span id="dash-phone" class="font-medium"></span>
+                        </div>
                         
-                        <hr class="border-white/10 my-4">
-                        <button onclick="deleteAccount()" class="bg-red-900/50 border border-red-500 text-red-400 px-4 py-2 rounded text-sm w-full hover:bg-red-900">Delete Account Permanently</button>
+                        <label class="block mt-4 font-bold text-gray-700">📍 Shipping Address</label>
+                        <textarea id="dash-address" rows="3" placeholder="House No, Street, Unit, Postal Code..."></textarea>
+                        <div class="flex gap-2 mb-2">
+                            <label class="text-xs flex items-center gap-1"><input type="checkbox" class="w-4 h-4 accent-pink-500"> Frequent</label>
+                            <select class="w-auto py-0 px-2 text-xs m-0 bg-white"><option>Home</option><option>Work</option></select>
+                        </div>
+                        <button onclick="updateProfile()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm w-full transition shadow-md"><i class="fas fa-save mr-2"></i>Save Changes</button>
+                        
+                        <hr class="border-gray-300 my-4">
+                        <button onclick="deleteAccount()" class="bg-red-100 hover:bg-red-200 text-red-600 border border-red-200 px-4 py-2 rounded-lg text-sm w-full transition"><i class="fas fa-trash mr-2"></i>Delete Account</button>
                     </div>
                 </div>
 
-                <!-- Order History -->
+                <!-- Order History (REAL-TIME) -->
                 <div class="glass-panel p-6 lg:col-span-2">
-                    <h3 class="text-xl font-bold border-b border-white/20 pb-2 mb-4">Order History</h3>
+                    <h3 class="text-xl font-bold border-b border-gray-200 pb-2 mb-4 flex justify-between items-center">
+                        <span>📦 Order History</span>
+                        <span class="text-xs font-normal bg-pink-100 text-pink-600 px-2 py-1 rounded-full animate-pulse">Live Updates</span>
+                    </h3>
                     <div class="overflow-x-auto">
                         <table class="custom-table">
                             <thead>
-                                <tr>
-                                    <th>Tracking No</th>
-                                    <th>Date</th>
+                                <tr>                                    <th>ID / Tracking</th>
                                     <th>Items</th>
                                     <th>Total</th>
                                     <th>Status</th>
-                                    <th>Note</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="user-order-history"></tbody>                        </table>
+                            <tbody id="user-order-history">
+                                <!-- Dynamic Content -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -202,60 +261,65 @@
 
         <!-- 4. ADMIN DASHBOARD -->
         <section id="view-admin" class="hidden-section">
-            <div class="glass-panel p-4 mb-6 bg-gradient-to-r from-yellow-600 to-orange-600">
-                <h2 class="text-2xl font-bold">ADMIN CONTROL PANEL</h2>
-                <p class="text-sm">Manage Users, Orders, and Products</p>
+            <div class="glass-panel p-6 mb-6 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-xl">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold">ADMIN COMMAND CENTER</h2>
+                        <p class="text-white/80 text-sm">Manage Universe of MFD Store</p>
+                    </div>
+                    <i class="fas fa-shield-alt text-5xl opacity-50"></i>
+                </div>
             </div>
 
             <!-- Tabs -->
-            <div class="flex gap-2 mb-4 overflow-x-auto">
-                <button onclick="showAdminTab('tab-products')" class="px-4 py-2 bg-white/10 rounded hover:bg-white/20 whitespace-nowrap">Products Mgmt</button>
-                <button onclick="showAdminTab('tab-orders')" class="px-4 py-2 bg-white/10 rounded hover:bg-white/20 whitespace-nowrap">Orders & Payment</button>
-                <button onclick="showAdminTab('tab-users')" class="px-4 py-2 bg-white/10 rounded hover:bg-white/20 whitespace-nowrap">User Management</button>
-                <button onclick="showAdminTab('tab-blacklist')" class="px-4 py-2 bg-white/10 rounded hover:bg-white/20 whitespace-nowrap">Blacklist</button>
+            <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+                <button onclick="playSound('click'); showAdminTab('tab-products')" class="px-6 py-3 bg-white/80 rounded-xl hover:bg-white text-indigo-600 font-bold shadow-sm transition whitespace-nowrap"><i class="fas fa-box mr-2"></i>Products</button>
+                <button onclick="playSound('click'); showAdminTab('tab-orders')" class="px-6 py-3 bg-white/80 rounded-xl hover:bg-white text-indigo-600 font-bold shadow-sm transition whitespace-nowrap"><i class="fas fa-receipt mr-2"></i>Orders</button>
+                <button onclick="playSound('click'); showAdminTab('tab-users')" class="px-6 py-3 bg-white/80 rounded-xl hover:bg-white text-indigo-600 font-bold shadow-sm transition whitespace-nowrap"><i class="fas fa-users mr-2"></i>Users</button>
+                <button onclick="playSound('click'); showAdminTab('tab-blacklist')" class="px-6 py-3 bg-white/80 rounded-xl hover:bg-white text-red-600 font-bold shadow-sm transition whitespace-nowrap"><i class="fas fa-ban mr-2"></i>Blacklist</button>
             </div>
 
             <!-- Tab: Products -->
             <div id="tab-products" class="admin-tab glass-panel p-6 mb-6">
-                <h3 class="text-lg font-bold mb-4">Add New Product (Free Mode)</h3>
-                <div class="bg-blue-900/30 p-3 rounded mb-4 text-sm border border-blue-500/30">
-                    <i class="fas fa-info-circle"></i> <strong>Tips:</strong> Since Storage is disabled, please upload your product image to a free host (like Imgur.com or Postimages.org) first, then copy the <strong>Direct Image Link</strong> and paste it below.
+                <h3 class="text-lg font-bold mb-4 text-indigo-600">🚀 Launch New Product</h3>
+                <div class="bg-blue-50 p-4 rounded-xl mb-4 text-sm border border-blue-200 flex items-start gap-3">
+                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                    <div>Paste image URL from browser (e.g., Imgur). No file upload needed for free mode.</div>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input type="text" id="prod-name" placeholder="Item Name">
                     <input type="number" id="prod-price" placeholder="Price (RM)">
-                    <input type="text" id="prod-variation" placeholder="Variation (e.g. Size L)">
+                    <input type="text" id="prod-variation" placeholder="Variation (Size/Color)">
                     <input type="text" id="prod-country" placeholder="Country of Origin">
                     <input type="text" id="prod-event" placeholder="Event Label (Optional)">
-                    <select id="prod-status" class="m-0">
-                        <option value="Public">Public</option>
-                        <option value="Private">Private</option>
-                        <option value="Out of Stock">Out of Stock</option>
+                    <select id="prod-status" class="m-0">                        <option value="Public">✅ Public</option>
+                        <option value="Private">🔒 Private</option>
+                        <option value="Out of Stock">❌ Out of Stock</option>
                     </select>
-                    <!-- CHANGED: Input URL instead of File Upload -->
                     <input type="url" id="prod-img-url" placeholder="Paste Image URL Here (https://...)" class="md:col-span-2">
                     <textarea id="prod-desc" placeholder="Description" class="md:col-span-2"></textarea>
                 </div>
-                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded mt-4">Launch Product</button>
+                <button onclick="addProduct()" class="btn-glitter px-8 py-3 rounded-xl mt-4 shadow-lg w-full md:w-auto"><i class="fas fa-plus mr-2"></i>LAUNCH PRODUCT</button>
 
-                <h3 class="text-lg font-bold mt-8 mb-4">Product List</h3>
+                <h3 class="text-lg font-bold mt-8 mb-4 text-gray-700">Inventory List</h3>
                 <div class="overflow-x-auto">
                     <table class="custom-table">
                         <thead>
-                            <tr><th>Bil</th><th>Img</th><th>Name</th><th>Price</th><th>Sold</th><th>Status</th><th>Action</th></tr>
-                        </thead>                        <tbody id="admin-prod-list"></tbody>
+                            <tr><th>#</th><th>Img</th><th>Name</th><th>Price</th><th>Sold</th><th>Status</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="admin-prod-list"></tbody>
                     </table>
                 </div>
             </div>
 
             <!-- Tab: Orders -->
             <div id="tab-orders" class="admin-tab hidden-section glass-panel p-6 mb-6">
-                <h3 class="text-lg font-bold mb-4">Pending Payments & Orders</h3>
+                <h3 class="text-lg font-bold mb-4 text-indigo-600">📋 Order Management</h3>
                 <div class="overflow-x-auto">
                     <table class="custom-table">
                         <thead>
                             <tr>
-                                <th>UAC</th><th>User</th><th>Item</th><th>Total</th><th>Payment Status</th><th>Tracking ID</th><th>Action</th>
+                                <th>User</th><th>Item Details</th><th>Total</th><th>Payment</th><th>Tracking</th><th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="admin-order-list"></tbody>
@@ -265,11 +329,11 @@
 
             <!-- Tab: Users -->
             <div id="tab-users" class="admin-tab hidden-section glass-panel p-6 mb-6">
-                <h3 class="text-lg font-bold mb-4">All Customers</h3>
+                <h3 class="text-lg font-bold mb-4 text-indigo-600">👥 Customer Database</h3>
                 <div class="overflow-x-auto">
                     <table class="custom-table">
                         <thead>
-                            <tr><th>UAC</th><th>Username</th><th>Phone</th><th>Status</th><th>Total Orders</th><th>Action</th></tr>
+                            <tr><th>UAC</th><th>Username</th><th>Contact</th><th>Status</th><th>Control</th></tr>
                         </thead>
                         <tbody id="admin-user-list"></tbody>
                     </table>
@@ -277,12 +341,11 @@
             </div>
 
              <!-- Tab: Blacklist -->
-             <div id="tab-blacklist" class="admin-tab hidden-section glass-panel p-6 mb-6">
-                <h3 class="text-lg font-bold mb-4 text-red-400">Blacklisted Accounts</h3>
+             <div id="tab-blacklist" class="admin-tab hidden-section glass-panel p-6 mb-6 border-2 border-red-100">                <h3 class="text-lg font-bold mb-4 text-red-600">⛔ Blacklisted Accounts</h3>
                 <div class="overflow-x-auto">
                     <table class="custom-table">
                         <thead>
-                            <tr><th>UAC</th><th>Username</th><th>Reason</th><th>Date Blocked</th><th>Action</th></tr>
+                            <tr><th>UAC</th><th>Username</th><th>Date Blocked</th><th>Action</th></tr>
                         </thead>
                         <tbody id="admin-blacklist-list"></tbody>
                     </table>
@@ -292,39 +355,43 @@
 
     </main>
 
-    <!-- CART MODAL -->    <div id="modal-cart" class="fixed inset-0 bg-black/90 z-50 hidden-section flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-2xl">&times;</button>
-            <h2 class="text-2xl font-bold mb-4">Checkout</h2>
+    <!-- CART MODAL -->
+    <div id="modal-cart" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto animate-bounce-in">
+            <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500 transition">&times;</button>
+            <h2 class="text-2xl font-bold mb-4 glitter-text">Checkout Station</h2>
             
-            <div id="cart-items" class="space-y-2 mb-4 text-sm"></div>
-            <div class="border-t border-white/20 pt-2 flex justify-between font-bold text-lg">
-                <span>Total:</span>
-                <span id="cart-total">RM 0.00</span>
+            <div id="cart-items" class="space-y-3 mb-6"></div>
+            <div class="border-t-2 border-dashed border-gray-300 pt-4 flex justify-between items-center">
+                <span class="font-bold text-lg text-gray-700">Grand Total:</span>
+                <span id="cart-total" class="text-2xl font-bold text-pink-600">RM 0.00</span>
             </div>
 
-            <div class="mt-6 bg-white/5 p-4 rounded">
-                <p class="font-bold text-yellow-400 mb-2">Payment Instructions:</p>
-                <ol class="list-decimal pl-5 text-sm space-y-1">
+            <div class="mt-6 bg-gradient-to-br from-indigo-50 to-pink-50 p-5 rounded-xl border border-indigo-100">
+                <p class="font-bold text-indigo-700 mb-3 flex items-center gap-2"><i class="fas fa-credit-card"></i> Payment Gateway</p>
+                <ol class="list-decimal pl-5 text-sm space-y-2 text-gray-700">
                     <li>Transfer exact amount to: <br>
-                        <strong>Sociabuzz:</strong> <a href="https://sociabuzz.com/fareezonzz_019/give" target="_blank" class="text-blue-300 underline">Link</a> <br>
-                        <strong>TNG E-Wallet:</strong> <span class="font-mono bg-black/40 px-1">161489981218</span>
+                        <strong class="text-pink-600">Sociabuzz:</strong> <a href="https://sociabuzz.com/fareezonzz_019/give" target="_blank" class="text-blue-500 underline hover:text-blue-700">Click to Pay</a> <br>
+                        <strong class="text-pink-600">TNG E-Wallet:</strong> <span class="font-mono bg-white px-2 py-0.5 rounded border">161489981218</span>
                     </li>
-                    <li>Send proof of payment to WhatsApp: <strong>+60145400413</strong></li>
-                    <li class="text-red-400">Warning: Order will be cancelled if payment is not verified within 24 hours.</li>
+                    <li class="flex items-start gap-2">
+                        <i class="fab fa-whatsapp text-green-500 mt-0.5"></i>
+                        <span>Send receipt to WhatsApp: <strong>+60145400413</strong></span>
+                    </li>
+                    <li class="text-red-500 font-semibold text-xs bg-red-50 p-2 rounded">
+                        <i class="fas fa-exclamation-triangle"></i> Warning: Order cancelled if payment not verified within 24h.
+                    </li>
                 </ol>
             </div>
 
-            <button onclick="submitOrder()" class="btn-glitter w-full py-3 rounded font-bold mt-6">CONFIRM ORDER</button>
+            <button onclick="submitOrder()" class="btn-glitter w-full py-4 rounded-xl font-bold mt-6 shadow-xl text-lg"><i class="fas fa-check-circle mr-2"></i>CONFIRM ORDER</button>
         </div>
     </div>
 
-    <!-- FIREBASE LOGIC (UPDATED FOR FREE MODE) -->
+    <!-- FIREBASE LOGIC -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        // Storage imports removed since you are not using it
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         // --- YOUR CONFIGURATION ---
         const firebaseConfig = {
@@ -340,22 +407,38 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        // Storage initialization removed
+
         // State
         let currentUser = null;
         let userData = {};
         let cart = [];
         let allProducts = [];
+        let unsubscribeOrders = null; // For real-time listener
+
+        // --- SOUND EFFECTS ---
+        window.playSound = (type) => {
+            const sounds = {
+                'click': document.getElementById('snd-click'),
+                'success': document.getElementById('snd-success'),
+                'error': document.getElementById('snd-error')
+            };
+            if(sounds[type]) {
+                sounds[type].currentTime = 0;
+                sounds[type].play().catch(e => console.log('Audio play failed'));
+            }
+        };
 
         // --- NAVIGATION ---
         window.navTo = (viewId) => {
+            playSound('click');
             document.querySelectorAll('section').forEach(el => el.classList.add('hidden-section'));
             document.getElementById(`view-${viewId}`).classList.remove('hidden-section');
+            window.scrollTo(0,0);
+            
             if(viewId === 'home') renderCatalog();
             if(viewId === 'admin') loadAdminData();
             if(viewId === 'dashboard') loadUserData();
         };
-
         window.showAdminTab = (tabId) => {
             document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden-section'));
             document.getElementById(tabId).classList.remove('hidden-section');
@@ -390,34 +473,47 @@
                     role: 'customer',
                     status: 'ACTIVE',
                     address: '',
-                    createdAt: serverTimestamp(),                    logCache: serverTimestamp()
+                    createdAt: serverTimestamp(),
+                    logCache: serverTimestamp()
                 });
-                alert("Registered! Please login.");
+                playSound('success');
+                alert("Registered Successfully! Please Login.");
                 navTo('login');
-            } catch(e) { alert(e.message); }
+            } catch(e) { 
+                playSound('error');
+                alert(e.message); 
+            }
         };
 
         window.doLogin = async () => {
             const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch(e) { alert("Login Failed: " + e.message); }
+            try {                await signInWithEmailAndPassword(auth, email, pass);
+                playSound('success');
+            } catch(e) { 
+                playSound('error');
+                alert("Login Failed: " + e.message); 
+            }
         };
 
-        window.logout = () => signOut(auth);
+        window.logout = () => {
+            signOut(auth);
+            playSound('click');
+            navTo('home');
+        };
 
         window.deleteAccount = async () => {
-            if(confirm("Are you sure? This sets status to INACTIVE.")) {
+            if(confirm("Are you sure? This will deactivate your account permanently.")) {
                 await updateDoc(doc(db, "users", currentUser.uid), { status: 'INACTIVE' });
                 signOut(auth);
+                playSound('success');
                 alert("Account deactivated.");
             }
         };
 
-        // --- DATA HANDLING ---
+        // --- DATA HANDLING (REAL-TIME) ---
         
-        // Load Products
+        // Load Products (Static fetch for catalog, could be real-time too)
         async function loadProducts() {
             const q = query(collection(db, "products"));
             const snap = await getDocs(q);
@@ -435,18 +531,26 @@
 
             if(sort === 'highest') filtered.sort((a,b) => (b.totalSold || 0) - (a.totalSold || 0));
             if(sort === 'event') filtered = filtered.filter(p => p.event);
+            if(sort === 'newest') filtered.sort((a,b) => (b.createdAt?.toDate() || 0) - (a.createdAt?.toDate() || 0));
 
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">No products found matching your criteria.</div>`;
+                return;
+            }
             grid.innerHTML = filtered.map(p => `
-                <div class="glass-panel p-4 flex flex-col">
-                    <img src="${p.imageUrl || 'https://via.placeholder.com/300?text=No+Image'}" class="w-full h-48 object-cover rounded mb-3 bg-gray-800" onerror="this.src='https://via.placeholder.com/300?text=Error'">
-                    <h3 class="font-bold text-lg">${p.name}</h3>                    <p class="text-sm text-gray-300 line-clamp-2">${p.description}</p>
-                    <div class="mt-2 flex justify-between items-center">
-                        <span class="text-yellow-400 font-bold">RM ${p.price}</span>
-                        <span class="text-xs bg-white/10 px-2 py-1 rounded">${p.country || 'Unknown'}</span>
+                <div class="glass-panel p-4 flex flex-col h-full relative group">
+                    ${p.event ? `<span class="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded shadow">${p.event}</span>` : ''}
+                    <img src="${p.imageUrl || 'https://via.placeholder.com/300?text=No+Image'}" class="w-full h-48 object-cover rounded-xl mb-3 bg-gray-200 shadow-inner group-hover:scale-105 transition duration-500" onerror="this.src='https://via.placeholder.com/300?text=Error'">
+                    <h3 class="font-bold text-lg text-gray-800 leading-tight">${p.name}</h3>
+                    <p class="text-sm text-gray-500 line-clamp-2 my-2 flex-grow">${p.description}</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-pink-600 font-bold text-lg">RM ${p.price}</span>
+                        <div class="flex items-center gap-1 text-xs text-gray-400">
+                            <i class="fas fa-star text-yellow-400"></i> ${p.rating || '5.0'}
+                        </div>
                     </div>
-                    ${p.event ? `<div class="text-xs text-pink-400 mt-1">#${p.event}</div>` : ''}
-                    <div class="mt-3 flex gap-2">
-                        <button onclick="addToCart('${p.id}')" class="btn-glitter flex-1 py-2 rounded text-sm">Add Cart</button>
+                    <div class="mt-4">
+                        <button onclick="playSound('click'); addToCart('${p.id}')" class="btn-glitter w-full py-2 rounded-lg text-sm shadow-md hover:shadow-lg transition"><i class="fas fa-cart-plus mr-1"></i> Add to Cart</button>
                     </div>
                 </div>
             `).join('');
@@ -457,24 +561,35 @@
             const p = allProducts.find(x => x.id === id);
             cart.push(p);
             document.getElementById('cart-count').innerText = cart.length;
-            alert("Added to cart!");
+            playSound('success');
+            // Small animation on cart icon
+            const icon = document.querySelector('.fa-shopping-cart');
+            icon.classList.add('fa-beat');
+            setTimeout(() => icon.classList.remove('fa-beat'), 1000);
         };
 
         function renderCartItems() {
             const container = document.getElementById('cart-items');
             const totalEl = document.getElementById('cart-total');
             let total = 0;
+            if(cart.length === 0) {
+                container.innerHTML = "<p class='text-center text-gray-500'>Your cart is empty.</p>";
+                totalEl.innerText = "RM 0.00";
+                return;
+            }
             container.innerHTML = cart.map((item, idx) => {
                 total += parseFloat(item.price);
                 return `
-                <div class="flex justify-between items-center bg-white/5 p-2 rounded">
-                    <div>
-                        <div class="font-bold">${item.name}</div>
-                        <div class="text-xs text-gray-400">Code: ${item.uniqueCode || 'N/A'}</div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span>RM ${item.price}</span>
-                        <button onclick="cart.splice(${idx},1); renderCartItems(); document.getElementById('cart-count').innerText=cart.length" class="text-red-400">&times;</button>
+                <div class="flex justify-between items-center bg-white/60 p-3 rounded-lg shadow-sm border border-white">
+                    <div class="flex items-center gap-3">
+                        <img src="${item.imageUrl}" class="w-12 h-12 rounded object-cover">
+                        <div>
+                            <div class="font-bold text-gray-700">${item.name}</div>
+                            <div class="text-xs text-gray-500">Code: ${item.uniqueCode || 'N/A'}</div>
+                        </div>                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-pink-600">RM ${item.price}</span>
+                        <button onclick="cart.splice(${idx},1); renderCartItems(); document.getElementById('cart-count').innerText=cart.length" class="text-red-400 hover:text-red-600 transition"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`;
             }).join('');
@@ -484,11 +599,12 @@
         window.submitOrder = async () => {
             if(!currentUser) return alert("Please login first");
             if(cart.length === 0) return alert("Cart empty");
-            if(!userData.address) return alert("Please update shipping address in Dashboard");
+            if(!userData.address) return alert("Please update shipping address in Dashboard first");
 
             const total = cart.reduce((sum, i) => sum + parseFloat(i.price), 0);
             const tracking = "TRK-" + Date.now().toString().substr(-8);
             const orderId = "ORD-" + Date.now().toString().substr(-6);
+
             try {
                 await addDoc(collection(db, "orders"), {
                     userId: currentUser.uid,
@@ -508,137 +624,179 @@
                 cart = [];
                 document.getElementById('cart-count').innerText = 0;
                 toggleCartModal();
-                alert("Order placed! Please pay and send receipt to WhatsApp.");
+                playSound('success');
+                alert("Order Placed Successfully! Please proceed to payment.");
                 loadUserData(); 
-            } catch(e) { alert("Error: " + e.message); }
+            } catch(e) { 
+                playSound('error');
+                alert("Error: " + e.message); 
+            }
         };
 
-        // --- DASHBOARD & ADMIN ---
+        // --- DASHBOARD & ADMIN (REAL-TIME LISTENERS) ---
 
-        async function loadUserData() {
-            if(!currentUser) return;
-            const snap = await getDoc(doc(db, "users", currentUser.uid));
-            if(snap.exists()) {
-                userData = snap.data();
-                document.getElementById('nav-username').innerText = userData.username;
-                document.getElementById('dash-uac').innerText = userData.uac;
-                document.getElementById('dash-status').innerText = userData.status;
-                document.getElementById('dash-user').innerText = userData.username;
-                document.getElementById('dash-phone').innerText = userData.phone;
-                document.getElementById('dash-address').value = userData.address || "";
+        async function loadUserData() {            if(!currentUser) return;
+            // Listen to user profile changes
+            onSnapshot(doc(db, "users", currentUser.uid), (docSnap) => {
+                if(docSnap.exists()) {
+                    userData = docSnap.data();
+                    document.getElementById('nav-username').innerText = userData.username;
+                    document.getElementById('nav-uac').innerText = userData.uac;
+                    document.getElementById('dash-user-display').innerText = userData.username;
+                    document.getElementById('dash-uac-display').innerText = userData.uac;
+                    document.getElementById('dash-status').innerText = userData.status;
+                    document.getElementById('dash-status').className = `inline-block px-3 py-1 rounded-full font-bold text-xs mt-1 ${userData.status === 'ACTIVE' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`;
+                    document.getElementById('dash-phone').innerText = userData.phone;
+                    document.getElementById('dash-address').value = userData.address || "";
+                }
+            });
 
-                const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
-                const orders = await getDocs(q);
+            // Listen to Orders Real-Time
+            if(unsubscribeOrders) unsubscribeOrders();
+            
+            const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
+            unsubscribeOrders = onSnapshot(q, (snapshot) => {
                 const tbody = document.getElementById('user-order-history');
-                tbody.innerHTML = orders.docs.map(d => {
+                if(snapshot.empty) {
+                    tbody.innerHTML = "<tr><td colspan='5' class='text-center py-4'>No orders yet.</td></tr>";
+                    return;
+                }
+                tbody.innerHTML = snapshot.docs.map(d => {
                     const o = d.data();
+                    const itemName = o.items.map(i => i.name).join(", ");
+                    let actionBtns = '';
+                    
+                    if(o.status === 'Pending' || o.paymentStatus === 'Not Verified') {
+                        actionBtns = `<button onclick="cancelOrderClient('${d.id}')" class="text-red-500 text-xs font-bold hover:underline">Cancel</button>`;
+                    } else if (o.paymentStatus === 'Verified' && !o.userRating) {
+                        actionBtns = `<button onclick="rateOrder('${d.id}')" class="text-yellow-500 text-xs font-bold hover:underline">Rate</button> <button onclick="reorder('${d.id}')" class="text-blue-500 text-xs font-bold hover:underline">Reorder</button>`;
+                    } else {
+                        actionBtns = `<button onclick="reorder('${d.id}')" class="text-blue-500 text-xs font-bold hover:underline">Reorder</button>`;
+                    }
+
                     return `<tr>
-                        <td>${o.trackingNo}</td>
-                        <td>${new Date(o.createdAt?.toDate()).toLocaleDateString()}</td>
-                        <td>${o.items.length} Items</td>
-                        <td>RM ${o.total}</td>
-                        <td><span class="px-2 py-1 rounded text-xs ${o.paymentStatus === 'Verified' ? 'bg-green-500' : 'bg-yellow-500'}">${o.paymentStatus}</span></td>                        <td class="text-xs">${o.adminNote || '-'}</td>
+                        <td>
+                            <div class="font-bold text-gray-700">${o.orderId}</div>
+                            <div class="text-xs text-gray-500 font-mono">${o.trackingNo}</div>
+                        </td>
+                        <td class="max-w-xs truncate" title="${itemName}">${itemName}</td>
+                        <td class="font-bold text-pink-600">RM ${o.total}</td>
+                        <td>
+                            <span class="px-2 py-1 rounded text-xs font-bold ${o.paymentStatus === 'Verified' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}">
+                                ${o.paymentStatus}
+                            </span>                        </td>
+                        <td>${actionBtns}</td>
                     </tr>`;
                 }).join('');
-            }
+            });
         }
 
         window.updateProfile = async () => {
             const addr = document.getElementById('dash-address').value;
             await updateDoc(doc(db, "users", currentUser.uid), { address: addr, logCache: serverTimestamp() });
-            alert("Profile updated");
-            loadUserData();
+            playSound('success');
+            alert("Profile Updated!");
         };
 
+        // Admin Functions
         async function loadAdminData() {
             if(userData.role !== 'admin') return navTo('home');
 
-            // Load Products for Admin Table
+            // Products
             const prodSnap = await getDocs(collection(db, "products"));
             document.getElementById('admin-prod-list').innerHTML = prodSnap.docs.map((d, i) => {
                 const p = d.data();
                 return `<tr>
                     <td>${i+1}</td>
-                    <td><img src="${p.imageUrl || 'https://via.placeholder.com/50'}" class="w-10 h-10 object-cover rounded" onerror="this.src='https://via.placeholder.com/50?text=?'"></td>
-                    <td>${p.name}</td>
-                    <td>${p.price}</td>
+                    <td><img src="${p.imageUrl || 'https://via.placeholder.com/50'}" class="w-10 h-10 object-cover rounded shadow"></td>
+                    <td class="font-bold">${p.name}</td>
+                    <td>RM ${p.price}</td>
                     <td>${p.totalSold || 0}</td>
-                    <td>${p.status}</td>
-                    <td><button onclick="deleteProduct('${d.id}')" class="text-red-400 text-xs">Delete</button></td>
+                    <td><span class="px-2 py-1 rounded text-xs ${p.status==='Public'?'bg-green-100 text-green-600':'bg-red-100 text-red-600'}">${p.status}</span></td>
+                    <td><button onclick="deleteProduct('${d.id}')" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></td>
                 </tr>`;
             }).join('');
 
-            // Load Orders
+            // Orders (Real-time for Admin too ideally, but static for simplicity in this snippet)
             const orderSnap = await getDocs(query(collection(db, "orders"), orderBy("createdAt", "desc")));
             document.getElementById('admin-order-list').innerHTML = orderSnap.docs.map(d => {
                 const o = d.data();
                 const itemName = o.items.map(i => i.name).join(", ");
                 return `<tr>
-                    <td>${o.uac}</td>
-                    <td>${o.username}</td>
-                    <td class="text-xs">${itemName}</td>
-                    <td>RM ${o.total}</td>
                     <td>
-                        <select onchange="updatePaymentStatus('${d.id}', this.value)" class="text-xs p-1 m-0 bg-black text-white">
-                            <option ${o.paymentStatus==='Not Verified'?'selected':''}>Not Verified</option>
-                            <option ${o.paymentStatus==='Verified'?'selected':''}>Verified</option>
-                        </select>
+                        <div class="font-bold">${o.username}</div>
+                        <div class="text-xs text-gray-500">${o.uac}</div>
+                    </td>
+                    <td class="max-w-xs truncate">${itemName}</td>
+                    <td class="font-bold">RM ${o.total}</td>
+                    <td>
+                        <select onchange="updatePaymentStatus('${d.id}', this.value)" class="text-xs p-1 rounded border ${o.paymentStatus==='Verified'?'bg-green-100':'bg-yellow-100'}">
+                            <option value="Not Verified" ${o.paymentStatus==='Not Verified'?'selected':''}>Not Verified</option>
+                            <option value="Verified" ${o.paymentStatus==='Verified'?'selected':''}>Verified</option>
+                        </select>                    </td>
+                    <td>
+                        <input type="text" value="${o.trackingNo}" onchange="updateTracking('${d.id}', this.value)" class="text-xs p-1 w-24 border rounded font-mono" placeholder="Tracking">
                     </td>
                     <td>
-                        <input type="text" value="${o.trackingNo}" onchange="updateTracking('${d.id}', this.value)" class="text-xs p-1 m-0 w-24 bg-black text-white">
-                    </td>                    <td><button onclick="cancelOrder('${d.id}')" class="text-red-400 text-xs">Cancel</button></td>
+                        <button onclick="cancelOrder('${d.id}')" class="text-red-500 text-xs font-bold border border-red-200 px-2 py-1 rounded hover:bg-red-50">Cancel</button>
+                    </td>
                 </tr>`;
             }).join('');
 
-            // Load Users
+            // Users
             const userSnap = await getDocs(collection(db, "users"));
             const users = userSnap.docs.map(d => ({id: d.id, ...d.data()}));
             
             document.getElementById('admin-user-list').innerHTML = users.filter(u => u.status !== 'BLOCKED').map(u => `
                 <tr>
-                    <td>${u.uac}</td><td>${u.username}</td><td>${u.phone}</td>
-                    <td>${u.status}</td><td>-</td>
-                    <td><button onclick="blockUser('${u.id}')" class="text-red-400 text-xs">Block</button></td>
+                    <td class="font-mono text-xs">${u.uac}</td>
+                    <td class="font-bold">${u.username}</td>
+                    <td>${u.phone}</td>
+                    <td><span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-600">${u.status}</span></td>
+                    <td><button onclick="blockUser('${u.id}')" class="text-red-500 font-bold text-xs hover:underline">Block</button></td>
                 </tr>
             `).join('');
 
             document.getElementById('admin-blacklist-list').innerHTML = users.filter(u => u.status === 'BLOCKED').map(u => `
                 <tr>
-                    <td>${u.uac}</td><td>${u.username}</td><td>Violation</td><td>-</td>
-                    <td><button onclick="unblockUser('${u.id}')" class="text-green-400 text-xs">Unblock</button></td>
+                    <td class="font-mono text-xs">${u.uac}</td>
+                    <td class="font-bold text-red-600">${u.username}</td>
+                    <td>-</td>
+                    <td><button onclick="unblockUser('${u.id}')" class="text-green-500 font-bold text-xs hover:underline">Unblock</button></td>
                 </tr>
             `).join('');
         }
 
-        // Admin Actions (UPDATED: No File Upload)
+        // Admin Actions
         window.addProduct = async () => {
             const imgUrl = document.getElementById('prod-img-url').value;
             if(!imgUrl) return alert("Please paste an Image URL");
             
-            // No upload needed, just use the URL directly
             await addDoc(collection(db, "products"), {
                 name: document.getElementById('prod-name').value,
                 price: document.getElementById('prod-price').value,
                 description: document.getElementById('prod-desc').value,
-                imageUrl: imgUrl, // Directly save the URL
+                imageUrl: imgUrl,
                 status: document.getElementById('prod-status').value,
                 country: document.getElementById('prod-country').value,
                 event: document.getElementById('prod-event').value,
                 variation: document.getElementById('prod-variation').value,
                 uniqueCode: "ITEM-" + Math.random().toString(36).substr(2,6).toUpperCase(),
-                totalSold: 0,
+                totalSold: 0,                rating: 5.0,
                 createdAt: serverTimestamp()
             });
-            alert("Product Added");
+            playSound('success');
+            alert("Product Launched!");
             loadAdminData();
             loadProducts();
             // Clear inputs
-            document.getElementById('prod-name').value = '';
-            document.getElementById('prod-img-url').value = '';
+            document.querySelectorAll('#tab-products input, #tab-products textarea').forEach(i => i.value = '');
         };
+
         window.deleteProduct = async (id) => {
-            if(confirm("Delete product?")) {
+            if(confirm("Delete this product?")) {
                 await deleteDoc(doc(db, "products", id));
+                playSound('click');
                 loadAdminData();
                 loadProducts();
             }
@@ -646,7 +804,7 @@
 
         window.updatePaymentStatus = async (id, status) => {
             await updateDoc(doc(db, "orders", id), { paymentStatus: status });
-            if(status === 'Verified') alert("Payment Verified!");
+            playSound('success');
         };
 
         window.updateTracking = async (id, val) => {
@@ -655,20 +813,45 @@
 
         window.cancelOrder = async (id) => {
             if(confirm("Cancel this order?")) {
-                await updateDoc(doc(db, "orders", id), { status: 'Cancelled' });
+                await updateDoc(doc(db, "orders", id), { status: 'Cancelled', paymentStatus: 'Refunded' });
+                playSound('error');
                 loadAdminData();
+            }
+        };
+
+        // Client Side Actions
+        window.cancelOrderClient = async (id) => {
+            if(confirm("Cancel your order?")) {
+                await updateDoc(doc(db, "orders", id), { status: 'Cancelled by User' });
+                playSound('success');
+            }
+        };
+
+        window.reorder = (id) => {
+            // Logic to find order by ID and add items to cart would go here
+            alert("Reorder feature: Items added to cart (Simulation)");
+            playSound('click');
+        };
+        window.rateOrder = (id) => {
+            const rating = prompt("Rate this item (1-5):", "5");
+            if(rating) {
+                updateDoc(doc(db, "orders", id), { userRating: parseInt(rating) });
+                playSound('success');
+                alert("Thank you for your rating!");
             }
         };
 
         window.blockUser = async (uid) => {
             if(confirm("Block this user?")) {
                 await updateDoc(doc(db, "users", uid), { status: 'BLOCKED' });
+                playSound('error');
                 loadAdminData();
             }
         };
         
         window.unblockUser = async (uid) => {
             await updateDoc(doc(db, "users", uid), { status: 'ACTIVE' });
+            playSound('success');
             loadAdminData();
         };
 
@@ -678,13 +861,17 @@
             if(user) {
                 document.getElementById('auth-nav').classList.add('hidden-section');
                 document.getElementById('user-nav').classList.remove('hidden-section');
+                
+                // Initial fetch for role check
                 const snap = await getDoc(doc(db, "users", user.uid));
                 if(snap.exists()) {
                     userData = snap.data();
                     if(userData.status === 'BLOCKED') {
+                        playSound('error');
                         alert("Account Blocked");
                         signOut(auth);
-                        return;                    }
+                        return;
+                    }
                     if(userData.role === 'admin') {
                         navTo('admin');
                     } else {
@@ -693,8 +880,7 @@
                 }
             } else {
                 document.getElementById('auth-nav').classList.remove('hidden-section');
-                document.getElementById('user-nav').classList.add('hidden-section');
-                navTo('home');
+                document.getElementById('user-nav').classList.add('hidden-section');                navTo('home');
             }
             loadProducts();
         });
