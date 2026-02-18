@@ -72,7 +72,7 @@
         .msg-edited { font-size: 0.6rem; opacity: 0.7; font-style: italic; }
         @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1); background: rgba(255,255,255,0.6); }
-        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px; font-size: 0.62rem; }
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1200px; font-size: 0.65rem; }
         .custom-table th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; text-align: left; font-weight: 700; border-bottom: 2px solid #e2e8f0; color: white; position: sticky; top: 0; }
         .custom-table td { padding: 10px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.5); vertical-align: middle; color: #2d3748; }
         .custom-table tr:hover td { background: rgba(255,255,255,0.9); }
@@ -82,7 +82,7 @@
             border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
         }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #9D50BB; box-shadow: 0 0 0 3px rgba(157, 80, 187, 0.2); }
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.52rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; display: inline-block; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.55rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; display: inline-block; }
         .badge-to-pay { background: #feebc8; color: #744210; }
         .badge-to-ship { background: #bee3f8; color: #2a4365; }
         .badge-to-receive { background: #c6f6d5; color: #22543d; }
@@ -103,18 +103,16 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .error-box { background: #fed7d7; border: 2px solid #fc8181; color: #c53030; padding: 15px; border-radius: 10px; margin: 10px 0; }
         .success-box { background: #c6f6d5; border: 2px solid #68d391; color: #22543d; padding: 15px; border-radius: 10px; margin: 10px 0; }
-        .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 0.55rem; font-weight: bold; cursor: pointer; margin: 0 2px; display: inline-block; }
+        .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 0.58rem; font-weight: bold; cursor: pointer; margin: 0 2px; display: inline-block; }
         .btn-edit { background: #bee3f8; color: #2a4365; }
         .btn-delete { background: #fed7d7; color: #c53030; }
         .btn-pin { background: #faf089; color: #744210; }
         .btn-edit:hover { background: #90cdf4; }
         .btn-delete:hover { background: #fc8181; color: white; }
         .btn-pin:hover { background: #f6e05e; }
-        .product-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; }
-        .product-modal-content { background: white; border-radius: 20px; max-width: 800px; max-height: 90vh; overflow-y: auto; }
-        .review-card { background: rgba(255,255,255,0.5); padding: 10px; border-radius: 10px; margin: 5px 0; }
-        .tab-active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .admin-mode-toggle { position: fixed; bottom: 20px; right: 20px; z-index: 100; }
+        .context-menu { position: absolute; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); padding: 8px; z-index: 100; min-width: 150px; }
+        .context-menu-item { padding: 8px 12px; cursor: pointer; font-size: 0.7rem; border-radius: 4px; }
+        .context-menu-item:hover { background: #f0f0f0; }
     </style>
 </head>
 <body class="p-0 md:p-4">
@@ -131,10 +129,6 @@
             <i class="fas fa-gem"></i> MFD STORE
         </div>
         <div class="flex items-center gap-2 md:gap-4">
-            <!-- Admin Mode Toggle -->
-            <button id="admin-mode-btn" onclick="toggleAdminMode()" class="hidden px-3 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold shadow hover:bg-purple-700 transition">
-                <i class="fas fa-user-shield mr-1"></i> Admin Mode
-            </button>
             <button onclick="playSound('click'); navTo('chat-list')" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Live Chat">
                 <i class="fas fa-comments text-purple-600 text-lg group-hover:scale-110 transition"></i>
                 <span id="chat-notif" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden animate-pulse">!</span>
@@ -145,13 +139,13 @@
             </button>
             <div id="auth-nav">
                 <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-purple-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>
-                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register</button>            </div>
+                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register</button>
+            </div>
             <div id="user-nav" class="hidden-section flex items-center gap-2 md:gap-3">
                 <div class="text-right hidden md:block">
                     <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>
                     <div id="nav-uac" class="text-[10px] text-purple-500 font-mono"></div>
-                </div>
-                <button onclick="playSound('click'); navTo('dashboard')" class="px-3 md:px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition text-xs md:text-sm"><i class="fas fa-user"></i></button>
+                </div>                <button onclick="playSound('click'); navTo('dashboard')" class="px-3 md:px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition text-xs md:text-sm"><i class="fas fa-user"></i></button>
                 <button onclick="playSound('click'); logout()" class="px-3 md:px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition text-xs md:text-sm"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
@@ -195,13 +189,12 @@
                 <p class="text-center mt-6 text-sm text-gray-600">New here? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('register')">Register Account</span></p>
             </div>
         </section>
+
         <section id="view-register" class="hidden-section max-w-md mx-auto mt-10">
             <div class="glass-panel p-8">
                 <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Register Account</h2>
-                <input type="text" id="reg-name" placeholder="Customer Name For Purchase">
                 <input type="text" id="reg-phone" placeholder="Phone Number (Active)">
-                <input type="email" id="reg-email" placeholder="Email Address (Optional)">
-                <input type="password" id="reg-pass" placeholder="Create Password">
+                <input type="email" id="reg-email" placeholder="Email Address (Optional)">                <input type="password" id="reg-pass" placeholder="Create Password">
                 <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">REGISTER FREE</button>
                 <p class="text-center mt-6 text-sm text-gray-600">Have account? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('login')">Login Here</span></p>
             </div>
@@ -218,7 +211,6 @@
                         </div>
                         <h3 class="text-lg md:text-xl font-bold text-gray-700" id="dash-user-display">Loading...</h3>
                         <p class="text-xs text-purple-500 font-mono" id="dash-uac-display">...</p>
-                        <p class="text-xs text-gray-600" id="dash-customer-name"></p>
                     </div>
                     <div class="space-y-2 text-xs md:text-sm">
                         <div class="bg-white/50 p-2 rounded"><strong>Status:</strong> <span id="dash-status" class="badge badge-active">ACTIVE</span></div>
@@ -243,7 +235,8 @@
                     <div id="dashboard-message"></div>
                     
                     <!-- Order Status Tabs -->
-                    <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar">                        <button onclick="filterOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 transition">All</button>
+                    <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar">
+                        <button onclick="filterOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 transition">All</button>
                         <button onclick="filterOrders('To Pay')" class="px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200 transition">To Pay</button>
                         <button onclick="filterOrders('To Ship')" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200 transition">To Ship</button>
                         <button onclick="filterOrders('To Receive')" class="px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200 transition">To Receive</button>
@@ -251,30 +244,28 @@
                         <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200 transition">Return/Refund</button>
                         <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200 transition">Cancelled</button>
                     </div>
-
                     <!-- Order Table -->
                     <div class="table-container">
                         <table class="custom-table">
                             <thead>
                                 <tr>
+                                    <th>Username</th>
                                     <th>Nama Item</th>
-                                    <th>Nama Customer</th>
-                                    <th>Tarikh Dibuat</th>
-                                    <th>Tarikh Selesai</th>
+                                    <th>Kode Unik Item</th>
                                     <th>Destination Address</th>
                                     <th>Quantity Order</th>
                                     <th>Harga Keseluruhan</th>
                                     <th>Payment Method</th>
-                                    <th>Payment Status</th>
+                                    <th>Payment Confirmation Status</th>
                                     <th>Delivery Status</th>
                                     <th>Tracking Number</th>
                                     <th>ID PESANAN</th>
-                                    <th>Rating</th>
+                                    <th>Rating Item</th>
                                     <th>Tindakan</th>
                                 </tr>
                             </thead>
                             <tbody id="user-order-history">
-                                <tr><td colspan="14" class="text-center py-8 text-gray-500">Memuatkan data pesanan...</td></tr>
+                                <tr><td colspan="13" class="text-center py-8 text-gray-500">Memuatkan data pesanan...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -292,7 +283,8 @@
                 <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2">
                     <i class="fas fa-headset"></i> Live Agent Support
                 </h2>
-                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">                    <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>
+                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
+                    <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>
                 </div>
                 <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
                     <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2">
@@ -300,8 +292,7 @@
                             <button onclick="closeChat()" class="text-gray-500 hover:text-purple-600 transition"><i class="fas fa-arrow-left"></i></button>
                             <div>
                                 <h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3>
-                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
-                            </div>
+                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>                            </div>
                         </div>
                         <div class="flex gap-1">
                             <button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded transition" title="Copy Chat ID"><i class="fas fa-copy"></i> ID</button>
@@ -314,7 +305,7 @@
                         <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
                         <button onclick="startRecording()" onmouseup="stopRecording()" ontouchend="stopRecording()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Rakam Suara"><i class="fas fa-microphone text-gray-600"></i></button>
                         <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Hantar Lokasi"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
-                        <button onclick="sendOrderInfo()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Send Maklumat Pesanan"><i class="fas fa-receipt text-gray-600"></i></button>
+                        <button onclick="sendOrderInfo()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Maklumat Pesanan"><i class="fas fa-receipt text-gray-600"></i></button>
                         <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
                         <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg"><i class="fas fa-paper-plane"></i></button>
                     </div>
@@ -324,7 +315,7 @@
             </div>
         </section>
 
-        <!-- 5. ADMIN DASHBOARD (2 MODES) -->
+        <!-- 5. ADMIN DASHBOARD -->
         <section id="view-admin" class="hidden-section">
             <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white shadow-xl rounded-2xl">
                 <div class="flex justify-between items-center">
@@ -341,6 +332,7 @@
                 <button onclick="showAdminTab('tab-users')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-users mr-1"></i> Users</button>
                 <button onclick="showAdminTab('tab-chat')" class="px-4 py-2 bg-white/80 rounded-xl text-pink-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-headset mr-1"></i> Live Chat</button>
             </div>
+
             <!-- Tab: Orders -->
             <div id="tab-orders" class="admin-tab glass-panel p-4 md:p-6 mb-6">
                 <h3 class="font-bold mb-4 text-purple-700">Jadual Pengesahan & Urusan Pesanan</h3>
@@ -349,19 +341,17 @@
                         <thead>
                             <tr>
                                 <th>UAC</th>
-                                <th>Username</th>
-                                <th>Nama Item</th>
+                                <th>Username</th>                                <th>Nama Item</th>
                                 <th>Kode Unik Item</th>
                                 <th>Destination Address</th>
                                 <th>Quantity Order</th>
                                 <th>Harga Keseluruhan</th>
                                 <th>Payment Method</th>
-                                <th>Payment Status</th>
+                                <th>Payment Confirmation Status</th>
                                 <th>Delivery Status</th>
                                 <th>Tracking Number</th>
                                 <th>ID PESANAN</th>
                                 <th>CURRENT STATUS</th>
-                                <th>ORDER CATEGORY</th>
                                 <th>Tindakan</th>
                             </tr>
                         </thead>
@@ -390,7 +380,8 @@
                 </div>
                 <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
                 <h3 class="font-bold mt-8 mb-4 text-purple-700">Senarai Daftar Produk Yang Telah Dilancarkan</h3>
-                <div class="table-container">                    <table class="custom-table">
+                <div class="table-container">
+                    <table class="custom-table">
                         <thead>
                             <tr>
                                 <th>BIL</th>
@@ -399,8 +390,7 @@
                                 <th>HARGA JUALAN</th>
                                 <th>RATING ITEM</th>
                                 <th>STATUS ITEM</th>
-                                <th>TOTAL SOLD</th>
-                                <th>Jumlah Pendapatan</th>
+                                <th>TOTAL SOLD</th>                                <th>Jumlah Pendapatan</th>
                                 <th>EDIT</th>
                                 <th>PADAM</th>
                             </tr>
@@ -419,7 +409,6 @@
                             <tr>
                                 <th>UAC</th>
                                 <th>Username</th>
-                                <th>Customer Name</th>
                                 <th>Password</th>
                                 <th>Phone Number</th>
                                 <th>Shipping Address</th>
@@ -427,7 +416,6 @@
                                 <th>Total Order Cart</th>
                                 <th>Total Order</th>
                                 <th>Total Check Out</th>
-                                <th>Is Account Currently in Use?</th>
                                 <th>Log Cache</th>
                                 <th>Tindakan</th>
                             </tr>
@@ -439,20 +427,18 @@
                 <div class="table-container border-2 border-red-100">
                     <table class="custom-table">
                         <thead>
-                            <tr>                                <th>UAC</th>
+                            <tr>
+                                <th>UAC</th>
                                 <th>Username</th>
-                                <th>Customer Name</th>
                                 <th>Status Account</th>
                                 <th>Log Cache</th>
                                 <th>Delete Account Permanently</th>
-                                <th>Comment</th>
                             </tr>
                         </thead>
                         <tbody id="admin-blacklist-list"></tbody>
                     </table>
                 </div>
             </div>
-
             <!-- Tab: Admin Chat -->
             <div id="tab-chat" class="admin-tab hidden-section glass-panel p-4 md:p-6 h-[70vh] flex flex-col">
                 <h3 class="font-bold mb-4 text-pink-700">Live Agent Dashboard (Owner)</h3>
@@ -465,7 +451,7 @@
                         <span class="font-bold text-purple-700" id="admin-chat-target">Customer</span>
                         <div class="flex gap-1">
                             <button onclick="copyChatID()" class="text-[10px] bg-gray-200 px-2 py-1 rounded"><i class="fas fa-copy"></i> Copy ID</button>
-                            <button onclick="deleteConversation()" class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded">Delete</button>
+                            <button onclick="deleteConversation()" class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded">Delete Conversation</button>
                         </div>
                     </div>
                     <div id="admin-chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 flex-1 overflow-y-auto"></div>
@@ -477,36 +463,6 @@
                         <textarea id="admin-msg-input" rows="1" class="m-0 flex-1 text-sm" placeholder="Reply..."></textarea>
                         <button onclick="sendAdminMessage()" class="btn-glitter px-4 rounded-lg text-sm">Send</button>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Admin Shopping Mode -->
-        <section id="view-admin-shopping" class="hidden-section">
-            <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-pink-600 via-purple-600 to-pink-600 text-white shadow-xl rounded-2xl">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl md:text-3xl font-bold">ADMIN SHOPPING MODE</h2>
-                        <p class="text-white/80 text-xs md:text-sm">Beli-belah seperti pelanggan biasa</p>
-                    </div>                    <i class="fas fa-shopping-bag text-4xl md:text-5xl opacity-50"></i>
-                </div>
-            </div>
-            <!-- Same as customer home view -->
-            <div class="glass-panel p-3 md:p-4 mb-4 md:mb-6 flex flex-col md:flex-row gap-3 items-center">
-                <div class="relative w-full md:w-1/2">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                    <input type="text" id="admin-search-bar" placeholder="Search Product..." class="pl-10 m-0" onkeyup="renderCatalog()">
-                </div>
-                <select id="admin-filter-sort" class="md:w-1/4 m-0" onchange="renderCatalog()">
-                    <option value="default">🔥 Trending</option>
-                    <option value="highest">💰 Highest Sales</option>
-                    <option value="event">🎉 Event Based</option>
-                </select>
-            </div>
-            <div id="admin-product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
-                <div class="col-span-full text-center py-20">
-                    <div class="loader mx-auto mb-4"></div>
-                    <p class="text-gray-600 font-bold animate-pulse text-sm">Loading Catalog...</p>
                 </div>
             </div>
         </section>
@@ -532,40 +488,10 @@
                         <i class="fas fa-exclamation-triangle"></i> PERINGATAN: Sila bayar mengikut jumlah yang ditetapkan atau pesanan anda digantung dan dibatalkan. Hantar butiran pembayaran melalui WhatsApp <strong>+60145400413</strong>.
                     </li>
                 </ol>
-                <p class="text-xs text-gray-500 mt-2">Your Payment Confirmation Status: Admin MFD Store only can confirm.</p>
-            </div>
+                <p class="text-xs text-gray-500 mt-2">Your Payment Confirmation Status: Admin MFD Store only can confirm.</p>            </div>
             <button onclick="submitOrder()" class="btn-glitter w-full py-4 rounded-xl font-bold mt-6 shadow-xl text-lg"><i class="fas fa-check-circle mr-2"></i>CHECK OUT</button>
         </div>
     </div>
-    <!-- PRODUCT DETAIL MODAL -->
-    <div id="product-modal" class="hidden-section product-modal" onclick="if(event.target===this) closeProductModal()">
-        <div class="product-modal-content glass-panel p-6">
-            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500">&times;</button>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <img id="modal-img" src="" class="w-full h-64 object-cover rounded-lg">
-                </div>
-                <div>
-                    <h2 id="modal-name" class="text-2xl font-bold glitter-text mb-2"></h2>
-                    <p id="modal-price" class="text-xl text-purple-600 font-bold mb-2"></p>
-                    <p id="modal-variation" class="text-sm text-gray-600 mb-2"></p>
-                    <p id="modal-desc" class="text-sm text-gray-700 mb-4"></p>
-                    <div class="flex gap-4 mb-4">
-                        <span class="text-sm"><i class="fas fa-star text-yellow-500"></i> <span id="modal-rating"></span></span>
-                        <span class="text-sm"><i class="fas fa-shopping-cart"></i> Sold: <span id="modal-sold"></span></span>
-                        <span class="text-sm"><i class="fas fa-globe"></i> <span id="modal-country"></span></span>
-                    </div>
-                    <div id="modal-reviews" class="mb-4"></div>
-                    <button id="modal-add-cart" class="btn-glitter w-full py-3 rounded-lg font-bold">Add Order Cart</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Mode Toggle Button -->
-    <button id="admin-mode-toggle" class="admin-mode-toggle hidden px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full shadow-lg font-bold text-sm" onclick="toggleAdminMode()">
-        <i class="fas fa-exchange-alt mr-2"></i>Switch Mode
-    </button>
 
     <!-- FIREBASE LOGIC -->
     <script type="module">
@@ -587,6 +513,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
+
         let currentUser = null;
         let userData = {};
         let cart = [];
@@ -597,8 +524,6 @@
         let unsubscribeOrders = null;
         let mediaRecorder;
         let audioChunks = [];
-        let isAdminMode = false;
-        let selectedProduct = null;
 
         // Sound Effects
         window.playSound = (type) => {
@@ -612,14 +537,13 @@
             msgBox.innerHTML = `<div class="${type === 'error' ? 'error-box' : 'success-box'}">${message}</div>`;
             setTimeout(() => { msgBox.innerHTML = ''; }, 5000);
         }
-
         // Navigation
         window.navTo = (viewId) => {
             playSound('click');
             document.querySelectorAll('section').forEach(el => el.classList.add('hidden-section'));
             document.getElementById(`view-${viewId}`).classList.remove('hidden-section');
             window.scrollTo(0,0);
-            if(viewId === 'home' || viewId === 'admin-shopping') renderCatalog();
+            if(viewId === 'home') renderCatalog();
             if(viewId === 'dashboard') loadUserData();
             if(viewId === 'admin') loadAdminData();
             if(viewId === 'chat-list') loadChatList();
@@ -635,22 +559,9 @@
             const m = document.getElementById('modal-cart');
             m.classList.contains('hidden-section') ? (renderCartItems(), m.classList.remove('hidden-section')) : m.classList.add('hidden-section');
         };
-        // Admin Mode Toggle
-        window.toggleAdminMode = () => {
-            isAdminMode = !isAdminMode;
-            playSound('click');
-            if(isAdminMode) {
-                navTo('admin');
-                document.getElementById('admin-mode-btn').innerHTML = '<i class="fas fa-shopping-bag mr-1"></i> Shopping Mode';
-            } else {
-                navTo('admin-shopping');
-                document.getElementById('admin-mode-btn').innerHTML = '<i class="fas fa-user-shield mr-1"></i> Admin Mode';
-            }
-        };
 
         // Authentication
         window.doRegister = async () => {
-            const name = document.getElementById('reg-name').value;
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
             const phone = document.getElementById('reg-phone').value;
@@ -659,7 +570,7 @@
                 const cred = await createUserWithEmailAndPassword(auth, email, pass);
                 const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
                 await setDoc(doc(db, "users", cred.user.uid), {
-                    username: "User_"+uac.split('-')[1], customerName: name || "User_"+uac.split('-')[1], email, phone, uac, role: 'customer', status: 'ACTIVE', address: '', createdAt: serverTimestamp(), logCache: serverTimestamp()
+                    username: "User_"+uac.split('-')[1], email, phone, uac, role: 'customer', status: 'ACTIVE', address: '', createdAt: serverTimestamp(), logCache: serverTimestamp()
                 });
                 playSound('success'); alert("Berjaya didaftarkan! Sila login."); navTo('login');
             } catch(e) { playSound('error'); alert(e.message); }
@@ -675,8 +586,7 @@
         window.logout = () => { signOut(auth); playSound('click'); navTo('home'); };
 
         window.deleteAccount = async () => {
-            if(confirm("Adakah anda pasti? Status akaun akan ditukar kepada INACTIVE.")) {
-                await updateDoc(doc(db, "users", currentUser.uid), { status: 'INACTIVE' });
+            if(confirm("Adakah anda pasti? Status akaun akan ditukar kepada INACTIVE.")) {                await updateDoc(doc(db, "users", currentUser.uid), { status: 'INACTIVE' });
                 signOut(auth);
                 playSound('success');
                 alert("Akaun dinyahaktifkan.");
@@ -684,7 +594,8 @@
         };
 
         // Products
-        async function loadProducts() {            try {
+        async function loadProducts() {
+            try {
                 const snap = await getDocs(collection(db, "products"));
                 allProducts = []; snap.forEach(d => allProducts.push({id: d.id, ...d.data()}));
                 renderCatalog();
@@ -703,7 +614,7 @@
             if(sort === 'event') filtered = filtered.filter(p => p.event);
             if(filtered.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Tiada produk dijumpai.</div>`; return; }
             grid.innerHTML = filtered.map(p => `
-                <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition cursor-pointer" onclick="openProductModal('${p.id}')">
+                <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition">
                     <img src="${p.imageUrl||'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg mb-2 bg-gray-200" onerror="this.src='https://via.placeholder.com/150?text=Error'">
                     <h3 class="font-bold text-sm text-gray-800 leading-tight">${p.name}</h3>
                     ${p.event ? `<span class="text-[10px] text-pink-600 font-bold">#${p.event}</span>` : ''}
@@ -717,47 +628,23 @@
                         <span class="text-[10px] text-gray-400">Sold: ${p.totalSold||0}</span>
                         <span class="text-[10px] text-yellow-500">⭐ ${p.rating||5.0}</span>
                     </div>
-                    <button onclick="event.stopPropagation(); addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2 shadow">Add Order Cart</button>
+                    <button onclick="addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2 shadow">Add Order Cart</button>
                 </div>`).join('');
-        };
-
-        window.openProductModal = (id) => {
-            selectedProduct = allProducts.find(p => p.id === id);
-            if(!selectedProduct) return;
-            document.getElementById('modal-img').src = selectedProduct.imageUrl || 'https://via.placeholder.com/150';
-            document.getElementById('modal-name').innerText = selectedProduct.name;
-            document.getElementById('modal-price').innerText = `RM ${selectedProduct.price}`;
-            document.getElementById('modal-variation').innerText = selectedProduct.variation || '';
-            document.getElementById('modal-desc').innerText = selectedProduct.description || '';
-            document.getElementById('modal-rating').innerText = selectedProduct.rating || 5.0;
-            document.getElementById('modal-sold').innerText = selectedProduct.totalSold || 0;
-            document.getElementById('modal-country').innerText = selectedProduct.country || '-';
-            document.getElementById('modal-reviews').innerHTML = '<div class="review-card"><p class="text-xs font-bold">Buyer Reviews</p><p class="text-[10px] text-gray-500">No reviews yet</p></div>';
-            document.getElementById('modal-add-cart').onclick = () => { addToCart(selectedProduct.id); closeProductModal(); };            document.getElementById('product-modal').classList.remove('hidden-section');
-            playSound('click');
-        };
-
-        window.closeProductModal = () => {
-            document.getElementById('product-modal').classList.add('hidden-section');
-            selectedProduct = null;
         };
 
         window.addToCart = (id) => { cart.push(allProducts.find(x=>x.id===id)); document.getElementById('cart-count').innerText=cart.length; playSound('success'); };
 
         function renderCartItems() {
-            const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
-            if(cart.length===0) { document.getElementById('cart-items').innerHTML = "<p class='text-center text-gray-500'>Cart kosong.</p>"; document.getElementById('cart-total').innerText = "RM 0.00"; return; }
+            const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);            if(cart.length===0) { document.getElementById('cart-items').innerHTML = "<p class='text-center text-gray-500'>Cart kosong.</p>"; document.getElementById('cart-total').innerText = "RM 0.00"; return; }
             document.getElementById('cart-items').innerHTML = cart.map((i,idx)=>`
-                <div class="flex gap-3 bg-white/60 p-3 rounded-lg">
-                    <img src="${i.imageUrl||'https://via.placeholder.com/50'}" class="w-16 h-16 object-cover rounded">
-                    <div class="flex-1">
-                        <div class="font-bold text-sm">${i.name}</div>
+                <div class="flex justify-between items-center bg-white/60 p-2 rounded">
+                    <div class="text-xs">
+                        <div class="font-bold">${i.name}</div>
                         <div class="text-[10px] text-gray-500">Kode: ${i.uniqueCode||'N/A'}</div>
-                        <div class="text-[10px] text-gray-500">Variasi: ${i.variation||'-'}</div>
-                        <div class="flex justify-between items-center mt-1">
-                            <span class="font-bold text-purple-600 text-xs">RM ${i.price}</span>
-                            <button onclick="cart.splice(${idx},1);renderCartItems();document.getElementById('cart-count').innerText=cart.length" class="text-red-500"><i class="fas fa-trash"></i></button>
-                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-purple-600 text-xs">RM ${i.price}</span>
+                        <button onclick="cart.splice(${idx},1);renderCartItems();document.getElementById('cart-count').innerText=cart.length" class="text-red-500"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>`).join('');
             document.getElementById('cart-total').innerText = "RM "+total.toFixed(2);
@@ -777,12 +664,13 @@
             
             try {
                 await addDoc(collection(db, "orders"), {
-                    userId: currentUser.uid, uac: userData.uac, username: userData.username, customerName: userData.customerName, items: cart, itemCounts: itemCounts, total: total, address: userData.address,
+                    userId: currentUser.uid, uac: userData.uac, username: userData.username, items: cart, itemCounts: itemCounts, total: total, address: userData.address,
                     trackingNo: tracking, orderId: orderId, paymentMethod: "Manual Transfer (TNG/Sociabuzz)", paymentStatus: "Not Verified", status: "To Pay", deliveryStatus: "Pending",
-                    adminNote: "", userRating: null, currentStatus: "Pending Payment", orderCategory: "To Pay", dateCreated: serverTimestamp(), dateCompleted: null
+                    adminNote: "", userRating: null, currentStatus: "Pending Payment", createdAt: serverTimestamp()
                 });
                 cart=[]; document.getElementById('cart-count').innerText=0; toggleCartModal(); playSound('success'); 
-                showDashboardMessage("✅ Pesanan berjaya! Sila buat pembayaran.", 'success');                setTimeout(() => { loadUserData(); navTo('dashboard'); }, 1000);
+                showDashboardMessage("✅ Pesanan berjaya! Sila buat pembayaran.", 'success');
+                setTimeout(() => { loadUserData(); navTo('dashboard'); }, 1000);
             } catch(e) { playSound('error'); showDashboardMessage("❌ Ralat: " + e.message, 'error'); }
         };
 
@@ -796,7 +684,6 @@
                 if(d.exists()){ userData=d.data(); updateDashUI(); } 
                 else { showDashboardMessage("❌ Data pengguna tidak dijumpai!", 'error'); }
             });
-
             if(unsubscribeOrders) unsubscribeOrders();
 
             try {
@@ -831,8 +718,8 @@
         function updateDashUI() {
             document.getElementById('nav-username').innerText = userData.username;
             document.getElementById('nav-uac').innerText = userData.uac;
-            document.getElementById('dash-user-display').innerText = userData.username;            document.getElementById('dash-uac-display').innerText = userData.uac;
-            document.getElementById('dash-customer-name').innerText = userData.customerName || '';
+            document.getElementById('dash-user-display').innerText = userData.username;
+            document.getElementById('dash-uac-display').innerText = userData.uac;
             document.getElementById('dash-phone').innerText = userData.phone;
             document.getElementById('dash-address').value = userData.address||"";
             const s = document.getElementById('dash-status'); s.innerText = userData.status;
@@ -846,8 +733,7 @@
             } catch(e) { playSound('error'); showDashboardMessage("❌ Error: " + e.message, 'error'); }
         };
 
-        // Filter Orders
-        window.filterOrders = (status) => {
+        // Filter Orders        window.filterOrders = (status) => {
             const tbody = document.getElementById('user-order-history');
             const noMsg = document.getElementById('no-orders-msg');
             const filtered = status === 'all' ? allUserOrders : allUserOrders.filter(o=>o.status===status);
@@ -857,9 +743,8 @@
             
             tbody.innerHTML = filtered.map(o=>{
                 const itemNames = o.items.map(i=>i.name).join(", ");
+                const itemCodes = o.items.map(i=>i.uniqueCode||'N/A').join(", ");
                 const totalQty = Object.values(o.itemCounts||{}).reduce((a,b)=>a+b,0) || o.items.length;
-                const dateCreated = o.dateCreated ? new Date(o.dateCreated.toDate()).toLocaleDateString() : '-';
-                const dateCompleted = o.dateCompleted ? new Date(o.dateCompleted.toDate()).toLocaleDateString() : '-';
                 let badgeClass = 'badge-to-pay';
                 if(o.status==='To Ship') badgeClass='badge-to-ship';
                 else if(o.status==='To Receive') badgeClass='badge-to-receive';
@@ -880,9 +765,9 @@
                     actions += ` <button onclick="reorder('${o.id}')" class="action-btn btn-edit">Reorder</button>`;
                 }
                 return `<tr>
-                    <td class="max-w-xs truncate">${itemNames}</td>                    <td>${o.customerName||o.username}</td>
-                    <td>${dateCreated}</td>
-                    <td>${dateCompleted}</td>
+                    <td class="font-bold text-xs">${o.username}</td>
+                    <td class="max-w-xs truncate">${itemNames}</td>
+                    <td class="font-mono text-[10px]">${itemCodes}</td>
                     <td class="max-w-xs truncate text-[10px]">${o.address}</td>
                     <td class="text-center">${totalQty}</td>
                     <td class="font-bold text-purple-600">RM ${o.total}</td>
@@ -897,8 +782,7 @@
             }).join('');
         };
 
-        window.cancelOrder = async (id) => { if(confirm("Batal pesanan?")) { await updateDoc(doc(db,"orders",id), {status:'Cancelled', orderCategory:'Cancelled'}); playSound('error'); showDashboardMessage("❌ Dibatalkan", 'error'); } };
-        window.completeOrder = async (id) => { await updateDoc(doc(db,"orders",id), {status:'Completed', deliveryStatus:'Delivered', orderCategory:'Completed', dateCompleted: serverTimestamp()}); playSound('success'); showDashboardMessage("✅ Selesai!", 'success'); };
+        window.cancelOrder = async (id) => { if(confirm("Batal pesanan?")) { await updateDoc(doc(db,"orders",id), {status:'Cancelled'}); playSound('error'); showDashboardMessage("❌ Dibatalkan", 'error'); } };        window.completeOrder = async (id) => { await updateDoc(doc(db,"orders",id), {status:'Completed', deliveryStatus:'Delivered'}); playSound('success'); showDashboardMessage("✅ Selesai!", 'success'); };
         window.rateOrder = async (id) => { const r=prompt("Rating (1-5):","5"); if(r) { await updateDoc(doc(db,"orders",id),{userRating:parseInt(r)}); playSound('success'); } };
         window.reorder = (id) => { const order = allUserOrders.find(o => o.id === id); if(order) { cart = [...cart, ...order.items]; document.getElementById('cart-count').innerText = cart.length; playSound('success'); showDashboardMessage("🛒 Item ditambah!", 'success'); } };
 
@@ -929,7 +813,8 @@
             } else {
                 const adminQuery = query(collection(db, "users"), where("role", "==", "admin"), limit(1));
                 const adminSnap = await getDocs(adminQuery);
-                if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500'>Tiada Admin.</p>"; return; }                const adminDoc = adminSnap.docs[0];
+                if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500'>Tiada Admin.</p>"; return; }
+                const adminDoc = adminSnap.docs[0];
                 listEl.innerHTML = `<div onclick="openChat('${adminDoc.id}', '${adminDoc.data().username}')" class="p-4 bg-white/80 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500">
                     <div class="flex items-center gap-3"><div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div>
                     <div><h4 class="font-bold">MFD Support</h4><p class="text-xs text-green-600">● Online</p></div></div><i class="fas fa-chevron-right"></i></div>`;
@@ -946,8 +831,7 @@
             if(unsubscribeChat) unsubscribeChat();
             const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
             unsubscribeChat = onSnapshot(q, (snap) => {
-                msgContainer.innerHTML = "";
-                snap.forEach(d => {
+                msgContainer.innerHTML = "";                snap.forEach(d => {
                     const m = d.data();
                     const isMe = m.senderId === currentUser.uid;
                     let content = '';
@@ -956,11 +840,17 @@
                     else if(m.type === 'audio') content = `<audio controls src="${m.url}" class="msg-audio"></audio>`;
                     else if(m.type === 'location') content = `<div class="msg-location"><i class="fas fa-map-marker-alt"></i> ${m.address}</div>`;
                     else if(m.type === 'order') content = `<div class="msg-location"><i class="fas fa-receipt"></i> ${m.orderInfo}</div>`;
-                    msgContainer.innerHTML += `<div class="message-bubble ${isMe?'msg-me':'msg-other'}">${content}<div class="text-[9px] opacity-70 text-right">${m.timestamp?new Date(m.timestamp.toDate()).toLocaleTimeString():''} ${isMe?(m.read?'✓✓':'✓'):''}</div></div>`;
+                    msgContainer.innerHTML += `<div class="message-bubble ${isMe?'msg-me':'msg-other'}" oncontextmenu="showMessageMenu(event, '${d.id}', ${isMe})">${content}<div class="text-[9px] opacity-70 text-right">${m.timestamp?new Date(m.timestamp.toDate()).toLocaleTimeString():''} ${isMe?(m.read?'✓✓':'✓'):''}</div></div>`;
                 });
                 msgContainer.scrollTop = msgContainer.scrollHeight;
                 if(snap.size > 0) playSound('msg');
             });
+        };
+
+        window.showMessageMenu = (e, msgId, isMe) => {
+            e.preventDefault();
+            // Context menu for delete, pin, edit
+            alert("Right-click menu: Delete, Pin, Edit (Implementation in progress)");
         };
 
         window.closeChat = () => { if(unsubscribeChat) unsubscribeChat(); document.getElementById('active-chat-view').classList.add('hidden-section'); document.getElementById('chat-list-view').classList.remove('hidden-section'); };
@@ -978,7 +868,8 @@
         window.handleFileUpload = async (input) => {
             const file = input.files[0];
             if(!file || !currentChatPartner) return;
-            try {                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
+            try {
+                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
                 await uploadBytes(storageRef, file);
                 const url = await getDownloadURL(storageRef);
                 await saveMessage('', 'image', url);
@@ -989,8 +880,7 @@
 
         window.handleAdminFileUpload = async (input) => {
             const file = input.files[0];
-            if(!file || !currentChatPartner) return;
-            try {
+            if(!file || !currentChatPartner) return;            try {
                 const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
                 await uploadBytes(storageRef, file);
                 const url = await getDownloadURL(storageRef);
@@ -1027,6 +917,7 @@
                 document.getElementById('recording-indicator').classList.add('hidden-section');
             }
         };
+
         window.sendLocation = async () => { const addr = prompt("Masukkan alamat atau nama lokasi:"); if(addr) { await saveMessage('', 'location', null, addr); } };
         window.sendOrderInfo = async () => {
             if(allUserOrders.length > 0) {
@@ -1038,24 +929,21 @@
             }
         };
 
-        // Admin Functions
-        window.loadAdminData = async () => {
+        // Admin Functions        window.loadAdminData = async () => {
             if(userData.role !== 'admin') return navTo('home');
             const ordSnap = await getDocs(query(collection(db, "orders"), orderBy("createdAt","desc")));
             document.getElementById('admin-order-list').innerHTML = ordSnap.docs.map(d=>{ const o=d.data();
                 return `<tr><td class="font-mono">${o.uac}</td><td>${o.username}</td><td class="text-[10px]">${o.items.map(i=>i.name).join(',')}</td><td class="font-mono text-[10px]">${o.items.map(i=>i.uniqueCode||'-').join(',')}</td><td class="text-[10px] truncate max-w-xs">${o.address}</td><td>${Object.values(o.itemCounts||{}).reduce((a,b)=>a+b,0)||o.items.length}</td><td>RM ${o.total}</td><td>${o.paymentMethod}</td>
                 <td><select onchange="updateOrderStatus('${d.id}','paymentStatus',this.value)" class="text-[10px] p-1"><option ${o.paymentStatus==='Not Verified'?'selected':''}>Not Verified</option><option ${o.paymentStatus==='Verified'?'selected':''}>Verified</option></select></td>
                 <td><select onchange="updateOrderStatus('${d.id}','deliveryStatus',this.value)" class="text-[10px] p-1"><option ${o.deliveryStatus==='Pending'?'selected':''}>Pending</option><option ${o.deliveryStatus==='Shipping'?'selected':''}>Shipping</option><option ${o.deliveryStatus==='Delivered'?'selected':''}>Delivered</option></select></td>
-                <td><input value="${o.trackingNo||''}" onchange="updateOrderStatus('${d.id}','trackingNo',this.value)" class="text-[10px] p-1 w-20"></td><td class="font-mono text-[10px]">${o.orderId}</td>
-                <td><textarea onchange="updateOrderStatus('${d.id}','adminNote',this.value)" class="text-[10px] p-1 w-32" placeholder="Update...">${o.adminNote||''}</textarea></td>
-                <td><select onchange="updateOrderStatus('${d.id}','orderCategory',this.value)" class="text-[10px] p-1"><option ${o.orderCategory==='To Pay'?'selected':''}>To Pay</option><option ${o.orderCategory==='To Ship'?'selected':''}>To Ship</option><option ${o.orderCategory==='To Receive'?'selected':''}>To Receive</option><option ${o.orderCategory==='Completed'?'selected':''}>Completed</option><option ${o.orderCategory==='Return/Refund'?'selected':''}>Return/Refund</option><option ${o.orderCategory==='Cancelled'?'selected':''}>Cancelled</option></select></td>
+                <td><input value="${o.trackingNo||''}" onchange="updateOrderStatus('${d.id}','trackingNo',this.value)" class="text-[10px] p-1 w-20"></td><td class="font-mono text-[10px]">${o.orderId}</td><td><span class="badge badge-to-pay">${o.currentStatus||o.status}</span></td>
                 <td><button onclick="updateOrderStatus('${d.id}','status','Cancelled')" class="action-btn btn-delete">Cancel</button></td></tr>`;
             }).join('');
             
             const usrSnap = await getDocs(collection(db, "users"));
             const users = usrSnap.docs.map(d=>({id:d.id, ...d.data()}));
-            document.getElementById('admin-user-list').innerHTML = users.filter(u=>u.status!=='BLOCKED').map(u=>`<tr><td>${u.uac}</td><td>${u.username}</td><td>${u.customerName||'-'}</td><td class="text-gray-400">******</td><td>${u.phone}</td><td class="truncate max-w-xs">${u.address||'-'}</td><td><span class="badge badge-active">${u.status}</span></td><td>-</td><td>-</td><td>-</td><td>-</td><td>${u.logCache?new Date(u.logCache.toDate()).toLocaleString():'-'}</td><td><button onclick="blockUser('${u.id}')" class="action-btn btn-delete">Block</button></td></tr>`).join('');
-            document.getElementById('admin-blacklist-list').innerHTML = users.filter(u=>u.status==='BLOCKED').map(u=>`<tr><td>${u.uac}</td><td class="text-red-600">${u.username}</td><td>${u.customerName||'-'}</td><td><span class="badge badge-blocked">BLOCKED</span></td><td>${u.logCache?new Date(u.logCache.toDate()).toLocaleString():'-'}</td><td><button onclick="deleteUser('${u.id}')" class="action-btn btn-delete">Delete</button></td><td><input type="text" placeholder="Comment" class="text-[10px] p-1 w-20"></td></tr>`).join('');
+            document.getElementById('admin-user-list').innerHTML = users.filter(u=>u.status!=='BLOCKED').map(u=>`<tr><td>${u.uac}</td><td>${u.username}</td><td class="text-gray-400">******</td><td>${u.phone}</td><td class="truncate max-w-xs">${u.address||'-'}</td><td><span class="badge badge-active">${u.status}</span></td><td>-</td><td>-</td><td>-</td><td>${u.logCache?new Date(u.logCache.toDate()).toLocaleString():'-'}</td><td><button onclick="blockUser('${u.id}')" class="action-btn btn-delete">Block</button></td></tr>`).join('');
+            document.getElementById('admin-blacklist-list').innerHTML = users.filter(u=>u.status==='BLOCKED').map(u=>`<tr><td>${u.uac}</td><td class="text-red-600">${u.username}</td><td><span class="badge badge-blocked">BLOCKED</span></td><td>${u.logCache?new Date(u.logCache.toDate()).toLocaleString():'-'}</td><td><button onclick="deleteUser('${u.id}')" class="action-btn btn-delete">Delete</button></td></tr>`).join('');
             
             const prodSnap = await getDocs(collection(db, "products"));
             document.getElementById('admin-prod-list').innerHTML = prodSnap.docs.map((d,i)=>{ const p=d.data(); const revenue = (p.totalSold||0) * (p.price||0);
@@ -1076,7 +964,8 @@
             await addDoc(collection(db, "products"), {
                 name: document.getElementById('prod-name').value, price: document.getElementById('prod-price').value, description: document.getElementById('prod-desc').value,
                 imageUrl: imgUrl, status: document.getElementById('prod-status').value, country: document.getElementById('prod-country').value,
-                event: document.getElementById('prod-event').value, variation: document.getElementById('prod-variation').value,                label: document.getElementById('prod-label').value,
+                event: document.getElementById('prod-event').value, variation: document.getElementById('prod-variation').value,
+                label: document.getElementById('prod-label').value,
                 uniqueCode: "ITEM-"+Math.random().toString(36).substr(2,6).toUpperCase(), totalSold: 0, rating: 5.0, revenue: 0, createdAt: serverTimestamp()
             });
             playSound('success'); alert("Produk dilancarkan!"); loadAdminData(); loadProducts();
@@ -1089,7 +978,6 @@
         window.deleteConversation = async () => { alert("Padam manual di Firebase Console > chats collection"); };
         window.copyChatID = () => { navigator.clipboard.writeText(currentChatPartner); playSound('success'); alert("ID copied!"); };
         window.blockContact = async () => { if(confirm("Block?")) { await updateDoc(doc(db, "users", currentChatPartner), {status: 'BLOCKED'}); playSound('error'); closeChat(); } };
-
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if(user) {
@@ -1099,23 +987,9 @@
                 if(snap.exists()) {
                     userData = snap.data();
                     if(userData.status === 'BLOCKED') { playSound('error'); alert("Akaun diblokir."); signOut(auth); return; }
-                    if(userData.role === 'admin') {
-                        document.getElementById('admin-mode-btn').classList.remove('hidden');
-                        document.getElementById('admin-mode-toggle').classList.remove('hidden');
-                        navTo('admin-shopping'); // Default to shopping mode for admin
-                    } else {
-                        document.getElementById('admin-mode-btn').classList.add('hidden');
-                        document.getElementById('admin-mode-toggle').classList.add('hidden');
-                        navTo('dashboard');
-                    }
+                    if(userData.role === 'admin') navTo('admin'); else navTo('dashboard');
                 }
-            } else { 
-                document.getElementById('auth-nav').classList.remove('hidden-section'); 
-                document.getElementById('user-nav').classList.add('hidden-section');
-                document.getElementById('admin-mode-btn').classList.add('hidden');
-                document.getElementById('admin-mode-toggle').classList.add('hidden');
-                navTo('home'); 
-            }
+            } else { document.getElementById('auth-nav').classList.remove('hidden-section'); document.getElementById('user-nav').classList.add('hidden-section'); navTo('home'); }
             loadProducts();
         });
     </script>
