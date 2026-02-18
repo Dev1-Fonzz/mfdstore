@@ -70,7 +70,7 @@
         .msg-pin { background: #fffacd; border: 1px solid #ffd700; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; margin-top: 5px; display: inline-block; color: #b7791f; }
         @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1); background: rgba(255,255,255,0.6); }
-        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1100px; font-size: 0.68rem; }
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1200px; font-size: 0.68rem; }
         .custom-table th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; text-align: left; font-weight: 700; border-bottom: 2px solid #e2e8f0; color: white; position: sticky; top: 0; }
         .custom-table td { padding: 10px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.5); vertical-align: middle; color: #2d3748; }
         .custom-table tr:hover td { background: rgba(255,255,255,0.9); }
@@ -106,6 +106,17 @@
         .btn-delete { background: #fed7d7; color: #c53030; }
         .btn-edit:hover { background: #90cdf4; }
         .btn-delete:hover { background: #fc8181; color: white; }
+        
+        /* Admin Filter Tabs Style */
+        .admin-filter-btn {
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .admin-filter-btn.active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-color: rgba(255,255,255,0.5);
+        }
     </style>
 </head>
 <body class="p-0 md:p-4">
@@ -134,8 +145,7 @@
                 <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-purple-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>
                 <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register</button>
             </div>
-            <div id="user-nav" class="hidden-section flex items-center gap-2 md:gap-3">
-                <div class="text-right hidden md:block">
+            <div id="user-nav" class="hidden-section flex items-center gap-2 md:gap-3">                <div class="text-right hidden md:block">
                     <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>
                     <div id="nav-uac" class="text-[10px] text-purple-500 font-mono"></div>
                 </div>
@@ -145,7 +155,8 @@
         </div>
     </nav>
 
-    <!-- MAIN CONTENT -->    <main class="container mx-auto p-2 md:p-4 pb-20 fade-in">
+    <!-- MAIN CONTENT -->
+    <main class="container mx-auto p-2 md:p-4 pb-20 fade-in">
 
         <!-- 1. HOME / CATALOG -->
         <section id="view-home">
@@ -183,8 +194,7 @@
             </div>
         </section>
 
-        <section id="view-register" class="hidden-section max-w-md mx-auto mt-10">
-            <div class="glass-panel p-8">
+        <section id="view-register" class="hidden-section max-w-md mx-auto mt-10">            <div class="glass-panel p-8">
                 <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Register Account</h2>
                 <input type="text" id="reg-phone" placeholder="Phone Number (Active)">
                 <input type="email" id="reg-email" placeholder="Email Address (Optional)">
@@ -194,7 +204,8 @@
             </div>
         </section>
 
-        <!-- 3. USER DASHBOARD -->        <section id="view-dashboard" class="hidden-section">
+        <!-- 3. USER DASHBOARD -->
+        <section id="view-dashboard" class="hidden-section">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
                 <div class="glass-panel p-4 md:p-6 lg:col-span-1 h-fit">
                     <div class="text-center mb-4">
@@ -232,8 +243,7 @@
                         <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200 transition">Return</button>
                         <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200 transition">Cancelled</button>
                     </div>
-                    <div class="table-container">
-                        <table class="custom-table">
+                    <div class="table-container">                        <table class="custom-table">
                             <thead>
                                 <tr>
                                     <th>Username</th>
@@ -243,7 +253,8 @@
                                     <th>Qty</th>
                                     <th>Harga</th>
                                     <th>Payment</th>
-                                    <th>Status</th>                                    <th>Delivery</th>
+                                    <th>Status</th>
+                                    <th>Delivery</th>
                                     <th>Tracking</th>
                                     <th>ID</th>
                                     <th>Rating</th>
@@ -281,8 +292,7 @@
                                 <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
                             </div>
                         </div>
-                        <div class="flex gap-1">
-                            <button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded transition"><i class="fas fa-copy"></i> ID</button>
+                        <div class="flex gap-1">                            <button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded transition"><i class="fas fa-copy"></i> ID</button>
                             <button onclick="blockContact()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded transition"><i class="fas fa-ban"></i></button>
                         </div>
                     </div>
@@ -292,7 +302,8 @@
                         <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
                         <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
                         <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
-                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg"><i class="fas fa-paper-plane"></i></button>                    </div>
+                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg"><i class="fas fa-paper-plane"></i></button>
+                    </div>
                     <div class="text-[10px] text-gray-400 mt-1 text-center">Auto-update 1 detik • Sound Effects Enabled • All Data in Firebase</div>
                 </div>
             </div>
@@ -315,17 +326,50 @@
                 <button onclick="showAdminTab('tab-users')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-users mr-1"></i> Users</button>
                 <button onclick="showAdminTab('tab-chat')" class="px-4 py-2 bg-white/80 rounded-xl text-pink-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-headset mr-1"></i> Live Chat</button>
             </div>
+            
+            <!-- TAB ORDERS (UPDATED WITH FILTERS & STATUS CHANGE) -->
             <div id="tab-orders" class="admin-tab glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4 text-purple-700">Jadual Pengesahan & Urusan Pesanan</h3>
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                    <h3 class="font-bold text-purple-700 text-lg">Jadual Pengesahan & Urusan Pesanan</h3>
+                    <div class="text-xs text-gray-500">*Klik pada status untuk menukar</div>
+                </div>
+                
+                <!-- Admin Order Filters -->
+                <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar border-b border-gray-200">
+                    <button onclick="filterAdminOrders('all')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 active">All</button>
+                    <button onclick="filterAdminOrders('To Pay')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200">To Pay</button>
+                    <button onclick="filterAdminOrders('To Ship')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200">To Ship</button>
+                    <button onclick="filterAdminOrders('To Receive')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200">To Receive</button>
+                    <button onclick="filterAdminOrders('Completed')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200">Completed</button>
+                    <button onclick="filterAdminOrders('Return/Refund')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200">Return</button>                    <button onclick="filterAdminOrders('Cancelled')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200">Cancelled</button>
+                </div>
+
                 <div class="table-container">
                     <table class="custom-table">
                         <thead>
-                            <tr><th>UAC</th><th>Username</th><th>Nama Item & Kode</th><th>Destination Address</th><th>Qty</th><th>Harga</th><th>Payment</th><th>Payment Status</th><th>Delivery</th><th>Tracking</th><th>ID</th><th>Status</th><th>Tindakan</th></tr>
+                            <tr>
+                                <th>UAC</th>
+                                <th>Username</th>
+                                <th>Nama Item & Kode</th>
+                                <th>Destination Address</th>
+                                <th>Qty</th>
+                                <th>Harga</th>
+                                <th>Payment</th>
+                                <th>Payment Status</th>
+                                <th>Delivery</th>
+                                <th>Tracking</th>
+                                <th>ID</th>
+                                <th>Status Utama</th>
+                                <th>Tindakan Admin</th>
+                            </tr>
                         </thead>
-                        <tbody id="admin-order-list"></tbody>
+                        <tbody id="admin-order-list">
+                            <!-- Data will be populated here -->
+                        </tbody>
                     </table>
                 </div>
             </div>
+
             <div id="tab-products" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
                 <h3 class="font-bold mb-4 text-purple-700">Tambah Produk Baharu</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white/30 p-4 rounded-xl">
@@ -341,12 +385,12 @@
                     </select>
                     <input type="url" id="prod-img-url" placeholder="Paste Image URL Here (https://...)" class="md:col-span-2">
                     <textarea id="prod-desc" placeholder="Deskripsi Item" class="md:col-span-2"></textarea>
-                </div>                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
+                </div>
+                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
                 <h3 class="font-bold mt-8 mb-4 text-purple-700">Senarai Produk Dilancarkan</h3>
                 <div class="table-container">
                     <table class="custom-table">
-                        <thead>
-                            <tr><th>BIL</th><th>GAMBAR</th><th>NAMA ITEM</th><th>HARGA</th><th>RATING</th><th>STATUS</th><th>SOLD</th><th>EDIT</th><th>PADAM</th></tr>
+                        <thead>                            <tr><th>BIL</th><th>GAMBAR</th><th>NAMA ITEM</th><th>HARGA</th><th>RATING</th><th>STATUS</th><th>SOLD</th><th>EDIT</th><th>PADAM</th></tr>
                         </thead>
                         <tbody id="admin-prod-list"></tbody>
                     </table>
@@ -390,11 +434,11 @@
                         <textarea id="admin-msg-input" rows="1" class="m-0 flex-1 text-sm" placeholder="Reply..."></textarea>
                         <button onclick="sendAdminMessage()" class="btn-glitter px-4 rounded-lg text-sm">Send</button>
                     </div>
-                </div>            </div>
+                </div>
+            </div>
         </section>
 
     </main>
-
     <!-- CART MODAL -->
     <div id="modal-cart" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
@@ -444,7 +488,7 @@
         let cart = [];
         let allProducts = [];
         let allUserOrders = [];
-        let currentChatPartner = null;
+        let allAdminOrders = []; // Store for admin filtering        let currentChatPartner = null;
         let unsubscribeChat = null;
         let unsubscribeOrders = null;
 
@@ -474,6 +518,7 @@
             document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden-section'));
             document.getElementById(id).classList.remove('hidden-section');
             if(id === 'tab-chat') setTimeout(loadChatList, 100);
+            if(id === 'tab-orders') filterAdminOrders('all'); // Reset filter when tab opens
         };
 
         window.toggleCartModal = () => {
@@ -488,11 +533,11 @@
             if(!email || !pass) return alert("Email & Password diperlukan");
             try {
                 const cred = await createUserWithEmailAndPassword(auth, email, pass);
-                const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();                await setDoc(doc(db, "users", cred.user.uid), {
+                const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+                await setDoc(doc(db, "users", cred.user.uid), {
                     username: "User_"+uac.split('-')[1], email, phone, uac, role: 'customer', status: 'ACTIVE', address: '', createdAt: serverTimestamp(), logCache: serverTimestamp()
                 });
-                playSound('success'); alert("Berjaya didaftarkan! Sila login."); navTo('login');
-            } catch(e) { playSound('error'); alert(e.message); }
+                playSound('success'); alert("Berjaya didaftarkan! Sila login."); navTo('login');            } catch(e) { playSound('error'); alert(e.message); }
         };
 
         window.doLogin = async () => {
@@ -537,11 +582,11 @@
                     <img src="${p.imageUrl||'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg mb-2 bg-gray-200" onerror="this.src='https://via.placeholder.com/150?text=Error'">
                     <h3 class="font-bold text-sm text-gray-800 leading-tight">${p.name}</h3>
                     ${p.event ? `<span class="text-[10px] text-pink-600 font-bold">#${p.event}</span>` : ''}
-                    <p class="text-[10px] text-gray-500 line-clamp-2 my-1 flex-grow">${p.description}</p>                    <div class="flex justify-between items-center mt-2">
+                    <p class="text-[10px] text-gray-500 line-clamp-2 my-1 flex-grow">${p.description}</p>
+                    <div class="flex justify-between items-center mt-2">
                         <span class="text-purple-600 font-bold text-sm">RM ${p.price}</span>
                         <span class="text-[10px] bg-gray-100 px-1 rounded">${p.country||'-'}</span>
-                    </div>
-                    <button onclick="addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2 shadow">Add to Cart</button>
+                    </div>                    <button onclick="addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2 shadow">Add to Cart</button>
                 </div>`).join('');
         };
 
@@ -586,10 +631,10 @@
             console.log("Loading user:", currentUser.uid);
             showDashboardMessage("🔄 Memuatkan data...", 'success');
 
-            onSnapshot(doc(db, "users", currentUser.uid), (d)=>{                 if(d.exists()){ userData=d.data(); updateDashUI(); } 
+            onSnapshot(doc(db, "users", currentUser.uid), (d)=>{
+                if(d.exists()){ userData=d.data(); updateDashUI(); } 
                 else { showDashboardMessage("❌ Data pengguna tidak dijumpai!", 'error'); }
             });
-
             if(unsubscribeOrders) unsubscribeOrders();
 
             try {
@@ -635,11 +680,11 @@
         window.updateProfile = async () => {
             try {
                 await updateDoc(doc(db, "users", currentUser.uid), { address: document.getElementById('dash-address').value, logCache: serverTimestamp() });
-                playSound('success'); showDashboardMessage("✅ Alamat dikemaskini!", 'success');            } catch(e) { playSound('error'); showDashboardMessage("❌ Error: " + e.message, 'error'); }
+                playSound('success'); showDashboardMessage("✅ Alamat dikemaskini!", 'success');
+            } catch(e) { playSound('error'); showDashboardMessage("❌ Error: " + e.message, 'error'); }
         };
 
-        window.filterOrders = (status) => {
-            const tbody = document.getElementById('user-order-history');
+        window.filterOrders = (status) => {            const tbody = document.getElementById('user-order-history');
             const noMsg = document.getElementById('no-orders-msg');
             const filtered = status === 'all' ? allUserOrders : allUserOrders.filter(o=>o.status===status);
             
@@ -684,11 +729,11 @@
                     <td>${o.userRating?'⭐'+o.userRating:'-'}</td>
                     <td class="text-center">${actions}</td>
                 </tr>`;
-            }).join('');        };
+            }).join('');
+        };
 
         window.cancelOrder = async (id) => { if(confirm("Batal?")) { await updateDoc(doc(db,"orders",id), {status:'Cancelled'}); playSound('error'); showDashboardMessage("❌ Dibatalkan", 'error'); } };
-        window.completeOrder = async (id) => { await updateDoc(doc(db,"orders",id), {status:'Completed', deliveryStatus:'Delivered'}); playSound('success'); showDashboardMessage("✅ Selesai!", 'success'); };
-        window.rateOrder = async (id) => { const r=prompt("Rating (1-5):","5"); if(r) { await updateDoc(doc(db,"orders",id),{userRating:parseInt(r)}); playSound('success'); } };
+        window.completeOrder = async (id) => { await updateDoc(doc(db,"orders",id), {status:'Completed', deliveryStatus:'Delivered'}); playSound('success'); showDashboardMessage("✅ Selesai!", 'success'); };        window.rateOrder = async (id) => { const r=prompt("Rating (1-5):","5"); if(r) { await updateDoc(doc(db,"orders",id),{userRating:parseInt(r)}); playSound('success'); } };
         window.reorder = (id) => { const order = allUserOrders.find(o => o.id === id); if(order) { cart = [...cart, ...order.items]; document.getElementById('cart-count').innerText = cart.length; playSound('success'); showDashboardMessage("🛒 Item ditambah!", 'success'); } };
 
         // Chat Functions
@@ -733,11 +778,11 @@
             document.getElementById('chat-partner-name').innerText = partnerName;
             const chatId = [currentUser.uid, partnerId].sort().join('_');
             const msgContainer = document.getElementById('chat-messages');
-            if(unsubscribeChat) unsubscribeChat();            const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
+            if(unsubscribeChat) unsubscribeChat();
+            const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
             unsubscribeChat = onSnapshot(q, (snap) => {
                 msgContainer.innerHTML = "";
-                snap.forEach(d => {
-                    const m = d.data();
+                snap.forEach(d => {                    const m = d.data();
                     const isMe = m.senderId === currentUser.uid;
                     let content = '';
                     if(m.type === 'text') content = `<p class="text-sm">${m.text}</p>`;
@@ -782,25 +827,25 @@
                 const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
                 await uploadBytes(storageRef, file);
                 const url = await getDownloadURL(storageRef);
-                await saveMessage('', 'image', url);                playSound('success');
+                await saveMessage('', 'image', url);
+                playSound('success');
             } catch(e) { alert("Upload gagal: " + e.message); }
             input.value = '';
         };
-
         window.sendLocation = async () => { const addr = prompt("Alamat/lokasi:"); if(addr) { await saveMessage('', 'location', null, addr); } };
 
         // Admin Functions
         window.loadAdminData = async () => {
             if(userData.role !== 'admin') return navTo('home');
-            const ordSnap = await getDocs(query(collection(db, "orders"), orderBy("createdAt","desc")));
-            document.getElementById('admin-order-list').innerHTML = ordSnap.docs.map(d=>{ const o=d.data();
-                return `<tr><td class="font-mono">${o.uac}</td><td>${o.username}</td><td class="text-[10px]">${o.items.map(i=>i.name).join(',')}</td><td class="text-[10px] truncate max-w-xs">${o.address}</td><td>${Object.values(o.itemCounts||{}).reduce((a,b)=>a+b,0)||o.items.length}</td><td>RM ${o.total}</td><td>${o.paymentMethod}</td>
-                <td><select onchange="updateOrderStatus('${d.id}','paymentStatus',this.value)" class="text-[10px] p-1"><option ${o.paymentStatus==='Not Verified'?'selected':''}>Not Verified</option><option ${o.paymentStatus==='Verified'?'selected':''}>Verified</option></select></td>
-                <td><select onchange="updateOrderStatus('${d.id}','deliveryStatus',this.value)" class="text-[10px] p-1"><option ${o.deliveryStatus==='Pending'?'selected':''}>Pending</option><option ${o.deliveryStatus==='Shipping'?'selected':''}>Shipping</option><option ${o.deliveryStatus==='Delivered'?'selected':''}>Delivered</option></select></td>
-                <td><input value="${o.trackingNo||''}" onchange="updateOrderStatus('${d.id}','trackingNo',this.value)" class="text-[10px] p-1 w-20"></td><td>${o.orderId}</td><td><span class="badge badge-to-pay">${o.status}</span></td>
-                <td><button onclick="updateOrderStatus('${d.id}','status','Cancelled')" class="action-btn btn-delete">Cancel</button></td></tr>`;
-            }).join('');
             
+            // Load Orders with Realtime Listener for Admin
+            const q = query(collection(db, "orders"), orderBy("createdAt","desc"));
+            onSnapshot(q, (snap) => {
+                allAdminOrders = [];
+                snap.forEach(d => allAdminOrders.push({id: d.id, ...d.data()}));
+                filterAdminOrders('all'); // Render default view
+            });
+
             const usrSnap = await getDocs(collection(db, "users"));
             const users = usrSnap.docs.map(d=>({id:d.id, ...d.data()}));
             document.getElementById('admin-user-list').innerHTML = users.filter(u=>u.status!=='BLOCKED').map(u=>`<tr><td>${u.uac}</td><td>${u.username}</td><td>${u.phone}</td><td class="truncate max-w-xs">${u.address||'-'}</td><td><span class="badge badge-active">${u.status}</span></td><td>-</td><td><button onclick="blockUser('${u.id}')" class="action-btn btn-delete">Block</button></td></tr>`).join('');
@@ -814,7 +859,102 @@
             loadChatList();
         };
 
-        window.updateOrderStatus = async (id, field, val) => { await updateDoc(doc(db, "orders", id), {[field]: val}); playSound('success'); loadAdminData(); };
+        // NEW FUNCTION: Filter Admin Orders by Status
+        window.filterAdminOrders = (status) => {
+            const tbody = document.getElementById('admin-order-list');
+            const filtered = status === 'all' ? allAdminOrders : allAdminOrders.filter(o => o.status === status);
+            
+            // Update Active Button State
+            document.querySelectorAll('.admin-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'ring-2', 'ring-purple-400');
+                if((status === 'all' && btn.innerText === 'All') || btn.innerText.includes(status)) {
+                    btn.classList.add('active', 'ring-2', 'ring-purple-400');
+                }
+            });
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="13" class="text-center py-8 text-gray-500">Tiada pesanan untuk status ini.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(o => {
+                const itemNames = o.items.map(i=>i.name).join(', ');
+                const totalQty = Object.values(o.itemCounts||{}).reduce((a,b)=>a+b,0) || o.items.length;
+                                // Determine Badge Class
+                let badgeClass = 'badge-to-pay';
+                if(o.status==='To Ship') badgeClass='badge-to-ship';
+                else if(o.status==='To Receive') badgeClass='badge-to-receive';
+                else if(o.status==='Completed') badgeClass='badge-completed';
+                else if(o.status==='Cancelled') badgeClass='badge-cancelled';
+                else if(o.status==='Return/Refund') badgeClass='badge-refund';
+
+                // Create Status Dropdown Options
+                const statuses = ['To Pay', 'To Ship', 'To Receive', 'Completed', 'Return/Refund', 'Cancelled'];
+                const statusOptions = statuses.map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('');
+
+                return `<tr>
+                    <td class="font-mono text-[10px]">${o.uac}</td>
+                    <td class="font-bold text-xs">${o.username}</td>
+                    <td class="text-[10px] max-w-xs truncate" title="${itemNames}">${itemNames}</td>
+                    <td class="text-[10px] truncate max-w-xs" title="${o.address}">${o.address}</td>
+                    <td class="text-center">${totalQty}</td>
+                    <td class="font-bold text-purple-600">RM ${o.total}</td>
+                    <td class="text-[10px]">${o.paymentMethod}</td>
+                    <td>
+                        <select onchange="updateOrderField('${o.id}','paymentStatus',this.value)" class="text-[10px] p-1 rounded border border-gray-300 bg-white/80">
+                            <option ${o.paymentStatus==='Not Verified'?'selected':''}>Not Verified</option>
+                            <option ${o.paymentStatus==='Verified'?'selected':''}>Verified</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select onchange="updateOrderField('${o.id}','deliveryStatus',this.value)" class="text-[10px] p-1 rounded border border-gray-300 bg-white/80">
+                            <option ${o.deliveryStatus==='Pending'?'selected':''}>Pending</option>
+                            <option ${o.deliveryStatus==='Shipping'?'selected':''}>Shipping</option>
+                            <option ${o.deliveryStatus==='Delivered'?'selected':''}>Delivered</option>
+                        </select>
+                    </td>
+                    <td><input value="${o.trackingNo||''}" onchange="updateOrderField('${o.id}','trackingNo',this.value)" class="text-[10px] p-1 w-20 rounded border border-gray-300"></td>
+                    <td class="font-mono text-[10px]">${o.orderId}</td>
+                    <td>
+                        <span class="badge ${badgeClass}">${o.status}</span>
+                    </td>
+                    <td class="text-center">
+                        <!-- MAIN STATUS CHANGER -->
+                        <select onchange="updateOrderStatus('${o.id}', this.value)" class="text-[10px] font-bold p-1 rounded border border-purple-300 bg-purple-50 text-purple-700 cursor-pointer hover:bg-purple-100 transition">
+                            ${statusOptions}
+                        </select>
+                        <br>
+                        <button onclick="deleteOrder('${o.id}')" class="action-btn btn-delete mt-1">Hapus</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        };
+        // Helper to update specific fields (payment, delivery, tracking)
+        window.updateOrderField = async (id, field, val) => {
+            await updateDoc(doc(db, "orders", id), {[field]: val});
+            playSound('click');
+            // No need to reload, realtime listener handles it, but we can show a tiny toast if needed
+        };
+
+        // Function to change Main Status
+        window.updateOrderStatus = async (id, newStatus) => {
+            if(confirm(`Tukar status pesanan ini kepada ${newStatus}?`)) {
+                await updateDoc(doc(db, "orders", id), { status: newStatus });
+                playSound('success');
+                // Realtime listener will auto-update the UI
+            } else {
+                // Revert the select box visually if cancelled (optional, complex without state management, skipping for simplicity as DB didn't change)
+                loadAdminData(); // Reload to reset select if needed, though RT listener usually keeps it in sync
+            }
+        };
+
+        window.deleteOrder = async (id) => {
+            if(confirm("Adakah anda pasti mahu MEMADAM pesanan ini secara kekal?")) {
+                await deleteDoc(doc(db, "orders", id));
+                playSound('error');
+            }
+        };
+
         window.blockUser = async (uid) => { if(confirm("Block?")) { await updateDoc(doc(db, "users", uid), {status: 'BLOCKED'}); playSound('error'); loadAdminData(); } };
         window.unblockUser = async (uid) => { await updateDoc(doc(db, "users", uid), {status: 'ACTIVE'}); playSound('success'); loadAdminData(); };
 
@@ -838,8 +978,7 @@
         window.blockContact = async () => { if(confirm("Block?")) { await updateDoc(doc(db, "users", currentChatPartner), {status: 'BLOCKED'}); playSound('error'); closeChat(); } };
 
         onAuthStateChanged(auth, async (user) => {
-            currentUser = user;
-            if(user) {
+            currentUser = user;            if(user) {
                 document.getElementById('auth-nav').classList.add('hidden-section');
                 document.getElementById('user-nav').classList.remove('hidden-section');
                 const snap = await getDoc(doc(db, "users", user.uid));
