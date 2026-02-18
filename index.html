@@ -2,505 +2,323 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MFD Store Ultimate Showcase</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MFD Store Showcase</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --text-dark: #2d3748;
+            --primary: #6a11cb;
+            --secondary: #2575fc;
+            --accent: #ff00cc;
+            --glass: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-light: #ffffff;
+            --text-dark: #333;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #FF9A9E 75%, #FECFEF 100%);
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
             color: var(--text-dark);
             min-height: 100vh;
             overflow-x: hidden;
         }
+
         @keyframes gradientBG {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(102, 126, 234, 0.25);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+        /* Glitter Effect */
+        .glitter-btn {
+            position: relative;
+            overflow: hidden;
+            transition: 0.3s;
+            border: none;
+            cursor: pointer;
         }
-        .glass-panel:hover { transform: translateY(-2px); box-shadow: 0 12px 40px 0 rgba(102, 126, 234, 0.35); }
-        
-        .glitter-text {
-            background: linear-gradient(to right, #9D50BB, #FF69B4, #6E48AA, #9D50BB);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;            background-size: 300% auto;
-            animation: shine 4s linear infinite;
-            font-weight: 800;
+        .glitter-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;            height: 200%;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.8) 50%, rgba(255,255,255,0) 100%);
+            transform: rotate(45deg);
+            transition: 0.5s;
+            opacity: 0;
         }
-        @keyframes shine { to { background-position: 300% center; } }
-        
-        .btn-glitter {
-            background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2);
-            background-size: 300% 300%;
-            animation: gradientMove 4s ease infinite;
-            color: white;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(110, 72, 170, 0.4);
+        .glitter-btn:hover::after {
+            left: 100%;
+            opacity: 1;
+            transition: 0.7s;
         }
-        .btn-glitter:active { transform: scale(0.95); }
-        .btn-glitter:hover { filter: brightness(1.2); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(110, 72, 170, 0.5); }
-        @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+        .glitter-btn:active { transform: scale(0.95); }
+
+        .app-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         
-        /* Chat & Utilities */
-        .chat-container { display: flex; flex-direction: column; height: calc(100vh - 220px); }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; scroll-behavior: smooth; }
-        .message-bubble { max-width: 80%; padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); word-wrap: break-word; cursor: pointer; }
-        .msg-me { align-self: flex-end; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom-right-radius: 2px; margin-left: auto; }
-        .msg-other { align-self: flex-start; background: white; color: #333; border-bottom-left-radius: 2px; }
-        .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; display: block; }
-        .msg-audio { width: 200px; margin-top: 5px; }
-        .msg-location { background: #e2e8f0; padding: 10px; border-radius: 10px; margin-top: 5px; font-size: 0.8rem; }
-        .msg-pin { background: #fffacd; border: 1px solid #ffd700; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; margin-top: 5px; display: inline-block; color: #b7791f; }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        
-        .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1); background: rgba(255,255,255,0.6); }
-        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px; font-size: 0.65rem; }
-        .custom-table th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; text-align: left; font-weight: 700; color: white; position: sticky; top: 0; }
-        .custom-table td { padding: 10px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.5); vertical-align: middle; }
-        
-        .hidden-section { display: none !important; }
-        input, select, textarea {
-            background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748;
-            border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
+        .header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px; background: var(--glass); backdrop-filter: blur(10px); 
+            border-radius: 15px; border: 1px solid var(--glass-border); 
+            margin-bottom: 20px; color: white; 
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            position: sticky; top: 10px; z-index: 100;
         }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #9D50BB; box-shadow: 0 0 0 3px rgba(157, 80, 187, 0.2); }
         
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.55rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; display: inline-block; }
-        .badge-active { background: #c6f6d5; color: #22543d; }
-        .badge-blocked { background: #fed7d7; color: #822727; }
-        .badge-to-pay { background: #feebc8; color: #744210; }
-        .badge-to-ship { background: #bee3f8; color: #2a4365; }
-        .badge-completed { background: #9ae6b4; color: #22543d; }
-        .badge-cancelled { background: #fed7d7; color: #c53030; }        
-        .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #9D50BB; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .nav-btn { 
+            background: rgba(255,255,255,0.2); border: none; color: white; 
+            padding: 8px 15px; border-radius: 20px; cursor: pointer; margin-left: 5px; 
+            transition: 0.2s;
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.4); }
+
+        .section { display: none; animation: fadeIn 0.5s; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Auth Forms */
+        .auth-box { max-width: 400px; margin: 50px auto; background: rgba(255,255,255,0.95); padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); text-align: center; }
+        .form-input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+        .btn-primary { width: 100%; padding: 12px; background: linear-gradient(45deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        /* Product Grid */
+        .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .product-card { background: rgba(255,255,255,0.95); border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: transform 0.3s; position: relative; }
+        .product-card:hover { transform: translateY(-5px); }
+        .prod-img { width: 100%; height: 200px; object-fit: cover; background: #eee; }
+        .prod-info { padding: 15px; }
+        .prod-price { color: var(--accent); font-weight: bold; font-size: 1.2em; }
+        .badge { position: absolute; top: 10px; right: 10px; padding: 5px 10px; border-radius: 12px; font-size: 0.8em; color: white; }
+        .badge-public { background: #2ecc71; }
+        .badge-stock { background: #e74c3c; }
+        /* Tables */
+        .table-responsive { overflow-x: auto; background: rgba(255,255,255,0.95); border-radius: 15px; padding: 15px; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; color: #333; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 0.85em; }
+        .st-verified { background: #d4edda; color: #155724; }
+        .st-pending { background: #fff3cd; color: #856404; }
+
+        /* Chat */
+        .chat-container { display: flex; height: 70vh; background: rgba(255,255,255,0.95); border-radius: 15px; overflow: hidden; }
+        .chat-sidebar { width: 30%; border-right: 1px solid #ddd; overflow-y: auto; background: #f9f9f9; }
+        .chat-main { width: 70%; display: flex; flex-direction: column; }
+        .chat-list-item { padding: 15px; border-bottom: 1px solid #eee; cursor: pointer; transition: 0.2s; }
+        .chat-list-item:hover, .chat-list-item.active { background: #eef2ff; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: #fff; display: flex; flex-direction: column; }
+        .message-bubble { max-width: 70%; padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; word-wrap: break-word; }
+        .msg-me { background: var(--secondary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .msg-other { background: #e9ecef; color: #333; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .chat-input-area { padding: 15px; border-top: 1px solid #ddd; display: flex; gap: 10px; background: #f8f9fa; }
         
-        .fade-in { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        /* FAB Cart */
+        .fab-cart { position: fixed; bottom: 20px; right: 20px; background: var(--accent); color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); cursor: pointer; z-index: 1000; }
+        .cart-count { position: absolute; top: -5px; right: -5px; background: red; color: white; font-size: 12px; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        /* Modal */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-content { background: white; padding: 20px; border-radius: 15px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
         
-        .admin-mode-toggle { position: fixed; bottom: 20px; right: 20px; z-index: 100; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hidden { display: none !important; }
+        .mt-2 { margin-top: 1rem; }
+        .text-center { text-align: center; }
     </style>
 </head>
-<body class="p-0 md:p-4">
+<body>
 
-    <!-- AUDIO EFFECTS -->
+    <!-- Audio Effects -->
     <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3"></audio>
-    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3"></audio>
-    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
     <audio id="snd-msg" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3"></audio>
 
-    <!-- NAVBAR -->
-    <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 md:p-4 flex justify-between items-center flex-wrap gap-3 shadow-lg">
-        <div class="text-xl md:text-2xl font-bold glitter-text cursor-pointer flex items-center gap-2" onclick="navTo('home')">
-            <i class="fas fa-gem"></i> MFD STORE
-        </div>
-        <div class="flex items-center gap-2 md:gap-4">
-            <button id="admin-mode-btn" onclick="toggleAdminMode()" class="hidden px-3 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold shadow hover:bg-purple-700 transition">
-                <i class="fas fa-user-shield mr-1"></i> Admin Mode
-            </button>
-            <button onclick="playSound('click'); navTo('chat-list')" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group">
-                <i class="fas fa-comments text-purple-600 text-lg group-hover:scale-110 transition"></i>
-                <span id="chat-notif" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden animate-pulse">!</span>
-            </button>
-            <button onclick="playSound('click'); toggleCartModal()" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group">
-                <i class="fas fa-shopping-cart text-pink-600 text-lg group-hover:scale-110 transition"></i>
-                <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">0</span>
-            </button>
-            <div id="auth-nav">
-                <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-purple-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>
-                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register</button>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <h2><i class="fas fa-store"></i> MFD Store</h2>
+            <div id="nav-auth">
+                <button class="nav-btn glitter-btn" onclick="showSection('login')">Login</button>
+                <button class="nav-btn glitter-btn" onclick="showSection('register')">Register</button>
             </div>
-            <div id="user-nav" class="hidden-section flex items-center gap-2 md:gap-3">
-                <div class="text-right hidden md:block">
-                    <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>
-                    <div id="nav-uac" class="text-[10px] text-purple-500 font-mono"></div>
-                </div>
-                <button onclick="playSound('click'); navTo('dashboard')" class="px-3 md:px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition text-xs md:text-sm"><i class="fas fa-user"></i></button>
-                <button onclick="playSound('click'); logout()" class="px-3 md:px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition text-xs md:text-sm"><i class="fas fa-sign-out-alt"></i></button>
+            <div id="nav-user" class="hidden">                <span id="user-display" style="margin-right: 10px;"></span>
+                <button class="nav-btn glitter-btn" onclick="showSection('dashboard-customer')"><i class="fas fa-user"></i> Profile</button>
+                <button class="nav-btn glitter-btn" onclick="showSection('chat')"><i class="fas fa-comments"></i> Chat</button>
+                <button class="nav-btn glitter-btn hidden" id="admin-link" onclick="showSection('dashboard-admin')"><i class="fas fa-cogs"></i> Admin</button>
+                <button class="nav-btn glitter-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
             </div>
-        </div>    </nav>
+        </header>
 
-    <!-- MAIN CONTENT -->
-    <main class="container mx-auto p-2 md:p-4 pb-20 fade-in">
-
-        <!-- 1. HOME / CATALOG -->
-        <section id="view-home">
-            <div class="glass-panel p-3 md:p-4 mb-4 md:mb-6 flex flex-col md:flex-row gap-3 items-center">
-                <div class="relative w-full md:w-1/2">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                    <input type="text" id="search-bar" placeholder="Search Product..." class="pl-10 m-0" onkeyup="renderCatalog()">
-                </div>
-                <select id="filter-sort" class="md:w-1/4 m-0" onchange="renderCatalog()">
-                    <option value="default">🔥 Trending</option>
-                    <option value="highest">💰 Highest Sales</option>
-                    <option value="event">🎉 Event Based</option>
-                </select>
-            </div>
-            <div class="glass-panel p-6 md:p-8 mb-6 md:mb-8 text-center bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-white shadow-xl relative overflow-hidden rounded-2xl">
-                <h2 class="text-2xl md:text-3xl font-bold glitter-text mb-2 drop-shadow-md">Recommendations For You</h2>
-                <p class="text-white/90 font-semibold text-sm md:text-base">Exclusive deals updated in real-time!</p>
-            </div>
-            <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
-                <div class="col-span-full text-center py-20">
-                    <div class="loader mx-auto mb-4"></div>
-                    <p class="text-gray-600 font-bold animate-pulse text-sm">Loading Catalog...</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- 2. AUTH PAGES -->
-        <section id="view-login" class="hidden-section max-w-md mx-auto mt-10">
-            <div class="glass-panel p-8">
-                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Login Account</h2>
-                <input type="email" id="login-email" placeholder="Email Address">
-                <input type="password" id="login-pass" placeholder="Password">
-                <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">LOGIN NOW</button>
-                <p class="text-center mt-6 text-sm text-gray-600">New here? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('register')">Register Account</span></p>
-            </div>
-        </section>
-        <section id="view-register" class="hidden-section max-w-md mx-auto mt-10">
-            <div class="glass-panel p-8">
-                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Register Account</h2>
-                <input type="text" id="reg-name" placeholder="Customer Name For Purchase">
-                <input type="text" id="reg-phone" placeholder="Phone Number (Active)">
-                <input type="email" id="reg-email" placeholder="Email Address (Optional)">
-                <input type="password" id="reg-pass" placeholder="Create Password">
-                <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">REGISTER FREE</button>
-                <p class="text-center mt-6 text-sm text-gray-600">Have account? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('login')">Login Here</span></p>
-            </div>        </section>
-
-        <!-- 3. USER DASHBOARD -->
-        <section id="view-dashboard" class="hidden-section">
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
-                <!-- Profile Sidebar -->
-                <div class="glass-panel p-4 md:p-6 lg:col-span-1 h-fit">
-                    <div class="text-center mb-4">
-                        <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full mx-auto flex items-center justify-center text-2xl md:text-3xl text-white shadow-lg mb-2">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <h3 class="text-lg md:text-xl font-bold text-gray-700" id="dash-user-display">Loading...</h3>
-                        <p class="text-xs text-purple-500 font-mono" id="dash-uac-display">...</p>
-                        <p class="text-xs text-gray-600" id="dash-customer-name"></p>
-                    </div>
-                    <div class="space-y-2 text-xs md:text-sm">
-                        <div class="bg-white/50 p-2 rounded"><strong>Status:</strong> <span id="dash-status" class="badge badge-active">ACTIVE</span></div>
-                        <div class="bg-white/50 p-2 rounded"><strong>Phone:</strong> <span id="dash-phone">-</span></div>
-                        <label class="block mt-3 font-bold text-gray-700">📍 Shipping Address</label>
-                        <textarea id="dash-address" rows="3" class="text-xs" placeholder="Pin location, House No, Building, Street name, Unit No, Postal Code, Full Name, Phone Number"></textarea>
-                        <div class="flex gap-2 mb-2">
-                            <label class="text-[10px] flex items-center gap-1"><input type="checkbox" id="addr-freq" class="w-3 h-3 accent-purple-500"> Frequent</label>
-                            <select id="addr-label" class="w-auto py-0 px-1 text-[10px] m-0 bg-white"><option>Home</option><option>Work</option></select>
-                        </div>
-                        <button onclick="updateProfile()" class="bg-purple-500 text-white px-3 py-1.5 rounded-lg text-xs w-full shadow hover:bg-purple-600 transition">Save Changes</button>
-                        <button onclick="deleteAccount()" class="bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs w-full mt-2 hover:bg-red-200 transition">Delete Account Permanently</button>
-                    </div>
-                </div>
-
-                <!-- Order Tabs -->
-                <div class="glass-panel p-4 md:p-6 lg:col-span-3">
-                    <h3 class="text-lg md:text-xl font-bold mb-4 flex justify-between items-center">
-                        <span>My Orders</span>
-                        <span class="text-[10px] bg-purple-100 text-purple-600 px-2 py-1 rounded-full animate-pulse">Live Update</span>
-                    </h3>
-                    <div id="dashboard-message"></div>
-                    
-                    <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar">
-                        <button onclick="filterOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 transition">All</button>
-                        <button onclick="filterOrders('To Pay')" class="px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200 transition">To Pay</button>
-                        <button onclick="filterOrders('To Ship')" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200 transition">To Ship</button>
-                        <button onclick="filterOrders('To Receive')" class="px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200 transition">To Receive</button>
-                        <button onclick="filterOrders('Completed')" class="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200 transition">Completed</button>
-                        <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200 transition">Return/Refund</button>
-                        <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200 transition">Cancelled</button>
-                    </div>
-
-                    <div class="table-container">
-                        <table class="custom-table">
-                            <thead>                                <tr>
-                                    <th>Nama Item</th>
-                                    <th>Customer</th>
-                                    <th>Tarikh Dibuat</th>
-                                    <th>Tarikh Selesai</th>
-                                    <th>Address</th>
-                                    <th>Qty</th>
-                                    <th>Harga</th>
-                                    <th>Payment</th>
-                                    <th>Status Bayaran</th>
-                                    <th>Delivery</th>
-                                    <th>Tracking No</th>
-                                    <th>ID PESANAN</th>
-                                    <th>Rating</th>
-                                    <th>Tindakan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="user-order-history">
-                                <tr><td colspan="14" class="text-center py-8 text-gray-500">Memuatkan data pesanan...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div id="no-orders-msg" class="hidden-section text-center py-8 text-gray-500">
-                        <i class="fas fa-inbox text-4xl mb-2 opacity-50"></i>
-                        <p>Belum ada sejarah pesanan.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 4. LIVE CHAT SYSTEM -->
-        <section id="view-chat-list" class="hidden-section">
-            <div class="glass-panel p-4 h-[80vh] flex flex-col">
-                <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2">
-                    <i class="fas fa-headset"></i> Live Agent Support
-                </h2>
-                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
-                    <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>
-                </div>
-                <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
-                    <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2">
-                        <div class="flex items-center gap-2">
-                            <button onclick="closeChat()" class="text-gray-500 hover:text-purple-600 transition"><i class="fas fa-arrow-left"></i></button>
-                            <div>
-                                <h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3>
-                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
-                            </div>
-                        </div>
-                        <div class="flex gap-1">
-                            <button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded transition"><i class="fas fa-copy"></i> ID</button>                            <button onclick="blockContact()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded transition"><i class="fas fa-ban"></i></button>
-                        </div>
-                    </div>
-                    <div id="chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 border border-white/50"></div>
-                    <div class="flex gap-2 items-end bg-white/50 p-2 rounded-xl">
-                        <button onclick="document.getElementById('file-input').click()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition"><i class="fas fa-image text-gray-600"></i></button>
-                        <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
-                        <button onclick="startRecording()" onmouseup="stopRecording()" ontouchend="stopRecording()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition"><i class="fas fa-microphone text-gray-600"></i></button>
-                        <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
-                        <button onclick="sendOrderInfo()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition"><i class="fas fa-receipt text-gray-600"></i></button>
-                        <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
-                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                    <div class="text-[10px] text-gray-400 mt-1 text-center">Auto-update 1 detik • Sound Effects • All Data in Firestore</div>
-                    <div id="recording-indicator" class="hidden-section text-red-500 text-[10px] mt-1 font-bold animate-pulse text-center"><i class="fas fa-circle text-[8px]"></i> Recording... Release to send</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 5. ADMIN DASHBOARD -->
-        <section id="view-admin" class="hidden-section">
-            <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white shadow-xl rounded-2xl">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl md:text-3xl font-bold">ADMIN COMMAND CENTER</h2>
-                        <p class="text-white/80 text-xs md:text-sm">Urus Pesanan, Pelanggan, Produk & Live Chat</p>
-                    </div>
-                    <i class="fas fa-shield-alt text-4xl md:text-5xl opacity-50"></i>
-                </div>
-            </div>
-            <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
-                <button onclick="showAdminTab('tab-orders')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-receipt mr-1"></i> Orders</button>
-                <button onclick="showAdminTab('tab-products')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-box mr-1"></i> Products</button>
-                <button onclick="showAdminTab('tab-users')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-users mr-1"></i> Users</button>
-                <button onclick="showAdminTab('tab-chat')" class="px-4 py-2 bg-white/80 rounded-xl text-pink-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-headset mr-1"></i> Live Chat</button>
+        <!-- HOME / CATALOG -->
+        <section id="home" class="section active">
+            <div style="text-align: center; margin-bottom: 20px; color: white;">
+                <h1>Selamat Datang ke MFD Store</h1>
+                <p>Temui produk terbaik dengan harga istimewa.</p>
+                <input type="text" id="search-input" placeholder="Cari produk..." class="form-input" style="max-width: 400px; margin: 10px auto; display:block;" onkeyup="filterProducts()">
             </div>
             
-            <!-- Tab: Orders -->
-            <div id="tab-orders" class="admin-tab glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4 text-purple-700">Jadual Pengesahan & Urusan Pesanan</h3>
-                <div class="table-container">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>UAC</th><th>Username</th><th>Item</th><th>Kode Unik</th><th>Address</th><th>Qty</th><th>Total</th>
-                                <th>Payment</th><th>Status Bayaran</th><th>Delivery</th><th>Tracking</th><th>ID</th><th>Catatan Admin</th><th>Kategori</th><th>Tindakan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-order-list"></tbody>
-                    </table>                </div>
-            </div>
-
-            <!-- Tab: Products -->
-            <div id="tab-products" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4 text-purple-700">Tambahkan Produk Baharu (Image to Firestore)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white/30 p-4 rounded-xl">
-                    <input type="text" id="prod-name" placeholder="Nama Item">
-                    <input type="number" id="prod-price" placeholder="Harga Jualan (RM)">
-                    <input type="text" id="prod-variation" placeholder="Variasi">
-                    <input type="text" id="prod-country" placeholder="Negara Asal">
-                    <input type="text" id="prod-event" placeholder="Event Item">
-                    <input type="text" id="prod-label" placeholder="Label Item">
-                    <select id="prod-status" class="m-0">
-                        <option value="Public">✅ Public</option>
-                        <option value="Private">🔒 Private</option>
-                        <option value="Out of Stock">❌ Out of Stock</option>
-                    </select>
-                    <!-- Image Upload to Base64 -->
-                    <div class="md:col-span-2">
-                        <label class="text-xs font-bold">Gambar Produk (Dari Galeri/Penyemak Imbas):</label>
-                        <input type="file" id="prod-img-file" accept="image/*" class="mt-1">
-                        <img id="prod-img-preview" class="h-20 mt-2 rounded hidden object-cover">
-                    </div>
-                    <textarea id="prod-desc" placeholder="Diskripsi Item" class="md:col-span-2"></textarea>
-                </div>
-                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
-                
-                <h3 class="font-bold mt-8 mb-4 text-purple-700">Senarai Produk</h3>
-                <div class="table-container">
-                    <table class="custom-table">
-                        <thead>
-                            <tr><th>BIL</th><th>GAMBAR</th><th>NAMA</th><th>HARGA</th><th>RATING</th><th>STATUS</th><th>SOLD</th><th>EDIT</th><th>PADAM</th></tr>
-                        </thead>
-                        <tbody id="admin-prod-list"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Tab: Users -->
-            <div id="tab-users" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4 text-purple-700">Database Pelanggan</h3>
-                <div class="table-container">
-                    <table class="custom-table">
-                        <thead>
-                            <tr><th>UAC</th><th>Username</th><th>Name</th><th>Phone</th><th>Address</th><th>Status</th><th>Last Log</th><th>Tindakan</th></tr>
-                        </thead>
-                        <tbody id="admin-user-list"></tbody>
-                    </table>
-                </div>                <h3 class="font-bold mt-8 mb-4 text-red-600">Blacklist</h3>
-                <div class="table-container border-2 border-red-100">
-                    <table class="custom-table">
-                        <thead><tr><th>UAC</th><th>Username</th><th>Status</th><th>Delete</th><th>Comment</th></tr></thead>
-                        <tbody id="admin-blacklist-list"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Tab: Admin Chat -->
-            <div id="tab-chat" class="admin-tab hidden-section glass-panel p-4 md:p-6 h-[70vh] flex flex-col">
-                <h3 class="font-bold mb-4 text-pink-700">Live Agent Dashboard</h3>
-                <div id="admin-chat-list" class="flex-1 overflow-y-auto space-y-2 mb-4 border rounded-lg p-2 bg-white/30"></div>
-                <div id="admin-active-chat" class="hidden-section flex-1 flex flex-col">
-                     <div class="flex items-center justify-between border-b pb-2 mb-2">
-                        <button onclick="closeAdminChat()" class="text-sm text-gray-600 hover:text-pink-600"><i class="fas fa-arrow-left"></i> Back</button>
-                        <span class="font-bold text-purple-700" id="admin-chat-target">Customer</span>
-                        <div class="flex gap-1">
-                            <button onclick="copyChatID()" class="text-[10px] bg-gray-200 px-2 py-1 rounded">Copy ID</button>
-                            <button onclick="deleteConversation()" class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded">Delete</button>
-                        </div>
-                    </div>
-                    <div id="admin-chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 flex-1 overflow-y-auto"></div>
-                    <div class="flex gap-2">
-                         <button onclick="document.getElementById('admin-file-input').click()" class="p-2 bg-gray-200 rounded-full"><i class="fas fa-image"></i></button>
-                         <input type="file" id="admin-file-input" class="hidden" accept="image/*" onchange="handleAdminFileUpload(this)">
-                         <button onclick="startRecording()" onmouseup="stopRecording()" class="p-2 bg-gray-200 rounded-full"><i class="fas fa-microphone"></i></button>
-                         <button onclick="sendLocation()" class="p-2 bg-gray-200 rounded-full"><i class="fas fa-map-marker-alt"></i></button>
-                        <textarea id="admin-msg-input" rows="1" class="m-0 flex-1 text-sm" placeholder="Reply..."></textarea>
-                        <button onclick="sendAdminMessage()" class="btn-glitter px-4 rounded-lg text-sm">Send</button>
-                    </div>
-                </div>
+            <div class="product-grid" id="product-list">
+                <div class="text-center" style="grid-column: 1/-1; color: white; font-size: 1.2em;">Memuatkan produk...</div>
             </div>
         </section>
 
-        <!-- Admin Shopping Mode -->
-        <section id="view-admin-shopping" class="hidden-section">
-            <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-pink-600 via-purple-600 to-pink-600 text-white shadow-xl rounded-2xl">
-                <h2 class="text-2xl md:text-3xl font-bold">ADMIN SHOPPING MODE</h2>
-                <p class="text-white/80 text-xs md:text-sm">Beli-belah seperti pelanggan biasa</p>
+        <!-- AUTHENTICATION -->
+        <section id="login" class="section">
+            <div class="auth-box">
+                <h2>Login Account</h2>
+                <input type="email" id="login-email" class="form-input" placeholder="Email (Digunakan sebagai ID)">
+                <input type="password" id="login-password" class="form-input" placeholder="Password">
+                <button class="btn-primary glitter-btn" onclick="handleLogin()">Masuk</button>
+                <p class="mt-2">Belum ada akaun? <a href="#" onclick="showSection('register')">Daftar Sekarang</a></p>
             </div>
-            <div class="glass-panel p-3 md:p-4 mb-4 md:mb-6 flex flex-col md:flex-row gap-3 items-center">
-                <div class="relative w-full md:w-1/2">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                    <input type="text" id="admin-search-bar" placeholder="Search Product..." class="pl-10 m-0" onkeyup="renderCatalog()">
-                </div>
-                <select id="admin-filter-sort" class="md:w-1/4 m-0" onchange="renderCatalog()">
-                    <option value="default">🔥 Trending</option>
-                    <option value="highest">💰 Highest Sales</option>
-                    <option value="event">🎉 Event Based</option>                </select>
-            </div>
-            <div id="admin-product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6"></div>
         </section>
 
-    </main>
-
-    <!-- CART MODAL -->
-    <div id="modal-cart" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500">&times;</button>
-            <h2 class="text-2xl font-bold mb-4 glitter-text">Saved Order Cart</h2>
-            <div id="cart-items" class="space-y-3 mb-6"></div>
-            <div class="border-t-2 border-dashed border-gray-300 pt-4 flex justify-between items-center">
-                <span class="font-bold text-lg text-gray-700">Jumlah Keseluruhan:</span>
-                <span id="cart-total" class="text-2xl font-bold text-purple-600">RM 0.00</span>
+        <section id="register" class="section">
+            <div class="auth-box">
+                <h2>Register Account</h2>
+                <input type="text" id="reg-name" class="form-input" placeholder="Nama Penuh">
+                <input type="tel" id="reg-phone" class="form-input" placeholder="Nombor Telefon">
+                <input type="email" id="reg-email" class="form-input" placeholder="Email (ID Login)">
+                <input type="password" id="reg-password" class="form-input" placeholder="Password">
+                <button class="btn-primary glitter-btn" onclick="handleRegister()">Daftar Akaun</button>
+                <p class="mt-2">Sudah ada akaun? <a href="#" onclick="showSection('login')">Login</a></p>
             </div>
-            <div class="mt-6 bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-xl border border-purple-100">
-                <p class="font-bold text-purple-700 mb-3"><i class="fas fa-credit-card"></i> Payment Method</p>
-                <ol class="list-decimal pl-5 text-sm space-y-2 text-gray-700">
-                    <li>Online: <a href="https://sociabuzz.com/fareezonzz_019/give" target="_blank" class="text-blue-500 underline">Sociabuzz Link</a></li>
-                    <li>TNG E-Wallet: <strong class="font-mono bg-white px-2 py-0.5 rounded border">161489981218</strong></li>
-                    <li class="text-red-500 font-semibold text-xs bg-red-50 p-2 rounded mt-2 border border-red-100">
-                        <i class="fas fa-exclamation-triangle"></i> PERINGATAN: Sila bayar jumlah tepat. Hantar bukti ke WhatsApp <strong>+60145400413</strong>.
-                    </li>
-                </ol>
-                <p class="text-xs text-gray-500 mt-2">Status: Admin only can confirm.</p>
-            </div>
-            <button onclick="submitOrder()" class="btn-glitter w-full py-4 rounded-xl font-bold mt-6 shadow-xl text-lg"><i class="fas fa-check-circle mr-2"></i>CHECK OUT</button>
-        </div>
-    </div>
+        </section>
 
-    <!-- PRODUCT MODAL -->
-    <div id="product-modal" class="hidden-section product-modal" onclick="if(event.target===this) closeProductModal()">
-        <div class="product-modal-content glass-panel p-6 relative">
-            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500">&times;</button>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div><img id="modal-img" src="" class="w-full h-64 object-cover rounded-lg"></div>
-                <div>
-                    <h2 id="modal-name" class="text-2xl font-bold glitter-text mb-2"></h2>
-                    <p id="modal-price" class="text-xl text-purple-600 font-bold mb-2"></p>
-                    <p id="modal-variation" class="text-sm text-gray-600 mb-2"></p>
-                    <p id="modal-desc" class="text-sm text-gray-700 mb-4"></p>
-                    <div class="flex gap-4 mb-4">
-                        <span class="text-sm"><i class="fas fa-star text-yellow-500"></i> <span id="modal-rating"></span></span>
-                        <span class="text-sm"><i class="fas fa-shopping-cart"></i> Sold: <span id="modal-sold"></span></span>
-                        <span class="text-sm"><i class="fas fa-globe"></i> <span id="modal-country"></span></span>
-                    </div>
-                    <button id="modal-add-cart" class="btn-glitter w-full py-3 rounded-lg font-bold">Add Order Cart</button>
+        <!-- CUSTOMER DASHBOARD -->
+        <section id="dashboard-customer" class="section">
+            <h2 style="color:white; margin-bottom:15px;">Dashboard Pelanggan</h2>
+            
+            <div class="table-responsive">
+                <h3>Maklumat Peribadi</h3>                <div id="profile-info"></div>
+                <button class="btn-primary glitter-btn" style="width:auto; background:#e74c3c; margin-top:10px;" onclick="deleteAccount()">Delete Account Permanently</button>
+            </div>
+
+            <div class="table-responsive">
+                <h3>Status Pesanan</h3>
+                <div style="display:flex; gap:10px; overflow-x:auto; margin-bottom:10px; flex-wrap:wrap;">
+                    <button class="nav-btn" onclick="renderOrderTable('To Pay')">To Pay</button>
+                    <button class="nav-btn" onclick="renderOrderTable('To Ship')">To Ship</button>
+                    <button class="nav-btn" onclick="renderOrderTable('To Receive')">To Receive</button>
+                    <button class="nav-btn" onclick="renderOrderTable('Completed Order')">Completed</button>
+                    <button class="nav-btn" onclick="renderOrderTable('Cancelled')">Cancelled</button>
+                </div>
+                <div id="customer-orders-table"></div>
+            </div>
+
+            <div class="table-responsive">
+                <h3>Saved Cart</h3>
+                <div id="cart-list"></div>
+                <button class="btn-primary glitter-btn mt-2" onclick="proceedToCheckout()">Check Out Sekarang</button>
+            </div>
+        </section>
+
+        <!-- ADMIN DASHBOARD -->
+        <section id="dashboard-admin" class="section">
+            <h2 style="color:white; margin-bottom:15px;">Panel Pengurusan Admin</h2>
+            
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px;">
+                <button class="nav-btn glitter-btn" onclick="showAdminTab('admin-products')">Urus Produk</button>
+                <button class="nav-btn glitter-btn" onclick="showAdminTab('admin-orders')">Urus Pesanan</button>
+                <button class="nav-btn glitter-btn" onclick="showAdminTab('admin-users')">Senarai Pengguna</button>
+            </div>
+
+            <div id="admin-products" class="admin-tab">
+                <div class="table-responsive">
+                    <h3>Tambah Produk Baru</h3>
+                    <input type="text" id="adm-prod-name" class="form-input" placeholder="Nama Item">
+                    <input type="number" id="adm-prod-price" class="form-input" placeholder="Harga Jualan">
+                    <textarea id="adm-prod-desc" class="form-input" placeholder="Deskripsi"></textarea>
+                    <!-- Simplified image input for demo (URL) -->
+                    <input type="text" id="adm-prod-img" class="form-input" placeholder="URL Gambar (atau kosongkan untuk default)">
+                    <button class="btn-primary glitter-btn" onclick="addProduct()">Tambah Produk</button>
+                </div>
+                <div class="table-responsive">
+                    <h3>Senarai Produk</h3>
+                    <table id="admin-product-table">
+                        <thead><tr><th>Gambar</th><th>Nama</th><th>Harga</th><th>Status</th><th>Aksi</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
                 </div>            </div>
+
+            <div id="admin-orders" class="admin-tab hidden">
+                <div class="table-responsive">
+                    <h3>Semua Pesanan Masuk</h3>
+                    <table id="admin-order-table">
+                        <thead><tr><th>ID</th><th>Pelanggan</th><th>Total</th><th>Bayaran</th><th>Status</th><th>Aksi</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="admin-users" class="admin-tab hidden">
+                <div class="table-responsive">
+                    <h3>Database Pelanggan</h3>
+                    <table id="admin-user-table">
+                        <thead><tr><th>ID</th><th>Nama</th><th>Email</th><th>Status</th><th>Aksi</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- LIVE CHAT -->
+        <section id="chat" class="section">
+            <h2 style="color:white; margin-bottom:15px;">Live Agent Support</h2>
+            <div class="chat-container">
+                <div class="chat-sidebar" id="chat-contact-list">
+                    <!-- Contact list loaded here -->
+                </div>
+                <div class="chat-main">
+                    <div class="chat-messages" id="chat-box">
+                        <div class="text-center" style="margin-top:50px; color:#888;">Pilih kontak untuk mula berbual.</div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" class="form-input" placeholder="Taip mesej..." style="margin:0;">
+                        <button class="nav-btn glitter-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHECKOUT MODAL -->
+        <div id="checkout-modal" class="modal">
+            <div class="modal-content">
+                <h3>Check Out & Pembayaran</h3>
+                <p>Jumlah Perlu Dibayar: <strong id="checkout-total" style="color:red; font-size:1.5em;">RM 0.00</strong></p>
+                <p>Sila bayar melalui:</p>
+                <ul style="margin:10px 20px; font-size:0.9em;">
+                    <li><strong>Online:</strong> <a href="https://sociabuzz.com/fareezonzz_019/give" target="_blank">Sociabuzz Link</a></li>                    <li><strong>Touch N' Go:</strong> 161489981218</li>
+                </ul>
+                <p style="color:red; font-size:0.8em;">*Hantar bukti pembayaran ke Whatsapp: +60145400413 selepas klik sahkan.</p>
+                
+                <select id="payment-method" class="form-input">
+                    <option value="TouchNGo">Touch N' Go E-Wallet</option>
+                    <option value="OnlineBanking">Online Banking</option>
+                </select>
+                
+                <button class="btn-primary glitter-btn" onclick="confirmPayment()">Hantar & Sahkan</button>
+                <button class="nav-btn" style="background:#ccc; color:#333; width:100%; margin-top:10px;" onclick="document.getElementById('checkout-modal').style.display='none'">Batal</button>
+            </div>
         </div>
+
     </div>
 
-    <button id="admin-mode-toggle" class="admin-mode-toggle hidden px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full shadow-lg font-bold text-sm" onclick="toggleAdminMode()">
-        <i class="fas fa-exchange-alt mr-2"></i>Switch Mode
-    </button>
+    <div class="fab-cart" onclick="showSection('dashboard-customer'); renderCart();">
+        <i class="fas fa-shopping-cart"></i>
+        <div class="cart-count" id="cart-count">0</div>
+    </div>
 
-    <!-- FIREBASE LOGIC (ALL IN FIRESTORE) -->
+    <!-- FIREBASE SDK (FIRESTORE VERSION) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        // Ganti database.js dengan firestore.js
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, onSnapshot, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
@@ -512,402 +330,449 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
-        
-        let currentUser = null;
-        let userData = {};
+        const auth = getAuth(app);
+
+        // GLOBAL STATE
+        let currentUserDoc = null; // Data user dari Firestore
+        let currentChatId = null;
         let cart = [];
-        let allProducts = [];
-        let allUserOrders = [];
-        let currentChatPartner = null;
-        let unsubscribeChat = null;
-        let unsubscribeOrders = null;
-        let unsubscribeProducts = null;
-        let mediaRecorder, audioChunks = [];
-        let isAdminMode = false;
-        let selectedProduct = null;
 
-        // --- UTILS ---
-        window.playSound = (type) => {
-            const sounds = { 'click': document.getElementById('snd-click'), 'success': document.getElementById('snd-success'), 'error': document.getElementById('snd-error'), 'msg': document.getElementById('snd-msg') };
-            if(sounds[type]) { sounds[type].currentTime = 0; sounds[type].play().catch(()=>{}); }
-        };
-
-        function showDashboardMessage(msg, type='success') {
-            const el = document.getElementById('dashboard-message');
-            if(!el) return;
-            el.innerHTML = `<div class="${type==='error'?'error-box':'success-box'}">${msg}</div>`;            setTimeout(()=>el.innerHTML='', 5000);
-        }
+        // --- AUDIO HELPER ---
+        window.playSound = (id) => {
+            const audio = document.getElementById(id);
+            if(audio) { audio.currentTime = 0; audio.play().catch(e=>{}); }        };
 
         // --- NAVIGATION ---
-        window.navTo = (viewId) => {
-            playSound('click');
-            document.querySelectorAll('section').forEach(el => el.classList.add('hidden-section'));
-            const target = document.getElementById(`view-${viewId}`);
-            if(target) target.classList.remove('hidden-section');
-            window.scrollTo(0,0);
-            if(['home','admin-shopping'].includes(viewId)) renderCatalog();
-            if(viewId === 'dashboard') loadUserData();
-            if(viewId === 'admin') loadAdminData();
-            if(viewId === 'chat-list') loadChatList();
+        window.showSection = (id) => {
+            playSound('snd-click');
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'home') loadProducts();
+            if(id === 'dashboard-customer' && currentUserDoc) loadCustomerData();
+            if(id === 'dashboard-admin' && currentUserDoc && currentUserDoc.role === 'admin') loadAdminData();
+            if(id === 'chat' && currentUserDoc) loadChatContacts();
         };
 
-        window.showAdminTab = (id) => {
-            document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden-section'));
-            document.getElementById(id).classList.remove('hidden-section');
-            if(id === 'tab-chat') setTimeout(loadChatList, 100);
-        };
-
-        window.toggleCartModal = () => {
-            const m = document.getElementById('modal-cart');
-            m.classList.contains('hidden-section') ? (renderCartItems(), m.classList.remove('hidden-section')) : m.classList.add('hidden-section');
-        };
-
-        window.toggleAdminMode = () => {
-            isAdminMode = !isAdminMode;
-            playSound('click');
-            const btn = document.getElementById('admin-mode-btn');
-            if(isAdminMode) { navTo('admin'); btn.innerHTML = '<i class="fas fa-shopping-bag mr-1"></i> Shopping Mode'; } 
-            else { navTo('admin-shopping'); btn.innerHTML = '<i class="fas fa-user-shield mr-1"></i> Admin Mode'; }
-        };
-
-        // --- AUTH ---
-        window.doRegister = async () => {
+        // --- AUTHENTICATION LOGIC (FIRESTORE + AUTH) ---
+        window.handleRegister = async () => {
             const name = document.getElementById('reg-name').value;
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
             const phone = document.getElementById('reg-phone').value;
-            if(!email || !pass) return alert("Email & Password diperlukan");
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, email, pass);
-                const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
-                await setDoc(doc(db, "users", cred.user.uid), {
-                    username: "User_"+uac.split('-')[1], customerName: name || "User_"+uac.split('-')[1], email, phone, uac, role: 'customer', status: 'ACTIVE', address: '', createdAt: serverTimestamp(), logCache: serverTimestamp()
-                });
-                playSound('success'); alert("Berjaya didaftarkan! Sila login."); navTo('login');
-            } catch(e) { playSound('error'); alert(e.message); }        };
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
 
-        window.doLogin = async () => {
-            try {
-                await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value);
-                playSound('success');
-            } catch(e) { playSound('error'); alert("Login Gagal: " + e.message); }
-        };
+            if(!name || !email || !password) { alert("Sila isi maklumat wajib."); return; }
 
-        window.logout = () => { signOut(auth); playSound('click'); navTo('home'); };
-        window.deleteAccount = async () => {
-            if(confirm("Adakah anda pasti? Status akaun akan ditukar kepada INACTIVE.")) {
-                await updateDoc(doc(db, "users", currentUser.uid), { status: 'INACTIVE' });
-                signOut(auth); playSound('success'); alert("Akaun dinyahaktifkan.");
+            try {
+                // 1. Create Auth User
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. Create User Document in Firestore
+                const newUser = {
+                    username: name.split(' ')[0], // Simple username
+                    customName: name,
+                    phone: phone,
+                    email: email,
+                    role: "customer",
+                    status: "ACTIVE",
+                    createdAt: serverTimestamp()
+                };
+
+                await setDoc(doc(db, "users", user.uid), newUser);
+                alert("Pendaftaran Berjaya! Sila Login.");
+                showSection('login');
+            } catch (error) {
+                alert("Error: " + error.message);
             }
         };
 
-        // --- PRODUCTS (Base64 Images) ---
-        function initProductListener() {
-            const q = query(collection(db, "products"), where("status", "==", "Public"));
-            unsubscribeProducts = onSnapshot(q, (snap) => {
-                allProducts = []; snap.forEach(d => allProducts.push({id: d.id, ...d.data()}));
-                renderCatalog();
-            }, (err) => console.error(err));
-        }
-        async function loadProducts() { if(!unsubscribeProducts) initProductListener(); }
-
-        window.renderCatalog = () => {
-            const search = (document.getElementById('search-bar')?.value || "").toLowerCase();
-            const sort = document.getElementById('filter-sort')?.value || "default";
-            let grid = document.getElementById(isAdminMode ? 'admin-product-grid' : 'product-grid');
-            if(!grid) grid = document.getElementById('product-grid');
-
-            let filtered = allProducts.filter(p => p.status === 'Public' && p.name.toLowerCase().includes(search));
-            if(sort === 'highest') filtered.sort((a,b) => (b.totalSold||0) - (a.totalSold||0));
-            if(sort === 'event') filtered = filtered.filter(p => p.event);
-
-            grid.innerHTML = filtered.length ? filtered.map(p => `
-                <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition cursor-pointer fade-in" onclick="openProductModal('${p.id}')">
-                    <img src="${p.imageUrl||'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg mb-2 bg-gray-200">
-                    <h3 class="font-bold text-sm text-gray-800 leading-tight">${p.name}</h3>
-                    ${p.event ? `<span class="text-[10px] text-pink-600 font-bold">#${p.event}</span>` : ''}
-                    <p class="text-[10px] text-gray-500 line-clamp-2 my-1 flex-grow">${p.description||''}</p>
-                    <div class="flex justify-between items-center mt-2">
-                        <span class="text-purple-600 font-bold text-sm">RM ${p.price}</span>
-                        <span class="text-[10px] text-yellow-500">⭐ ${p.rating||5.0}</span>
-                    </div>
-                    <button onclick="event.stopPropagation(); addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2 shadow">Add Order Cart</button>
-                </div>`).join('') : `<div class="col-span-full text-center py-10">Tiada produk.</div>`;
+        window.handleLogin = async () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged will handle the rest
+            } catch (error) {
+                alert("Login Gagal: " + error.message);
+            }
         };
-        window.openProductModal = (id) => {
-            selectedProduct = allProducts.find(p => p.id === id);
-            if(!selectedProduct) return;
-            document.getElementById('modal-img').src = selectedProduct.imageUrl || 'https://via.placeholder.com/150';
-            document.getElementById('modal-name').innerText = selectedProduct.name;
-            document.getElementById('modal-price').innerText = `RM ${selectedProduct.price}`;
-            document.getElementById('modal-desc').innerText = selectedProduct.description || '';
-            document.getElementById('modal-sold').innerText = selectedProduct.totalSold || 0;
-            document.getElementById('modal-add-cart').onclick = () => { addToCart(selectedProduct.id); closeProductModal(); };
-            document.getElementById('product-modal').classList.remove('hidden-section');
-            playSound('click');
+
+        window.logout = () => {
+            signOut(auth);
+            currentUserDoc = null;
+            document.getElementById('nav-auth').classList.remove('hidden');
+            document.getElementById('nav-user').classList.add('hidden');
+            showSection('home');
         };
-        window.closeProductModal = () => { document.getElementById('product-modal').classList.add('hidden-section'); selectedProduct = null; };
-        window.addToCart = (id) => { const p = allProducts.find(x=>x.id===id); if(p){ cart.push(p); document.getElementById('cart-count').innerText=cart.length; playSound('success'); } };
 
-        function renderCartItems() {
-            const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
-            document.getElementById('cart-items').innerHTML = cart.length ? cart.map((i,idx)=>`
-                <div class="flex gap-3 bg-white/60 p-3 rounded-lg">
-                    <img src="${i.imageUrl}" class="w-16 h-16 object-cover rounded">
-                    <div class="flex-1">
-                        <div class="font-bold text-sm">${i.name}</div>
-                        <div class="font-bold text-purple-600 text-xs">RM ${i.price}</div>
-                        <button onclick="cart.splice(${idx},1);renderCartItems();document.getElementById('cart-count').innerText=cart.length" class="text-red-500 text-xs"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`).join('') : "<p class='text-center'>Cart kosong.</p>";
-            document.getElementById('cart-total').innerText = "RM "+total.toFixed(2);
+        window.deleteAccount = async () => {
+            if(confirm("Adakah anda pasti? Akaun akan menjadi INACTIVE.")) {
+                await updateDoc(doc(db, "users", currentUserDoc.id), { status: 'INACTIVE' });
+                alert("Akaun dinyahaktifkan.");
+                logout();
+            }
+        };
+
+        // Listen to Auth State Changes
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // Get User Data from Firestore
+                const docRef = doc(db, "users", user.uid);
+                // We need to fetch once to get role
+                const docSnap = await getDocs(query(collection(db, "users"), where("__name__", "==", user.uid))); 
+                // Fallback simple get if query fails due to rules or index
+                try {
+                    const directSnap = await getDocs(collection(db, "users")); 
+                    // Better way: use doc() but need to handle loading state
+                    // For simplicity in this single file, we assume we can read own doc
+                    const uSnap = await getDocs(query(collection(db, "users"), where("email", "==", user.email)));
+                    
+                    if(!uSnap.empty) {
+                        const data = uSnap.docs[0].data();
+                        currentUserDoc = { id: uSnap.docs[0].id, ...data };
+                        
+                        document.getElementById('nav-auth').classList.add('hidden');
+                        document.getElementById('nav-user').classList.remove('hidden');
+                        document.getElementById('user-display').innerText = `Hi, ${currentUserDoc.customName}`;
+                        
+                        if(currentUserDoc.role === 'admin') {
+                            document.getElementById('admin-link').classList.remove('hidden');
+                        } else {
+                            document.getElementById('admin-link').classList.add('hidden');                        }
+                        showSection('home');
+                    }
+                } catch (e) {
+                    console.error("Error fetching user data", e);
+                }
+
+            } else {
+                currentUserDoc = null;
+                document.getElementById('nav-auth').classList.remove('hidden');
+                document.getElementById('nav-user').classList.add('hidden');
+            }
+        });
+
+        // --- PRODUCT LOGIC ---
+        async function loadProducts() {
+            const list = document.getElementById('product-list');
+            list.innerHTML = "<div class='text-center' style='color:white'>Memuatkan...</div>";
+            
+            try {
+                const querySnapshot = await getDocs(collection(db, "products"));
+                list.innerHTML = "";
+                if(querySnapshot.empty) {
+                    list.innerHTML = "<p style='color:white; grid-column:1/-1; text-align:center;'>Tiada produk lagi.</p>";
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const p = doc.data();
+                    if(p.status !== 'Public') return;
+
+                    const card = `
+                        <div class="product-card">
+                            <span class="badge badge-public">${p.eventTag || 'New'}</span>
+                            <img src="${p.images ? p.images[0] : 'https://via.placeholder.com/250'}" class="prod-img">
+                            <div class="prod-info">
+                                <h4>${p.name}</h4>
+                                <p class="prod-price">RM ${p.priceSale || p.priceOriginal}</p>
+                                <p style="font-size:0.8em; color:#666;">Sold: ${p.totalSold || 0} | Rating: ${p.rating || 0}★</p>
+                                <button class="btn-primary glitter-btn mt-2" onclick="addToCart('${doc.id}', '${p.name}', ${p.priceSale || p.priceOriginal})">Add to Cart</button>
+                            </div>
+                        </div>
+                    `;
+                    list.innerHTML += card;
+                });
+            } catch (error) {
+                console.error("Error loading products:", error);
+                list.innerHTML = "<p style='color:red'>Gagal memuatkan produk. Semak Rules Firestore.</p>";
+            }
         }
+        window.filterProducts = () => {
+            const input = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('.product-card');
+            cards.forEach(card => {
+                const title = card.querySelector('h4').innerText.toLowerCase();
+                card.style.display = title.includes(input) ? 'block' : 'none';
+            });
+        };
 
-        window.submitOrder = async () => {
-            if(!currentUser) return alert("Sila login dahulu");
-            if(cart.length===0) return alert("Cart kosong");
-            if(!userData.address) return alert("Sila masukkan alamat di Dashboard dahulu");
-            const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
+        window.addToCart = (id, name, price) => {
+            playSound('snd-click');
+            cart.push({ id, name, price, qty: 1 });
+            document.getElementById('cart-count').innerText = cart.length;
+            alert(`${name} ditambah ke cart!`);
+        };
+
+        // --- ORDER & CHECKOUT LOGIC ---
+        window.proceedToCheckout = () => {
+            if(cart.length === 0) { alert("Cart kosong!"); return; }
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            document.getElementById('checkout-total').innerText = "RM " + total.toFixed(2);
+            document.getElementById('checkout-modal').style.display = 'flex';
+        };
+
+        window.confirmPayment = async () => {
+            if(!currentUserDoc) { alert("Sila login dahulu"); return; }
+            const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const method = document.getElementById('payment-method').value;
+            
             try {
                 await addDoc(collection(db, "orders"), {
-                    userId: currentUser.uid, uac: userData.uac, username: userData.username, customerName: userData.customerName, items: cart, total: total, address: userData.address,
-                    trackingNo: "TRK-"+Date.now().toString().substr(-8), orderId: "ORD-"+Date.now().toString().substr(-6), 
-                    paymentMethod: "Manual Transfer", paymentStatus: "Not Verified", status: "To Pay", deliveryStatus: "Pending",
-                    adminNote: "", currentStatus: "Pending Payment", orderCategory: "To Pay", dateCreated: serverTimestamp()
+                    userId: currentUserDoc.id, // Match rule: resource.data.userId
+                    customerName: currentUserDoc.customName,
+                    items: cart,
+                    totalAmount: total,
+                    shippingAddress: "Alamat Default (Sila update di profile)",
+                    paymentMethod: method,
+                    paymentStatus: "Not Verified",
+                    orderStatus: "To Pay",
+                    trackingNumber: "",
+                    createdAt: serverTimestamp()
                 });
-                cart=[]; document.getElementById('cart-count').innerText=0; toggleCartModal(); playSound('success'); 
-                showDashboardMessage("✅ Pesanan berjaya!"); setTimeout(() => navTo('dashboard'), 1000);
-            } catch(e) { alert("Error: " + e.message); }
+                
+                cart = [];
+                document.getElementById('cart-count').innerText = 0;
+                document.getElementById('checkout-modal').style.display = 'none';
+                alert("Pesanan dibuat! Sila tunggu pengesahan admin.");
+                showSection('dashboard-customer');
+            } catch (e) {                alert("Gagal membuat pesanan: " + e.message);
+            }
         };
 
-        // --- USER DASHBOARD ---
-        async function loadUserData() {
-            if(!currentUser) return;            onSnapshot(doc(db, "users", currentUser.uid), (d)=>{ if(d.exists()){ userData=d.data(); updateDashUI(); } });
-            if(unsubscribeOrders) unsubscribeOrders();
-            const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid), orderBy("dateCreated", "desc"));
-            unsubscribeOrders = onSnapshot(q, (snap) => {
-                allUserOrders = []; snap.forEach(d => allUserOrders.push({id:d.id, ...d.data()}));
-                filterOrders('all');
-            });
+        async function loadCustomerData() {
+            if(!currentUserDoc) return;
+            document.getElementById('profile-info').innerHTML = `
+                <p><strong>ID:</strong> ${currentUserDoc.id}</p>
+                <p><strong>Nama:</strong> ${currentUserDoc.customName}</p>
+                <p><strong>Telefon:</strong> ${currentUserDoc.phone}</p>
+                <p><strong>Status:</strong> ${currentUserDoc.status}</p>
+            `;
+            renderOrderTable('To Pay');
         }
-        function updateDashUI() {
-            document.getElementById('nav-username').innerText = userData.username;
-            document.getElementById('nav-uac').innerText = userData.uac;
-            document.getElementById('dash-user-display').innerText = userData.username;
-            document.getElementById('dash-uac-display').innerText = userData.uac;
-            document.getElementById('dash-customer-name').innerText = userData.customerName;
-            document.getElementById('dash-phone').innerText = userData.phone;
-            document.getElementById('dash-address').value = userData.address||"";
-            const s = document.getElementById('dash-status'); s.innerText = userData.status;
-            s.className = `badge ${userData.status==='ACTIVE'?'badge-active':'badge-blocked'}`;
-        }
-        window.updateProfile = async () => {
-            await updateDoc(doc(db, "users", currentUser.uid), { 
-                address: document.getElementById('dash-address').value, 
-                logCache: serverTimestamp() 
-            });
-            playSound('success'); showDashboardMessage("✅ Alamat dikemaskini!");
-        };
-        window.filterOrders = (status) => {
-            const tbody = document.getElementById('user-order-history');
-            const filtered = status === 'all' ? allUserOrders : allUserOrders.filter(o=>o.status===status);
-            tbody.innerHTML = filtered.length ? filtered.map(o=>`
-                <tr>
-                    <td>${o.items.map(i=>i.name).join(', ')}</td><td>${o.customerName}</td>
-                    <td>${o.dateCreated?new Date(o.dateCreated.toDate()).toLocaleDateString():'-'}</td>
-                    <td>-</td><td class="truncate max-w-xs">${o.address}</td><td>${o.items.length}</td>
-                    <td>RM ${o.total}</td><td>${o.paymentMethod}</td>
-                    <td><span class="badge ${o.paymentStatus==='Verified'?'badge-completed':'badge-to-pay'}">${o.paymentStatus}</span></td>
-                    <td>${o.deliveryStatus}</td><td>${o.trackingNo}</td><td>${o.orderId}</td>
-                    <td>${o.userRating?'⭐'+o.userRating:'-'}</td>
-                    <td>${o.status==='To Pay' ? `<button onclick="cancelOrder('${o.id}')" class="text-red-500 text-xs">Cancel</button>` : ''}</td>
-                </tr>`).join('') : `<tr><td colspan="14" class="text-center">Tiada pesanan.</td></tr>`;
-        };
-        window.cancelOrder = async (id) => { if(confirm("Batal?")) { await updateDoc(doc(db,"orders",id), {status:'Cancelled'}); playSound('error'); } };
 
-        // --- CHAT (All in Firestore) ---
-        async function loadChatList() {
-            if(!currentUser) return navTo('login');
-            const listEl = document.getElementById('chat-list-view');
-            if(userData.role === 'admin') {
-                const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
-                onSnapshot(q, (snap) => {                    listEl.innerHTML = "";
-                    snap.forEach(docSnap => {
-                        const data = docSnap.data();
-                        const partnerId = data.participants.find(id => id !== currentUser.uid);
-                        getDoc(doc(db, "users", partnerId)).then(pSnap => {
-                            if(pSnap.exists()) {
-                                const p = pSnap.data();
-                                listEl.innerHTML += `<div onclick="openChat('${partnerId}', '${p.username}')" class="p-3 bg-white/50 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center">
-                                    <div class="flex items-center gap-3"><div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white">${p.username[0]}</div>
-                                    <div><h4 class="font-bold text-sm">${p.username}</h4><p class="text-xs text-gray-500 truncate w-40">${data.lastMessage||'-'}</p></div></div></div>`;
-                            }
-                        });
+        window.renderOrderTable = async (statusFilter) => {
+            if(!currentUserDoc) return;
+            const container = document.getElementById('customer-orders-table');
+            container.innerHTML = "Memuatkan...";
+            
+            try {
+                const q = query(collection(db, "orders"), where("userId", "==", currentUserDoc.id));
+                const querySnapshot = await getDocs(q);
+                
+                let html = `<table><thead><tr><th>Item</th><th>Total</th><th>Bayaran</th><th>Status</th><th>Tracking</th></tr></thead><tbody>`;
+                
+                if(querySnapshot.empty) {
+                    html += `<tr><td colspan="5" class="text-center">Tiada pesanan.</td></tr>`;
+                } else {
+                    querySnapshot.forEach((doc) => {
+                        const o = doc.data();
+                        if(o.orderStatus === statusFilter) {
+                            const itemNames = o.items.map(i => i.name).join(", ");
+                            html += `
+                                <tr>
+                                    <td>${itemNames}</td>
+                                    <td>RM ${o.totalAmount}</td>
+                                    <td><span class="status-badge ${o.paymentStatus === 'Verified' ? 'st-verified' : 'st-pending'}">${o.paymentStatus}</span></td>
+                                    <td>${o.orderStatus}</td>
+                                    <td>${o.trackingNumber || '-'}</td>
+                                </tr>
+                            `;
+                        }
                     });
+                }
+                html += `</tbody></table>`;
+                container.innerHTML = html;
+            } catch (e) {
+                container.innerHTML = "Ralat memuatkan pesanan.";
+                console.error(e);            }
+        };
+
+        // --- ADMIN LOGIC ---
+        async function loadAdminData() {
+            if(!currentUserDoc || currentUserDoc.role !== 'admin') return;
+            
+            // Load Products
+            const pSnap = await getDocs(collection(db, "products"));
+            const pTable = document.querySelector('#admin-product-table tbody');
+            pTable.innerHTML = "";
+            pSnap.forEach(doc => {
+                const p = doc.data();
+                pTable.innerHTML += `
+                    <tr>
+                        <td><img src="${p.images?.[0]}" width="50"></td>
+                        <td>${p.name}</td>
+                        <td>${p.priceSale}</td>
+                        <td>${p.status}</td>
+                        <td><button class="nav-btn" style="background:red;color:white" onclick="alert('Func delete soon')"><i class="fas fa-trash"></i></button></td>
+                    </tr>
+                `;
+            });
+
+            // Load Orders
+            const oSnap = await getDocs(collection(db, "orders"));
+            const oTable = document.querySelector('#admin-order-table tbody');
+            oTable.innerHTML = "";
+            oSnap.forEach(doc => {
+                const o = doc.data();
+                oTable.innerHTML += `
+                    <tr>
+                        <td>${doc.id.substr(0,8)}...</td>
+                        <td>${o.customerName}</td>
+                        <td>RM ${o.totalAmount}</td>
+                        <td>${o.paymentStatus}</td>
+                        <td>${o.orderStatus}</td>
+                        <td>
+                            ${o.paymentStatus === 'Not Verified' ? `<button class="nav-btn" style="background:green;color:white" onclick="verifyPayment('${doc.id}')">Verify</button>` : ''}
+                            <select onchange="updateOrderStatus('${doc.id}', this.value)" style="padding:5px;">
+                                <option value="To Pay" ${o.orderStatus==='To Pay'?'selected':''}>To Pay</option>
+                                <option value="To Ship" ${o.orderStatus==='To Ship'?'selected':''}>To Ship</option>
+                                <option value="Completed Order" ${o.orderStatus==='Completed Order'?'selected':''}>Completed</option>
+                                <option value="Cancelled" ${o.orderStatus==='Cancelled'?'selected':''}>Cancel</option>
+                            </select>
+                        </td>
+                    </tr>
+                `;
+            });
+                        // Load Users for Blacklist/User Mgmt
+            const uSnap = await getDocs(collection(db, "users"));
+            const uTable = document.querySelector('#admin-user-table tbody');
+            uTable.innerHTML = "";
+            uSnap.forEach(doc => {
+                const u = doc.data();
+                uTable.innerHTML += `
+                    <tr>
+                        <td>${doc.id.substr(0,8)}</td>
+                        <td>${u.customName}</td>
+                        <td>${u.email}</td>
+                        <td>${u.status}</td>
+                        <td><button class="nav-btn" style="background:orange" onclick="alert('Block feature')">Block</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.addProduct = async () => {
+            const name = document.getElementById('adm-prod-name').value;
+            const price = parseFloat(document.getElementById('adm-prod-price').value);
+            const img = document.getElementById('adm-prod-img').value || 'https://via.placeholder.com/250';
+            
+            try {
+                await addDoc(collection(db, "products"), {
+                    name: name,
+                    priceSale: price,
+                    status: 'Public',
+                    images: [img],
+                    totalSold: 0,
+                    rating: 0,
+                    description: document.getElementById('adm-prod-desc').value
+                });
+                alert("Produk ditambah!");
+                loadAdminData();
+            } catch(e) { alert("Gagal: " + e.message); }
+        };
+
+        window.verifyPayment = async (orderId) => {
+            await updateDoc(doc(db, "orders", orderId), { paymentStatus: 'Verified', orderStatus: 'To Ship' });
+            alert("Disahkan!");
+            loadAdminData();
+        };
+
+        window.updateOrderStatus = async (orderId, newStatus) => {
+            await updateDoc(doc(db, "orders", orderId), { orderStatus: newStatus });
+            loadAdminData();
+        };
+
+        window.showAdminTab = (id) => {            document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+        };
+
+        // --- CHAT LOGIC (FIRESTORE) ---
+        async function loadChatContacts() {
+            const list = document.getElementById('chat-contact-list');
+            list.innerHTML = "";
+            
+            if(currentUserDoc.role === 'admin') {
+                // Admin sees all customers (simplified)
+                const users = await getDocs(collection(db, "users"));
+                users.forEach(doc => {
+                    const u = doc.data();
+                    if(u.role !== 'admin') {
+                        // Chat ID format: chat_userId_adminId (sorted)
+                        const chatId = [doc.id, currentUserDoc.id].sort().join('_');
+                        list.innerHTML += `<div class="chat-list-item" onclick="openChat('${chatId}', '${u.customName}')">${u.customName}</div>`;
+                    }
                 });
             } else {
-                const adminSnap = await getDocs(query(collection(db, "users"), where("role", "==", "admin"), limit(1)));
-                if(!adminSnap.empty) {
-                    const adminDoc = adminSnap.docs[0];
-                    listEl.innerHTML = `<div onclick="openChat('${adminDoc.id}', '${adminDoc.data().username}')" class="p-4 bg-white/80 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500">
-                        <div class="flex items-center gap-3"><div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div>
-                        <div><h4 class="font-bold">MFD Support</h4><p class="text-xs text-green-600">● Online</p></div></div></div>`;
-                }
+                // Customer chats with Admin (Fixed ID for demo)
+                // In real app, find admin user first
+                const chatId = [currentUserDoc.id, 'admin_main'].sort().join('_');
+                list.innerHTML += `<div class="chat-list-item" onclick="openChat('${chatId}', 'MFD Support')">MFD Store Support</div>`;
             }
         }
-        window.openChat = (partnerId, partnerName) => {
-            currentChatPartner = partnerId;
-            document.getElementById('chat-list-view').classList.add('hidden-section');
-            document.getElementById('active-chat-view').classList.remove('hidden-section');
-            document.getElementById('chat-partner-name').innerText = partnerName;
-            const chatId = [currentUser.uid, partnerId].sort().join('_');
-            const msgContainer = document.getElementById('chat-messages');
-            if(unsubscribeChat) unsubscribeChat();
-            const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
-            unsubscribeChat = onSnapshot(q, (snap) => {
-                msgContainer.innerHTML = "";
-                snap.forEach(d => {
-                    const m = d.data();
-                    const isMe = m.senderId === currentUser.uid;
-                    let content = '';
-                    if(m.type === 'text') content = `<p class="text-sm">${m.text}</p>`;
-                    else if(m.type === 'image') content = `<img src="${m.url}" class="msg-img">`;
-                    else if(m.type === 'audio') content = `<audio controls src="${m.url}" class="msg-audio"></audio>`;
-                    else if(m.type === 'location') content = `<div class="msg-location"><i class="fas fa-map-marker-alt"></i> ${m.address}</div>`;
-                    msgContainer.innerHTML += `<div class="message-bubble ${isMe?'msg-me':'msg-other'}">${content}<div class="text-[9px] opacity-70 text-right">${m.timestamp?new Date(m.timestamp.toDate()).toLocaleTimeString():''}</div></div>`;
-                });
-                msgContainer.scrollTop = msgContainer.scrollHeight;
-            });
-        };
-        window.closeChat = () => { if(unsubscribeChat) unsubscribeChat(); document.getElementById('active-chat-view').classList.add('hidden-section'); document.getElementById('chat-list-view').classList.remove('hidden-section'); };
-        window.sendMessage = async () => { const input = document.getElementById('msg-input'); const text = input.value.trim(); if(!text || !currentChatPartner) return; await saveMessage(text, 'text'); input.value = ''; };        async function saveMessage(text, type, url = null, address = null) {
-            const chatId = [currentUser.uid, currentChatPartner].sort().join('_');
-            await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, text, type, url, address, timestamp: serverTimestamp() });
-            await setDoc(doc(db, "chats", chatId), { participants: [currentUser.uid, currentChatPartner], lastMessage: text, lastTime: serverTimestamp() }, {merge:true});
-            playSound('msg');
-        }
-        // Image to Base64 for Firestore
-        const fileToBase64 = file => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
-        window.handleFileUpload = async (input) => {
-            const file = input.files[0];
-            if(!file || !currentChatPartner) return;
-            try {
-                const base64 = await fileToBase64(file);
-                await saveMessage('', 'image', base64);
-                playSound('success');
-            } catch(e) { alert("Gagal upload: " + e.message); }
-            input.value = '';
-        };
-        window.handleAdminFileUpload = window.handleFileUpload; // Same logic
-        
-        window.startRecording = async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                mediaRecorder = new MediaRecorder(stream);
-                audioChunks = [];
-                mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-                mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-                    const base64 = await fileToBase64(audioBlob);
-                    await saveMessage('', 'audio', base64);
-                    playSound('success');
-                };
-                mediaRecorder.start();
-                document.getElementById('recording-indicator').classList.remove('hidden-section');
-            } catch(e) { alert("Mic denied"); }
-        };
-        window.stopRecording = () => { if(mediaRecorder && mediaRecorder.state !== 'inactive') { mediaRecorder.stop(); document.getElementById('recording-indicator').classList.add('hidden-section'); } };
-        window.sendLocation = async () => { const addr = prompt("Alamat/Lokasi:"); if(addr) await saveMessage('', 'location', null, addr); };
-        window.sendOrderInfo = async () => { if(allUserOrders.length) await saveMessage('', 'text', null, `Order: ${allUserOrders[0].orderId}`); };
-        window.copyChatID = () => { navigator.clipboard.writeText(currentChatPartner); alert("ID copied!"); };
-        window.blockContact = async () => { if(confirm("Block?")) { await updateDoc(doc(db, "users", currentChatPartner), {status: 'BLOCKED'}); closeChat(); } };
-        window.sendAdminMessage = async () => { const input = document.getElementById('admin-msg-input'); const text = input.value.trim(); if(!text || !currentChatPartner) return; await saveMessage(text, 'text'); input.value = ''; };
-        window.closeAdminChat = window.closeChat;
-        window.deleteConversation = async () => { alert("Delete manual in Console"); };
-        // --- ADMIN FUNCTIONS ---
-        window.loadAdminData = async () => {
-            if(userData.role !== 'admin') return navTo('home');
-            // Orders
-            const ordSnap = await getDocs(query(collection(db, "orders"), orderBy("dateCreated","desc")));
-            document.getElementById('admin-order-list').innerHTML = ordSnap.docs.map(d=>{ const o=d.data();
-                return `<tr><td>${o.uac}</td><td>${o.username}</td><td class="truncate max-w-xs">${o.items.map(i=>i.name).join(',')}</td>
-                <td>${o.trackingNo}</td><td class="truncate max-w-xs">${o.address}</td><td>${o.items.length}</td><td>RM ${o.total}</td>
-                <td>${o.paymentMethod}</td>
-                <td><select onchange="updateOrderStatus('${d.id}','paymentStatus',this.value)" class="text-[10px]"><option ${o.paymentStatus==='Not Verified'?'selected':''}>Not Verified</option><option ${o.paymentStatus==='Verified'?'selected':''}>Verified</option></select></td>
-                <td><select onchange="updateOrderStatus('${d.id}','deliveryStatus',this.value)" class="text-[10px]"><option>${o.deliveryStatus||'Pending'}</option><option>Shipping</option><option>Delivered</option></select></td>
-                <td><input value="${o.trackingNo||''}" onchange="updateOrderStatus('${d.id}','trackingNo',this.value)" class="text-[10px] w-20"></td>
-                <td>${o.orderId}</td>
-                <td><textarea onchange="updateOrderStatus('${d.id}','adminNote',this.value)" class="text-[10px] w-32">${o.adminNote||''}</textarea></td>
-                <td><select onchange="updateOrderStatus('${d.id}','orderCategory',this.value)" class="text-[10px]"><option>${o.orderCategory||'To Pay'}</option><option>To Ship</option><option>Completed</option><option>Cancelled</option></select></td>
-                <td><button onclick="updateOrderStatus('${d.id}','status','Cancelled')" class="text-red-500">Cancel</button></td></tr>`;
-            }).join('');
-            // Users
-            const usrSnap = await getDocs(collection(db, "users"));
-            const users = usrSnap.docs.map(d=>({id:d.id, ...d.data()}));
-            document.getElementById('admin-user-list').innerHTML = users.filter(u=>u.status!=='BLOCKED').map(u=>`<tr><td>${u.uac}</td><td>${u.username}</td><td>${u.customerName}</td><td>${u.phone}</td><td class="truncate max-w-xs">${u.address||'-'}</td><td><span class="badge badge-active">${u.status}</span></td><td>${u.logCache?new Date(u.logCache.toDate()).toLocaleString():'-'}</td><td><button onclick="blockUser('${u.id}')" class="text-red-500">Block</button></td></tr>`).join('');
-            document.getElementById('admin-blacklist-list').innerHTML = users.filter(u=>u.status==='BLOCKED').map(u=>`<tr><td>${u.uac}</td><td>${u.username}</td><td><span class="badge badge-blocked">BLOCKED</span></td><td><button onclick="deleteUser('${u.id}')" class="text-red-500">Delete</button></td><td><input class="text-[10px]"></td></tr>`).join('');
-            // Products
-            if(allProducts.length === 0) await loadProducts();
-            document.getElementById('admin-prod-list').innerHTML = allProducts.map((p,i)=>`<tr><td>${i+1}</td><td><img src="${p.imageUrl}" class="w-8 h-8 rounded"></td><td>${p.name}</td><td>RM ${p.price}</td><td>⭐${p.rating||5}</td><td>${p.status}</td><td>${p.totalSold||0}</td><td><button onclick="editProduct('${p.id}')" class="text-blue-500">Edit</button></td><td><button onclick="deleteProduct('${p.id}')" class="text-red-500">Padam</button></td></tr>`).join('');
-            loadChatList();
-        };
-        window.updateOrderStatus = async (id, field, val) => { await updateDoc(doc(db, "orders", id), {[field]: val}); playSound('success'); loadAdminData(); };
-        window.blockUser = async (uid) => { if(confirm("Block?")) { await updateDoc(doc(db, "users", uid), {status: 'BLOCKED'}); loadAdminData(); } };
-        window.deleteUser = async (uid) => { if(confirm("Delete?")) { await updateDoc(doc(db, "users", uid), {status: 'INACTIVE'}); loadAdminData(); } };
-        
-        window.addProduct = async () => {
-            const fileInput = document.getElementById('prod-img-file');
-            if(!fileInput.files[0]) return alert("Sila pilih gambar produk");
-            const base64Img = await fileToBase64(fileInput.files[0]);
-            
-            await addDoc(collection(db, "products"), {
-                name: document.getElementById('prod-name').value, price: document.getElementById('prod-price').value, description: document.getElementById('prod-desc').value,
-                imageUrl: base64Img, status: document.getElementById('prod-status').value, country: document.getElementById('prod-country').value,
-                event: document.getElementById('prod-event').value, variation: document.getElementById('prod-variation').value,
-                label: document.getElementById('prod-label').value, uniqueCode: "ITEM-"+Math.random().toString(36).substr(2,6).toUpperCase(), totalSold: 0, rating: 5.0, createdAt: serverTimestamp()
-            });
-            playSound('success'); alert("Produk dilancarkan!"); loadAdminData();
-            document.querySelectorAll('#tab-products input, #tab-products textarea').forEach(i=>i.value='');
-            document.getElementById('prod-img-preview').classList.add('hidden');
-        };
-        window.editProduct = async (id) => { const newPrice = prompt("Harga baru:"); if(newPrice) { await updateDoc(doc(db, "products", id), {price: newPrice}); loadAdminData(); } };
-        window.deleteProduct = async (id) => { if(confirm("Padam?")) { await deleteDoc(doc(db, "products", id)); loadAdminData(); } };
 
-        // --- INIT ---        onAuthStateChanged(auth, async (user) => {
-            currentUser = user;
-            if(user) {
-                document.getElementById('auth-nav').classList.add('hidden-section');
-                document.getElementById('user-nav').classList.remove('hidden-section');
-                const snap = await getDoc(doc(db, "users", user.uid));
-                if(snap.exists()) {
-                    userData = snap.data();
-                    if(userData.status === 'BLOCKED') { alert("Akaun diblokir."); signOut(auth); return; }
-                    if(userData.role === 'admin') {
-                        document.getElementById('admin-mode-btn').classList.remove('hidden');
-                        document.getElementById('admin-mode-toggle').classList.remove('hidden');
-                        navTo('admin-shopping');
-                    } else {
-                        document.getElementById('admin-mode-btn').classList.add('hidden');
-                        document.getElementById('admin-mode-toggle').classList.add('hidden');
-                        navTo('dashboard');
-                    }
+        window.openChat = (chatId, name) => {
+            currentChatId = chatId;
+            document.getElementById('chat-box').innerHTML = "Loading...";
+            
+            // Listen to messages subcollection
+            const q = query(collection(db, "chats", chatId, "messages")); // Assuming subcollection structure based on rules
+            // Note: Rules said "chats/{chatId}/messages". 
+            // If your structure is flat "messages" with chatId field, adjust accordingly. 
+            // Based on rules: match /chats/{chatId} { match /messages/{messageId} ... } -> This implies SUBCOLLECTION.
+            
+            onSnapshot(q, (snapshot) => {
+                const box = document.getElementById('chat-box');
+                box.innerHTML = "";
+                if(snapshot.empty) {
+                    box.innerHTML = "<div class='text-center' style='color:#888'>Tiada mesej lagi.</div>";
+                    return;
                 }
-            } else { 
-                document.getElementById('auth-nav').classList.remove('hidden-section'); 
-                document.getElementById('user-nav').classList.add('hidden-section');
-                document.getElementById('admin-mode-btn').classList.add('hidden');
-                document.getElementById('admin-mode-toggle').classList.add('hidden');
-                navTo('home'); 
+                snapshot.forEach(doc => {
+                    const msg = doc.data();
+                    const isMe = msg.sender === currentUserDoc.id;
+                    const cls = isMe ? 'msg-me' : 'msg-other';
+                    box.innerHTML += `<div class="message-bubble ${cls}">${msg.text}</div>`;                });
+                box.scrollTop = box.scrollHeight;
+            });
+        };
+
+        window.sendMessage = async () => {
+            const txt = document.getElementById('chat-input').value;
+            if(!txt || !currentChatId || !currentUserDoc) return;
+
+            try {
+                // Ensure chat doc exists first (simplified)
+                const chatRef = doc(db, "chats", currentChatId);
+                // Add message to subcollection
+                await addDoc(collection(db, "chats", currentChatId, "messages"), {
+                    sender: currentUserDoc.id,
+                    text: txt,
+                    timestamp: serverTimestamp(),
+                    type: 'text'
+                });
+                
+                // Update chat metadata (participants) if new
+                // For demo, assuming participants array exists or handled by cloud function
+                // To satisfy rules "request.auth.uid in resource.data.participants", 
+                // The chat document MUST have a 'participants' array.
+                // Let's try to set it if not exists (simplified logic)
+                await setDoc(chatRef, {
+                    participants: [currentUserDoc.id, 'admin_main'], // Simplified
+                    lastMessage: txt,
+                    lastMessageTime: serverTimestamp()
+                }, { merge: true });
+
+                document.getElementById('chat-input').value = "";
+                playSound('snd-msg');
+            } catch (e) {
+                alert("Gagal hantar mesej: " + e.message);
             }
-            loadProducts();
-        });
+        };
+
+        // Initial Load
+        loadProducts();
     </script>
 </body>
 </html>
