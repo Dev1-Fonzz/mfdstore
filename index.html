@@ -8,54 +8,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            --glass-bg: rgba(255, 255, 255, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --text-dark: #2d3748;
-        }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #FF9A9E 75%, #FECFEF 100%);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: var(--text-dark);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(102, 126, 234, 0.25);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+        /* ... (SEMUA CSS ANDA YANG LAMA DI SINI - TIADA PERUBAHAN) ... */
+        :root { --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); --glass-bg: rgba(255, 255, 255, 0.75); --glass-border: rgba(255, 255, 255, 0.6); --text-dark: #2d3748; }
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #FF9A9E 75%, #FECFEF 100%); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: var(--text-dark); min-height: 100vh; overflow-x: hidden; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(102, 126, 234, 0.25); transition: transform 0.2s ease, box-shadow 0.2s ease; }
         .glass-panel:hover { transform: translateY(-2px); box-shadow: 0 12px 40px 0 rgba(102, 126, 234, 0.35); }
-        .glitter-text {
-            background: linear-gradient(to right, #9D50BB, #FF69B4, #6E48AA, #9D50BB);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            background-size: 300% auto;
-            animation: shine 4s linear infinite;
-            font-weight: 800;
-        }
-        @keyframes shine { to { background-position: 300% center; } }        .btn-glitter {
-            background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2);
-            background-size: 300% 300%;
-            animation: gradientMove 4s ease infinite;
-            color: white;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(110, 72, 170, 0.4);
-        }
+        .glitter-text { background: linear-gradient(to right, #9D50BB, #FF69B4, #6E48AA, #9D50BB); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 300% auto; animation: shine 4s linear infinite; font-weight: 800; }
+        @keyframes shine { to { background-position: 300% center; } }
+        .btn-glitter { background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2); background-size: 300% 300%; animation: gradientMove 4s ease infinite; color: white; font-weight: bold; transition: all 0.3s; box-shadow: 0 4px 15px rgba(110, 72, 170, 0.4); }
         .btn-glitter:active { transform: scale(0.95); }
         .btn-glitter:hover { filter: brightness(1.2); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(110, 72, 170, 0.5); }
         @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
@@ -77,10 +38,7 @@
         .custom-table td { padding: 10px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.5); vertical-align: middle; color: #2d3748; }
         .custom-table tr:hover td { background: rgba(255,255,255,0.9); }
         .hidden-section { display: none !important; }
-        input, select, textarea {
-            background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748;
-            border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
-        }
+        input, select, textarea { background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748; border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #9D50BB; box-shadow: 0 0 0 3px rgba(157, 80, 187, 0.2); }
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.52rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; display: inline-block; }
         .badge-to-pay { background: #feebc8; color: #744210; }
@@ -89,14 +47,14 @@
         .badge-completed { background: #9ae6b4; color: #22543d; }
         .badge-cancelled { background: #fed7d7; color: #822727; }
         .badge-refund { background: #faf089; color: #744210; }
-        .badge-active { background: #c6f6d5; color: #22543d; }
-        .badge-blocked { background: #fed7d7; color: #822727; }
+        .badge-active { background: #c6f6d5; color: #22543d; }        .badge-blocked { background: #fed7d7; color: #822727; }
         .badge-inactive { background: #e2e8f0; color: #4a5568; }
         .badge-delivery-pending { background: #feebc8; color: #744210; }
         .badge-delivery-shipping { background: #bee3f8; color: #2a4365; }
         .badge-delivery-delivered { background: #9ae6b4; color: #22543d; }
         .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #9D50BB; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
         ::-webkit-scrollbar-thumb { background: #9D50BB; border-radius: 3px; }
         .fade-in { animation: fadeIn 0.5s ease-in; }
@@ -131,7 +89,6 @@
             <i class="fas fa-gem"></i> MFD STORE
         </div>
         <div class="flex items-center gap-2 md:gap-4">
-            <!-- Admin Mode Toggle -->
             <button id="admin-mode-btn" onclick="toggleAdminMode()" class="hidden px-3 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold shadow hover:bg-purple-700 transition">
                 <i class="fas fa-user-shield mr-1"></i> Admin Mode
             </button>
@@ -139,13 +96,13 @@
                 <i class="fas fa-comments text-purple-600 text-lg group-hover:scale-110 transition"></i>
                 <span id="chat-notif" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden animate-pulse">!</span>
             </button>
-            <button onclick="playSound('click'); toggleCartModal()" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Shopping Cart">
-                <i class="fas fa-shopping-cart text-pink-600 text-lg group-hover:scale-110 transition"></i>
+            <button onclick="playSound('click'); toggleCartModal()" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Shopping Cart">                <i class="fas fa-shopping-cart text-pink-600 text-lg group-hover:scale-110 transition"></i>
                 <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">0</span>
             </button>
             <div id="auth-nav">
                 <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-purple-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>
-                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register</button>            </div>
+                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register</button>
+            </div>
             <div id="user-nav" class="hidden-section flex items-center gap-2 md:gap-3">
                 <div class="text-right hidden md:block">
                     <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>
@@ -188,8 +145,7 @@
         <!-- 2. AUTH PAGES -->
         <section id="view-login" class="hidden-section max-w-md mx-auto mt-10">
             <div class="glass-panel p-8">
-                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Login Account</h2>
-                <input type="email" id="login-email" placeholder="Email Address">
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Login Account</h2>                <input type="email" id="login-email" placeholder="Email Address">
                 <input type="password" id="login-pass" placeholder="Password">
                 <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">LOGIN NOW</button>
                 <p class="text-center mt-6 text-sm text-gray-600">New here? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('register')">Register Account</span></p>
@@ -210,7 +166,6 @@
         <!-- 3. USER DASHBOARD -->
         <section id="view-dashboard" class="hidden-section">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
-                <!-- Profile Sidebar -->
                 <div class="glass-panel p-4 md:p-6 lg:col-span-1 h-fit">
                     <div class="text-center mb-4">
                         <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full mx-auto flex items-center justify-center text-2xl md:text-3xl text-white shadow-lg mb-2">
@@ -233,16 +188,12 @@
                         <button onclick="deleteAccount()" class="bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs w-full mt-2 hover:bg-red-200 transition">Delete Account Permanently</button>
                     </div>
                 </div>
-
-                <!-- Order Tabs -->
                 <div class="glass-panel p-4 md:p-6 lg:col-span-3">
                     <h3 class="text-lg md:text-xl font-bold mb-4 flex justify-between items-center">
                         <span>My Orders</span>
                         <span class="text-[10px] bg-purple-100 text-purple-600 px-2 py-1 rounded-full animate-pulse">Live Update</span>
                     </h3>
                     <div id="dashboard-message"></div>
-                    
-                    <!-- Order Status Tabs -->
                     <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar">                        <button onclick="filterOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 transition">All</button>
                         <button onclick="filterOrders('To Pay')" class="px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200 transition">To Pay</button>
                         <button onclick="filterOrders('To Ship')" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200 transition">To Ship</button>
@@ -251,8 +202,6 @@
                         <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200 transition">Return/Refund</button>
                         <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200 transition">Cancelled</button>
                     </div>
-
-                    <!-- Order Table -->
                     <div class="table-container">
                         <table class="custom-table">
                             <thead>
@@ -292,9 +241,9 @@
                 <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2">
                     <i class="fas fa-headset"></i> Live Agent Support
                 </h2>
-                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">                    <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>
-                </div>
-                <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
+                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
+                    <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>
+                </div>                <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
                     <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2">
                         <div class="flex items-center gap-2">
                             <button onclick="closeChat()" class="text-gray-500 hover:text-purple-600 transition"><i class="fas fa-arrow-left"></i></button>
@@ -312,7 +261,7 @@
                     <div class="flex gap-2 items-end bg-white/50 p-2 rounded-xl">
                         <button onclick="document.getElementById('file-input').click()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Upload Foto"><i class="fas fa-image text-gray-600"></i></button>
                         <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
-                        <button onclick="startRecording()" onmouseup="stopRecording()" ontouchend="stopRecording()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Rakam Suara"><i class="fas fa-microphone text-gray-600"></i></button>
+                        <button id="record-btn" onclick="toggleRecording()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Rakam Suara"><i class="fas fa-microphone text-gray-600"></i></button>
                         <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Hantar Lokasi"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
                         <button onclick="sendOrderInfo()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Send Maklumat Pesanan"><i class="fas fa-receipt text-gray-600"></i></button>
                         <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
@@ -343,8 +292,7 @@
             </div>
             <!-- Tab: Orders -->
             <div id="tab-orders" class="admin-tab glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4 text-purple-700">Jadual Pengesahan & Urusan Pesanan</h3>
-                <div class="table-container">
+                <h3 class="font-bold mb-4 text-purple-700">Jadual Pengesahan & Urusan Pesanan</h3>                <div class="table-container">
                     <table class="custom-table">
                         <thead>
                             <tr>
@@ -390,10 +338,10 @@
                 </div>
                 <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
                 <h3 class="font-bold mt-8 mb-4 text-purple-700">Senarai Daftar Produk Yang Telah Dilancarkan</h3>
-                <div class="table-container">                    <table class="custom-table">
+                <div class="table-container">
+                    <table class="custom-table">
                         <thead>
-                            <tr>
-                                <th>BIL</th>
+                            <tr>                                <th>BIL</th>
                                 <th>GAMBAR PRODUK</th>
                                 <th>NAMA ITEM</th>
                                 <th>HARGA JUALAN</th>
@@ -439,10 +387,10 @@
                 <div class="table-container border-2 border-red-100">
                     <table class="custom-table">
                         <thead>
-                            <tr>                                <th>UAC</th>
+                            <tr>
+                                <th>UAC</th>
                                 <th>Username</th>
-                                <th>Customer Name</th>
-                                <th>Status Account</th>
+                                <th>Customer Name</th>                                <th>Status Account</th>
                                 <th>Log Cache</th>
                                 <th>Delete Account Permanently</th>
                                 <th>Comment</th>
@@ -488,11 +436,10 @@
                     <div>
                         <h2 class="text-2xl md:text-3xl font-bold">ADMIN SHOPPING MODE</h2>
                         <p class="text-white/80 text-xs md:text-sm">Beli-belah seperti pelanggan biasa</p>
-                    </div>                    <i class="fas fa-shopping-bag text-4xl md:text-5xl opacity-50"></i>
+                    </div>
+                    <i class="fas fa-shopping-bag text-4xl md:text-5xl opacity-50"></i>
                 </div>
-            </div>
-            <!-- Same as customer home view -->
-            <div class="glass-panel p-3 md:p-4 mb-4 md:mb-6 flex flex-col md:flex-row gap-3 items-center">
+            </div>            <div class="glass-panel p-3 md:p-4 mb-4 md:mb-6 flex flex-col md:flex-row gap-3 items-center">
                 <div class="relative w-full md:w-1/2">
                     <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                     <input type="text" id="admin-search-bar" placeholder="Search Product..." class="pl-10 m-0" onkeyup="renderCatalog()">
@@ -541,8 +488,7 @@
     <div id="product-modal" class="hidden-section product-modal" onclick="if(event.target===this) closeProductModal()">
         <div class="product-modal-content glass-panel p-6">
             <button onclick="closeProductModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500">&times;</button>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">                <div>
                     <img id="modal-img" src="" class="w-full h-64 object-cover rounded-lg">
                 </div>
                 <div>
@@ -567,7 +513,7 @@
         <i class="fas fa-exchange-alt mr-2"></i>Switch Mode
     </button>
 
-    <!-- FIREBASE LOGIC -->
+    <!-- FIREBASE LOGIC (OPTIMIZED) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
@@ -587,11 +533,11 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
+
         let currentUser = null;
         let userData = {};
         let cart = [];
-        let allProducts = [];
-        let allUserOrders = [];
+        let allProducts = [];        let allUserOrders = [];
         let currentChatPartner = null;
         let unsubscribeChat = null;
         let unsubscribeOrders = null;
@@ -599,6 +545,11 @@
         let audioChunks = [];
         let isAdminMode = false;
         let selectedProduct = null;
+        
+        // --- OPTIMIZATION: CACHING SYSTEM ---
+        let productsCache = null;
+        let productsCacheTime = 0;
+        const CACHE_DURATION = 30000; // 30 seconds cache
 
         // Sound Effects
         window.playSound = (type) => {
@@ -635,8 +586,7 @@
             const m = document.getElementById('modal-cart');
             m.classList.contains('hidden-section') ? (renderCartItems(), m.classList.remove('hidden-section')) : m.classList.add('hidden-section');
         };
-        // Admin Mode Toggle
-        window.toggleAdminMode = () => {
+        // Admin Mode Toggle        window.toggleAdminMode = () => {
             isAdminMode = !isAdminMode;
             playSound('click');
             if(isAdminMode) {
@@ -683,26 +633,59 @@
             }
         };
 
-        // Products
-        async function loadProducts() {            try {
+        // --- PRODUCTS (FIXED & OPTIMIZED) ---
+        async function loadProducts() {
+            const now = Date.now();            
+            // 1. Check Cache First (Instant Load)
+            if (productsCache && (now - productsCacheTime) < CACHE_DURATION) {
+                console.log("Loading from cache...");
+                allProducts = productsCache;
+                renderCatalog();
+                return;
+            }
+
+            // 2. Fetch from Firebase if Cache Expired or Empty
+            console.log("Fetching from Firebase...");
+            try {
                 const snap = await getDocs(collection(db, "products"));
-                allProducts = []; snap.forEach(d => allProducts.push({id: d.id, ...d.data()}));
+                allProducts = []; 
+                snap.forEach(d => allProducts.push({id: d.id, ...d.data()}));
+                
+                // Update Cache
+                productsCache = allProducts;
+                productsCacheTime = now;
+                
                 renderCatalog();
             } catch(e) {
                 console.error("Error loading products:", e);
-                document.getElementById('product-grid').innerHTML = `<div class="col-span-full text-center py-10 text-red-500">Error: ${e.message}</div>`;
+                // Show friendly error instead of breaking
+                const grid = document.getElementById('product-grid');
+                if(grid) grid.innerHTML = `<div class="col-span-full text-center py-10 text-red-500">Gagal memuatkan produk. Sila refresh. <br><small>${e.message}</small></div>`;
             }
         }
 
         window.renderCatalog = () => {
-            const search = document.getElementById('search-bar').value.toLowerCase();
-            const sort = document.getElementById('filter-sort').value;
+            const searchInput = document.getElementById('search-bar');
+            const sortInput = document.getElementById('filter-sort');
+            
+            // Safety check if inputs don't exist (e.g. in admin shopping mode using different IDs)
+            const search = searchInput ? searchInput.value.toLowerCase() : '';
+            const sort = sortInput ? sortInput.value : 'default';
+            
             const grid = document.getElementById('product-grid');
+            const adminGrid = document.getElementById('admin-product-grid');
+            
             let filtered = allProducts.filter(p => p.status === 'Public' && p.name.toLowerCase().includes(search));
             if(sort === 'highest') filtered.sort((a,b) => (b.totalSold || 0) - (a.totalSold || 0));
             if(sort === 'event') filtered = filtered.filter(p => p.event);
-            if(filtered.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Tiada produk dijumpai.</div>`; return; }
-            grid.innerHTML = filtered.map(p => `
+            
+            if(filtered.length === 0) { 
+                const emptyMsg = `<div class="col-span-full text-center py-10 text-gray-500">Tiada produk dijumpai.</div>`;
+                if(grid) grid.innerHTML = emptyMsg;
+                if(adminGrid) adminGrid.innerHTML = emptyMsg;
+                return; 
+            }            
+            const html = filtered.map(p => `
                 <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition cursor-pointer" onclick="openProductModal('${p.id}')">
                     <img src="${p.imageUrl||'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg mb-2 bg-gray-200" onerror="this.src='https://via.placeholder.com/150?text=Error'">
                     <h3 class="font-bold text-sm text-gray-800 leading-tight">${p.name}</h3>
@@ -719,6 +702,9 @@
                     </div>
                     <button onclick="event.stopPropagation(); addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2 shadow">Add Order Cart</button>
                 </div>`).join('');
+            
+            if(grid) grid.innerHTML = html;
+            if(adminGrid) adminGrid.innerHTML = html;
         };
 
         window.openProductModal = (id) => {
@@ -733,7 +719,8 @@
             document.getElementById('modal-sold').innerText = selectedProduct.totalSold || 0;
             document.getElementById('modal-country').innerText = selectedProduct.country || '-';
             document.getElementById('modal-reviews').innerHTML = '<div class="review-card"><p class="text-xs font-bold">Buyer Reviews</p><p class="text-[10px] text-gray-500">No reviews yet</p></div>';
-            document.getElementById('modal-add-cart').onclick = () => { addToCart(selectedProduct.id); closeProductModal(); };            document.getElementById('product-modal').classList.remove('hidden-section');
+            document.getElementById('modal-add-cart').onclick = () => { addToCart(selectedProduct.id); closeProductModal(); };
+            document.getElementById('product-modal').classList.remove('hidden-section');
             playSound('click');
         };
 
@@ -746,8 +733,7 @@
 
         function renderCartItems() {
             const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
-            if(cart.length===0) { document.getElementById('cart-items').innerHTML = "<p class='text-center text-gray-500'>Cart kosong.</p>"; document.getElementById('cart-total').innerText = "RM 0.00"; return; }
-            document.getElementById('cart-items').innerHTML = cart.map((i,idx)=>`
+            if(cart.length===0) { document.getElementById('cart-items').innerHTML = "<p class='text-center text-gray-500'>Cart kosong.</p>"; document.getElementById('cart-total').innerText = "RM 0.00"; return; }            document.getElementById('cart-items').innerHTML = cart.map((i,idx)=>`
                 <div class="flex gap-3 bg-white/60 p-3 rounded-lg">
                     <img src="${i.imageUrl||'https://via.placeholder.com/50'}" class="w-16 h-16 object-cover rounded">
                     <div class="flex-1">
@@ -782,7 +768,8 @@
                     adminNote: "", userRating: null, currentStatus: "Pending Payment", orderCategory: "To Pay", dateCreated: serverTimestamp(), dateCompleted: null
                 });
                 cart=[]; document.getElementById('cart-count').innerText=0; toggleCartModal(); playSound('success'); 
-                showDashboardMessage("✅ Pesanan berjaya! Sila buat pembayaran.", 'success');                setTimeout(() => { loadUserData(); navTo('dashboard'); }, 1000);
+                showDashboardMessage("✅ Pesanan berjaya! Sila buat pembayaran.", 'success');
+                setTimeout(() => { loadUserData(); navTo('dashboard'); }, 1000);
             } catch(e) { playSound('error'); showDashboardMessage("❌ Ralat: " + e.message, 'error'); }
         };
 
@@ -796,7 +783,6 @@
                 if(d.exists()){ userData=d.data(); updateDashUI(); } 
                 else { showDashboardMessage("❌ Data pengguna tidak dijumpai!", 'error'); }
             });
-
             if(unsubscribeOrders) unsubscribeOrders();
 
             try {
@@ -831,7 +817,8 @@
         function updateDashUI() {
             document.getElementById('nav-username').innerText = userData.username;
             document.getElementById('nav-uac').innerText = userData.uac;
-            document.getElementById('dash-user-display').innerText = userData.username;            document.getElementById('dash-uac-display').innerText = userData.uac;
+            document.getElementById('dash-user-display').innerText = userData.username;
+            document.getElementById('dash-uac-display').innerText = userData.uac;
             document.getElementById('dash-customer-name').innerText = userData.customerName || '';
             document.getElementById('dash-phone').innerText = userData.phone;
             document.getElementById('dash-address').value = userData.address||"";
@@ -845,7 +832,6 @@
                 playSound('success'); showDashboardMessage("✅ Alamat dikemaskini!", 'success');
             } catch(e) { playSound('error'); showDashboardMessage("❌ Error: " + e.message, 'error'); }
         };
-
         // Filter Orders
         window.filterOrders = (status) => {
             const tbody = document.getElementById('user-order-history');
@@ -880,7 +866,8 @@
                     actions += ` <button onclick="reorder('${o.id}')" class="action-btn btn-edit">Reorder</button>`;
                 }
                 return `<tr>
-                    <td class="max-w-xs truncate">${itemNames}</td>                    <td>${o.customerName||o.username}</td>
+                    <td class="max-w-xs truncate">${itemNames}</td>
+                    <td>${o.customerName||o.username}</td>
                     <td>${dateCreated}</td>
                     <td>${dateCompleted}</td>
                     <td class="max-w-xs truncate text-[10px]">${o.address}</td>
@@ -893,8 +880,7 @@
                     <td class="font-mono text-[10px]">${o.orderId}</td>
                     <td>${o.userRating?'⭐'+o.userRating:'-'}</td>
                     <td class="text-center">${actions}</td>
-                </tr>`;
-            }).join('');
+                </tr>`;            }).join('');
         };
 
         window.cancelOrder = async (id) => { if(confirm("Batal pesanan?")) { await updateDoc(doc(db,"orders",id), {status:'Cancelled', orderCategory:'Cancelled'}); playSound('error'); showDashboardMessage("❌ Dibatalkan", 'error'); } };
@@ -929,7 +915,8 @@
             } else {
                 const adminQuery = query(collection(db, "users"), where("role", "==", "admin"), limit(1));
                 const adminSnap = await getDocs(adminQuery);
-                if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500'>Tiada Admin.</p>"; return; }                const adminDoc = adminSnap.docs[0];
+                if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500'>Tiada Admin.</p>"; return; }
+                const adminDoc = adminSnap.docs[0];
                 listEl.innerHTML = `<div onclick="openChat('${adminDoc.id}', '${adminDoc.data().username}')" class="p-4 bg-white/80 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500">
                     <div class="flex items-center gap-3"><div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div>
                     <div><h4 class="font-bold">MFD Support</h4><p class="text-xs text-green-600">● Online</p></div></div><i class="fas fa-chevron-right"></i></div>`;
@@ -942,8 +929,7 @@
             document.getElementById('active-chat-view').classList.remove('hidden-section');
             document.getElementById('chat-partner-name').innerText = partnerName;
             const chatId = [currentUser.uid, partnerId].sort().join('_');
-            const msgContainer = document.getElementById('chat-messages');
-            if(unsubscribeChat) unsubscribeChat();
+            const msgContainer = document.getElementById('chat-messages');            if(unsubscribeChat) unsubscribeChat();
             const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
             unsubscribeChat = onSnapshot(q, (snap) => {
                 msgContainer.innerHTML = "";
@@ -978,7 +964,8 @@
         window.handleFileUpload = async (input) => {
             const file = input.files[0];
             if(!file || !currentChatPartner) return;
-            try {                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
+            try {
+                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
                 await uploadBytes(storageRef, file);
                 const url = await getDownloadURL(storageRef);
                 await saveMessage('', 'image', url);
@@ -991,8 +978,7 @@
             const file = input.files[0];
             if(!file || !currentChatPartner) return;
             try {
-                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
-                await uploadBytes(storageRef, file);
+                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);                await uploadBytes(storageRef, file);
                 const url = await getDownloadURL(storageRef);
                 await saveMessage('', 'image', url);
                 playSound('success');
@@ -1041,8 +1027,7 @@
         // Admin Functions
         window.loadAdminData = async () => {
             if(userData.role !== 'admin') return navTo('home');
-            const ordSnap = await getDocs(query(collection(db, "orders"), orderBy("createdAt","desc")));
-            document.getElementById('admin-order-list').innerHTML = ordSnap.docs.map(d=>{ const o=d.data();
+            const ordSnap = await getDocs(query(collection(db, "orders"), orderBy("createdAt","desc")));            document.getElementById('admin-order-list').innerHTML = ordSnap.docs.map(d=>{ const o=d.data();
                 return `<tr><td class="font-mono">${o.uac}</td><td>${o.username}</td><td class="text-[10px]">${o.items.map(i=>i.name).join(',')}</td><td class="font-mono text-[10px]">${o.items.map(i=>i.uniqueCode||'-').join(',')}</td><td class="text-[10px] truncate max-w-xs">${o.address}</td><td>${Object.values(o.itemCounts||{}).reduce((a,b)=>a+b,0)||o.items.length}</td><td>RM ${o.total}</td><td>${o.paymentMethod}</td>
                 <td><select onchange="updateOrderStatus('${d.id}','paymentStatus',this.value)" class="text-[10px] p-1"><option ${o.paymentStatus==='Not Verified'?'selected':''}>Not Verified</option><option ${o.paymentStatus==='Verified'?'selected':''}>Verified</option></select></td>
                 <td><select onchange="updateOrderStatus('${d.id}','deliveryStatus',this.value)" class="text-[10px] p-1"><option ${o.deliveryStatus==='Pending'?'selected':''}>Pending</option><option ${o.deliveryStatus==='Shipping'?'selected':''}>Shipping</option><option ${o.deliveryStatus==='Delivered'?'selected':''}>Delivered</option></select></td>
@@ -1076,7 +1061,8 @@
             await addDoc(collection(db, "products"), {
                 name: document.getElementById('prod-name').value, price: document.getElementById('prod-price').value, description: document.getElementById('prod-desc').value,
                 imageUrl: imgUrl, status: document.getElementById('prod-status').value, country: document.getElementById('prod-country').value,
-                event: document.getElementById('prod-event').value, variation: document.getElementById('prod-variation').value,                label: document.getElementById('prod-label').value,
+                event: document.getElementById('prod-event').value, variation: document.getElementById('prod-variation').value,
+                label: document.getElementById('prod-label').value,
                 uniqueCode: "ITEM-"+Math.random().toString(36).substr(2,6).toUpperCase(), totalSold: 0, rating: 5.0, revenue: 0, createdAt: serverTimestamp()
             });
             playSound('success'); alert("Produk dilancarkan!"); loadAdminData(); loadProducts();
@@ -1090,8 +1076,7 @@
         window.copyChatID = () => { navigator.clipboard.writeText(currentChatPartner); playSound('success'); alert("ID copied!"); };
         window.blockContact = async () => { if(confirm("Block?")) { await updateDoc(doc(db, "users", currentChatPartner), {status: 'BLOCKED'}); playSound('error'); closeChat(); } };
 
-        onAuthStateChanged(auth, async (user) => {
-            currentUser = user;
+        onAuthStateChanged(auth, async (user) => {            currentUser = user;
             if(user) {
                 document.getElementById('auth-nav').classList.add('hidden-section');
                 document.getElementById('user-nav').classList.remove('hidden-section');
@@ -1116,6 +1101,7 @@
                 document.getElementById('admin-mode-toggle').classList.add('hidden');
                 navTo('home'); 
             }
+            // Load products immediately for guests too
             loadProducts();
         });
     </script>
