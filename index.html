@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MFD Store Ultimate Showcase</title>
+    <title>MFD Store Ultimate | E-Commerce & Admin System</title>
+    
+    <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
@@ -44,10 +47,10 @@
             background-clip: text;
             color: transparent;
             background-size: 300% auto;
-            animation: shine 4s linear infinite;
-            font-weight: 800;
+            animation: shine 4s linear infinite;            font-weight: 800;
         }
-        @keyframes shine { to { background-position: 300% center; } }        .btn-glitter {
+        @keyframes shine { to { background-position: 300% center; } }
+        .btn-glitter {
             background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2);
             background-size: 300% 300%;
             animation: gradientMove 4s ease infinite;
@@ -59,7 +62,8 @@
         .btn-glitter:active { transform: scale(0.95); }
         .btn-glitter:hover { filter: brightness(1.2); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(110, 72, 170, 0.5); }
         @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
-        .chat-container { display: flex; flex-direction: column; height: calc(100vh - 220px); }
+        
+        /* Chat Styles */
         .chat-messages { flex: 1; overflow-y: auto; padding: 15px; scroll-behavior: smooth; }
         .message-bubble { max-width: 80%; padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); word-wrap: break-word; cursor: pointer; }
         .message-bubble:active { transform: scale(0.98); }
@@ -67,19 +71,23 @@
         .msg-other { align-self: flex-start; background: white; color: #333; border-bottom-left-radius: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; cursor: pointer; display: block; }
         .msg-location { background: #e2e8f0; padding: 10px; border-radius: 10px; margin-top: 5px; font-size: 0.8rem; }
-        .msg-pin { background: #fffacd; border: 1px solid #ffd700; padding: 5px 10px; border-radius: 5px; font-size: 0.75rem; margin-top: 5px; display: inline-block; color: #b7791f; }
         @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        /* Table Styles */
         .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1); background: rgba(255,255,255,0.6); }
         .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1200px; font-size: 0.68rem; }
-        .custom-table th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; text-align: left; font-weight: 700; border-bottom: 2px solid #e2e8f0; color: white; position: sticky; top: 0; }
+        .custom-table th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; text-align: left; font-weight: 700; border-bottom: 2px solid #e2e8f0; color: white; position: sticky; top: 0; z-index: 10; }
         .custom-table td { padding: 10px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.5); vertical-align: middle; color: #2d3748; }
         .custom-table tr:hover td { background: rgba(255,255,255,0.9); }
+        
         .hidden-section { display: none !important; }
         input, select, textarea {
             background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748;
             border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
         }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #9D50BB; box-shadow: 0 0 0 3px rgba(157, 80, 187, 0.2); }
+        
+        /* Badges */
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.58rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; display: inline-block; }
         .badge-to-pay { background: #feebc8; color: #744210; }
         .badge-to-ship { background: #bee3f8; color: #2a4365; }
@@ -88,35 +96,25 @@
         .badge-cancelled { background: #fed7d7; color: #822727; }
         .badge-refund { background: #faf089; color: #744210; }
         .badge-active { background: #c6f6d5; color: #22543d; }
-        .badge-blocked { background: #fed7d7; color: #822727; }
-        .badge-inactive { background: #e2e8f0; color: #4a5568; }
-        .badge-delivery-pending { background: #feebc8; color: #744210; }
-        .badge-delivery-shipping { background: #bee3f8; color: #2a4365; }
-        .badge-delivery-delivered { background: #9ae6b4; color: #22543d; }
+        .badge-blocked { background: #fed7d7; color: #822727; }        .badge-inactive { background: #e2e8f0; color: #4a5568; }
+        
         .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #9D50BB; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
+        
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }        ::-webkit-scrollbar-thumb { background: #9D50BB; border-radius: 3px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
+        ::-webkit-scrollbar-thumb { background: #9D50BB; border-radius: 3px; }
+        
         .fade-in { animation: fadeIn 0.5s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .error-box { background: #fed7d7; border: 2px solid #fc8181; color: #c53030; padding: 15px; border-radius: 10px; margin: 10px 0; }
-        .success-box { background: #c6f6d5; border: 2px solid #68d391; color: #22543d; padding: 15px; border-radius: 10px; margin: 10px 0; }
+        
         .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; cursor: pointer; margin: 0 2px; }
         .btn-edit { background: #bee3f8; color: #2a4365; }
         .btn-delete { background: #fed7d7; color: #c53030; }
-        .btn-edit:hover { background: #90cdf4; }
-        .btn-delete:hover { background: #fc8181; color: white; }
         
-        /* Admin Filter Tabs Style */
-        .admin-filter-btn {
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-        .admin-filter-btn.active {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            border-color: rgba(255,255,255,0.5);
-        }
+        /* Admin Filter Tabs */
+        .admin-filter-btn { transition: all 0.2s; border: 1px solid transparent; }
+        .admin-filter-btn.active { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: rgba(255,255,255,0.5); ring: 2px solid #9D50BB; }
     </style>
 </head>
 <body class="p-0 md:p-4">
@@ -145,9 +143,9 @@
                 <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-purple-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>
                 <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register</button>
             </div>
-            <div id="user-nav" class="hidden-section flex items-center gap-2 md:gap-3">                <div class="text-right hidden md:block">
-                    <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>
-                    <div id="nav-uac" class="text-[10px] text-purple-500 font-mono"></div>
+            <div id="user-nav" class="hidden-section flex items-center gap-2 md:gap-3">
+                <div class="text-right hidden md:block">
+                    <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>                    <div id="nav-uac" class="text-[10px] text-purple-500 font-mono"></div>
                 </div>
                 <button onclick="playSound('click'); navTo('dashboard')" class="px-3 md:px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition text-xs md:text-sm"><i class="fas fa-user"></i></button>
                 <button onclick="playSound('click'); logout()" class="px-3 md:px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition text-xs md:text-sm"><i class="fas fa-sign-out-alt"></i></button>
@@ -194,9 +192,9 @@
             </div>
         </section>
 
-        <section id="view-register" class="hidden-section max-w-md mx-auto mt-10">            <div class="glass-panel p-8">
-                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Register Account</h2>
-                <input type="text" id="reg-phone" placeholder="Phone Number (Active)">
+        <section id="view-register" class="hidden-section max-w-md mx-auto mt-10">
+            <div class="glass-panel p-8">
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Register Account</h2>                <input type="text" id="reg-phone" placeholder="Phone Number (Active)">
                 <input type="email" id="reg-email" placeholder="Email Address (Optional)">
                 <input type="password" id="reg-pass" placeholder="Create Password">
                 <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">REGISTER FREE</button>
@@ -207,6 +205,7 @@
         <!-- 3. USER DASHBOARD -->
         <section id="view-dashboard" class="hidden-section">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 md:gap-6">
+                <!-- Profile Section -->
                 <div class="glass-panel p-4 md:p-6 lg:col-span-1 h-fit">
                     <div class="text-center mb-4">
                         <div class="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full mx-auto flex items-center justify-center text-2xl md:text-3xl text-white shadow-lg mb-2">
@@ -228,22 +227,27 @@
                         <button onclick="deleteAccount()" class="bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs w-full mt-2 hover:bg-red-200 transition">Delete Account Permanently</button>
                     </div>
                 </div>
+                
+                <!-- Orders Section -->
                 <div class="glass-panel p-4 md:p-6 lg:col-span-3">
                     <h3 class="text-lg md:text-xl font-bold mb-4 flex justify-between items-center">
                         <span>My Orders</span>
                         <span class="text-[10px] bg-purple-100 text-purple-600 px-2 py-1 rounded-full animate-pulse">Live Update</span>
                     </h3>
                     <div id="dashboard-message"></div>
+                    
+                    <!-- Order Filters -->
                     <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar">
                         <button onclick="filterOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 transition">All</button>
                         <button onclick="filterOrders('To Pay')" class="px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200 transition">To Pay</button>
                         <button onclick="filterOrders('To Ship')" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200 transition">To Ship</button>
                         <button onclick="filterOrders('To Receive')" class="px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200 transition">To Receive</button>
                         <button onclick="filterOrders('Completed')" class="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200 transition">Completed</button>
-                        <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200 transition">Return</button>
-                        <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200 transition">Cancelled</button>
+                        <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200 transition">Return</button>                        <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200 transition">Cancelled</button>
                     </div>
-                    <div class="table-container">                        <table class="custom-table">
+                    
+                    <div class="table-container">
+                        <table class="custom-table">
                             <thead>
                                 <tr>
                                     <th>Username</th>
@@ -288,11 +292,11 @@
                         <div class="flex items-center gap-2">
                             <button onclick="closeChat()" class="text-gray-500 hover:text-purple-600 transition"><i class="fas fa-arrow-left"></i></button>
                             <div>
-                                <h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3>
-                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
+                                <h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3>                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
                             </div>
                         </div>
-                        <div class="flex gap-1">                            <button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded transition"><i class="fas fa-copy"></i> ID</button>
+                        <div class="flex gap-1">
+                            <button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded transition"><i class="fas fa-copy"></i> ID</button>
                             <button onclick="blockContact()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded transition"><i class="fas fa-ban"></i></button>
                         </div>
                     </div>
@@ -327,7 +331,7 @@
                 <button onclick="showAdminTab('tab-chat')" class="px-4 py-2 bg-white/80 rounded-xl text-pink-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-headset mr-1"></i> Live Chat</button>
             </div>
             
-            <!-- TAB ORDERS (UPDATED WITH FILTERS & STATUS CHANGE) -->
+            <!-- TAB ORDERS -->
             <div id="tab-orders" class="admin-tab glass-panel p-4 md:p-6 mb-6">
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
                     <h3 class="font-bold text-purple-700 text-lg">Jadual Pengesahan & Urusan Pesanan</h3>
@@ -337,11 +341,11 @@
                 <!-- Admin Order Filters -->
                 <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar border-b border-gray-200">
                     <button onclick="filterAdminOrders('all')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 active">All</button>
-                    <button onclick="filterAdminOrders('To Pay')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200">To Pay</button>
-                    <button onclick="filterAdminOrders('To Ship')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200">To Ship</button>
+                    <button onclick="filterAdminOrders('To Pay')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200">To Pay</button>                    <button onclick="filterAdminOrders('To Ship')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200">To Ship</button>
                     <button onclick="filterAdminOrders('To Receive')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200">To Receive</button>
                     <button onclick="filterAdminOrders('Completed')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200">Completed</button>
-                    <button onclick="filterAdminOrders('Return/Refund')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200">Return</button>                    <button onclick="filterAdminOrders('Cancelled')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200">Cancelled</button>
+                    <button onclick="filterAdminOrders('Return/Refund')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200">Return</button>
+                    <button onclick="filterAdminOrders('Cancelled')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200">Cancelled</button>
                 </div>
 
                 <div class="table-container">
@@ -370,6 +374,7 @@
                 </div>
             </div>
 
+            <!-- TAB PRODUCTS -->
             <div id="tab-products" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
                 <h3 class="font-bold mb-4 text-purple-700">Tambah Produk Baharu</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white/30 p-4 rounded-xl">
@@ -385,17 +390,19 @@
                     </select>
                     <input type="url" id="prod-img-url" placeholder="Paste Image URL Here (https://...)" class="md:col-span-2">
                     <textarea id="prod-desc" placeholder="Deskripsi Item" class="md:col-span-2"></textarea>
-                </div>
-                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
+                </div>                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
                 <h3 class="font-bold mt-8 mb-4 text-purple-700">Senarai Produk Dilancarkan</h3>
                 <div class="table-container">
                     <table class="custom-table">
-                        <thead>                            <tr><th>BIL</th><th>GAMBAR</th><th>NAMA ITEM</th><th>HARGA</th><th>RATING</th><th>STATUS</th><th>SOLD</th><th>EDIT</th><th>PADAM</th></tr>
+                        <thead>
+                            <tr><th>BIL</th><th>GAMBAR</th><th>NAMA ITEM</th><th>HARGA</th><th>RATING</th><th>STATUS</th><th>SOLD</th><th>EDIT</th><th>PADAM</th></tr>
                         </thead>
                         <tbody id="admin-prod-list"></tbody>
                     </table>
                 </div>
             </div>
+
+            <!-- TAB USERS -->
             <div id="tab-users" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
                 <h3 class="font-bold mb-4 text-purple-700">Jadual Database Pelanggan</h3>
                 <div class="table-container">
@@ -416,6 +423,8 @@
                     </table>
                 </div>
             </div>
+
+            <!-- TAB CHAT -->
             <div id="tab-chat" class="admin-tab hidden-section glass-panel p-4 md:p-6 h-[70vh] flex flex-col">
                 <h3 class="font-bold mb-4 text-pink-700">Live Agent Dashboard (Owner)</h3>
                 <div id="admin-chat-list" class="flex-1 overflow-y-auto space-y-2 mb-4 border rounded-lg p-2 bg-white/30">
@@ -430,8 +439,7 @@
                     <div id="admin-chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 flex-1 overflow-y-auto"></div>
                     <div class="flex gap-2">
                          <button onclick="document.getElementById('admin-file-input').click()" class="p-2 bg-gray-200 rounded-full"><i class="fas fa-image"></i></button>
-                         <input type="file" id="admin-file-input" class="hidden" accept="image/*" onchange="handleAdminFileUpload(this)">
-                        <textarea id="admin-msg-input" rows="1" class="m-0 flex-1 text-sm" placeholder="Reply..."></textarea>
+                         <input type="file" id="admin-file-input" class="hidden" accept="image/*" onchange="handleAdminFileUpload(this)">                        <textarea id="admin-msg-input" rows="1" class="m-0 flex-1 text-sm" placeholder="Reply..."></textarea>
                         <button onclick="sendAdminMessage()" class="btn-glitter px-4 rounded-lg text-sm">Send</button>
                     </div>
                 </div>
@@ -439,6 +447,7 @@
         </section>
 
     </main>
+
     <!-- CART MODAL -->
     <div id="modal-cart" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
@@ -479,8 +488,7 @@
             appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+        const app = initializeApp(firebaseConfig);        const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
         let currentUser = null;
@@ -488,7 +496,8 @@
         let cart = [];
         let allProducts = [];
         let allUserOrders = [];
-        let allAdminOrders = []; // Store for admin filtering        let currentChatPartner = null;
+        let allAdminOrders = []; 
+        let currentChatPartner = null;
         let unsubscribeChat = null;
         let unsubscribeOrders = null;
 
@@ -518,7 +527,7 @@
             document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden-section'));
             document.getElementById(id).classList.remove('hidden-section');
             if(id === 'tab-chat') setTimeout(loadChatList, 100);
-            if(id === 'tab-orders') filterAdminOrders('all'); // Reset filter when tab opens
+            if(id === 'tab-orders') filterAdminOrders('all');
         };
 
         window.toggleCartModal = () => {
@@ -528,8 +537,7 @@
 
         window.doRegister = async () => {
             const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;
-            const phone = document.getElementById('reg-phone').value;
+            const pass = document.getElementById('reg-pass').value;            const phone = document.getElementById('reg-phone').value;
             if(!email || !pass) return alert("Email & Password diperlukan");
             try {
                 const cred = await createUserWithEmailAndPassword(auth, email, pass);
@@ -537,7 +545,8 @@
                 await setDoc(doc(db, "users", cred.user.uid), {
                     username: "User_"+uac.split('-')[1], email, phone, uac, role: 'customer', status: 'ACTIVE', address: '', createdAt: serverTimestamp(), logCache: serverTimestamp()
                 });
-                playSound('success'); alert("Berjaya didaftarkan! Sila login."); navTo('login');            } catch(e) { playSound('error'); alert(e.message); }
+                playSound('success'); alert("Berjaya didaftarkan! Sila login."); navTo('login');
+            } catch(e) { playSound('error'); alert(e.message); }
         };
 
         window.doLogin = async () => {
@@ -577,8 +586,7 @@
             if(sort === 'highest') filtered.sort((a,b) => (b.totalSold || 0) - (a.totalSold || 0));
             if(sort === 'event') filtered = filtered.filter(p => p.event);
             if(filtered.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Tiada produk dijumpai.</div>`; return; }
-            grid.innerHTML = filtered.map(p => `
-                <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition">
+            grid.innerHTML = filtered.map(p => `                <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition">
                     <img src="${p.imageUrl||'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg mb-2 bg-gray-200" onerror="this.src='https://via.placeholder.com/150?text=Error'">
                     <h3 class="font-bold text-sm text-gray-800 leading-tight">${p.name}</h3>
                     ${p.event ? `<span class="text-[10px] text-pink-600 font-bold">#${p.event}</span>` : ''}
@@ -586,7 +594,8 @@
                     <div class="flex justify-between items-center mt-2">
                         <span class="text-purple-600 font-bold text-sm">RM ${p.price}</span>
                         <span class="text-[10px] bg-gray-100 px-1 rounded">${p.country||'-'}</span>
-                    </div>                    <button onclick="addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2 shadow">Add to Cart</button>
+                    </div>
+                    <button onclick="addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2 shadow">Add to Cart</button>
                 </div>`).join('');
         };
 
@@ -626,22 +635,20 @@
             } catch(e) { playSound('error'); showDashboardMessage("❌ Ralat: " + e.message, 'error'); }
         };
 
-        async function loadUserData() {
-            if(!currentUser) return;
-            console.log("Loading user:", currentUser.uid);
+        async function loadUserData() {            if(!currentUser) return;
             showDashboardMessage("🔄 Memuatkan data...", 'success');
 
             onSnapshot(doc(db, "users", currentUser.uid), (d)=>{
                 if(d.exists()){ userData=d.data(); updateDashUI(); } 
                 else { showDashboardMessage("❌ Data pengguna tidak dijumpai!", 'error'); }
             });
+
             if(unsubscribeOrders) unsubscribeOrders();
 
             try {
                 const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
                 unsubscribeOrders = onSnapshot(q, (snap) => {
                     allUserOrders = []; snap.forEach(d => allUserOrders.push({id:d.id, ...d.data()}));
-                    console.log("Orders loaded:", allUserOrders.length);
                     filterOrders('all');
                     if(snap.size > 0) showDashboardMessage(`✅ ${snap.size} pesanan dijumpai!`, 'success');
                 }, (error) => { 
@@ -677,14 +684,14 @@
             s.className = `badge ${userData.status==='ACTIVE'?'badge-active':userData.status==='BLOCKED'?'badge-blocked':'badge-inactive'}`;
         }
 
-        window.updateProfile = async () => {
-            try {
+        window.updateProfile = async () => {            try {
                 await updateDoc(doc(db, "users", currentUser.uid), { address: document.getElementById('dash-address').value, logCache: serverTimestamp() });
                 playSound('success'); showDashboardMessage("✅ Alamat dikemaskini!", 'success');
             } catch(e) { playSound('error'); showDashboardMessage("❌ Error: " + e.message, 'error'); }
         };
 
-        window.filterOrders = (status) => {            const tbody = document.getElementById('user-order-history');
+        window.filterOrders = (status) => {
+            const tbody = document.getElementById('user-order-history');
             const noMsg = document.getElementById('no-orders-msg');
             const filtered = status === 'all' ? allUserOrders : allUserOrders.filter(o=>o.status===status);
             
@@ -726,14 +733,14 @@
                     <td><span class="badge ${deliveryBadge}">${o.deliveryStatus||'Pending'}</span></td>
                     <td class="font-mono text-[10px]">${o.trackingNo||'-'}</td>
                     <td class="font-mono text-[10px]">${o.orderId}</td>
-                    <td>${o.userRating?'⭐'+o.userRating:'-'}</td>
-                    <td class="text-center">${actions}</td>
+                    <td>${o.userRating?'⭐'+o.userRating:'-'}</td>                    <td class="text-center">${actions}</td>
                 </tr>`;
             }).join('');
         };
 
         window.cancelOrder = async (id) => { if(confirm("Batal?")) { await updateDoc(doc(db,"orders",id), {status:'Cancelled'}); playSound('error'); showDashboardMessage("❌ Dibatalkan", 'error'); } };
-        window.completeOrder = async (id) => { await updateDoc(doc(db,"orders",id), {status:'Completed', deliveryStatus:'Delivered'}); playSound('success'); showDashboardMessage("✅ Selesai!", 'success'); };        window.rateOrder = async (id) => { const r=prompt("Rating (1-5):","5"); if(r) { await updateDoc(doc(db,"orders",id),{userRating:parseInt(r)}); playSound('success'); } };
+        window.completeOrder = async (id) => { await updateDoc(doc(db,"orders",id), {status:'Completed', deliveryStatus:'Delivered'}); playSound('success'); showDashboardMessage("✅ Selesai!", 'success'); };
+        window.rateOrder = async (id) => { const r=prompt("Rating (1-5):","5"); if(r) { await updateDoc(doc(db,"orders",id),{userRating:parseInt(r)}); playSound('success'); } };
         window.reorder = (id) => { const order = allUserOrders.find(o => o.id === id); if(order) { cart = [...cart, ...order.items]; document.getElementById('cart-count').innerText = cart.length; playSound('success'); showDashboardMessage("🛒 Item ditambah!", 'success'); } };
 
         // Chat Functions
@@ -775,14 +782,14 @@
             currentChatPartner = partnerId;
             document.getElementById('chat-list-view').classList.add('hidden-section');
             document.getElementById('active-chat-view').classList.remove('hidden-section');
-            document.getElementById('chat-partner-name').innerText = partnerName;
-            const chatId = [currentUser.uid, partnerId].sort().join('_');
+            document.getElementById('chat-partner-name').innerText = partnerName;            const chatId = [currentUser.uid, partnerId].sort().join('_');
             const msgContainer = document.getElementById('chat-messages');
             if(unsubscribeChat) unsubscribeChat();
             const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
             unsubscribeChat = onSnapshot(q, (snap) => {
                 msgContainer.innerHTML = "";
-                snap.forEach(d => {                    const m = d.data();
+                snap.forEach(d => {
+                    const m = d.data();
                     const isMe = m.senderId === currentUser.uid;
                     let content = '';
                     if(m.type === 'text') content = `<p class="text-sm">${m.text}</p>`;
@@ -824,26 +831,25 @@
             const file = input.files[0];
             if(!file || !currentChatPartner) return;
             try {
-                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
-                await uploadBytes(storageRef, file);
+                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);                await uploadBytes(storageRef, file);
                 const url = await getDownloadURL(storageRef);
                 await saveMessage('', 'image', url);
                 playSound('success');
             } catch(e) { alert("Upload gagal: " + e.message); }
             input.value = '';
         };
+
         window.sendLocation = async () => { const addr = prompt("Alamat/lokasi:"); if(addr) { await saveMessage('', 'location', null, addr); } };
 
         // Admin Functions
         window.loadAdminData = async () => {
             if(userData.role !== 'admin') return navTo('home');
             
-            // Load Orders with Realtime Listener for Admin
             const q = query(collection(db, "orders"), orderBy("createdAt","desc"));
             onSnapshot(q, (snap) => {
                 allAdminOrders = [];
                 snap.forEach(d => allAdminOrders.push({id: d.id, ...d.data()}));
-                filterAdminOrders('all'); // Render default view
+                filterAdminOrders('all');
             });
 
             const usrSnap = await getDocs(collection(db, "users"));
@@ -859,12 +865,10 @@
             loadChatList();
         };
 
-        // NEW FUNCTION: Filter Admin Orders by Status
         window.filterAdminOrders = (status) => {
             const tbody = document.getElementById('admin-order-list');
             const filtered = status === 'all' ? allAdminOrders : allAdminOrders.filter(o => o.status === status);
             
-            // Update Active Button State
             document.querySelectorAll('.admin-filter-btn').forEach(btn => {
                 btn.classList.remove('active', 'ring-2', 'ring-purple-400');
                 if((status === 'all' && btn.innerText === 'All') || btn.innerText.includes(status)) {
@@ -876,11 +880,10 @@
                 tbody.innerHTML = `<tr><td colspan="13" class="text-center py-8 text-gray-500">Tiada pesanan untuk status ini.</td></tr>`;
                 return;
             }
-
             tbody.innerHTML = filtered.map(o => {
                 const itemNames = o.items.map(i=>i.name).join(', ');
                 const totalQty = Object.values(o.itemCounts||{}).reduce((a,b)=>a+b,0) || o.items.length;
-                                // Determine Badge Class
+                
                 let badgeClass = 'badge-to-pay';
                 if(o.status==='To Ship') badgeClass='badge-to-ship';
                 else if(o.status==='To Receive') badgeClass='badge-to-receive';
@@ -888,7 +891,6 @@
                 else if(o.status==='Cancelled') badgeClass='badge-cancelled';
                 else if(o.status==='Return/Refund') badgeClass='badge-refund';
 
-                // Create Status Dropdown Options
                 const statuses = ['To Pay', 'To Ship', 'To Receive', 'Completed', 'Return/Refund', 'Cancelled'];
                 const statusOptions = statuses.map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('');
 
@@ -919,7 +921,6 @@
                         <span class="badge ${badgeClass}">${o.status}</span>
                     </td>
                     <td class="text-center">
-                        <!-- MAIN STATUS CHANGER -->
                         <select onchange="updateOrderStatus('${o.id}', this.value)" class="text-[10px] font-bold p-1 rounded border border-purple-300 bg-purple-50 text-purple-700 cursor-pointer hover:bg-purple-100 transition">
                             ${statusOptions}
                         </select>
@@ -929,22 +930,17 @@
                 </tr>`;
             }).join('');
         };
-        // Helper to update specific fields (payment, delivery, tracking)
         window.updateOrderField = async (id, field, val) => {
             await updateDoc(doc(db, "orders", id), {[field]: val});
             playSound('click');
-            // No need to reload, realtime listener handles it, but we can show a tiny toast if needed
         };
 
-        // Function to change Main Status
         window.updateOrderStatus = async (id, newStatus) => {
             if(confirm(`Tukar status pesanan ini kepada ${newStatus}?`)) {
                 await updateDoc(doc(db, "orders", id), { status: newStatus });
                 playSound('success');
-                // Realtime listener will auto-update the UI
             } else {
-                // Revert the select box visually if cancelled (optional, complex without state management, skipping for simplicity as DB didn't change)
-                loadAdminData(); // Reload to reset select if needed, though RT listener usually keeps it in sync
+                loadAdminData();
             }
         };
 
@@ -978,11 +974,11 @@
         window.blockContact = async () => { if(confirm("Block?")) { await updateDoc(doc(db, "users", currentChatPartner), {status: 'BLOCKED'}); playSound('error'); closeChat(); } };
 
         onAuthStateChanged(auth, async (user) => {
-            currentUser = user;            if(user) {
+            currentUser = user;
+            if(user) {
                 document.getElementById('auth-nav').classList.add('hidden-section');
                 document.getElementById('user-nav').classList.remove('hidden-section');
-                const snap = await getDoc(doc(db, "users", user.uid));
-                if(snap.exists()) {
+                const snap = await getDoc(doc(db, "users", user.uid));                if(snap.exists()) {
                     userData = snap.data();
                     if(userData.status === 'BLOCKED') { playSound('error'); alert("Akaun diblokir."); signOut(auth); return; }
                     if(userData.role === 'admin') navTo('admin'); else navTo('dashboard');
