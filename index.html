@@ -3,174 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MFD Store Ultimate Showcase</title>
-    <!-- Tailwind CSS -->
+    <title>MFD Store Ultimate - Fixed Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <style>
-        /* TEMA GRADIENT & GLITTER */
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.6);
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #FF9A9E 75%, #FECFEF 100%);
-        }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: var(--primary-gradient);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-            color: #2d3748;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        /* GLASSMORPHISM PANELS */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: 0 8px 32px 0 rgba(102, 126, 234, 0.25);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .glass-panel:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 40px 0 rgba(102, 126, 234, 0.35);
-        }
-        /* GLITTER TEXT EFFECT */
-        .glitter-text {
-            background: linear-gradient(to right, #9D50BB, #FF69B4, #6E48AA, #9D50BB);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            background-size: 300% auto;
-            animation: shine 4s linear infinite;
-            font-weight: 800;
-        }
+        :root { --glass-bg: rgba(255, 255, 255, 0.85); --glass-border: rgba(255, 255, 255, 0.6); }
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #FF9A9E 75%, #FECFEF 100%); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: #2d3748; min-height: 100vh; overflow-x: hidden; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: 20px; box-shadow: 0 8px 32px 0 rgba(102, 126, 234, 0.25); transition: transform 0.2s; }
+        .glass-panel:hover { transform: translateY(-2px); box-shadow: 0 12px 40px 0 rgba(102, 126, 234, 0.35); }
+        .glitter-text { background: linear-gradient(to right, #9D50BB, #FF69B4, #6E48AA, #9D50BB); -webkit-background-clip: text; background-clip: text; color: transparent; background-size: 300% auto; animation: shine 4s linear infinite; font-weight: 800; }
         @keyframes shine { to { background-position: 300% center; } }
-
-        /* BUTTONS */
-        .btn-glitter {
-            background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2);
-            background-size: 300% 300%;
-            animation: gradientMove 4s ease infinite;
-            color: white;
-            font-weight: bold;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(110, 72, 170, 0.4);
-        }
+        .btn-glitter { background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2); background-size: 300% 300%; animation: gradientMove 4s ease infinite; color: white; font-weight: bold; transition: all 0.3s; box-shadow: 0 4px 15px rgba(110, 72, 170, 0.4); }
         .btn-glitter:active { transform: scale(0.95); }
         .btn-glitter:hover { filter: brightness(1.2); transform: translateY(-2px); }
         @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
-
-        /* TABLES */
-        .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); background: rgba(255,255,255,0.5); }
-        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px; font-size: 0.7rem; }
-        .custom-table th { 
-            background: linear-gradient(135deg, #667eea, #764ba2); 
-            padding: 12px; text-align: left; font-weight: 700; 
-            color: white; position: sticky; top: 0; z-index: 10;
-        }
-        .custom-table td { padding: 10px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.6); vertical-align: middle; }
-        .custom-table tr:hover td { background: rgba(255,255,255,0.9); }
-
-        /* CHAT STYLES */
-        .chat-container { display: flex; flex-direction: column; height: calc(100vh - 220px); }
-        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; scroll-behavior: smooth; }
-        .message-bubble { max-width: 80%; padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); word-wrap: break-word; cursor: pointer; }
-        .message-bubble:active { transform: scale(0.98); }
-        .msg-me { align-self: flex-end; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom-right-radius: 2px; margin-left: auto; box-shadow: 0 4px 10px rgba(118, 75, 162, 0.4); }
-        .msg-other { align-self: flex-start; background: white; color: #333; border-bottom-left-radius: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; cursor: pointer; display: block; }
-        .msg-location { background: #e2e8f0; padding: 10px; border-radius: 10px; margin-top: 5px; font-size: 0.85rem; border-left: 4px solid #667eea; }
-        @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-
-        /* UTILS */
-        .hidden-section { display: none !important; }        input, select, textarea {
-            background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748;
-            border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
-        }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: #9D50BB; box-shadow: 0 0 0 3px rgba(157, 80, 187, 0.1); }
-        
-        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.55rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; display: inline-block; }
+        .hidden-section { display: none !important; }
+        input, select, textarea { background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s; }
+        input:focus { outline: none; border-color: #9D50BB; box-shadow: 0 0 0 3px rgba(157, 80, 187, 0.1); }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.55rem; font-weight: bold; text-transform: uppercase; }
         .badge-to-pay { background: #feebc8; color: #744210; }
-        .badge-to-ship { background: #bee3f8; color: #2a4365; }
-        .badge-to-receive { background: #c6f6d5; color: #22543d; }
         .badge-completed { background: #9ae6b4; color: #22543d; }
         .badge-cancelled { background: #fed7d7; color: #822727; }
-        .badge-refund { background: #faf089; color: #744210; }
         .badge-active { background: #c6f6d5; color: #22543d; }
-        .badge-blocked { background: #fed7d7; color: #822727; }
-        .badge-inactive { background: #e2e8f0; color: #4a5568; }
-
+        .table-container { overflow-x: auto; border-radius: 15px; }
+        .custom-table { width: 100%; border-collapse: separate; min-width: 1200px; font-size: 0.7rem; }
+        .custom-table th { background: linear-gradient(135deg, #667eea, #764ba2); padding: 12px; color: white; position: sticky; top: 0; }
+        .custom-table td { padding: 10px; border-bottom: 1px solid #edf2f7; }
+        .chat-bubble { max-width: 80%; padding: 10px 15px; border-radius: 15px; margin: 5px 0; animation: popIn 0.3s; word-wrap: break-word; }
+        .msg-me { align-self: flex-end; background: linear-gradient(135deg, #667eea, #764ba2); color: white; margin-left: auto; }
+        .msg-other { align-self: flex-start; background: white; }
+        .msg-location { background: #e2e8f0; padding: 10px; border-radius: 10px; margin-top: 5px; font-size: 0.85rem; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
         .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #9D50BB; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        
-        .error-box { background: #fed7d7; border: 2px solid #fc8181; color: #c53030; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 0.9em; }
-        .success-box { background: #c6f6d5; border: 2px solid #68d391; color: #22543d; padding: 10px; border-radius: 8px; margin: 10px 0; font-size: 0.9em; }
-        
-        .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; cursor: pointer; margin: 0 2px; display: inline-block; transition: all 0.2s; }
+        .error-box { background: #fed7d7; border: 2px solid #fc8181; color: #c53030; padding: 10px; border-radius: 8px; margin: 10px 0; }
+        .success-box { background: #c6f6d5; border: 2px solid #68d391; color: #22543d; padding: 10px; border-radius: 8px; margin: 10px 0; }
+        .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; cursor: pointer; margin: 0 2px; display: inline-block; }
         .btn-edit { background: #bee3f8; color: #2a4365; }
         .btn-delete { background: #fed7d7; color: #c53030; }
-        .btn-edit:hover { background: #90cdf4; }
-        .btn-delete:hover { background: #fc8181; color: white; }
-
-        /* SCROLLBAR */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
-        ::-webkit-scrollbar-thumb { background: #9D50BB; border-radius: 3px; }
     </style>
 </head>
 <body class="p-0 md:p-4">
 
-    <!-- AUDIO EFFECTS -->
-    <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3" preload="auto"></audio>
-    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3" preload="auto"></audio>
-    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
-    <audio id="snd-msg" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3" preload="auto"></audio>
+    <!-- AUDIO EFFECTS -->    <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3"></audio>
+    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3"></audio>
+    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+    <audio id="snd-msg" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3"></audio>
 
     <!-- NAVBAR -->
     <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 flex justify-between items-center gap-3 shadow-lg">
-        <div class="text-xl font-bold glitter-text cursor-pointer flex items-center gap-2" onclick="navTo('home')">
-            <i class="fas fa-gem"></i> MFD STORE
-        </div>
+        <div class="text-xl font-bold glitter-text cursor-pointer" onclick="navTo('home')"><i class="fas fa-gem"></i> MFD STORE</div>
         <div class="flex items-center gap-2">
-            <!-- Admin Toggle -->            <button id="admin-mode-btn" onclick="toggleAdminMode()" class="hidden px-3 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold shadow hover:bg-purple-700 transition">
-                <i class="fas fa-user-shield mr-1"></i> Admin Mode
-            </button>
-            <!-- Chat -->
-            <button onclick="navTo('chat-list')" class="relative p-2 hover:bg-white/40 rounded-full transition group">
-                <i class="fas fa-comments text-purple-600 text-lg group-hover:scale-110 transition"></i>
-                <span id="chat-notif" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden animate-pulse">!</span>
-            </button>
-            <!-- Cart -->
-            <button onclick="toggleCartModal()" class="relative p-2 hover:bg-white/40 rounded-full transition group">
-                <i class="fas fa-shopping-cart text-pink-600 text-lg group-hover:scale-110 transition"></i>
-                <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">0</span>
-            </button>
-            <!-- Auth -->
+            <button id="admin-mode-btn" onclick="toggleAdminMode()" class="hidden px-3 py-2 bg-purple-600 text-white rounded-lg text-xs font-bold shadow">Admin Mode</button>
+            <button onclick="navTo('chat-list')" class="relative p-2 hover:bg-white/40 rounded-full"><i class="fas fa-comments text-purple-600"></i></button>
+            <button onclick="toggleCartModal()" class="relative p-2 hover:bg-white/40 rounded-full"><i class="fas fa-shopping-cart text-pink-600"></i><span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full">0</span></button>
             <div id="auth-nav">
-                <button onclick="navTo('login')" class="px-3 py-2 rounded-xl bg-white/60 text-purple-600 font-bold text-xs shadow-sm hover:bg-white transition">Login</button>
-                <button onclick="navTo('register')" class="px-3 py-2 rounded-xl btn-glitter text-xs shadow-lg hover:brightness-110 transition">Register</button>
+                <button onclick="navTo('login')" class="px-3 py-2 rounded-xl bg-white/60 text-purple-600 font-bold text-xs shadow-sm">Login</button>
+                <button onclick="navTo('register')" class="px-3 py-2 rounded-xl btn-glitter text-xs shadow-lg">Register</button>
             </div>
-            <!-- User Menu -->
             <div id="user-nav" class="hidden-section flex items-center gap-2">
                 <div class="text-right hidden md:block">
                     <div id="nav-username" class="font-bold text-xs truncate max-w-[100px]"></div>
-                    <div id="nav-uac" class="text-[10px] text-purple-500 font-mono"></div>
+                    <div id="nav-uac" class="text-[10px] text-purple-500"></div>
                 </div>
-                <button onclick="navTo('dashboard')" class="px-3 py-2 bg-purple-500 text-white rounded-xl text-xs shadow hover:bg-purple-600 transition"><i class="fas fa-user"></i></button>
-                <button onclick="logout()" class="px-3 py-2 bg-red-500 text-white rounded-xl text-xs shadow hover:bg-red-600 transition"><i class="fas fa-sign-out-alt"></i></button>
+                <button onclick="navTo('dashboard')" class="px-3 py-2 bg-purple-500 text-white rounded-xl text-xs shadow"><i class="fas fa-user"></i></button>
+                <button onclick="logout()" class="px-3 py-2 bg-red-500 text-white rounded-xl text-xs shadow"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </nav>
@@ -180,28 +79,16 @@
 
         <!-- 1. HOME / CATALOG -->
         <section id="view-home">
-            <div class="glass-panel p-3 mb-4 flex flex-col md:flex-row gap-3 items-center">
-                <div class="relative w-full md:w-1/2">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                    <input type="text" id="search-bar" placeholder="Search Product..." class="pl-10 m-0" onkeyup="renderCatalog()">
-                </div>
-                <select id="filter-sort" class="md:w-1/4 m-0" onchange="renderCatalog()">
-                    <option value="default">🔥 Trending</option>
-                    <option value="highest">💰 Highest Sales</option>
-                    <option value="event">🎉 Event Based</option>
-                </select>
+            <div class="glass-panel p-3 mb-4 flex gap-3">
+                <div class="relative w-full md:w-1/2"><i class="fas fa-search absolute left-3 top-3 text-gray-400"></i><input type="text" id="search-bar" placeholder="Search Product..." class="pl-10 m-0" onkeyup="renderCatalog()"></div>
+                <select id="filter-sort" class="md:w-1/4 m-0" onchange="renderCatalog()"><option value="default">🔥 Trending</option><option value="highest">💰 Sales</option><option value="event">🎉 Event</option></select>
             </div>
-            <div class="glass-panel p-6 mb-6 text-center bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-white rounded-2xl shadow-xl relative overflow-hidden">
-                <div class="relative z-10">
-                    <h2 class="text-2xl md:text-3xl font-bold glitter-text mb-2 drop-shadow-md">Recommendations For You</h2>
-                    <p class="text-white/90 text-sm md:text-base">Exclusive deals updated in real-time!</p>                </div>
-                <div class="absolute top-0 left-0 w-full h-full bg-white/10 blur-3xl"></div>
+            <div class="glass-panel p-6 mb-6 text-center bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-white rounded-2xl shadow-xl">
+                <h2 class="text-2xl font-bold glitter-text mb-2">Recommendations For You</h2>
+                <p class="text-white/90 text-sm">Exclusive deals updated in real-time!</p>
             </div>
             <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
-                <div class="col-span-full text-center py-20">
-                    <div class="loader mx-auto mb-4"></div>
-                    <p class="text-gray-600 font-bold animate-pulse">Loading Catalog...</p>
-                </div>
+                <div class="col-span-full text-center py-20"><div class="loader mx-auto mb-4"></div><p class="text-gray-600 font-bold">Loading Catalog...</p></div>
             </div>
         </section>
 
@@ -209,11 +96,10 @@
         <section id="view-login" class="hidden-section max-w-md mx-auto mt-10">
             <div class="glass-panel p-8">
                 <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Login Account</h2>
-                <div id="login-msg"></div>
-                <input type="email" id="login-email" placeholder="Email Address">
+                <div id="login-msg"></div>                <input type="email" id="login-email" placeholder="Email Address">
                 <input type="password" id="login-pass" placeholder="Password">
                 <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">LOGIN NOW</button>
-                <p class="text-center mt-6 text-sm">New here? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="navTo('register')">Register Account</span></p>
+                <p class="text-center mt-6 text-sm">New? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="navTo('register')">Register</span></p>
             </div>
         </section>
 
@@ -221,89 +107,50 @@
             <div class="glass-panel p-8">
                 <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Register Account</h2>
                 <div id="reg-msg"></div>
-                <input type="text" id="reg-name" placeholder="Customer Name For Purchase">
+                <!-- WAJIB ISI NAMA -->
+                <input type="text" id="reg-name" placeholder="Customer Name For Purchase (Wajib)">
                 <input type="text" id="reg-phone" placeholder="Phone Number (Active)">
-                <input type="email" id="reg-email" placeholder="Email Address (Optional)">
+                <input type="email" id="reg-email" placeholder="Email Address">
                 <input type="password" id="reg-pass" placeholder="Create Password">
                 <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">REGISTER FREE</button>
-                <p class="text-center mt-6 text-sm">Have account? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="navTo('login')">Login Here</span></p>
+                <p class="text-center mt-6 text-sm">Have account? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="navTo('login')">Login</span></p>
             </div>
         </section>
 
         <!-- 3. USER DASHBOARD -->
         <section id="view-dashboard" class="hidden-section">
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-                <!-- Profile Sidebar -->
-                <div class="glass-panel p-4 lg:col-span-1 h-fit">
+                <div class="glass-panel p-4 lg:col-span-1">
                     <div class="text-center mb-4">
-                        <div class="w-16 h-16 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full mx-auto flex items-center justify-center text-2xl text-white mb-2 shadow-lg">
-                            <i class="fas fa-user"></i>
-                        </div>
+                        <div class="w-16 h-16 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full mx-auto flex items-center justify-center text-2xl text-white mb-2"><i class="fas fa-user"></i></div>
                         <h3 class="text-lg font-bold" id="dash-user-display">Loading...</h3>
-                        <p class="text-xs text-purple-500 font-mono" id="dash-uac-display">...</p>
+                        <p class="text-xs text-purple-500" id="dash-uac-display">...</p>
                         <p class="text-xs text-gray-600" id="dash-customer-name"></p>
                     </div>
-                    <div class="space-y-2 text-xs">                        <div class="bg-white/50 p-2 rounded flex justify-between items-center">
-                            <strong>Status:</strong> <span id="dash-status" class="badge badge-active">ACTIVE</span>
-                        </div>
+                    <div class="space-y-2 text-xs">
+                        <div class="bg-white/50 p-2 rounded"><strong>Status:</strong> <span id="dash-status" class="badge badge-active">ACTIVE</span></div>
                         <div class="bg-white/50 p-2 rounded"><strong>Phone:</strong> <span id="dash-phone">-</span></div>
-                        <label class="block mt-3 font-bold text-gray-700">📍 Shipping Address</label>
-                        <textarea id="dash-address" rows="3" class="text-xs" placeholder="House No, Building, Street, Unit, Postal Code..."></textarea>
-                        <div class="flex gap-2 mb-2">
-                            <label class="text-[10px] flex items-center gap-1"><input type="checkbox" class="w-3 h-3 accent-purple-500"> Frequent</label>
-                            <select class="w-auto py-0 px-1 text-[10px] m-0 bg-white"><option>Home</option><option>Work</option></select>
-                        </div>
-                        <button onclick="updateProfile()" class="bg-purple-500 text-white px-3 py-1.5 rounded-lg text-xs w-full shadow hover:bg-purple-600 transition">Save Changes</button>
-                        <button onclick="deleteAccount()" class="bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs w-full mt-2 hover:bg-red-200 transition">Delete Account Permanently</button>
+                        <label class="block mt-3 font-bold">📍 Shipping Address</label>
+                        <textarea id="dash-address" rows="3" class="text-xs" placeholder="House No, Building, Street..."></textarea>
+                        <button onclick="updateProfile()" class="bg-purple-500 text-white px-3 py-1.5 rounded-lg text-xs w-full">Save Changes</button>
+                        <button onclick="deleteAccount()" class="bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs w-full mt-2">Delete Account</button>
                     </div>
                 </div>
-
-                <!-- Order History Tabs -->
                 <div class="glass-panel p-4 lg:col-span-3">
-                    <h3 class="text-lg font-bold mb-4 flex justify-between items-center">
-                        My Orders 
-                        <span class="text-[10px] bg-purple-100 text-purple-600 px-2 py-1 rounded-full animate-pulse">Live Update</span>
-                    </h3>
+                    <h3 class="text-lg font-bold mb-4">My Orders <span class="text-[10px] bg-purple-100 text-purple-600 px-2 py-1 rounded-full">Live Update</span></h3>
                     <div id="dashboard-message"></div>
-                    
-                    <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar">
-                        <button onclick="filterOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 transition">All</button>
-                        <button onclick="filterOrders('To Pay')" class="px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200 transition">To Pay</button>
-                        <button onclick="filterOrders('To Ship')" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200 transition">To Ship</button>
-                        <button onclick="filterOrders('To Receive')" class="px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200 transition">To Receive</button>
-                        <button onclick="filterOrders('Completed')" class="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200 transition">Completed</button>
-                        <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200 transition">Return/Refund</button>
-                        <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200 transition">Cancelled</button>
+                    <div class="flex overflow-x-auto gap-2 mb-4 pb-2">
+                        <button onclick="filterOrders('all')" class="px-3 py-1.5 rounded-lg bg-gray-200 text-xs font-bold">All</button>
+                        <button onclick="filterOrders('To Pay')" class="px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold">To Pay</button>
+                        <button onclick="filterOrders('Completed')" class="px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold">Completed</button>
+                        <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold">Cancelled</button>
                     </div>
-
-                    <div class="table-container">
-                        <table class="custom-table">
-                            <thead>
-                                <tr>
-                                    <th>Nama Item</th>
-                                    <th>Nama Customer</th>
-                                    <th>Tarikh Dibuat</th>
-                                    <th>Tarikh Selesai</th>
-                                    <th>Destination Address</th>
-                                    <th>Qty</th>
-                                    <th>Harga</th>
-                                    <th>Payment</th>
-                                    <th>Status Bayaran</th>
-                                    <th>Delivery</th>
-                                    <th>Tracking No</th>
-                                    <th>ID Pesanan</th>
-                                    <th>Rating</th>                                    <th>Tindakan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="user-order-history">
-                                <tr><td colspan="14" class="text-center py-8 text-gray-500">Memuatkan data pesanan...</td></tr>
-                            </tbody>
+                    <div class="table-container">                        <table class="custom-table">
+                            <thead><tr><th>Item</th><th>Date</th><th>Total</th><th>Status</th><th>Tracking</th><th>Action</th></tr></thead>
+                            <tbody id="user-order-history"><tr><td colspan="6" class="text-center py-8">Loading...</td></tr></tbody>
                         </table>
                     </div>
-                    <div id="no-orders-msg" class="hidden-section text-center py-8">
-                        <i class="fas fa-inbox text-4xl mb-2 opacity-50 text-gray-400"></i>
-                        <p class="text-gray-500">Belum ada sejarah pesanan.</p>
-                    </div>
+                    <div id="no-orders-msg" class="hidden-section text-center py-8"><i class="fas fa-inbox text-4xl mb-2 opacity-50"></i><p>No orders yet.</p></div>
                 </div>
             </div>
         </section>
@@ -311,202 +158,68 @@
         <!-- 4. LIVE CHAT -->
         <section id="view-chat-list" class="hidden-section">
             <div class="glass-panel p-4 h-[80vh] flex flex-col">
-                <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2">
-                    <i class="fas fa-headset"></i> Live Agent Support
-                </h2>
-                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
-                    <div class="text-center mt-10">
-                        <div class="loader mx-auto mb-2"></div>
-                        <p class="text-xs text-gray-500">Loading conversations...</p>
-                    </div>
-                </div>
-                
+                <h2 class="text-xl font-bold glitter-text mb-4"><i class="fas fa-headset"></i> Live Support</h2>
+                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2"><div class="text-center mt-10"><div class="loader mx-auto"></div></div></div>
                 <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
-                    <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2">
-                        <div class="flex items-center gap-2">
-                            <button onclick="closeChat()" class="text-gray-500 hover:text-purple-600 transition"><i class="fas fa-arrow-left"></i></button>
-                            <div>
-                                <h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3>
-                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1">
-                                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Online
-                                </span>
-                            </div>
-                        </div>
-                        <div class="flex gap-1">
-                            <button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded transition" title="Copy Chat ID"><i class="fas fa-copy"></i> ID</button>
-                            <button onclick="blockContact()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded transition" title="Block Contact"><i class="fas fa-ban"></i></button>
-                        </div>
+                    <div class="flex items-center justify-between border-b pb-2 mb-2">
+                        <button onclick="closeChat()" class="text-gray-500"><i class="fas fa-arrow-left"></i></button>
+                        <h3 id="chat-partner-name" class="font-bold text-sm"></h3>
+                        <button onclick="copyChatID()" class="text-[10px] bg-gray-200 px-2 py-1 rounded"><i class="fas fa-copy"></i> ID</button>
                     </div>
-
-                    <div id="chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 border border-white/50">
-                        <!-- Messages injected here -->
+                    <div id="chat-messages" class="flex-1 overflow-y-auto bg-white/30 rounded-xl p-2 mb-2 flex flex-col"></div>
+                    <div class="flex gap-2">
+                        <button onclick="sendLocation()" class="p-2 bg-gray-200 rounded-full" title="Location"><i class="fas fa-map-marker-alt"></i></button>
+                        <button onclick="sendOrderInfo()" class="p-2 bg-gray-200 rounded-full" title="Order Info"><i class="fas fa-receipt"></i></button>
+                        <textarea id="msg-input" rows="1" placeholder="Type..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
+                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full"><i class="fas fa-paper-plane"></i></button>
                     </div>
-                    <div class="flex gap-2 items-end bg-white/50 p-2 rounded-xl">
-                        <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Send Location"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
-                        <button onclick="sendOrderInfo()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Send Order Info"><i class="fas fa-receipt text-gray-600"></i></button>
-                        <textarea id="msg-input" rows="1" placeholder="Type message or paste image URL..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
-                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg hover:shadow-xl transition"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                    <div class="text-[10px] text-gray-400 mt-1 text-center">
-                        Auto-update 1s • Text & Image URLs Only (No Storage)
-                    </div>
+                    <div class="text-[10px] text-gray-400 mt-1 text-center">Auto-update • Text & Links Only</div>
                 </div>
             </div>
         </section>
 
         <!-- 5. ADMIN DASHBOARD -->
         <section id="view-admin" class="hidden-section">
-            <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white rounded-2xl shadow-xl">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl md:text-3xl font-bold">ADMIN COMMAND CENTER</h2>
-                        <p class="text-white/80 text-xs md:text-sm">Urus Pesanan, Pelanggan, Produk & Live Chat</p>
-                    </div>
-                    <i class="fas fa-shield-alt text-4xl md:text-5xl opacity-50"></i>
-                </div>
+            <div class="glass-panel p-4 mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white rounded-2xl shadow-xl">
+                <h2 class="text-2xl font-bold">ADMIN COMMAND CENTER</h2>
+                <p class="text-white/80 text-xs">Manage Everything</p>
             </div>
-
-            <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
-                <button onclick="showAdminTab('tab-orders')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-receipt mr-1"></i> Orders</button>
-                <button onclick="showAdminTab('tab-products')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-box mr-1"></i> Products</button>
-                <button onclick="showAdminTab('tab-users')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-users mr-1"></i> Users</button>
+            <div class="flex gap-2 mb-4 overflow-x-auto">
+                <button onclick="showAdminTab('tab-orders')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs">Orders</button>
+                <button onclick="showAdminTab('tab-products')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs">Products</button>
+                <button onclick="showAdminTab('tab-users')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs">Users</button>
             </div>
             
-            <!-- Tab: Orders -->
-            <div id="tab-orders" class="admin-tab glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4 text-purple-700">Jadual Pengesahan & Urusan Pesanan</h3>
-                <div class="table-container">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>UAC</th>
-                                <th>Username</th>
-                                <th>Nama Item</th>
-                                <th>Kode Unik</th>
-                                <th>Address</th>
-                                <th>Qty</th>
-                                <th>Total</th>
-                                <th>Payment Method</th>
-                                <th>Payment Status</th>
-                                <th>Delivery Status</th>
-                                <th>Tracking No</th>
-                                <th>ID Pesanan</th>                                <th>Current Status (Admin Note)</th>
-                                <th>Category</th>
-                                <th>Tindakan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-order-list"></tbody>
-                    </table>
+            <div id="tab-orders" class="admin-tab glass-panel p-4 mb-6">
+                <h3 class="font-bold mb-4 text-purple-700">All Orders</h3>
+                <div class="table-container"><table class="custom-table"><thead><tr><th>User</th><th>Item</th><th>Total</th><th>Status</th><th>Action</th></tr></thead><tbody id="admin-order-list"></tbody></table></div>
+            </div>
+                        <div id="tab-products" class="admin-tab hidden-section glass-panel p-4 mb-6">
+                <h3 class="font-bold mb-4 text-purple-700">Add Product (Paste Image URL)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white/30 p-4 rounded-xl">
+                    <input type="text" id="prod-name" placeholder="Name">
+                    <input type="number" id="prod-price" placeholder="Price (RM)">
+                    <input type="text" id="prod-desc" placeholder="Description" class="md:col-span-2">
+                    <input type="url" id="prod-img-url" placeholder="Image URL (https://...)" class="md:col-span-2">
+                    <select id="prod-status" class="md:col-span-2"><option value="Public">Public</option><option value="Out of Stock">Out of Stock</option></select>
                 </div>
+                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4">Add Product</button>
+                <h3 class="font-bold mt-8 mb-4 text-purple-700">Product List</h3>
+                <div class="table-container"><table class="custom-table"><thead><tr><th>Img</th><th>Name</th><th>Price</th><th>Action</th></tr></thead><tbody id="admin-prod-list"></tbody></table></div>
             </div>
 
-            <!-- Tab: Products -->
-            <div id="tab-products" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4 text-purple-700">Tambah Produk Baharu (Paste Image URL)</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white/30 p-4 rounded-xl">
-                    <input type="text" id="prod-name" placeholder="Nama Item">
-                    <input type="number" id="prod-price" placeholder="Harga Jualan (RM)">
-                    <input type="text" id="prod-variation" placeholder="Variasi (Size/Color)">
-                    <input type="text" id="prod-country" placeholder="Negara Asal">
-                    <input type="text" id="prod-event" placeholder="Event Label">
-                    <input type="text" id="prod-label" placeholder="Label Item">
-                    <select id="prod-status" class="md:col-span-2">
-                        <option value="Public">✅ Public</option>
-                        <option value="Private">🔒 Private</option>
-                        <option value="Out of Stock">❌ Out of Stock</option>
-                    </select>
-                    <input type="url" id="prod-img-url" placeholder="Paste Image URL (https://...)" class="md:col-span-2">
-                    <textarea id="prod-desc" placeholder="Deskripsi Item" class="md:col-span-2"></textarea>
-                </div>
-                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
-                
-                <h3 class="font-bold mt-8 mb-4 text-purple-700">Senarai Produk Dilancarkan</h3>
-                <div class="table-container">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>BIL</th>
-                                <th>GAMBAR</th>
-                                <th>NAMA ITEM</th>
-                                <th>HARGA</th>
-                                <th>RATING</th>
-                                <th>STATUS</th>
-                                <th>TOTAL SOLD</th>
-                                <th>REVENUE</th>
-                                <th>EDIT</th>
-                                <th>PADAM</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-prod-list"></tbody>
-                    </table>
-                </div>            </div>
-
-            <!-- Tab: Users -->
-            <div id="tab-users" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4 text-purple-700">Jadual Database Pelanggan</h3>
-                <div class="table-container">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>UAC</th>
-                                <th>Username</th>
-                                <th>Customer Name</th>
-                                <th>Phone</th>
-                                <th>Address</th>
-                                <th>Status</th>
-                                <th>Last Login</th>
-                                <th>Tindakan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-user-list"></tbody>
-                    </table>
-                </div>
-                
-                <h3 class="font-bold mt-8 mb-4 text-red-600">Senarai Hitam (Blacklist)</h3>
-                <div class="table-container border-2 border-red-100">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>UAC</th>
-                                <th>Username</th>
-                                <th>Status</th>
-                                <th>Log Cache</th>
-                                <th>Tindakan</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-blacklist-list"></tbody>
-                    </table>
-                </div>
+            <div id="tab-users" class="admin-tab hidden-section glass-panel p-4 mb-6">
+                <h3 class="font-bold mb-4 text-purple-700">Users</h3>
+                <div class="table-container"><table class="custom-table"><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Action</th></tr></thead><tbody id="admin-user-list"></tbody></table></div>
             </div>
         </section>
 
         <!-- Admin Shopping Mode -->
         <section id="view-admin-shopping" class="hidden-section">
-            <div class="glass-panel p-4 mb-6 bg-gradient-to-r from-pink-600 via-purple-600 to-pink-600 text-white rounded-2xl shadow-xl">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl md:text-3xl font-bold">ADMIN SHOPPING MODE</h2>
-                        <p class="text-white/80 text-xs md:text-sm">Beli-belah seperti pelanggan biasa</p>
-                    </div>
-                    <i class="fas fa-shopping-bag text-4xl md:text-5xl opacity-50"></i>                </div>
+            <div class="glass-panel p-4 mb-6 bg-gradient-to-r from-pink-600 via-purple-600 to-pink-600 text-white rounded-2xl">
+                <h2 class="text-2xl font-bold">ADMIN SHOPPING MODE</h2>
             </div>
-            <div class="glass-panel p-3 mb-4 flex gap-3">
-                <div class="relative w-full md:w-1/2">
-                    <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                    <input type="text" id="admin-search-bar" placeholder="Search Product..." class="pl-10 m-0" onkeyup="renderCatalog()">
-                </div>
-                <select id="admin-filter-sort" class="md:w-1/4 m-0" onchange="renderCatalog()">
-                    <option value="default">🔥 Trending</option>
-                    <option value="highest">💰 Highest Sales</option>
-                    <option value="event">🎉 Event Based</option>
-                </select>
-            </div>
-            <div id="admin-product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
-                <div class="col-span-full text-center py-20">
-                    <div class="loader mx-auto mb-4"></div>
-                    <p class="text-gray-600 font-bold animate-pulse">Loading Catalog...</p>
-                </div>
-            </div>
+            <div id="admin-product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"></div>
         </section>
 
     </main>
@@ -514,68 +227,40 @@
     <!-- CART MODAL -->
     <div id="modal-cart" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500 transition">&times;</button>
-            <h2 class="text-2xl font-bold mb-4 glitter-text">Saved Order Cart</h2>
+            <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-2xl">&times;</button>
+            <h2 class="text-2xl font-bold mb-4 glitter-text">Cart</h2>
             <div id="cart-items" class="space-y-3 mb-6"></div>
-            <div class="border-t-2 border-dashed border-gray-300 pt-4 flex justify-between items-center">
-                <span class="font-bold text-lg text-gray-700">Jumlah Keseluruhan:</span>
-                <span id="cart-total" class="text-2xl font-bold text-purple-600">RM 0.00</span>
+            <div class="border-t-2 border-dashed pt-4 flex justify-between"><span class="font-bold">Total:</span><span id="cart-total" class="text-2xl font-bold text-purple-600">RM 0.00</span></div>
+            <div class="mt-6 bg-purple-50 p-5 rounded-xl text-xs">
+                <p class="font-bold text-purple-700 mb-2">Payment:</p>
+                <ol class="list-decimal pl-5 space-y-1"><li>Sociabuzz: <a href="https://sociabuzz.com/fareezonzz_019/give" class="text-blue-500 underline">Link</a></li><li>TNG: <strong>161489981218</strong></li><li>WhatsApp: +60145400413</li></ol>
             </div>
-            <div class="mt-6 bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-xl border border-purple-100">
-                <p class="font-bold text-purple-700 mb-3 flex items-center gap-2"><i class="fas fa-credit-card"></i> Payment Method</p>
-                <ol class="list-decimal pl-5 text-sm space-y-2 text-gray-700">
-                    <li>Online Payment: <a href="https://sociabuzz.com/fareezonzz_019/give" target="_blank" class="text-blue-500 underline hover:text-blue-700 font-bold">Sociabuzz Link</a></li>
-                    <li>Touch N'Go E-Wallet: <strong class="font-mono bg-white px-2 py-0.5 rounded border">161489981218</strong> (Copy & Paste)</li>
-                    <li class="text-red-500 font-semibold text-xs bg-red-50 p-2 rounded mt-2 border border-red-100">
-                        <i class="fas fa-exclamation-triangle"></i> PERINGATAN: Sila bayar jumlah tepat. Hantar bukti ke WhatsApp <strong>+60145400413</strong>. Pesanan akan dibatalkan jika tidak disahkan.
-                    </li>
-                </ol>
-                <p class="text-xs text-gray-500 mt-2 italic">Status: Admin MFD Store only can confirm.</p>
-            </div>
-            <button id="checkout-btn" onclick="submitOrder()" class="btn-glitter w-full py-4 rounded-xl font-bold mt-6 shadow-xl text-lg"><i class="fas fa-check-circle mr-2"></i>CHECK OUT</button>
-            <div id="checkout-status" class="text-center text-sm mt-2 min-h-[20px]"></div>
+            <button id="checkout-btn" onclick="submitOrder()" class="btn-glitter w-full py-4 rounded-xl font-bold mt-6">CHECK OUT</button>
+            <div id="checkout-status" class="text-center text-sm mt-2"></div>
         </div>
     </div>
 
-    <!-- PRODUCT DETAIL MODAL -->    <div id="product-modal" class="hidden-section fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target===this) closeProductModal()">
-        <div class="glass-panel p-6 max-w-3xl max-h-[90vh] overflow-y-auto relative">
-            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500 transition">&times;</button>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <img id="modal-img" src="" class="w-full h-64 object-cover rounded-lg shadow-md">
-                </div>
+    <!-- PRODUCT MODAL -->
+    <div id="product-modal" class="hidden-section fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onclick="if(event.target===this) closeProductModal()">
+        <div class="glass-panel p-6 max-w-2xl max-h-[90vh] overflow-y-auto">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-2xl">&times;</button>            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div><img id="modal-img" src="" class="w-full h-64 object-cover rounded-lg"></div>
                 <div>
                     <h2 id="modal-name" class="text-2xl font-bold glitter-text mb-2"></h2>
                     <p id="modal-price" class="text-xl text-purple-600 font-bold mb-2"></p>
-                    <p id="modal-variation" class="text-sm text-gray-600 mb-2 italic"></p>
-                    <p id="modal-desc" class="text-sm text-gray-700 mb-4 leading-relaxed"></p>
-                    
-                    <div class="flex gap-4 mb-4 text-sm">
-                        <span class="flex items-center gap-1"><i class="fas fa-star text-yellow-500"></i> <span id="modal-rating"></span></span>
-                        <span class="flex items-center gap-1"><i class="fas fa-shopping-cart text-purple-500"></i> Sold: <span id="modal-sold"></span></span>
-                        <span class="flex items-center gap-1"><i class="fas fa-globe text-blue-500"></i> <span id="modal-country"></span></span>
-                    </div>
-
-                    <div class="bg-white/50 p-3 rounded-lg mb-4">
-                        <h4 class="font-bold text-xs text-gray-500 uppercase mb-2">Buyer Reviews</h4>
-                        <div id="modal-reviews" class="text-xs text-gray-600">
-                            <p class="italic">No reviews yet.</p>
-                        </div>
-                    </div>
-
-                    <button id="modal-add-cart" class="btn-glitter w-full py-3 rounded-lg font-bold shadow-lg hover:shadow-xl transition">Add Order Cart</button>
+                    <p id="modal-desc" class="text-sm text-gray-700 mb-4"></p>
+                    <button id="modal-add-cart" class="btn-glitter w-full py-3 rounded-lg font-bold">Add Order Cart</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- FIREBASE LOGIC (OPTIMIZED & NO STORAGE) -->
+    <!-- FIREBASE LOGIC (FIXED) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = {
             apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
             authDomain: "mfd-store.firebaseapp.com",
@@ -586,9 +271,9 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // --- STATE MANAGEMENT ---
         let currentUser = null;
         let userData = {};
         let cart = [];
@@ -600,42 +285,25 @@
         let isAdminMode = false;
         let selectedProduct = null;
         
-        // CACHING SYSTEM (INSTANT LOAD - 30 SECONDS)
+        // CACHING SYSTEM
         let productsCache = null;
         let productsCacheTime = 0;
-        const CACHE_DURATION = 30000; 
+        const CACHE_DURATION = 30000;
 
-        // --- SOUND EFFECTS ---
         window.playSound = (type) => {
-            const sounds = { 
-                'click': document.getElementById('snd-click'), 
-                'success': document.getElementById('snd-success'), 
-                'error': document.getElementById('snd-error'), 
-                'msg': document.getElementById('snd-msg') 
-            };
-            if(sounds[type]) { 
-                sounds[type].currentTime = 0; 
-                sounds[type].play().catch(()=>{}); 
-            }
-        };
+            const sounds = { 'click': document.getElementById('snd-click'), 'success': document.getElementById('snd-success'), 'error': document.getElementById('snd-error'), 'msg': document.getElementById('snd-msg') };
+            if(sounds[type]) { sounds[type].currentTime = 0; sounds[type].play().catch(()=>{}); }        };
 
-        // --- NAVIGATION SYSTEM ---
         window.navTo = (id) => {
             playSound('click');
             document.querySelectorAll('section').forEach(el => el.classList.add('hidden-section'));
-            const targetMap = {
-                'home': 'view-home', 'login': 'view-login', 'register': 'view-register',
-                'dashboard': 'view-dashboard', 'chat-list': 'view-chat-list',
-                'admin': 'view-admin', 'admin-shopping': 'view-admin-shopping'
-            };
-            const target = document.getElementById(targetMap[id]);
+            const target = document.getElementById(id === 'home' ? 'view-home' : (id === 'login' ? 'view-login' : (id === 'register' ? 'view-register' : (id === 'dashboard' ? 'view-dashboard' : (id === 'chat-list' ? 'view-chat-list' : (id === 'admin' ? 'view-admin' : 'view-admin-shopping'))))));
             if(target) target.classList.remove('hidden-section');
-            
             if(id === 'home' || id === 'admin-shopping') renderCatalog();
             if(id === 'dashboard') loadUserData();
             if(id === 'admin') loadAdminData();
             if(id === 'chat-list') loadChatList();
-            window.scrollTo(0,0);        };
+        };
 
         window.showAdminTab = (id) => {
             document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden-section'));
@@ -650,46 +318,53 @@
         window.toggleAdminMode = () => {
             isAdminMode = !isAdminMode;
             playSound('click');
-            if(isAdminMode) { 
-                navTo('admin'); 
-                document.getElementById('admin-mode-btn').innerHTML = '<i class="fas fa-shopping-bag mr-1"></i> Shopping Mode'; 
-            } else { 
-                navTo('admin-shopping'); 
-                document.getElementById('admin-mode-btn').innerHTML = '<i class="fas fa-user-shield mr-1"></i> Admin Mode'; 
-            }
+            if(isAdminMode) { navTo('admin'); document.getElementById('admin-mode-btn').innerText = 'Shopping Mode'; }
+            else { navTo('admin-shopping'); document.getElementById('admin-mode-btn').innerText = 'Admin Mode'; }
         };
 
-        // --- AUTHENTICATION ---
+        // --- FIXED REGISTER FUNCTION ---
         window.doRegister = async () => {
-            const name = document.getElementById('reg-name').value;
+            const name = document.getElementById('reg-name').value.trim();
             const email = document.getElementById('reg-email').value;
             const pass = document.getElementById('reg-pass').value;
             const phone = document.getElementById('reg-phone').value;
             const msgDiv = document.getElementById('reg-msg');
             
-            if(!email || !pass || !name) { msgDiv.innerHTML = '<div class="error-box">❌ Sila isi semua field wajib</div>'; return; }
+            // VALIDATION: Nama wajib isi
+            if(!name) { msgDiv.innerHTML = '<div class="error-box">❌ Sila masukkan Customer Name</div>'; return; }
+            if(!email || !pass) { msgDiv.innerHTML = '<div class="error-box">❌ Email & Password wajib diisi</div>'; return; }
             
             try {
                 const cred = await createUserWithEmailAndPassword(auth, email, pass);
                 const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+                
+                // PASTIKAN SEMUA FIELD ADA VALUE (Tiada undefined)
                 await setDoc(doc(db, "users", cred.user.uid), { 
-                    username: name, customerName: name, email, phone, uac, role: 'customer', status: 'ACTIVE', address: '', createdAt: serverTimestamp(), logCache: serverTimestamp() 
+                    username: name, 
+                    customerName: name, // Fallback ke name jika kosong                    email: email, 
+                    phone: phone || 'N/A', 
+                    uac: uac, 
+                    role: 'customer', 
+                    status: 'ACTIVE', 
+                    address: '', 
+                    createdAt: serverTimestamp(), 
+                    logCache: serverTimestamp() 
                 });
-                msgDiv.innerHTML = '<div class="success-box">✅ Pendaftaran Berjaya! Mengalih ke login...</div>';
+                
+                msgDiv.innerHTML = '<div class="success-box">✅ Pendaftaran Berjaya! Sila login.</div>';
                 setTimeout(() => { navTo('login'); }, 2000);
             } catch(e) {
                 let errMsg = e.message;
-                if(e.code === 'auth/email-already-in-use') errMsg = "Email telah digunakan.";
+                if(e.code === 'auth/email-already-in-use') errMsg = "Email sudah digunakan.";
                 msgDiv.innerHTML = `<div class="error-box">❌ ${errMsg}</div>`;
             }
         };
 
-        window.doLogin = async () => {            const email = document.getElementById('login-email').value;
+        window.doLogin = async () => {
+            const email = document.getElementById('login-email').value;
             const pass = document.getElementById('login-pass').value;
             const msgDiv = document.getElementById('login-msg');
-            
             if(!email || !pass) { msgDiv.innerHTML = '<div class="error-box">❌ Masukkan email & password</div>'; return; }
-            
             try {
                 await signInWithEmailAndPassword(auth, email, pass);
             } catch(e) {
@@ -700,15 +375,8 @@
         };
 
         window.logout = () => { signOut(auth); };
-        window.deleteAccount = async () => { 
-            if(confirm("Adakah anda pasti? Status akaun akan ditukar kepada INACTIVE.")) { 
-                await updateDoc(doc(db, "users", currentUser.uid), { status: 'INACTIVE' }); 
-                signOut(auth); 
-                alert("✅ Akaun dinyahaktifkan."); 
-            } 
-        };
+        window.deleteAccount = async () => { if(confirm("Delete account?")) { await updateDoc(doc(db, "users", currentUser.uid), { status: 'INACTIVE' }); signOut(auth); alert("Account deactivated"); } };
 
-        // --- PRODUCTS SYSTEM (CACHED) ---
         async function loadProducts() {
             const now = Date.now();
             if(productsCache && (now - productsCacheTime) < CACHE_DURATION) {
@@ -722,38 +390,20 @@
                 productsCache = allProducts;
                 productsCacheTime = now;
                 renderCatalog();
-            } catch(e) { console.error(e); }
-        }
+            } catch(e) { console.error(e); }        }
 
         window.renderCatalog = () => {
-            const searchInput = document.getElementById('search-bar');
-            const sortInput = document.getElementById('filter-sort');
-            const adminSearch = document.getElementById('admin-search-bar');
-            const adminSort = document.getElementById('admin-filter-sort');
-            
-            const search = (searchInput ? searchInput.value : (adminSearch ? adminSearch.value : '')).toLowerCase();
-            const sort = (sortInput ? sortInput.value : (adminSort ? adminSort.value : 'default'));
-                        const grid = document.getElementById('product-grid');
+            const search = document.getElementById('search-bar').value.toLowerCase();
+            const grid = document.getElementById('product-grid');
             const adminGrid = document.getElementById('admin-product-grid');
-            
             let filtered = allProducts.filter(p => p.status === 'Public' && p.name.toLowerCase().includes(search));
-            
-            if(sort === 'highest') filtered.sort((a,b) => (b.totalSold || 0) - (a.totalSold || 0));
-            if(sort === 'event') filtered = filtered.filter(p => p.event);
-            
-            const html = filtered.map(p => `
-                <div class="glass-panel p-3 cursor-pointer hover:shadow-lg transition flex flex-col h-full" onclick="openProductModal('${p.id}')">
-                    <img src="${p.imageUrl||'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg mb-2 bg-gray-100">
-                    <h3 class="font-bold text-sm text-gray-800 leading-tight flex-grow">${p.name}</h3>
-                    ${p.event ? `<span class="text-[10px] text-pink-600 font-bold mt-1">#${p.event}</span>` : ''}
-                    <div class="flex justify-between items-center mt-2">
-                        <span class="text-purple-600 font-bold text-sm">RM ${p.price}</span>
-                        <button onclick="event.stopPropagation(); addToCart('${p.id}')" class="bg-purple-600 hover:bg-purple-700 text-white text-[10px] px-2 py-1 rounded transition">Add</button>
-                    </div>
-                </div>`).join('');
-            
-            if(grid) grid.innerHTML = html || '<div class="col-span-full text-center text-gray-500 py-10">Tiada produk dijumpai.</div>';
-            if(adminGrid) adminGrid.innerHTML = html || '<div class="col-span-full text-center text-gray-500 py-10">Tiada produk dijumpai.</div>';
+            const html = filtered.map(p => `<div class="glass-panel p-3 cursor-pointer hover:shadow-lg transition" onclick="openProductModal('${p.id}')">
+                <img src="${p.imageUrl||'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg mb-2">
+                <h3 class="font-bold text-sm">${p.name}</h3>
+                <div class="flex justify-between items-center mt-2"><span class="text-purple-600 font-bold text-sm">RM ${p.price}</span><button onclick="event.stopPropagation(); addToCart('${p.id}')" class="bg-purple-600 text-white text-xs px-2 py-1 rounded">Add</button></div>
+            </div>`).join('');
+            if(grid) grid.innerHTML = html;
+            if(adminGrid) adminGrid.innerHTML = html;
         };
 
         window.openProductModal = (id) => {
@@ -762,198 +412,119 @@
             document.getElementById('modal-img').src = selectedProduct.imageUrl || 'https://via.placeholder.com/150';
             document.getElementById('modal-name').innerText = selectedProduct.name;
             document.getElementById('modal-price').innerText = `RM ${selectedProduct.price}`;
-            document.getElementById('modal-variation').innerText = selectedProduct.variation || '';
             document.getElementById('modal-desc').innerText = selectedProduct.description || '';
-            document.getElementById('modal-rating').innerText = selectedProduct.rating || 5.0;
-            document.getElementById('modal-sold').innerText = selectedProduct.totalSold || 0;
-            document.getElementById('modal-country').innerText = selectedProduct.country || '-';
             document.getElementById('modal-add-cart').onclick = () => { addToCart(selectedProduct.id); closeProductModal(); playSound('success'); };
             document.getElementById('product-modal').classList.remove('hidden-section');
             playSound('click');
         };
         window.closeProductModal = () => { document.getElementById('product-modal').classList.add('hidden-section'); selectedProduct = null; };
-        window.addToCart = (id) => { cart.push(allProducts.find(x=>x.id===id)); document.getElementById('cart-count').innerText = cart.length; playSound('success'); alert("✅ Item ditambah ke cart!"); };
+        window.addToCart = (id) => { cart.push(allProducts.find(x=>x.id===id)); document.getElementById('cart-count').innerText = cart.length; alert("Added to cart!"); };
 
         function renderCartItems() {
             const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
-            if(cart.length===0) { 
-                document.getElementById('cart-items').innerHTML = "<p class='text-center text-gray-500'>Cart kosong.</p>"; 
-                document.getElementById('cart-total').innerText = "RM 0.00"; 
-                document.getElementById('checkout-btn').disabled = true; 
-                document.getElementById('checkout-btn').innerText = "CHECK OUT (Disabled)";
-                return; 
-            }            document.getElementById('checkout-btn').disabled = false;
-            document.getElementById('checkout-btn').innerText = "CHECK OUT";
-            document.getElementById('cart-items').innerHTML = cart.map((i,idx)=>`
-                <div class="flex gap-3 bg-white/60 p-3 rounded-lg items-center">
-                    <img src="${i.imageUrl||'https://via.placeholder.com/50'}" class="w-12 h-12 object-cover rounded">
-                    <div class="flex-1">
-                        <div class="font-bold text-sm">${i.name}</div>
-                        <div class="text-[10px] text-gray-500">Var: ${i.variation||'-'}</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="font-bold text-purple-600 text-xs">RM ${i.price}</div>
-                        <button onclick="cart.splice(${idx},1);renderCartItems()" class="text-red-500 text-xs hover:underline"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`).join('');
+            if(cart.length===0) { document.getElementById('cart-items').innerHTML = "<p class='text-center'>Cart empty.</p>"; document.getElementById('cart-total').innerText = "RM 0.00"; document.getElementById('checkout-btn').disabled = true; return; }
+            document.getElementById('checkout-btn').disabled = false;
+            document.getElementById('cart-items').innerHTML = cart.map((i,idx)=>`<div class="flex justify-between items-center bg-white/60 p-2 rounded"><span class="text-sm font-bold">${i.name}</span><span class="text-purple-600 font-bold">RM ${i.price}</span><button onclick="cart.splice(${idx},1);renderCartItems()" class="text-red-500"><i class="fas fa-trash"></i></button></div>`).join('');
             document.getElementById('cart-total').innerText = "RM "+total.toFixed(2);
         }
 
+        // --- FIXED SUBMIT ORDER FUNCTION ---
         window.submitOrder = async () => {
             const btn = document.getElementById('checkout-btn');
             const statusDiv = document.getElementById('checkout-status');
-            if(!currentUser) { statusDiv.innerHTML = '<span class="text-red-500">❌ Sila login dahulu</span>'; return; }
-            if(cart.length===0) { statusDiv.innerHTML = '<span class="text-red-500">❌ Cart kosong</span>'; return; }
-            if(!userData.address) { statusDiv.innerHTML = '<span class="text-red-500">❌ Sila masukkan alamat di Dashboard</span>'; return; }
             
-            btn.disabled = true; btn.innerText = 'Processing...';
+            if(!currentUser) { statusDiv.innerHTML = '<span class="text-red-500">Please login first</span>'; return; }
+            if(cart.length===0) { statusDiv.innerHTML = '<span class="text-red-500">Cart empty</span>'; return; }
+            if(!userData.address) { statusDiv.innerHTML = '<span class="text-red-500">Please add address in Dashboard</span>'; return; }
+            
+            // SAFETY CHECK: Pastikan customerName wujud
+            const safeCustomerName = userData.customerName || userData.username || "Unknown Customer";
+                        btn.disabled = true; btn.innerText = 'Processing...';
             try {
                 const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
-                const orderId = "ORD-"+Date.now().toString().substr(-6);
-                await addDoc(collection(db, "orders"), { 
-                    userId: currentUser.uid, uac: userData.uac, username: userData.username, customerName: userData.customerName, 
-                    items: cart, total: total, address: userData.address, orderId: orderId, 
-                    paymentMethod: "Manual Transfer", paymentStatus: "Not Verified", status: "To Pay", 
-                    deliveryStatus: "Pending", orderCategory: "To Pay", dateCreated: serverTimestamp(), dateCompleted: null,
-                    trackingNo: "", adminNote: ""
-                });
+                
+                // DATA OBJECT YANG SIAP (Tiada undefined)
+                const orderData = {
+                    userId: currentUser.uid,
+                    uac: userData.uac || "UNKNOWN",
+                    username: userData.username || "Unknown",
+                    customerName: safeCustomerName, // GUNA VARIABLE YANG SUDAH DISAFEKAN
+                    items: cart,
+                    total: total,
+                    address: userData.address,
+                    orderId: "ORD-"+Date.now().toString().substr(-6),
+                    paymentMethod: "Manual",
+                    paymentStatus: "Not Verified",
+                    status: "To Pay",
+                    deliveryStatus: "Pending",
+                    orderCategory: "To Pay",
+                    dateCreated: serverTimestamp()
+                };
+
+                console.log("Submitting Order:", orderData); // DEBUG LOG
+                await addDoc(collection(db, "orders"), orderData);
+                
                 cart = []; document.getElementById('cart-count').innerText = 0;
                 btn.disabled = false; btn.innerText = 'CHECK OUT';
-                statusDiv.innerHTML = '<span class="text-green-600 font-bold">✅ Pesanan Berjaya! Sila buat pembayaran.</span>';
-                setTimeout(() => { toggleCartModal(); navTo('dashboard'); statusDiv.innerHTML = ''; }, 2500);
-            } catch(e) { 
-                btn.disabled = false; btn.innerText = 'CHECK OUT'; 
-                statusDiv.innerHTML = `<span class="text-red-500">❌ Ralat: ${e.message}</span>`; 
+                statusDiv.innerHTML = '<span class="text-green-600">✅ Order Placed! Check Dashboard.</span>';
+                setTimeout(() => { toggleCartModal(); navTo('dashboard'); }, 2000);
+            } catch(e) {
+                console.error("Order Error:", e);
+                btn.disabled = false; btn.innerText = 'CHECK OUT';
+                statusDiv.innerHTML = `<span class="text-red-500">Error: ${e.message}</span>`;
             }
         };
 
-        // --- USER DATA & ORDERS ---
         async function loadUserData() {
             if(!currentUser) return;
             if(unsubscribeOrders) unsubscribeOrders();
-                        onSnapshot(doc(db, "users", currentUser.uid), (d)=>{ 
+            onSnapshot(doc(db, "users", currentUser.uid), (d)=>{ 
                 if(d.exists()){ 
                     userData=d.data(); 
-                    document.getElementById('nav-username').innerText = userData.username;
-                    document.getElementById('nav-uac').innerText = userData.uac;
-                    document.getElementById('dash-user-display').innerText = userData.username;
-                    document.getElementById('dash-uac-display').innerText = userData.uac;
-                    document.getElementById('dash-customer-name').innerText = userData.customerName || '';
-                    document.getElementById('dash-phone').innerText = userData.phone;
-                    document.getElementById('dash-address').value = userData.address || '';
-                    const s = document.getElementById('dash-status'); 
-                    s.innerText = userData.status; 
-                    s.className = `badge ${userData.status==='ACTIVE'?'badge-active':'badge-cancelled'}`;
+                    // Fallback jika data hilang
+                    if(!userData.customerName) userData.customerName = userData.username;
+                    updateDashUI(); 
                 }
             });
-
             const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
-            unsubscribeOrders = onSnapshot(q, (snap) => { 
-                allUserOrders = []; 
-                snap.forEach(d => allUserOrders.push({id:d.id, ...d.data()})); 
-                filterOrders('all'); 
-            }, (error) => { console.error(error); });
+            unsubscribeOrders = onSnapshot(q, (snap) => { allUserOrders = []; snap.forEach(d => allUserOrders.push({id:d.id, ...d.data()})); filterOrders('all'); }, (error) => { console.error(error); });
         }
-
-        window.updateProfile = async () => { 
-            await updateDoc(doc(db, "users", currentUser.uid), { address: document.getElementById('dash-address').value, logCache: serverTimestamp() }); 
-            playSound('success'); alert("✅ Profil dikemaskini!"); 
-        };
+        function updateDashUI() {
+            document.getElementById('nav-username').innerText = userData.username;
+            document.getElementById('nav-uac').innerText = userData.uac;
+            document.getElementById('dash-user-display').innerText = userData.username;
+            document.getElementById('dash-uac-display').innerText = userData.uac;
+            document.getElementById('dash-customer-name').innerText = userData.customerName || '';
+            document.getElementById('dash-phone').innerText = userData.phone;
+            document.getElementById('dash-address').value = userData.address || '';
+            const s = document.getElementById('dash-status'); s.innerText = userData.status; s.className = `badge ${userData.status==='ACTIVE'?'badge-active':'badge-cancelled'}`;
+        }
 
         window.filterOrders = (status) => {
             const tbody = document.getElementById('user-order-history');
             const noMsg = document.getElementById('no-orders-msg');
-            const filtered = status === 'all' ? allUserOrders : allUserOrders.filter(o=>o.orderCategory===status || o.status===status);
-            
+            const filtered = status === 'all' ? allUserOrders : allUserOrders.filter(o=>o.status===status);
             if(filtered.length===0) { tbody.innerHTML=""; noMsg.classList.remove('hidden-section'); return; }
             noMsg.classList.add('hidden-section');
-            
             tbody.innerHTML = filtered.map(o=>{
-                const itemNames = o.items.map(i=>i.name).join(", ").substring(0, 25) + '...';
+                const itemNames = o.items.map(i=>i.name).join(", ").substring(0, 20) + '...';
                 const dateCreated = o.dateCreated ? new Date(o.dateCreated.toDate()).toLocaleDateString() : '-';
-                const dateCompleted = o.dateCompleted ? new Date(o.dateCompleted.toDate()).toLocaleDateString() : '-';
-                
-                let badgeClass = 'badge-to-pay';
-                if(o.status==='To Ship' || o.orderCategory==='To Ship') badgeClass='badge-to-ship';
-                else if(o.status==='To Receive' || o.orderCategory==='To Receive') badgeClass='badge-to-receive';
-                else if(o.status==='Completed' || o.orderCategory==='Completed') badgeClass='badge-completed';
-                else if(o.status==='Cancelled' || o.orderCategory==='Cancelled') badgeClass='badge-cancelled';
-                else if(o.status==='Return/Refund' || o.orderCategory==='Return/Refund') badgeClass='badge-refund';
-
-                let actions = '';                if(o.status==='To Pay' || o.orderCategory==='To Pay') actions = `<button onclick="cancelOrder('${o.id}')" class="action-btn btn-delete">Cancel</button>`;
-                if(o.status==='To Receive' || o.orderCategory==='To Receive') actions = `<button onclick="completeOrder('${o.id}')" class="action-btn" style="background:#9ae6b4;color:#22543d;">Received</button>`;
-                if(o.status==='Completed' || o.orderCategory==='Completed') {
-                    if(!o.userRating) actions += ` <button onclick="rateOrder('${o.id}')" class="action-btn btn-edit">Rate</button>`;
-                    else actions += ` <span class="text-yellow-500 text-xs">⭐${o.userRating}</span>`;
-                    actions += ` <button onclick="reorder('${o.id}')" class="action-btn btn-edit ml-1">Reorder</button>`;
-                }
-
-                return `<tr>
-                    <td class="truncate font-bold text-xs">${itemNames}</td>
-                    <td class="text-xs">${o.customerName||o.username}</td>
-                    <td class="text-xs">${dateCreated}</td>
-                    <td class="text-xs">${dateCompleted}</td>
-                    <td class="truncate text-[10px] max-w-[150px]" title="${o.address}">${o.address||'-'}</td>
-                    <td class="text-center text-xs">${o.items.length}</td>
-                    <td class="font-bold text-purple-600 text-xs">RM ${o.total}</td>
-                    <td class="text-[10px]">${o.paymentMethod||'Manual'}</td>
-                    <td><span class="badge ${o.paymentStatus==='Verified'?'badge-completed':'badge-to-pay'}">${o.paymentStatus}</span></td>
-                    <td><span class="badge ${o.deliveryStatus==='Delivered'?'badge-completed':'badge-to-ship'}">${o.deliveryStatus||'Pending'}</span></td>
-                    <td class="font-mono text-[10px]">${o.trackingNo||'-'}</td>
-                    <td class="font-mono text-[10px] text-gray-500">${o.orderId}</td>
-                    <td class="text-center">${o.userRating?'⭐'+o.userRating:'-'}</td>
-                    <td class="text-center whitespace-nowrap">${actions}</td>
-                </tr>`;
+                let badgeClass = o.status==='To Pay'?'badge-to-pay':o.status==='Completed'?'badge-completed':'badge-cancelled';
+                return `<tr><td class="truncate">${itemNames}</td><td>${dateCreated}</td><td>RM ${o.total}</td><td><span class="badge ${badgeClass}">${o.paymentStatus}</span></td><td class="text-[10px]">${o.trackingNo||'-'}</td><td><button onclick="alert('Feature coming soon')" class="text-blue-600 text-xs underline">View</button></td></tr>`;
             }).join('');
         };
 
-        window.cancelOrder = async (id) => { 
-            if(confirm("Batal pesanan ini?")) { 
-                await updateDoc(doc(db,"orders",id), {status:'Cancelled', orderCategory:'Cancelled'}); 
-                playSound('error'); alert("❌ Pesanan dibatalkan"); 
-            } 
-        };
-        window.completeOrder = async (id) => { 
-            await updateDoc(doc(db,"orders",id), {status:'Completed', orderCategory:'Completed', deliveryStatus:'Delivered', dateCompleted: serverTimestamp()}); 
-            playSound('success'); alert("✅ Pesanan selesai!"); 
-        };
-        window.rateOrder = async (id) => { 
-            const r=prompt("Berikan rating (1-5):","5"); 
-            if(r) { await updateDoc(doc(db,"orders",id),{userRating:parseInt(r)}); playSound('success'); alert("⭐ Terima kasih!"); } 
-        };
-        window.reorder = (id) => { 
-            const order = allUserOrders.find(o => o.id === id); 
-            if(order) { cart = [...cart, ...order.items]; document.getElementById('cart-count').innerText = cart.length; playSound('success'); alert("🛒 Item ditambah ke cart!"); toggleCartModal(); } 
-        };
+        window.updateProfile = async () => { await updateDoc(doc(db, "users", currentUser.uid), { address: document.getElementById('dash-address').value, logCache: serverTimestamp() }); alert("Saved!"); };
 
-        // --- LIVE CHAT SYSTEM (TEXT & LINKS ONLY) ---
         async function loadChatList() {
             if(!currentUser) return;
-            const listEl = document.getElementById('chat-list-view');            listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div></div>';
-            
-            // Find Admin
+            const listEl = document.getElementById('chat-list-view');
+            listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div></div>';
             const adminQuery = query(collection(db, "users"), where("role", "==", "admin"), limit(1));
             const adminSnap = await getDocs(adminQuery);
-            if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500 mt-10'>❌ Tiada Admin Online</p>"; return; }
-            
+            if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500'>No Admin Online</p>"; return; }
             const adminDoc = adminSnap.docs[0];
-            const adminId = adminDoc.id;
-            const adminName = adminDoc.data().username;
-
-            listEl.innerHTML = `
-                <div onclick="openChat('${adminId}', '${adminName}')" class="p-4 bg-white/80 hover:bg-white rounded-lg cursor-pointer border-l-4 border-purple-500 transition shadow-sm">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white shadow">
-                            <i class="fas fa-headset"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm text-gray-800">MFD Support (${adminName})</h4>
-                            <p class="text-xs text-green-600 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Online Now</p>
-                        </div>
-                    </div>
-                    <div class="text-right"><i class="fas fa-chevron-right text-gray-300"></i></div>
-                </div>
-            `;
+            listEl.innerHTML = `<div onclick="openChat('${adminDoc.id}', '${adminDoc.data().username}')" class="p-4 bg-white/80 rounded-lg cursor-pointer border-l-4 border-purple-500"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div><div><h4 class="font-bold">MFD Support</h4><p class="text-xs text-green-600">● Online</p></div></div></div>`;
         }
 
         window.openChat = (partnerId, partnerName) => {
@@ -961,228 +532,71 @@
             document.getElementById('chat-list-view').classList.add('hidden-section');
             document.getElementById('active-chat-view').classList.remove('hidden-section');
             document.getElementById('chat-partner-name').innerText = partnerName;
-            
             const chatId = [currentUser.uid, partnerId].sort().join('_');
             if(unsubscribeChat) unsubscribeChat();
-            
             const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
             unsubscribeChat = onSnapshot(q, (snap) => {
                 const msgContainer = document.getElementById('chat-messages');
-                msgContainer.innerHTML = "";
-                snap.forEach(d => {
+                msgContainer.innerHTML = "";                snap.forEach(d => {
                     const m = d.data();
                     const isMe = m.senderId === currentUser.uid;
                     let content = '';
-                    
                     if(m.type === 'text') content = `<p class="text-sm">${m.text}</p>`;
-                    else if(m.type === 'link') content = `<a href="${m.url}" target="_blank" class="text-blue-200 underline break-all">${m.text}</a>`;
-                    else if(m.type === 'location') content = `<div class="msg-location"><i class="fas fa-map-marker-alt mr-2"></i> ${m.address}</div>`;
-                    else if(m.type === 'order') content = `<div class="msg-location bg-purple-100 border-purple-300"><i class="fas fa-receipt mr-2 text-purple-600"></i> ${m.orderInfo.replace(/\n/g, '<br>')}</div>`;
-                                        msgContainer.innerHTML += `<div class="chat-bubble ${isMe?'msg-me':'msg-other'}">${content}<div class="text-[9px] opacity-70 text-right mt-1">${m.timestamp?new Date(m.timestamp.toDate()).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}):''}</div></div>`;
+                    else if(m.type === 'link') content = `<a href="${m.url}" target="_blank" class="text-blue-300 underline">${m.text}</a>`;
+                    else if(m.type === 'location') content = `<div class="msg-location"><i class="fas fa-map-marker-alt"></i> ${m.address}</div>`;
+                    else if(m.type === 'order') content = `<div class="msg-location"><i class="fas fa-receipt"></i> ${m.orderInfo}</div>`;
+                    msgContainer.innerHTML += `<div class="chat-bubble ${isMe?'msg-me':'msg-other'}">${content}</div>`;
                 });
                 msgContainer.scrollTop = msgContainer.scrollHeight;
-                if(snap.size > 0 && !document.getElementById('active-chat-view').classList.contains('hidden-section')) playSound('msg');
+                if(snap.size > 0) playSound('msg');
             });
         };
 
-        window.closeChat = () => { 
-            if(unsubscribeChat) unsubscribeChat(); 
-            document.getElementById('active-chat-view').classList.add('hidden-section'); 
-            document.getElementById('chat-list-view').classList.remove('hidden-section'); 
-            currentChatPartner = null; 
-        };
+        window.closeChat = () => { if(unsubscribeChat) unsubscribeChat(); document.getElementById('active-chat-view').classList.add('hidden-section'); document.getElementById('chat-list-view').classList.remove('hidden-section'); currentChatPartner = null; };
         
         window.sendMessage = async () => {
             const input = document.getElementById('msg-input');
             const text = input.value.trim();
             if(!text || !currentChatPartner) return;
-            
-            // Detect if URL (Image)
-            if(text.startsWith('http') && (text.match(/\.(jpeg|jpg|gif|png)$/) != null)) {
-                await saveMessage("Image", 'link', text);
-            } else {
-                await saveMessage(text, 'text');
-            }
+            if(text.startsWith('http')) { await saveMessage(text, 'link', text); } else { await saveMessage(text, 'text'); }
             input.value = '';
         };
         
         async function saveMessage(text, type, url = null, address = null, orderInfo = null) {
             const chatId = [currentUser.uid, currentChatPartner].sort().join('_');
-            await addDoc(collection(db, `chats/${chatId}/messages`), { 
-                senderId: currentUser.uid, text, type, url, address, orderInfo, timestamp: serverTimestamp() 
-            });
-            await setDoc(doc(db, "chats", chatId), { 
-                participants: [currentUser.uid, currentChatPartner], lastMessage: text, lastTime: serverTimestamp() 
-            }, {merge:true});
+            await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, text, type, url, address, orderInfo, timestamp: serverTimestamp() });
+            await setDoc(doc(db, "chats", chatId), { participants: [currentUser.uid, currentChatPartner], lastMessage: text, lastTime: serverTimestamp() }, {merge:true});
         }
 
-        window.sendLocation = async () => { 
-            const addr = prompt("Masukkan alamat atau nama lokasi:"); 
-            if(addr) { await saveMessage('', 'location', null, addr); playSound('success'); } 
-        };
-        
+        window.sendLocation = async () => { const addr = prompt("Address:"); if(addr) { await saveMessage('', 'location', null, addr); } };
         window.sendOrderInfo = async () => {
             if(allUserOrders.length > 0) {
                 const order = allUserOrders[0];
-                const orderInfo = `ID: ${order.orderId}\nTotal: RM ${order.total}\nStatus: ${order.status}`;
+                const orderInfo = `Order: ${order.orderId}\nTotal: RM ${order.total}\nStatus: ${order.status}`;
                 await saveMessage('', 'order', null, null, orderInfo);
-                playSound('success');
-            } else { alert("Tiada pesanan aktif untuk dihantar."); }        };
-        
-        window.copyChatID = () => { navigator.clipboard.writeText(currentChatPartner); playSound('success'); alert("✅ ID Disalin!"); };
-        window.blockContact = async () => { if(confirm("Block contact ini?")) { await updateDoc(doc(db, "users", currentChatPartner), {status: 'BLOCKED'}); playSound('error'); closeChat(); } };
+            } else { alert("No orders"); }
+        };
+        window.copyChatID = () => { navigator.clipboard.writeText(currentChatPartner); alert("ID Copied!"); };
 
-        // --- ADMIN FUNCTIONS ---
         window.loadAdminData = async () => {
             if(userData.role !== 'admin') return;
-            
-            // Load Orders
             const ordSnap = await getDocs(query(collection(db, "orders"), orderBy("createdAt","desc")));
-            document.getElementById('admin-order-list').innerHTML = ordSnap.docs.map(d=>{ 
-                const o=d.data(); 
-                const itemDetail = o.items.map(i=>i.name).join(', ').substring(0, 20) + '...';
-                return `<tr>
-                    <td class="font-mono text-[10px]">${o.uac}</td>
-                    <td class="font-bold text-xs">${o.username}</td>
-                    <td class="truncate text-[10px]" title="${o.items.map(i=>i.name).join(', ')}">${itemDetail}</td>
-                    <td class="font-mono text-[10px]">${o.items[0]?.uniqueCode||'-'}</td>
-                    <td class="truncate text-[10px] max-w-[150px]">${o.address||'-'}</td>
-                    <td class="text-center text-xs">${o.items.length}</td>
-                    <td class="font-bold text-purple-600 text-xs">RM ${o.total}</td>
-                    <td class="text-[10px]">${o.paymentMethod||'Manual'}</td>
-                    <td>
-                        <select onchange="updateOrderStatus('${d.id}','paymentStatus',this.value)" class="text-[10px] p-1 rounded border ${o.paymentStatus==='Verified'?'bg-green-100':'bg-yellow-100'}">
-                            <option ${o.paymentStatus==='Not Verified'?'selected':''}>Not Verified</option>
-                            <option ${o.paymentStatus==='Verified'?'selected':''}>Verified</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select onchange="updateOrderStatus('${d.id}','deliveryStatus',this.value)" class="text-[10px] p-1 rounded border">
-                            <option ${o.deliveryStatus==='Pending'?'selected':''}>Pending</option>
-                            <option ${o.deliveryStatus==='Shipping'?'selected':''}>Shipping</option>
-                            <option ${o.deliveryStatus==='Delivered'?'selected':''}>Delivered</option>
-                        </select>
-                    </td>
-                    <td><input value="${o.trackingNo||''}" onchange="updateOrderStatus('${d.id}','trackingNo',this.value)" class="text-[10px] p-1 w-20 border rounded font-mono" placeholder="Track..."></td>
-                    <td class="font-mono text-[10px] text-gray-500">${o.orderId}</td>
-                    <td><input value="${o.adminNote||''}" onchange="updateOrderStatus('${d.id}','adminNote',this.value)" class="text-[10px] p-1 w-32 border rounded" placeholder="Update status..."></td>
-                    <td>
-                        <select onchange="updateOrderStatus('${d.id}','orderCategory',this.value)" class="text-[10px] p-1 rounded border bg-white">
-                            <option ${o.orderCategory==='To Pay'?'selected':''}>To Pay</option>
-                            <option ${o.orderCategory==='To Ship'?'selected':''}>To Ship</option>
-                            <option ${o.orderCategory==='To Receive'?'selected':''}>To Receive</option>
-                            <option ${o.orderCategory==='Completed'?'selected':''}>Completed</option>
-                            <option ${o.orderCategory==='Return/Refund'?'selected':''}>Return</option>
-                            <option ${o.orderCategory==='Cancelled'?'selected':''}>Cancelled</option>
-                        </select>
-                    </td>
-                    <td><button onclick="updateOrderStatus('${d.id}','status','Cancelled')" class="action-btn btn-delete">Cancel</button></td>                </tr>`; 
-            }).join('');
-            
-            // Load Users
+            document.getElementById('admin-order-list').innerHTML = ordSnap.docs.map(d=>{ const o=d.data(); return `<tr><td>${o.username}</td><td class="truncate">${o.items.length} items</td><td>RM ${o.total}</td><td><span class="badge badge-to-pay">${o.status}</span></td><td><button onclick="updateOrderStatus('${d.id}','status','Completed')" class="text-blue-600 text-xs">Complete</button></td></tr>`; }).join('');
             const usrSnap = await getDocs(collection(db, "users"));
-            const users = usrSnap.docs.map(d=>({id:d.id, ...d.data()}));
-            
-            document.getElementById('admin-user-list').innerHTML = users.filter(u=>u.status!=='BLOCKED').map(u=>`
-                <tr>
-                    <td class="font-mono text-[10px]">${u.uac}</td>
-                    <td class="font-bold text-xs">${u.username}</td>
-                    <td class="text-xs">${u.customerName||'-'}</td>
-                    <td class="text-xs">${u.phone}</td>
-                    <td class="truncate text-[10px] max-w-[200px]">${u.address||'-'}</td>
-                    <td><span class="badge badge-active">${u.status}</span></td>
-                    <td class="text-[10px]">${u.logCache?new Date(u.logCache.toDate()).toLocaleString():'-'}</td>
-                    <td><button onclick="blockUser('${u.id}')" class="action-btn btn-delete">Block</button></td>
-                </tr>
-            `).join('');
-
-            document.getElementById('admin-blacklist-list').innerHTML = users.filter(u=>u.status==='BLOCKED').map(u=>`
-                <tr>
-                    <td class="font-mono text-[10px]">${u.uac}</td>
-                    <td class="font-bold text-red-600 text-xs">${u.username}</td>
-                    <td><span class="badge badge-blocked">BLOCKED</span></td>
-                    <td class="text-[10px]">${u.logCache?new Date(u.logCache.toDate()).toLocaleString():'-'}</td>
-                    <td><button onclick="unblockUser('${u.id}')" class="action-btn btn-edit">Unblock</button></td>
-                </tr>
-            `).join('');
-
-            // Load Products
+            document.getElementById('admin-user-list').innerHTML = usrSnap.docs.map(d=>{ const u=d.data(); return `<tr><td>${u.customerName}</td><td>${u.email}</td><td><span class="badge badge-active">${u.status}</span></td><td>-</td></tr>`; }).join('');
             const prodSnap = await getDocs(collection(db, "products"));
-            document.getElementById('admin-prod-list').innerHTML = prodSnap.docs.map((d,i)=>{ 
-                const p=d.data(); 
-                const revenue = (p.totalSold||0) * (p.price||0);
-                return `<tr>
-                    <td>${i+1}</td>
-                    <td><img src="${p.imageUrl}" class="w-8 h-8 rounded object-cover"></td>
-                    <td class="font-bold text-xs">${p.name}</td>
-                    <td class="text-xs">RM ${p.price}</td>
-                    <td class="text-xs">⭐${p.rating||5}</td>
-                    <td><span class="badge ${p.status==='Public'?'badge-active':'badge-cancelled'}">${p.status}</span></td>
-                    <td class="text-xs">${p.totalSold||0}</td>
-                    <td class="text-xs font-bold text-green-600">RM ${revenue.toFixed(2)}</td>
-                    <td><button onclick="editProduct('${d.id}')" class="action-btn btn-edit">Edit</button></td>
-                    <td><button onclick="deleteProduct('${d.id}')" class="action-btn btn-delete">Padam</button></td>
-                </tr>`; 
-            }).join('');
+            document.getElementById('admin-prod-list').innerHTML = prodSnap.docs.map(d=>{ const p=d.data(); return `<tr><td><img src="${p.imageUrl}" class="w-8 h-8 rounded"></td><td>${p.name}</td><td>RM ${p.price}</td><td><button onclick="deleteProduct('${d.id}')" class="text-red-600 text-xs">Del</button></td></tr>`; }).join('');
         };
-        window.updateOrderStatus = async (id, field, val) => { 
-            await updateDoc(doc(db, "orders", id), {[field]: val}); 
-            playSound('success'); 
-            loadAdminData(); 
-        };
-        
-        window.blockUser = async (uid) => { 
-            if(confirm("Block pengguna ini?")) { 
-                await updateDoc(doc(db, "users", uid), {status: 'BLOCKED'}); 
-                playSound('error'); 
-                loadAdminData(); 
-            } 
-        };
-        
-        window.unblockUser = async (uid) => { 
-            await updateDoc(doc(db, "users", uid), {status: 'ACTIVE'}); 
-            playSound('success'); 
-            loadAdminData(); 
-        };
-        
+        window.updateOrderStatus = async (id, field, val) => { await updateDoc(doc(db, "orders", id), {[field]: val}); loadAdminData(); };
         window.addProduct = async () => {
             const imgUrl = document.getElementById('prod-img-url').value;
-            if(!imgUrl) { playSound('error'); alert("❌ Sila paste Image URL"); return; }
-            await addDoc(collection(db, "products"), { 
-                name: document.getElementById('prod-name').value, 
-                price: parseFloat(document.getElementById('prod-price').value), 
-                description: document.getElementById('prod-desc').value, 
-                imageUrl: imgUrl, 
-                status: document.getElementById('prod-status').value, 
-                country: document.getElementById('prod-country').value,
-                event: document.getElementById('prod-event').value,
-                variation: document.getElementById('prod-variation').value,
-                label: document.getElementById('prod-label').value,
-                uniqueCode: "ITEM-"+Math.random().toString(36).substr(2,6).toUpperCase(), 
-                totalSold: 0, rating: 5.0, createdAt: serverTimestamp() 
-            });
-            playSound('success'); alert("✅ Produk dilancarkan!"); 
-            loadAdminData(); loadProducts();
-            document.querySelectorAll('#tab-products input, #tab-products textarea').forEach(i=>i.value='');
+            if(!imgUrl) { alert("Paste Image URL"); return; }
+            await addDoc(collection(db, "products"), { name: document.getElementById('prod-name').value, price: parseFloat(document.getElementById('prod-price').value), description: document.getElementById('prod-desc').value, imageUrl: imgUrl, status: document.getElementById('prod-status').value, totalSold: 0, rating: 5.0, createdAt: serverTimestamp() });
+            alert("Product Added!"); loadAdminData(); loadProducts();
+            document.querySelectorAll('#tab-products input').forEach(i=>i.value='');
         };
-        
-        window.editProduct = async (id) => { 
-            const newPrice = prompt("Masukkan harga baru:"); 
-            if(newPrice) { 
-                await updateDoc(doc(db, "products", id), {price: parseFloat(newPrice)}); 
-                playSound('success'); 
-                loadAdminData(); loadProducts(); 
-            } 
-        };
-                window.deleteProduct = async (id) => { 
-            if(confirm("Padam produk ini?")) { 
-                await deleteDoc(doc(db, "products", id)); 
-                playSound('click'); 
-                loadAdminData(); loadProducts(); 
-            } 
-        };
+        window.deleteProduct = async (id) => { if(confirm("Delete?")) { await deleteDoc(doc(db, "products", id)); loadAdminData(); loadProducts(); } };
 
-        // --- AUTH LISTENER ---
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
             if(user) {
@@ -1191,19 +605,14 @@
                 const snap = await getDoc(doc(db, "users", user.uid));
                 if(snap.exists()) {
                     userData = snap.data();
-                    if(userData.status === 'BLOCKED') { 
-                        playSound('error'); 
-                        alert("❌ Akaun anda telah diblokir."); 
-                        signOut(auth); 
-                        return; 
+                    // FIX DATA LAMA YANG KOSONG
+                    if(!userData.customerName) {
+                        userData.customerName = userData.username;
+                        await updateDoc(doc(db, "users", user.uid), { customerName: userData.username });
                     }
-                    if(userData.role === 'admin') { 
-                        document.getElementById('admin-mode-btn').classList.remove('hidden'); 
-                        navTo('admin-shopping'); // Default to shopping for admin
-                    } else { 
-                        document.getElementById('admin-mode-btn').classList.add('hidden'); 
-                        navTo('dashboard'); 
-                    }
+                    
+                    if(userData.role === 'admin') { document.getElementById('admin-mode-btn').classList.remove('hidden'); navTo('admin-shopping'); }
+                    else { document.getElementById('admin-mode-btn').classList.add('hidden'); navTo('dashboard'); }
                 }
             } else {
                 document.getElementById('auth-nav').classList.remove('hidden-section');
