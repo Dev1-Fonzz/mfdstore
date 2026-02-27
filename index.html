@@ -17,6 +17,8 @@
             --glass-bg: rgba(255, 255, 255, 0.75);
             --glass-border: rgba(255, 255, 255, 0.6);
             --text-dark: #2d3748;
+            --error-red: #e53e3e;
+            --success-green: #38a169;
         }
         body {
             font-family: 'Poppins', sans-serif;
@@ -45,10 +47,10 @@
         .glitter-text {
             background: linear-gradient(to right, #9D50BB, #FF69B4, #6E48AA, #9D50BB);
             -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            background-clip: text;            color: transparent;
             background-size: 300% auto;
-            animation: shine 4s linear infinite;            font-weight: 800;
+            animation: shine 4s linear infinite;
+            font-weight: 800;
         }
         @keyframes shine { to { background-position: 300% center; } }
         .btn-glitter {
@@ -74,19 +76,42 @@
         .msg-location { background: #e2e8f0; padding: 10px; border-radius: 10px; margin-top: 5px; font-size: 0.8rem; }
         @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         
-        /* Table Styles */
-        .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1); background: rgba(255,255,255,0.6); }
-        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1200px; font-size: 0.68rem; }
-        .custom-table th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 12px; text-align: left; font-weight: 700; border-bottom: 2px solid #e2e8f0; color: white; position: sticky; top: 0; z-index: 10; }
-        .custom-table td { padding: 10px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.5); vertical-align: middle; color: #2d3748; }
+        /* Table Styles - PRODUCTION OPTIMIZED */
+        .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1); background: rgba(255,255,255,0.6); -webkit-overflow-scrolling: touch; }
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1400px; font-size: 0.65rem; }
+        .custom-table th { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            padding: 12px 8px; 
+            text-align: left; 
+            font-weight: 700; 
+            border-bottom: 2px solid #e2e8f0; 
+            color: white; 
+            position: sticky; 
+            top: 0; 
+            z-index: 10;
+            white-space: nowrap;
+        }
+        .custom-table td { 
+            padding: 10px 8px; 
+            border-bottom: 1px solid #edf2f7; 
+            background: rgba(255,255,255,0.5); 
+            vertical-align: middle; 
+            color: #2d3748;            white-space: nowrap;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
         .custom-table tr:hover td { background: rgba(255,255,255,0.9); }
+        .custom-table td[title] { cursor: help; }
         
         .hidden-section { display: none !important; }
         input, select, textarea {
             background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748;
             border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
+            box-sizing: border-box;
         }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #9D50BB; box-shadow: 0 0 0 3px rgba(157, 80, 187, 0.2); }
+        input:disabled, select:disabled, textarea:disabled { background: #edf2f7; cursor: not-allowed; }
         
         /* Badges */
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.58rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; display: inline-block; }
@@ -97,7 +122,10 @@
         .badge-cancelled { background: #fed7d7; color: #822727; }
         .badge-refund { background: #faf089; color: #744210; }
         .badge-active { background: #c6f6d5; color: #22543d; }
-        .badge-blocked { background: #fed7d7; color: #822727; }        .badge-inactive { background: #e2e8f0; color: #4a5568; }
+        .badge-blocked { background: #fed7d7; color: #822727; }
+        .badge-inactive { background: #e2e8f0; color: #4a5568; }
+        .badge-private { background: #e9d8fd; color: #553c9a; }
+        .badge-outstock { background: #cbd5e0; color: #4a5568; }
         
         .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #9D50BB; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
@@ -109,22 +137,56 @@
         .fade-in { animation: fadeIn 0.5s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         
-        .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; cursor: pointer; margin: 0 2px; }
+        .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; cursor: pointer; margin: 0 2px; border: none; }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn-edit { background: #bee3f8; color: #2a4365; }
         .btn-delete { background: #fed7d7; color: #c53030; }
+        .btn-view { background: #c6f6d5; color: #22543d; }
         
         /* Admin Filter Tabs */
         .admin-filter-btn { transition: all 0.2s; border: 1px solid transparent; }
-        .admin-filter-btn.active { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: rgba(255,255,255,0.5); ring: 2px solid #9D50BB; }
+        .admin-filter-btn.active { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: rgba(255,255,255,0.5); ring: 2px solid #9D50BB; }        
+        /* Password blur */
+        .password-blur { filter: blur(4px); cursor: pointer; transition: filter 0.2s; user-select: none; }
+        .password-blur:hover { filter: blur(0); }
+        .password-blur.revealed { filter: none; cursor: default; }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 60; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-content { background: white; border-radius: 16px; padding: 20px; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        
+        /* Toast Notifications */
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 10px; color: white; font-size: 0.85rem; z-index: 100; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast.success { background: var(--success-green); }
+        .toast.error { background: var(--error-red); }
+        .toast.warning { background: #dd6b20; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .custom-table { min-width: 1000px; font-size: 0.6rem; }
+            .custom-table th, .custom-table td { padding: 8px 6px; }
+            .glass-panel { border-radius: 16px; }
+            .btn-glitter { padding: 10px 16px; }
+        }
+        
+        /* Print friendly */
+        @media print {
+            .glass-panel { box-shadow: none; border: 1px solid #ccc; }
+            .btn-glitter, .action-btn { display: none; }
+        }
     </style>
 </head>
 <body class="p-0 md:p-4">
 
     <!-- AUDIO EFFECTS -->
-    <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3"></audio>
-    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3"></audio>
-    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
-    <audio id="snd-msg" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3"></audio>
+    <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3" preload="auto"></audio>
+    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3" preload="auto"></audio>
+    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+    <audio id="snd-msg" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3" preload="auto"></audio>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
 
     <!-- NAVBAR -->
     <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 md:p-4 flex justify-between items-center flex-wrap gap-3 shadow-lg">
@@ -132,8 +194,7 @@
             <i class="fas fa-gem"></i> MFD STORE
         </div>
         <div class="flex items-center gap-2 md:gap-4">
-            <button onclick="playSound('click'); navTo('chat-list')" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Live Chat">
-                <i class="fas fa-comments text-purple-600 text-lg group-hover:scale-110 transition"></i>
+            <button onclick="playSound('click'); navTo('chat-list')" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Live Chat">                <i class="fas fa-comments text-purple-600 text-lg group-hover:scale-110 transition"></i>
                 <span id="chat-notif" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden animate-pulse">!</span>
             </button>
             <button onclick="playSound('click'); toggleCartModal()" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Shopping Cart">
@@ -146,23 +207,23 @@
             </div>
             <div id="user-nav" class="hidden-section flex items-center gap-2 md:gap-3">
                 <div class="text-right hidden md:block">
-                    <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>                    <div id="nav-uac" class="text-[10px] text-purple-500 font-mono"></div>
+                    <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>
+                    <div id="nav-uac" class="text-[10px] text-purple-500 font-mono"></div>
                 </div>
-                <button onclick="playSound('click'); navTo('dashboard')" class="px-3 md:px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition text-xs md:text-sm"><i class="fas fa-user"></i></button>
-                <button onclick="playSound('click'); logout()" class="px-3 md:px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition text-xs md:text-sm"><i class="fas fa-sign-out-alt"></i></button>
+                <button onclick="playSound('click'); navTo('dashboard')" class="px-3 md:px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition text-xs md:text-sm" title="Dashboard"><i class="fas fa-user"></i></button>
+                <button onclick="playSound('click'); logout()" class="px-3 md:px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition text-xs md:text-sm" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </nav>
 
     <!-- MAIN CONTENT -->
     <main class="container mx-auto p-2 md:p-4 pb-20 fade-in">
-
         <!-- 1. HOME / CATALOG -->
         <section id="view-home">
             <div class="glass-panel p-3 md:p-4 mb-4 md:mb-6 flex flex-col md:flex-row gap-3 items-center">
                 <div class="relative w-full md:w-1/2">
                     <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                    <input type="text" id="search-bar" placeholder="Search Product..." class="pl-10 m-0" onkeyup="renderCatalog()">
+                    <input type="text" id="search-bar" placeholder="Search Product..." class="pl-10 m-0" onkeyup="renderCatalog()" autocomplete="off">
                 </div>
                 <select id="filter-sort" class="md:w-1/4 m-0" onchange="renderCatalog()">
                     <option value="default">🔥 Trending</option>
@@ -182,23 +243,23 @@
             </div>
         </section>
 
-        <!-- 2. AUTH PAGES -->
-        <section id="view-login" class="hidden-section max-w-md mx-auto mt-10">
+        <!-- 2. AUTH PAGES -->        <section id="view-login" class="hidden-section max-w-md mx-auto mt-10">
             <div class="glass-panel p-8">
                 <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Login Account</h2>
-                <input type="email" id="login-email" placeholder="Email Address">
-                <input type="password" id="login-pass" placeholder="Password">
-                <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">LOGIN NOW</button>
+                <input type="email" id="login-email" placeholder="Email Address" autocomplete="email" required>
+                <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" required>
+                <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg" id="login-btn">LOGIN NOW</button>
                 <p class="text-center mt-6 text-sm text-gray-600">New here? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('register')">Register Account</span></p>
             </div>
         </section>
 
         <section id="view-register" class="hidden-section max-w-md mx-auto mt-10">
             <div class="glass-panel p-8">
-                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Register Account</h2>                <input type="text" id="reg-phone" placeholder="Phone Number (Active)">
-                <input type="email" id="reg-email" placeholder="Email Address (Optional)">
-                <input type="password" id="reg-pass" placeholder="Create Password">
-                <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg">REGISTER FREE</button>
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Register Account</h2>
+                <input type="tel" id="reg-phone" placeholder="Phone Number (Active)" pattern="[0-9+\-\s()]{10,}" required>
+                <input type="email" id="reg-email" placeholder="Email Address (Optional)" autocomplete="email">
+                <input type="password" id="reg-pass" placeholder="Create Password (min 6 characters)" minlength="6" required>
+                <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg" id="register-btn">REGISTER FREE</button>
                 <p class="text-center mt-6 text-sm text-gray-600">Have account? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('login')">Login Here</span></p>
             </div>
         </section>
@@ -219,20 +280,19 @@
                         <div class="bg-white/50 p-2 rounded"><strong>Status:</strong> <span id="dash-status" class="badge badge-active">ACTIVE</span></div>
                         <div class="bg-white/50 p-2 rounded"><strong>Phone:</strong> <span id="dash-phone">-</span></div>
                         <label class="block mt-3 font-bold text-gray-700">📭 Shipping Address</label>
-                        <textarea id="dash-address" rows="3" class="text-xs" placeholder="House No, Building, Street, Unit No, Postal Code, Full Name, Phone"></textarea>
+                        <textarea id="dash-address" rows="3" class="text-xs" placeholder="House No, Building, Street, Unit No, Postal Code, Full Name, Phone" maxlength="500"></textarea>
                         <div class="flex gap-2 mb-2">
                             <label class="text-[10px] flex items-center gap-1"><input type="checkbox" class="w-3 h-3 accent-purple-500"> Frequent</label>
                             <select class="w-auto py-0 px-1 text-[10px] m-0 bg-white"><option>Home</option><option>Work</option></select>
                         </div>
-                        <button onclick="updateProfile()" class="bg-purple-500 text-white px-3 py-1.5 rounded-lg text-xs w-full shadow hover:bg-purple-600 transition">Save Changes</button>
+                        <button onclick="updateProfile()" class="bg-purple-500 text-white px-3 py-1.5 rounded-lg text-xs w-full shadow hover:bg-purple-600 transition disabled:opacity-50" id="save-profile-btn">Save Changes</button>
                         <button onclick="deleteAccount()" class="bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs w-full mt-2 hover:bg-red-200 transition">Delete Account Permanently</button>
                     </div>
                 </div>
                 
                 <!-- Orders Section -->
                 <div class="glass-panel p-4 md:p-6 lg:col-span-3">
-                    <h3 class="text-lg md:text-xl font-bold mb-4 flex justify-between items-center">
-                        <span>My Orders</span>
+                    <h3 class="text-lg md:text-xl font-bold mb-4 flex justify-between items-center">                        <span>My Orders</span>
                         <span class="text-[10px] bg-purple-100 text-purple-600 px-2 py-1 rounded-full animate-pulse">Live Update</span>
                     </h3>
                     <div id="dashboard-message"></div>
@@ -244,7 +304,8 @@
                         <button onclick="filterOrders('To Ship')" class="px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200 transition">To Ship</button>
                         <button onclick="filterOrders('To Receive')" class="px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200 transition">To Receive</button>
                         <button onclick="filterOrders('Completed')" class="px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200 transition">Completed</button>
-                        <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200 transition">Return</button>                        <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200 transition">Cancelled</button>
+                        <button onclick="filterOrders('Return/Refund')" class="px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200 transition">Return</button>
+                        <button onclick="filterOrders('Cancelled')" class="px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200 transition">Cancelled</button>
                     </div>
                     
                     <div class="table-container">
@@ -267,7 +328,7 @@
                                 </tr>
                             </thead>
                             <tbody id="user-order-history">
-                                <tr><td colspan="13" class="text-center py-8 text-gray-500">Penyelenggaraan sedang berjalan...</td></tr>
+                                <tr><td colspan="13" class="text-center py-8 text-gray-500">Loading orders...</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -280,8 +341,7 @@
         </section>
 
         <!-- 4. LIVE CHAT SYSTEM -->
-        <section id="view-chat-list" class="hidden-section">
-            <div class="glass-panel p-4 h-[80vh] flex flex-col">
+        <section id="view-chat-list" class="hidden-section">            <div class="glass-panel p-4 h-[80vh] flex flex-col">
                 <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2">
                     <i class="fas fa-headset"></i> Live Agent🟢
                 </h2>
@@ -293,7 +353,8 @@
                         <div class="flex items-center gap-2">
                             <button onclick="closeChat()" class="text-gray-500 hover:text-purple-600 transition"><i class="fas fa-arrow-left"></i></button>
                             <div>
-                                <h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3>                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
+                                <h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3>
+                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
                             </div>
                         </div>
                         <div class="flex gap-1">
@@ -303,50 +364,112 @@
                     </div>
                     <div id="chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 border border-white/50"></div>
                     <div class="flex gap-2 items-end bg-white/50 p-2 rounded-xl">
-                        <button onclick="document.getElementById('file-input').click()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition"><i class="fas fa-image text-gray-600"></i></button>
+                        <button onclick="document.getElementById('file-input').click()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Attach Image"><i class="fas fa-image text-gray-600"></i></button>
                         <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
-                        <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
-                        <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}"></textarea>
-                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg"><i class="fas fa-paper-plane"></i></button>
+                        <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Send Location"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
+                        <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}" maxlength="1000"></textarea>
+                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg" title="Send"><i class="fas fa-paper-plane"></i></button>
                     </div>
-                    <div class="text-[10px] text-gray-400 mt-1 text-center">Auto-update 1 detik • Sound Effects Enabled • All Data in Firebase</div>
+                    <div class="text-[10px] text-gray-400 mt-1 text-center">Auto-update • Sound Effects Enabled • All Data Encrypted</div>
                 </div>
             </div>
         </section>
 
-        <!-- 5. ADMIN DASHBOARD -->
+        <!-- 5. ADMIN DASHBOARD - PRODUCTION READY -->
         <section id="view-admin" class="hidden-section">
             <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white shadow-xl rounded-2xl">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h2 class="text-2xl md:text-3xl font-bold">ADMIN MANAGEMENT CENTER</h2>
-                        <p class="text-white/80 text-xs md:text-sm">Urus Pesanan, Pelanggan, Produk & Live Chat</p>
+                        <h2 class="text-2xl md:text-3xl font-bold">ADMIN MANAGEMENT CENTER v2.0</h2>
+                        <p class="text-white/80 text-xs md:text-sm">Urus Pesanan, Pelanggan, Produk & Live Chat - Production Ready</p>
                     </div>
                     <i class="fas fa-shield-alt text-4xl md:text-5xl opacity-50"></i>
                 </div>
             </div>
+            
+            <!-- Admin Stats Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <div class="glass-panel p-3 text-center cursor-pointer hover:shadow-lg transition" onclick="showAdminTab('tab-users')">
+                    <div class="text-2xl font-bold text-purple-600" id="stat-total-users">-</div>                    <div class="text-[10px] text-gray-600">Total Users</div>
+                </div>
+                <div class="glass-panel p-3 text-center cursor-pointer hover:shadow-lg transition" onclick="showAdminTab('tab-orders-verify')">
+                    <div class="text-2xl font-bold text-pink-600" id="stat-total-orders">-</div>
+                    <div class="text-[10px] text-gray-600">Total Orders</div>
+                </div>
+                <div class="glass-panel p-3 text-center">
+                    <div class="text-2xl font-bold text-green-600" id="stat-revenue">RM -</div>
+                    <div class="text-[10px] text-gray-600">Total Revenue</div>
+                </div>
+                <div class="glass-panel p-3 text-center cursor-pointer hover:shadow-lg transition" onclick="showAdminTab('tab-orders-manage')">
+                    <div class="text-2xl font-bold text-orange-600" id="stat-pending">-</div>
+                    <div class="text-[10px] text-gray-600">Pending Orders</div>
+                </div>
+            </div>
+            
             <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
-                <button onclick="showAdminTab('tab-orders')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-receipt mr-1"></i> Orders</button>
-                <button onclick="showAdminTab('tab-products')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-box mr-1"></i> Products</button>
-                <button onclick="showAdminTab('tab-users')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-users mr-1"></i> Users</button>
+                <button onclick="showAdminTab('tab-users')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-users mr-1"></i> Database Akaun</button>
+                <button onclick="showAdminTab('tab-orders-verify')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-receipt mr-1"></i> Pengesahan Pesanan</button>
+                <button onclick="showAdminTab('tab-orders-manage')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-clipboard-list mr-1"></i> Urus Pesanan</button>
+                <button onclick="showAdminTab('tab-products')" class="px-4 py-2 bg-white/80 rounded-xl text-purple-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-box mr-1"></i> Produk</button>
+                <button onclick="showAdminTab('tab-blacklist')" class="px-4 py-2 bg-white/80 rounded-xl text-red-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-user-slash mr-1"></i> Blacklist</button>
                 <button onclick="showAdminTab('tab-chat')" class="px-4 py-2 bg-white/80 rounded-xl text-pink-600 font-bold text-xs md:text-sm whitespace-nowrap shadow-sm hover:bg-white transition"><i class="fas fa-headset mr-1"></i> Live Chat</button>
             </div>
             
-            <!-- TAB ORDERS -->
-            <div id="tab-orders" class="admin-tab glass-panel p-4 md:p-6 mb-6">
+            <!-- TAB DATABASE AKOUN PELANGGAN -->
+            <div id="tab-users" class="admin-tab glass-panel p-4 md:p-6 mb-6">
                 <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-                    <h3 class="font-bold text-purple-700 text-lg">Jadual Pengesahan & Urusan Pesanan</h3>
-                    <div class="text-xs text-gray-500">*Klik pada status untuk menukar</div>
+                    <h3 class="font-bold text-purple-700 text-lg">📊 Jadual Database Akaun Pelanggan</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="user-search" placeholder="Cari pengguna..." class="w-40 text-xs py-1 m-0" onkeyup="filterAdminUsers()" autocomplete="off">
+                        <select id="user-status-filter" class="w-32 text-xs py-1 m-0" onchange="filterAdminUsers()">
+                            <option value="all">Semua Status</option>
+                            <option value="ACTIVE">Active</option>
+                            <option value="INACTIVE">Inactive</option>
+                            <option value="BLOCKED">Blocked</option>
+                        </select>
+                    </div>
                 </div>
                 
-                <!-- Admin Order Filters -->
-                <div class="flex overflow-x-auto gap-2 mb-4 pb-2 no-scrollbar border-b border-gray-200">
-                    <button onclick="filterAdminOrders('all')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 active">All</button>
-                    <button onclick="filterAdminOrders('To Pay')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200">To Pay</button>                    <button onclick="filterAdminOrders('To Ship')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200">To Ship</button>
-                    <button onclick="filterAdminOrders('To Receive')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200">To Receive</button>
-                    <button onclick="filterAdminOrders('Completed')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200">Completed</button>
-                    <button onclick="filterAdminOrders('Return/Refund')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200">Return</button>
-                    <button onclick="filterAdminOrders('Cancelled')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200">Cancelled</button>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>UAC</th>
+                                <th>Username</th>
+                                <th>Password</th>
+                                <th>Phone</th>
+                                <th>Shipping Address</th>
+                                <th>Status</th>                                <th>Cart</th>
+                                <th>Total Order</th>
+                                <th>Total Checkout</th>
+                                <th>In Use?</th>
+                                <th>Log Cache</th>
+                                <th>Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-user-list">
+                            <tr><td colspan="12" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TAB PENGESAHAN PESANAN -->
+            <div id="tab-orders-verify" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                    <h3 class="font-bold text-purple-700 text-lg">✅ Jadual Pengesahan Pembelian Pelanggan</h3>
+                    <div class="text-xs text-gray-500">*Klik status untuk update</div>
+                </div>
+                
+                <!-- Filter Tabs -->
+                <div class="flex overflow-x-auto gap-2 mb-4 pb-2 border-b border-gray-200">
+                    <button onclick="filterVerifyOrders('all')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 active">All</button>
+                    <button onclick="filterVerifyOrders('To Pay')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200">To Pay</button>
+                    <button onclick="filterVerifyOrders('To Ship')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200">To Ship</button>
+                    <button onclick="filterVerifyOrders('To Receive')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200">To Receive</button>
+                    <button onclick="filterVerifyOrders('Completed')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200">Completed</button>
+                    <button onclick="filterVerifyOrders('Return/Refund')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-yellow-100 text-yellow-800 text-xs font-bold whitespace-nowrap hover:bg-yellow-200">Return</button>
+                    <button onclick="filterVerifyOrders('Cancelled')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200">Cancelled</button>
                 </div>
 
                 <div class="table-container">
@@ -355,74 +478,167 @@
                             <tr>
                                 <th>UAC</th>
                                 <th>Username</th>
-                                <th>Nama Item & Kode</th>
-                                <th>Destination Address</th>
+                                <th>Nama Item</th>
+                                <th>Kode Unik</th>
+                                <th>Address</th>
                                 <th>Qty</th>
-                                <th>Harga</th>
+                                <th>Total</th>
                                 <th>Payment</th>
                                 <th>Payment Status</th>
-                                <th>Delivery</th>
-                                <th>Tracking</th>
-                                <th>ID</th>
-                                <th>Status Utama</th>
-                                <th>Tindakan Admin</th>
+                                <th>Tracking No</th>
+                                <th>ID Pesanan</th>
+                                <th>Current Status</th>
+                                <th>Category</th>                                <th>Tindakan</th>
                             </tr>
                         </thead>
-                        <tbody id="admin-order-list">
-                            <!-- Data will be populated here -->
+                        <tbody id="admin-verify-order-list">
+                            <tr><td colspan="14" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- TAB PRODUCTS -->
+            <!-- TAB URUS PESANAN PELANGGAN -->
+            <div id="tab-orders-manage" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                    <h3 class="font-bold text-purple-700 text-lg">📦 Senarai Pesanan Pelanggan (Urusan Admin)</h3>
+                    <div class="flex gap-2">
+                        <input type="text" id="order-search" placeholder="Cari pesanan..." class="w-40 text-xs py-1 m-0" onkeyup="filterManageOrders()" autocomplete="off">
+                        <select id="order-category-filter" class="w-36 text-xs py-1 m-0" onchange="filterManageOrders()">
+                            <option value="all">Semua Kategori</option>
+                            <option value="To Pay">To Pay</option>
+                            <option value="To Ship">To Ship</option>
+                            <option value="To Receive">To Receive</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Return/Refund">Return/Refund</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>UAC</th>
+                                <th>Username</th>
+                                <th>Nama Item</th>
+                                <th>Kode Unik</th>
+                                <th>Address</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                                <th>Payment</th>
+                                <th>Payment Status</th>
+                                <th>Delivery Status</th>
+                                <th>Tracking No</th>
+                                <th>ID Pesanan</th>
+                                <th>Cancel Order</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-manage-order-list">
+                            <tr><td colspan="13" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr>
+                        </tbody>                    </table>
+                </div>
+            </div>
+
+            <!-- TAB PRODUK - PRODUCTION READY -->
             <div id="tab-products" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4 text-purple-700">Tambah Produk Baharu</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white/30 p-4 rounded-xl">
-                    <input type="text" id="prod-name" placeholder="Nama Item">
-                    <input type="number" id="prod-price" placeholder="Harga Jualan (RM)">
-                    <input type="text" id="prod-variation" placeholder="Variasi (Size/Color)">
-                    <input type="text" id="prod-country" placeholder="Negara Asal">
-                    <input type="text" id="prod-event" placeholder="Label Event">
+                <h3 class="font-bold mb-4 text-purple-700">➕ Tambah Produk Baharu</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 bg-white/30 p-4 rounded-xl">
+                    <!-- Image Upload -->
+                    <div class="md:col-span-2 lg:col-span-3">
+                        <label class="block text-xs font-bold mb-1">🖼️ Gambar Produk</label>
+                        <div class="flex gap-2">
+                            <input type="file" id="prod-img-file" accept="image/*" class="flex-1 text-xs py-2 m-0" title="Upload dari device">
+                            <input type="url" id="prod-img-url" placeholder="Atau paste URL gambar..." class="flex-1 text-xs m-0" title="Paste URL gambar">
+                        </div>
+                        <div id="prod-img-preview" class="mt-2 hidden"><img class="w-20 h-20 object-cover rounded-lg border"></div>
+                        <p class="text-[10px] text-gray-500 mt-1">*Max 5MB. Format: JPG, PNG, WebP</p>
+                    </div>
+                    
+                    <input type="text" id="prod-name" placeholder="Nama Item *" required maxlength="100">
+                    <input type="number" id="prod-price-cost" placeholder="Harga Kos (RM) - Optional" min="0" step="0.01">
+                    <input type="number" id="prod-price-sell" placeholder="Harga Jualan (RM) *" required min="0.01" step="0.01">
+                    <input type="text" id="prod-variation" placeholder="Variasi (Size/Color/Type)" maxlength="50">
+                    <textarea id="prod-desc" placeholder="Deskripsi Item" class="md:col-span-2 lg:col-span-3" maxlength="500"></textarea>
+                    <input type="text" id="prod-country" placeholder="Negara Asal" maxlength="50">
+                    <input type="url" id="prod-link" placeholder="Pautan Optional (Website/Video)" maxlength="200">
+                    <input type="text" id="prod-label" placeholder="Label Item (e.g. Best Seller)" maxlength="30">
+                    <input type="text" id="prod-event" placeholder="Event Item (e.g. Ramadan Sale)" maxlength="30">
+                    <input type="text" id="prod-unique-code" placeholder="Kod Unik Item (Auto-generated)" readonly class="bg-gray-100 cursor-not-allowed">
                     <select id="prod-status" class="m-0">
                         <option value="Public">✅ Public</option>
                         <option value="Private">🔒 Private</option>
                         <option value="Out of Stock">❌ Out of Stock</option>
                     </select>
-                    <input type="url" id="prod-img-url" placeholder="Paste Image URL Here (https://...)" class="md:col-span-2">
-                    <textarea id="prod-desc" placeholder="Deskripsi Item" class="md:col-span-2"></textarea>
-                </div>                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
-                <h3 class="font-bold mt-8 mb-4 text-purple-700">Senarai Produk Dilancarkan</h3>
+                    <div class="md:col-span-2 lg:col-span-3 flex gap-4 text-xs">
+                        <label class="flex items-center gap-1"><input type="checkbox" id="prod-allow-review" checked> Allow Buyer Reviews</label>
+                        <label class="flex items-center gap-1"><input type="checkbox" id="prod-featured"> Featured Item</label>
+                    </div>
+                </div>
+                <button onclick="addProductEnhanced()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg disabled:opacity-50" id="add-product-btn"><i class="fas fa-plus mr-2"></i>LANCAR PRODUK</button>
+                
+                <h3 class="font-bold mt-8 mb-4 text-purple-700">📋 Senarai Produk Dilancarkan</h3>
+                <div class="flex gap-2 mb-3">
+                    <input type="text" id="prod-search" placeholder="Cari produk..." class="w-40 text-xs py-1 m-0" onkeyup="renderAdminProducts()" autocomplete="off">
+                    <select id="prod-status-filter" class="w-32 text-xs py-1 m-0" onchange="renderAdminProducts()">
+                        <option value="all">Semua Status</option>
+                        <option value="Public">Public</option>
+                        <option value="Private">Private</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                    </select>                </div>
                 <div class="table-container">
                     <table class="custom-table">
                         <thead>
-                            <tr><th>BIL</th><th>GAMBAR</th><th>NAMA ITEM</th><th>HARGA</th><th>RATING</th><th>STATUS</th><th>SOLD</th><th>EDIT</th><th>PADAM</th></tr>
+                            <tr>
+                                <th>BIL</th>
+                                <th>GAMBAR</th>
+                                <th>NAMA ITEM</th>
+                                <th>HARGA JUALAN</th>
+                                <th>RATING</th>
+                                <th>STATUS</th>
+                                <th>TOTAL SOLD</th>
+                                <th>REVENUE</th>
+                                <th>REVIEWS</th>
+                                <th>EDIT</th>
+                                <th>PADAM</th>
+                            </tr>
                         </thead>
                         <tbody id="admin-prod-list"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- TAB USERS -->
-            <div id="tab-users" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
-                <h3 class="font-bold mb-4 text-purple-700">Jadual Database Pelanggan</h3>
-                <div class="table-container">
-                    <table class="custom-table">
-                        <thead>
-                            <tr><th>UAC</th><th>Username</th><th>Phone</th><th>Address</th><th>Status</th><th>Orders</th><th>Tindakan</th></tr>
-                        </thead>
-                        <tbody id="admin-user-list"></tbody>
-                    </table>
+            <!-- TAB BLACKLIST - PRODUCTION READY -->
+            <div id="tab-blacklist" class="admin-tab hidden-section glass-panel p-4 md:p-6 mb-6">
+                <h3 class="font-bold mb-4 text-red-600">⚠️ Senarai Hitam (Blacklist) Pelanggan</h3>
+                <div class="mb-4 p-3 bg-red-50 rounded-lg border border-red-200 text-xs text-red-700">
+                    <i class="fas fa-info-circle mr-1"></i> Akaun yang diblacklist tidak boleh login, order, atau chat. Tindakan ini tidak boleh dipulihkan tanpa admin approval.
                 </div>
-                <h3 class="font-bold mt-8 mb-4 text-red-600">Senarai Hitam (Blacklist)</h3>
                 <div class="table-container border-2 border-red-100">
                     <table class="custom-table">
                         <thead>
-                            <tr><th>UAC</th><th>Username</th><th>Status</th><th>Log Cache</th><th>Tindakan</th></tr>
+                            <tr>
+                                <th>UAC</th>
+                                <th>Username</th>
+                                <th>Customer Name</th>
+                                <th>Status</th>
+                                <th>Log Cache</th>
+                                <th>Comment</th>
+                                <th>Tindakan</th>
+                            </tr>
                         </thead>
-                        <tbody id="admin-blacklist-list"></tbody>
+                        <tbody id="admin-blacklist-list">
+                            <tr><td colspan="7" class="text-center py-8 text-gray-500">Tiada akaun dalam blacklist.</td></tr>
+                        </tbody>
                     </table>
                 </div>
+                
+                <h3 class="font-bold mt-8 mb-4 text-purple-700">🔍 Block Akaun Pelanggan</h3>
+                <div class="flex gap-2 mb-3">                    <input type="text" id="block-search" placeholder="Cari akaun untuk block..." class="flex-1 text-xs py-2 m-0" autocomplete="off">
+                    <button onclick="searchForBlock()" class="px-4 py-2 bg-purple-500 text-white rounded-lg text-xs font-bold hover:bg-purple-600 transition disabled:opacity-50" id="search-block-btn">Cari</button>
+                </div>
+                <div id="block-search-results" class="space-y-2 max-h-40 overflow-y-auto"></div>
             </div>
 
             <!-- TAB CHAT -->
@@ -439,631 +655,1493 @@
                     </div>
                     <div id="admin-chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 flex-1 overflow-y-auto"></div>
                     <div class="flex gap-2">
-                         <button onclick="document.getElementById('admin-file-input').click()" class="p-2 bg-gray-200 rounded-full"><i class="fas fa-image"></i></button>
-                         <input type="file" id="admin-file-input" class="hidden" accept="image/*" onchange="handleAdminFileUpload(this)">                        <textarea id="admin-msg-input" rows="1" class="m-0 flex-1 text-sm" placeholder="Reply..."></textarea>
+                         <button onclick="document.getElementById('admin-file-input').click()" class="p-2 bg-gray-200 rounded-full" title="Attach Image"><i class="fas fa-image"></i></button>
+                         <input type="file" id="admin-file-input" class="hidden" accept="image/*" onchange="handleAdminFileUpload(this)">
+                        <textarea id="admin-msg-input" rows="1" class="m-0 flex-1 text-sm" placeholder="Reply..." maxlength="1000"></textarea>
                         <button onclick="sendAdminMessage()" class="btn-glitter px-4 rounded-lg text-sm">Send</button>
                     </div>
                 </div>
             </div>
         </section>
-
     </main>
 
     <!-- CART MODAL -->
-<div id="modal-cart" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">
-    <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
-        <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500 transition">&times;</button>
-        <h2 class="text-2xl font-bold mb-4 glitter-text">Checkout Station</h2>
-        <div id="cart-items" class="space-y-3 mb-6"></div>
-        <div class="border-t-2 border-dashed border-gray-300 pt-4 flex justify-between items-center">
-            <span class="font-bold text-lg text-gray-700">Jumlah Keseluruhan:</span>
-            <span id="cart-total" class="text-2xl font-bold text-purple-600">RM 0.00</span>
-        </div>
-        
-        <!-- PAYMENT SECTION WITH QR CODE -->
-        <div class="mt-6 bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-xl border border-purple-100">
-            <p class="font-bold text-purple-700 mb-3 flex items-center gap-2">
-                <i class="fas fa-credit-card"></i> Payment Method
-            </p>
-            
-            <!-- QR CODE (BLUR BY DEFAULT, CLICK TO REVEAL) -->
-            <div class="text-center mb-4">
-                <p class="text-sm text-gray-600 mb-2">🔐 Klik QR untuk lihat & scan:</p>
-                
-                <img src="https://i.postimg.cc/DzHmmZqQ/IMG-20260227-134328-052.jpg" 
-                     alt="QR Code Touch 'n Go" 
-                     id="qr-payment"
-                     onclick="toggleQRBlur()"
-                     class="w-40 h-40 mx-auto object-contain border-2 border-purple-200 rounded-xl shadow-sm bg-white cursor-pointer transition-all duration-300 blur-md hover:blur-sm select-none">
-                
-                <p id="qr-hint" class="text-xs text-purple-600 mt-2 font-medium">👆 Klik untuk jelas</p>
+    <div id="modal-cart" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="toggleCartModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500 transition" aria-label="Close">&times;</button>
+            <h2 class="text-2xl font-bold mb-4 glitter-text">Checkout Station</h2>
+            <div id="cart-items" class="space-y-3 mb-6"></div>
+            <div class="border-t-2 border-dashed border-gray-300 pt-4 flex justify-between items-center">
+                <span class="font-bold text-lg text-gray-700">Jumlah Keseluruhan:</span>
+                <span id="cart-total" class="text-2xl font-bold text-purple-600">RM 0.00</span>
             </div>
-            <!-- END QR CODE -->
             
-            <ol class="list-decimal pl-5 text-sm space-y-2 text-gray-700">
-                <li>Online: <a href="https://sociabuzz.com/fareezonzz_019/give" target="_blank" class="text-blue-500 underline font-bold">Sociabuzz</a></li>
-                <li>TNG: <strong class="font-mono bg-white px-2 py-0.5 rounded border">161489981218</strong></li>
-                <li class="text-red-500 font-semibold text-xs bg-red-50 p-2 rounded mt-2">
-                    <i class="fas fa-exclamation-triangle"></i> Hantar bukti ke WhatsApp <strong>+60145400413</strong>
-                </li>
-            </ol>
+            <!-- PAYMENT SECTION WITH QR CODE -->
+            <div class="mt-6 bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-xl border border-purple-100">
+                <p class="font-bold text-purple-700 mb-3 flex items-center gap-2">
+                    <i class="fas fa-credit-card"></i> Payment Method
+                </p>
+                
+                <!-- QR CODE (BLUR BY DEFAULT, CLICK TO REVEAL) -->
+                <div class="text-center mb-4">
+                    <p class="text-sm text-gray-600 mb-2">🔐 Klik QR untuk lihat & scan:</p>                    <img src="https://i.postimg.cc/DzHmmZqQ/IMG-20260227-134328-052.jpg" 
+                         alt="QR Code Touch 'n Go" 
+                         id="qr-payment"
+                         onclick="toggleQRBlur()"
+                         class="w-40 h-40 mx-auto object-contain border-2 border-purple-200 rounded-xl shadow-sm bg-white cursor-pointer transition-all duration-300 blur-md hover:blur-sm select-none"
+                         loading="lazy">
+                    <p id="qr-hint" class="text-xs text-purple-600 mt-2 font-medium">👆 Klik untuk jelas</p>
+                </div>
+                
+                <ol class="list-decimal pl-5 text-sm space-y-2 text-gray-700">
+                    <li>Online: <a href="https://sociabuzz.com/fareezonzz_019/give" target="_blank" rel="noopener" class="text-blue-500 underline font-bold">Sociabuzz</a></li>
+                    <li>TNG: <strong class="font-mono bg-white px-2 py-0.5 rounded border">161489981218</strong></li>
+                    <li class="text-red-500 font-semibold text-xs bg-red-50 p-2 rounded mt-2">
+                        <i class="fas fa-exclamation-triangle"></i> Hantar bukti ke WhatsApp <strong>+60145400413</strong>
+                    </li>
+                </ol>
+            </div>
+            
+            <button onclick="submitOrder()" class="btn-glitter w-full py-4 rounded-xl font-bold mt-6 shadow-xl text-lg disabled:opacity-50" id="checkout-btn">
+                <i class="fas fa-check-circle mr-2"></i>KONFIRM PESANAN
+            </button>
         </div>
-        
-        <button onclick="submitOrder()" class="btn-glitter w-full py-4 rounded-xl font-bold mt-6 shadow-xl text-lg">
-            <i class="fas fa-check-circle mr-2"></i>KONFIRM PESANAN
-        </button>
     </div>
-</div>
 
-<!-- ============================================ -->
-<!-- SCRIPT UNTUK QR CODE BLUR/CLICK (Paste sebelum </body>) -->
-<!-- ============================================ -->
-<script>
-    // Fungsi toggle blur QR code
-    function toggleQRBlur() {
-        const qr = document.getElementById('qr-payment');
-        const hint = document.getElementById('qr-hint');
-        
-        if (!qr || !hint) return;
-        
-        if (qr.classList.contains('blur-md')) {
-            // Remove blur, make clear
-            qr.classList.remove('blur-md');
-            qr.classList.add('blur-none');
-            hint.innerHTML = '✅ QR Jelas - Sila scan!';
-            hint.classList.remove('text-purple-600');
-            hint.classList.add('text-green-600');
-        } else {
-            // Add blur back
-            qr.classList.add('blur-md');
-            qr.classList.remove('blur-none');
-            hint.innerHTML = '👆 Klik untuk jelas';
-            hint.classList.remove('text-green-600');
-            hint.classList.add('text-purple-600');
-        }
-    }
-    
-    // Auto-reset QR blur bila modal ditutup (optional tapi disyorkan)
-    const originalToggleCartModal = window.toggleCartModal;
-    window.toggleCartModal = function() {
-        // Call original function first
-        if (originalToggleCartModal) originalToggleCartModal();
-        
-        // Reset QR to blurred state after modal closes
-        setTimeout(() => {
-            const modal = document.getElementById('modal-cart');
-            if (modal && modal.classList.contains('hidden-section')) {
-                const qr = document.getElementById('qr-payment');
-                const hint = document.getElementById('qr-hint');
-                if (qr) {
-                    qr.classList.add('blur-md');
-                    qr.classList.remove('blur-none');
-                }
-                if (hint) {
-                    hint.innerHTML = '👆 Klik untuk jelas';
-                    hint.classList.remove('text-green-600');
-                    hint.classList.add('text-purple-600');
-                }
-            }
-        }, 300);
-    };
-</script>
+    <!-- MODAL FOR REVIEWS -->
+    <div id="modal-reviews" class="modal-overlay hidden-section">
+        <div class="modal-content glass-panel">
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="font-bold text-purple-700">⭐ Buyer Reviews</h4>
+                <button onclick="closeReviewsModal()" class="text-xl text-gray-500 hover:text-red-500" aria-label="Close">&times;</button>
+            </div>
+            <div id="reviews-content" class="space-y-3 max-h-60 overflow-y-auto"></div>
+        </div>
+    </div>
 
-    <!-- FIREBASE LOGIC -->
+    <!-- FIREBASE LOGIC - PRODUCTION READY -->
     <script type="module">
+        // Import Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit, arrayUnion } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
+        // Firebase Config - GANTI DENGAN CONFIG ANDA SENDIRI
         const firebaseConfig = {
             apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
             authDomain: "mfd-store.firebaseapp.com",
             projectId: "mfd-store",
             storageBucket: "mfd-store.firebasestorage.app",
-            messagingSenderId: "1039564529069",
-            appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
+            messagingSenderId: "1039564529069",            appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
         };
 
-        const app = initializeApp(firebaseConfig);        const auth = getAuth(app);
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
         const storage = getStorage(app);
+        
+        // Global state
         let currentUser = null;
         let userData = {};
         let cart = [];
         let allProducts = [];
         let allUserOrders = [];
         let allAdminOrders = []; 
+        let allUsers = [];
         let currentChatPartner = null;
         let unsubscribeChat = null;
         let unsubscribeOrders = null;
+        let unsubscribeUsers = null;
 
+        // ==================== UTILITY FUNCTIONS ====================
+        
+        // Play sound with error handling
         window.playSound = (type) => {
-            const sounds = { 'click': document.getElementById('snd-click'), 'success': document.getElementById('snd-success'), 'error': document.getElementById('snd-error'), 'msg': document.getElementById('snd-msg') };
-            if(sounds[type]) { sounds[type].currentTime = 0; sounds[type].play().catch(()=>{}); }
+            try {
+                const sounds = { 
+                    'click': document.getElementById('snd-click'), 
+                    'success': document.getElementById('snd-success'), 
+                    'error': document.getElementById('snd-error'), 
+                    'msg': document.getElementById('snd-msg') 
+                };
+                if(sounds[type]) { 
+                    sounds[type].currentTime = 0; 
+                    sounds[type].play().catch(() => {}); // Silent fail
+                }
+            } catch(e) { console.warn('Sound error:', e); }
         };
 
+        // Show toast notification (replaces alert)
+        function showToast(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>${message}`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // Dashboard message (legacy support)
         function showDashboardMessage(message, type = 'success') {
             const msgBox = document.getElementById('dashboard-message');
-            msgBox.innerHTML = `<div class="${type === 'error' ? 'error-box' : 'success-box'}">${message}</div>`;
+            if(!msgBox) return;
+            msgBox.innerHTML = `<div class="p-3 rounded-lg mb-3 ${type === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'} text-xs">${message}</div>`;
             setTimeout(() => { msgBox.innerHTML = ''; }, 5000);
         }
 
+        // Validate email format
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // Validate phone format (Malaysia)
+        function isValidPhone(phone) {
+            return /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/.test(phone.replace(/[\s\-\(\)]/g, ''));
+        }
+
+        // Format currency
+        function formatRM(amount) {
+            return 'RM ' + parseFloat(amount || 0).toFixed(2);
+        }
+
+        // Format date
+        function formatDate(timestamp) {
+            if(!timestamp) return '-';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleString('ms-MY', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        }
+
+        // ==================== NAVIGATION ====================
+        
         window.navTo = (viewId) => {
             playSound('click');
             document.querySelectorAll('section').forEach(el => el.classList.add('hidden-section'));
-            document.getElementById(`view-${viewId}`).classList.remove('hidden-section');
+            const target = document.getElementById(`view-${viewId}`);
+            if(target) target.classList.remove('hidden-section');
             window.scrollTo(0,0);
+            
+            // Load data based on view
             if(viewId === 'home') renderCatalog();
-            if(viewId === 'dashboard') loadUserData();
-            if(viewId === 'admin') loadAdminData();
-            if(viewId === 'chat-list') loadChatList();
+            if(viewId === 'dashboard' && currentUser) loadUserData();
+            if(viewId === 'admin' && currentUser) loadAdminData();
+            if(viewId === 'chat-list' && currentUser) loadChatList();
         };
-
         window.showAdminTab = (id) => {
             document.querySelectorAll('.admin-tab').forEach(el => el.classList.add('hidden-section'));
-            document.getElementById(id).classList.remove('hidden-section');
+            const tab = document.getElementById(id);
+            if(tab) tab.classList.remove('hidden-section');
+            
             if(id === 'tab-chat') setTimeout(loadChatList, 100);
-            if(id === 'tab-orders') filterAdminOrders('all');
+            if(id === 'tab-orders-verify' || id === 'tab-orders-manage') filterVerifyOrders('all');
         };
 
         window.toggleCartModal = () => {
-            const m = document.getElementById('modal-cart');
-            m.classList.contains('hidden-section') ? (renderCartItems(), m.classList.remove('hidden-section')) : m.classList.add('hidden-section');
-        };
-
-        window.doRegister = async () => {
-            const email = document.getElementById('reg-email').value;
-            const pass = document.getElementById('reg-pass').value;            const phone = document.getElementById('reg-phone').value;
-            if(!email || !pass) return alert("Email & Password diperlukan");
-            try {
-                const cred = await createUserWithEmailAndPassword(auth, email, pass);
-                const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
-                await setDoc(doc(db, "users", cred.user.uid), {
-                    username: "User_"+uac.split('-')[1], email, phone, uac, role: 'customer', status: 'ACTIVE', address: '', createdAt: serverTimestamp(), logCache: serverTimestamp()
-                });
-                playSound('success'); alert("Berjaya didaftarkan! Sila login."); navTo('login');
-            } catch(e) { playSound('error'); alert(e.message); }
-        };
-
-        window.doLogin = async () => {
-            try {
-                await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value);
-                playSound('success');
-            } catch(e) { playSound('error'); alert("Login Gagal: " + e.message); }
-        };
-
-        window.logout = () => { signOut(auth); playSound('click'); navTo('home'); };
-
-        window.deleteAccount = async () => {
-            if(confirm("Adakah anda pasti? Status akaun akan ditukar kepada INACTIVE.")) {
-                await updateDoc(doc(db, "users", currentUser.uid), { status: 'INACTIVE' });
-                signOut(auth);
-                playSound('success');
-                alert("Akaun dinyahaktifkan.");
+            const modal = document.getElementById('modal-cart');
+            if(modal.classList.contains('hidden-section')) {
+                renderCartItems();
+                modal.classList.remove('hidden-section');
+                document.body.style.overflow = 'hidden'; // Prevent background scroll
+            } else {
+                modal.classList.add('hidden-section');
+                document.body.style.overflow = '';
             }
         };
 
+        // Close modal when clicking outside
+        document.getElementById('modal-cart')?.addEventListener('click', (e) => {
+            if(e.target.id === 'modal-cart') toggleCartModal();
+        });
+
+        // ==================== AUTHENTICATION ====================
+        
+        window.doRegister = async () => {
+            const email = document.getElementById('reg-email').value.trim();
+            const pass = document.getElementById('reg-pass').value;
+            const phone = document.getElementById('reg-phone').value.trim();
+            const btn = document.getElementById('register-btn');
+            
+            // Validation
+            if(!pass || pass.length < 6) {
+                showToast('Password mesti sekurang-kurangnya 6 karakter', 'error');
+                return;
+            }
+            if(!phone || !isValidPhone(phone)) {
+                showToast('Nombor telefon tidak sah', 'error');
+                return;
+            }
+            if(email && !isValidEmail(email)) {
+                showToast('Format email tidak sah', 'error');
+                return;
+            }
+            
+            // Disable button during processing            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email || `user-${Date.now()}@mfd.local`, pass);
+                const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+                
+                // Create user document in Firestore
+                await setDoc(doc(db, "users", cred.user.uid), {
+                    username: "User_"+uac.split('-')[1], 
+                    email: email || '',
+                    phone: phone, 
+                    uac: uac, 
+                    role: 'customer', 
+                    status: 'ACTIVE', 
+                    address: '', 
+                    createdAt: serverTimestamp(), 
+                    logCache: serverTimestamp(),
+                    // Note: Password is handled by Firebase Auth, no need to store separately
+                });
+                
+                showToast('✅ Pendaftaran berjaya! Sila login.', 'success');
+                navTo('login');
+            } catch(e) {
+                console.error('Registration error:', e);
+                let msg = 'Pendaftaran gagal';
+                if(e.code === 'auth/email-already-in-use') msg = 'Email sudah digunakan';
+                else if(e.code === 'auth/weak-password') msg = 'Password terlalu lemah';
+                else if(e.code === 'auth/invalid-email') msg = 'Email tidak sah';
+                showToast(`❌ ${msg}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'REGISTER FREE';
+            }
+        };
+
+        window.doLogin = async () => {
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-pass').value;
+            const btn = document.getElementById('login-btn');
+            
+            if(!email || !pass) {
+                showToast('Sila masukkan email dan password', 'error');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
+            
+            try {                await signInWithEmailAndPassword(auth, email, pass);
+                showToast('✅ Login berjaya!', 'success');
+            } catch(e) {
+                console.error('Login error:', e);
+                let msg = 'Login gagal';
+                if(e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
+                    msg = 'Email atau password salah';
+                } else if(e.code === 'auth/too-many-requests') {
+                    msg = 'Terlalu banyak percubaan. Sila cuba sebentar lagi.';
+                }
+                showToast(`❌ ${msg}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'LOGIN NOW';
+            }
+        };
+
+        window.logout = () => {
+            signOut(auth);
+            playSound('click');
+            showToast('✅ Anda telah logout', 'success');
+            navTo('home');
+        };
+
+        window.deleteAccount = async () => {
+            if(!confirm("⚠️ Adakah anda pasti?\n\nAkaun anda akan dinyahaktifkan dan anda tidak boleh login semula.\n\nUntuk pemadaman kekal, hubungi admin.")) return;
+            
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), { 
+                    status: 'INACTIVE', 
+                    logCache: serverTimestamp(),
+                    deletedAt: serverTimestamp()
+                });
+                await signOut(auth);
+                showToast('✅ Akaun dinyahaktifkan. Terima kasih!', 'success');
+                navTo('home');
+            } catch(e) {
+                console.error('Delete error:', e);
+                showToast('❌ Gagal nyahaktif akaun', 'error');
+            }
+        };
+
+        // ==================== PRODUCT FUNCTIONS ====================
+        
         async function loadProducts() {
             try {
-                const snap = await getDocs(collection(db, "products"));
-                allProducts = []; snap.forEach(d => allProducts.push({id: d.id, ...d.data()}));
-                renderCatalog();
+                const q = query(collection(db, "products"), where("status", "==", "Public"));
+                const snap = await getDocs(q);
+                allProducts = []; 
+                snap.forEach(d => allProducts.push({id: d.id, ...d.data()}));                renderCatalog();
             } catch(e) {
                 console.error("Error loading products:", e);
-                document.getElementById('product-grid').innerHTML = `<div class="col-span-full text-center py-10 text-red-500">Error: ${e.message}</div>`;
+                document.getElementById('product-grid').innerHTML = `<div class="col-span-full text-center py-10 text-red-500">❌ Gagal memuatkan produk. Sila refresh.</div>`;
             }
         }
 
         window.renderCatalog = () => {
-            const search = document.getElementById('search-bar').value.toLowerCase();
-            const sort = document.getElementById('filter-sort').value;
+            const search = (document.getElementById('search-bar')?.value || '').toLowerCase().trim();
+            const sort = document.getElementById('filter-sort')?.value || 'default';
             const grid = document.getElementById('product-grid');
-            let filtered = allProducts.filter(p => p.status === 'Public' && p.name.toLowerCase().includes(search));
+            
+            let filtered = allProducts.filter(p => {
+                const matchSearch = !search || p.name?.toLowerCase().includes(search) || p.description?.toLowerCase().includes(search);
+                return p.status === 'Public' && matchSearch;
+            });
+            
             if(sort === 'highest') filtered.sort((a,b) => (b.totalSold || 0) - (a.totalSold || 0));
             if(sort === 'event') filtered = filtered.filter(p => p.event);
-            if(filtered.length === 0) { grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Tiada produk dijumpai.</div>`; return; }
-            grid.innerHTML = filtered.map(p => `                <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition">
-                    <img src="${p.imageUrl||'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg mb-2 bg-gray-200" onerror="this.src='https://via.placeholder.com/150?text=Error'">
-                    <h3 class="font-bold text-sm text-gray-800 leading-tight">${p.name}</h3>
+            
+            if(filtered.length === 0) { 
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Tiada produk dijumpai.</div>`; 
+                return; 
+            }
+            
+            grid.innerHTML = filtered.map(p => `
+                <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition">
+                    <img src="${p.imageUrl || 'https://via.placeholder.com/150?text=No+Image'}" 
+                         class="w-full h-32 object-cover rounded-lg mb-2 bg-gray-200" 
+                         onerror="this.src='https://via.placeholder.com/150?text=Error'"
+                         loading="lazy"
+                         alt="${p.name || 'Product'}">
+                    <h3 class="font-bold text-sm text-gray-800 leading-tight">${p.name || 'Unnamed'}</h3>
                     ${p.event ? `<span class="text-[10px] text-pink-600 font-bold">#${p.event}</span>` : ''}
-                    <p class="text-[10px] text-gray-500 line-clamp-2 my-1 flex-grow">${p.description}</p>
+                    <p class="text-[10px] text-gray-500 line-clamp-2 my-1 flex-grow">${p.description || ''}</p>
                     <div class="flex justify-between items-center mt-2">
-                        <span class="text-purple-600 font-bold text-sm">RM ${p.price}</span>
-                        <span class="text-[10px] bg-gray-100 px-1 rounded">${p.country||'-'}</span>
+                        <span class="text-purple-600 font-bold text-sm">${formatRM(p.priceSell || p.price)}</span>
+                        <span class="text-[10px] bg-gray-100 px-1 rounded">${p.country || '-'}</span>
                     </div>
                     <button onclick="addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2 shadow">Add to Cart</button>
                 </div>`).join('');
         };
 
-        window.addToCart = (id) => { cart.push(allProducts.find(x=>x.id===id)); document.getElementById('cart-count').innerText=cart.length; playSound('success'); };
-
-        function renderCartItems() {
-            const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
-            if(cart.length===0) { document.getElementById('cart-items').innerHTML = "<p class='text-center text-gray-500'>Cart kosong.</p>"; document.getElementById('cart-total').innerText = "RM 0.00"; return; }
-            document.getElementById('cart-items').innerHTML = cart.map((i,idx)=>`
-                <div class="flex justify-between items-center bg-white/60 p-2 rounded">
-                    <div class="text-xs"><div class="font-bold">${i.name}</div><div class="text-[10px] text-gray-500">Kode: ${i.uniqueCode||'N/A'}</div></div>
-                    <div class="flex items-center gap-2"><span class="font-bold text-purple-600 text-xs">RM ${i.price}</span><button onclick="cart.splice(${idx},1);renderCartItems();document.getElementById('cart-count').innerText=cart.length" class="text-red-500"><i class="fas fa-trash"></i></button></div>
-                </div>`).join('');
-            document.getElementById('cart-total').innerText = "RM "+total.toFixed(2);
-        }
-
-        window.submitOrder = async () => {
-            if(!currentUser) return alert("Sila login dahulu");
-            if(cart.length===0) return alert("Cart kosong");
-            if(!userData.address) return alert("Sila masukkan alamat di Dashboard dahulu");
-            
-            const total = cart.reduce((s,i)=>s+parseFloat(i.price),0);
-            const tracking = "TRK-"+Date.now().toString().substr(-8);
-            const orderId = "ORD-"+Date.now().toString().substr(-6);
-            const itemCounts = {};
-            cart.forEach(i => { itemCounts[i.id] = (itemCounts[i.id] || 0) + 1; });
-            
-            try {
-                await addDoc(collection(db, "orders"), {
-                    userId: currentUser.uid, uac: userData.uac, username: userData.username, items: cart, itemCounts: itemCounts, total: total, address: userData.address,
-                    trackingNo: tracking, orderId: orderId, paymentMethod: "Manual Transfer", paymentStatus: "Not Verified", status: "To Pay", deliveryStatus: "Pending",
-                    adminNote: "", userRating: null, currentStatus: "Pending Payment", createdAt: serverTimestamp()
-                });
-                cart=[]; document.getElementById('cart-count').innerText=0; toggleCartModal(); playSound('success'); 
-                showDashboardMessage("✅ Pesanan berjaya! Sila buat pembayaran.", 'success');
-                setTimeout(() => { loadUserData(); navTo('dashboard'); }, 1000);
-            } catch(e) { playSound('error'); showDashboardMessage("❌ Ralat: " + e.message, 'error'); }
+        window.addToCart = (id) => { 
+            const product = allProducts.find(x => x.id === id);
+            if(product) {
+                cart.push(product); 
+                document.getElementById('cart-count').innerText = cart.length; 
+                playSound('success');
+                showToast('✅ Ditambah ke cart', 'success', 1500);            }
         };
 
-        async function loadUserData() {            if(!currentUser) return;
-            showDashboardMessage("🔄 Memuatkan data...", 'success');
-
-            onSnapshot(doc(db, "users", currentUser.uid), (d)=>{
-                if(d.exists()){ userData=d.data(); updateDashUI(); } 
-                else { showDashboardMessage("❌ Data pengguna tidak dijumpai! sila buat akaun baru", 'error'); }
-            });
-
-            if(unsubscribeOrders) unsubscribeOrders();
-
-            try {
-                const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"));
-                unsubscribeOrders = onSnapshot(q, (snap) => {
-                    allUserOrders = []; snap.forEach(d => allUserOrders.push({id:d.id, ...d.data()}));
-                    filterOrders('all');
-                    if(snap.size > 0) showDashboardMessage(`✅ ${snap.size} pesanan dijumpai!`, 'success');
-                }, (error) => { 
-                    console.error("Order error:", error);
-                    if(error.code === 'failed-precondition') loadOrdersFallback();
-                    else showDashboardMessage("❌ Error: " + error.message, 'error');
-                });
-            } catch (e) { loadOrdersFallback(); }
+        function renderCartItems() {
+            const total = cart.reduce((s,i) => s + parseFloat(i.priceSell || i.price || 0), 0);
+            const container = document.getElementById('cart-items');
+            
+            if(cart.length === 0) { 
+                container.innerHTML = "<p class='text-center text-gray-500 py-4'>Cart kosong.</p>"; 
+                document.getElementById('cart-total').innerText = formatRM(0); 
+                return; 
+            }
+            
+            container.innerHTML = cart.map((i, idx) => `
+                <div class="flex justify-between items-center bg-white/60 p-2 rounded">
+                    <div class="text-xs">
+                        <div class="font-bold">${i.name || 'Item'}</div>
+                        <div class="text-[10px] text-gray-500">Kode: ${i.uniqueCode || 'N/A'}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-purple-600 text-xs">${formatRM(i.priceSell || i.price)}</span>
+                        <button onclick="removeFromCart(${idx})" class="text-red-500 hover:text-red-700 transition" title="Remove">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>`).join('');
+            document.getElementById('cart-total').innerText = formatRM(total);
         }
 
-        async function loadOrdersFallback() {
+        window.removeFromCart = (index) => {
+            cart.splice(index, 1);
+            renderCartItems();
+            document.getElementById('cart-count').innerText = cart.length;
+            playSound('click');
+        };
+
+        window.submitOrder = async () => {
+            if(!currentUser) {
+                showToast('❌ Sila login dahulu', 'error');
+                navTo('login');
+                return;
+            }
+            if(cart.length === 0) {
+                showToast('❌ Cart kosong', 'error');
+                return;
+            }
+            if(!userData?.address?.trim()) {
+                showToast('❌ Sila masukkan alamat di Dashboard dahulu', 'error');
+                navTo('dashboard');
+                return;            }
+            
+            const btn = document.getElementById('checkout-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            
             try {
-                const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid));
-                const snapshot = await getDocs(q);
-                allUserOrders = [];
-                snapshot.forEach(d => allUserOrders.push({id:d.id, ...d.data()}));
-                allUserOrders.sort((a, b) => (b.createdAt?.toDate?.() || 0) - (a.createdAt?.toDate?.() || 0));
-                filterOrders('all');
-                showDashboardMessage(`✅ ${allUserOrders.length} pesanan (Fallback)`, 'success');
-            } catch(e) {
-                showDashboardMessage("❌ Error: " + e.message, 'error');
+                const total = cart.reduce((s,i) => s + parseFloat(i.priceSell || i.price || 0), 0);
+                const tracking = "TRK-" + Date.now().toString().substr(-8);
+                const orderId = "ORD-" + Date.now().toString().substr(-6);
+                const itemCounts = {};
+                cart.forEach(i => { itemCounts[i.id] = (itemCounts[i.id] || 0) + 1; });
+                
+                await addDoc(collection(db, "orders"), {
+                    userId: currentUser.uid, 
+                    uac: userData.uac, 
+                    username: userData.username, 
+                    items: cart, 
+                    itemCounts: itemCounts, 
+                    total: total, 
+                    address: userData.address,
+                    trackingNo: tracking, 
+                    orderId: orderId, 
+                    paymentMethod: "Manual Transfer", 
+                    paymentStatus: "Not Verified", 
+                    status: "To Pay", 
+                    deliveryStatus: "Pending",
+                    adminNote: "", 
+                    currentStatus: "Pending Payment - Menunggu pembayaran", 
+                    userRating: null, 
+                    createdAt: serverTimestamp(), 
+                    category: "To Pay",
+                    updatedAt: serverTimestamp()
+                });
+                
+                // Update product sold count (optional - can be done via Cloud Function)
+                cart.forEach(item => {
+                    updateDoc(doc(db, "products", item.id), {
+                        totalSold: (item.totalSold || 0) + 1
+                    }).catch(() => {}); // Silent fail
+                });
+                
+                cart = []; 
+                document.getElementById('cart-count').innerText = 0; 
+                toggleCartModal(); 
+                playSound('success');
+                showToast('✅ Pesanan berjaya! Sila buat pembayaran.', 'success', 5000);
+                
+                setTimeout(() => { 
+                    if(currentUser) loadUserData();                     navTo('dashboard'); 
+                }, 1000);
+                
+            } catch(e) { 
+                console.error('Order error:', e);
+                showToast('❌ Ralat: ' + (e.message || 'Unknown error'), 'error'); 
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>KONFIRM PESANAN';
+            }
+        };
+
+        // ==================== USER DASHBOARD ====================
+        
+        async function loadUserData() {
+            if(!currentUser) return;
+            
+            // Listen to user data changes
+            if(unsubscribeUsers) unsubscribeUsers();
+            unsubscribeUsers = onSnapshot(doc(db, "users", currentUser.uid), (d) => {
+                if(d.exists()) { 
+                    userData = d.data(); 
+                    updateDashUI(); 
+                } else { 
+                    showToast('❌ Data pengguna tidak dijumpai', 'error'); 
+                }
+            }, (error) => {
+                console.error('User snapshot error:', error);
+            });
+
+            // Listen to orders
+            if(unsubscribeOrders) unsubscribeOrders();
+            
+            try {
+                const q = query(collection(db, "orders"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc"), limit(50));
+                unsubscribeOrders = onSnapshot(q, (snap) => {
+                    allUserOrders = []; 
+                    snap.forEach(d => allUserOrders.push({id: d.id, ...d.data()}));
+                    filterOrders('all');
+                }, (error) => { 
+                    console.error("Order error:", error); 
+                });
+            } catch (e) { 
+                console.error(e); 
             }
         }
 
         function updateDashUI() {
-            document.getElementById('nav-username').innerText = userData.username;
-            document.getElementById('nav-uac').innerText = userData.uac;
-            document.getElementById('dash-user-display').innerText = userData.username;
-            document.getElementById('dash-uac-display').innerText = userData.uac;
-            document.getElementById('dash-phone').innerText = userData.phone;
-            document.getElementById('dash-address').value = userData.address||"";
-            const s = document.getElementById('dash-status'); s.innerText = userData.status;
-            s.className = `badge ${userData.status==='ACTIVE'?'badge-active':userData.status==='BLOCKED'?'badge-blocked':'badge-inactive'}`;
+            const els = {
+                'nav-username': userData.username,                'nav-uac': userData.uac,
+                'dash-user-display': userData.username,
+                'dash-uac-display': userData.uac,
+                'dash-phone': userData.phone,
+                'dash-address': userData.address || ""
+            };
+            
+            Object.entries(els).forEach(([id, val]) => {
+                const el = document.getElementById(id);
+                if(el) el.innerText = val || '-';
+            });
+            
+            const statusEl = document.getElementById('dash-status');
+            if(statusEl) {
+                statusEl.innerText = userData.status || 'UNKNOWN';
+                statusEl.className = `badge ${userData.status === 'ACTIVE' ? 'badge-active' : userData.status === 'BLOCKED' ? 'badge-blocked' : 'badge-inactive'}`;
+            }
         }
 
-        window.updateProfile = async () => {            try {
-                await updateDoc(doc(db, "users", currentUser.uid), { address: document.getElementById('dash-address').value, logCache: serverTimestamp() });
-                playSound('success'); showDashboardMessage("✅ Alamat dikemaskini!", 'success');
-            } catch(e) { playSound('error'); showDashboardMessage("❌ Error: " + e.message, 'error'); }
+        window.updateProfile = async () => {
+            const address = document.getElementById('dash-address')?.value?.trim();
+            const btn = document.getElementById('save-profile-btn');
+            
+            if(!address) {
+                showToast('❌ Alamat tidak boleh kosong', 'error');
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), { 
+                    address: address, 
+                    logCache: serverTimestamp() 
+                });
+                showToast('✅ Alamat dikemaskini!', 'success');
+            } catch(e) { 
+                console.error('Update error:', e);
+                showToast('❌ Gagal kemaskini: ' + e.message, 'error'); 
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Save Changes';
+            }
         };
 
         window.filterOrders = (status) => {
             const tbody = document.getElementById('user-order-history');
             const noMsg = document.getElementById('no-orders-msg');
-            const filtered = status === 'all' ? allUserOrders : allUserOrders.filter(o=>o.status===status);
+            const filtered = status === 'all' ? allUserOrders : allUserOrders.filter(o => o.status === status || o.category === status);            
+            if(filtered.length === 0) { 
+                tbody.innerHTML = ""; 
+                noMsg?.classList.remove('hidden-section'); 
+                return; 
+            }
+            noMsg?.classList.add('hidden-section');
             
-            if(filtered.length===0) { tbody.innerHTML=""; noMsg.classList.remove('hidden-section'); return; }
-            noMsg.classList.add('hidden-section');
-            
-            tbody.innerHTML = filtered.map(o=>{
-                const itemNames = o.items.map(i=>i.name).join(", ");
-                const itemCodes = o.items.map(i=>i.uniqueCode||'N/A').join(", ");
-                const totalQty = Object.values(o.itemCounts||{}).reduce((a,b)=>a+b,0) || o.items.length;
-                let badgeClass = 'badge-to-pay';
-                if(o.status==='To Ship') badgeClass='badge-to-ship';
-                else if(o.status==='To Receive') badgeClass='badge-to-receive';
-                else if(o.status==='Completed') badgeClass='badge-completed';
-                else if(o.status==='Cancelled') badgeClass='badge-cancelled';
-                else if(o.status==='Return/Refund') badgeClass='badge-refund';
+            tbody.innerHTML = filtered.map(o => {
+                const itemNames = o.items?.map(i => i.name).join(", ") || '-';
+                const itemCodes = o.items?.map(i => i.uniqueCode || 'N/A').join(", ") || '-';
+                const totalQty = Object.values(o.itemCounts || {}).reduce((a,b) => a + b, 0) || o.items?.length || 0;
                 
-                let deliveryBadge = 'badge-delivery-pending';
-                if(o.deliveryStatus==='Shipping') deliveryBadge = 'badge-delivery-shipping';
-                else if(o.deliveryStatus==='Delivered') deliveryBadge = 'badge-delivery-delivered';
+                let badgeClass = 'badge-to-pay';
+                if(o.status === 'To Ship') badgeClass = 'badge-to-ship';
+                else if(o.status === 'To Receive') badgeClass = 'badge-to-receive';
+                else if(o.status === 'Completed') badgeClass = 'badge-completed';
+                else if(o.status === 'Cancelled') badgeClass = 'badge-cancelled';
+                else if(o.status === 'Return/Refund') badgeClass = 'badge-refund';
                 
                 let actions = '';
-                if(o.status==='To Pay') actions = `<button onclick="cancelOrder('${o.id}')" class="action-btn btn-delete">Cancel</button>`;
-                if(o.status==='To Receive') actions = `<button onclick="completeOrder('${o.id}')" class="action-btn" style="background:#9ae6b4;color:#22543d;">Received</button>`;
-                if(o.status==='Completed') {
+                if(o.status === 'To Pay') actions = `<button onclick="cancelOrder('${o.id}')" class="action-btn btn-delete">Cancel</button>`;
+                if(o.status === 'To Receive') actions = `<button onclick="completeOrder('${o.id}')" class="action-btn" style="background:#9ae6b4;color:#22543d;">Received</button>`;
+                if(o.status === 'Completed') {
                     if(!o.userRating) actions += ` <button onclick="rateOrder('${o.id}')" class="action-btn" style="background:#faf089;color:#744210;">Rate</button>`;
                     else actions += ` <span class="text-yellow-500 text-[10px]">⭐${o.userRating}</span>`;
                     actions += ` <button onclick="reorder('${o.id}')" class="action-btn btn-edit">Reorder</button>`;
                 }
+                
                 return `<tr>
-                    <td class="font-bold text-xs">${o.username}</td>
-                    <td class="max-w-xs truncate">${itemNames}</td>
+                    <td class="font-bold text-xs">${o.username || '-'}</td>
+                    <td class="max-w-xs truncate" title="${itemNames}">${itemNames}</td>
                     <td class="font-mono text-[10px]">${itemCodes}</td>
-                    <td class="max-w-xs truncate text-[10px]">${o.address}</td>
+                    <td class="max-w-xs truncate text-[10px]" title="${o.address || '-'}">${o.address || '-'}</td>
                     <td class="text-center">${totalQty}</td>
-                    <td class="font-bold text-purple-600">RM ${o.total}</td>
-                    <td class="text-[10px]">${o.paymentMethod}</td>
-                    <td><span class="badge ${badgeClass}">${o.paymentStatus}</span></td>
-                    <td><span class="badge ${deliveryBadge}">${o.deliveryStatus||'Pending'}</span></td>
-                    <td class="font-mono text-[10px]">${o.trackingNo||'-'}</td>
-                    <td class="font-mono text-[10px]">${o.orderId}</td>
-                    <td>${o.userRating?'⭐'+o.userRating:'-'}</td>                    <td class="text-center">${actions}</td>
+                    <td class="font-bold text-purple-600">${formatRM(o.total)}</td>
+                    <td class="text-[10px]">${o.paymentMethod || '-'}</td>
+                    <td><span class="badge ${badgeClass}">${o.paymentStatus || '-'}</span></td>
+                    <td><span class="badge ${o.deliveryStatus === 'Delivered' ? 'badge-completed' : 'badge-to-ship'}">${o.deliveryStatus || 'Pending'}</span></td>
+                    <td class="font-mono text-[10px]">${o.trackingNo || '-'}</td>
+                    <td class="font-mono text-[10px]">${o.orderId || '-'}</td>
+                    <td>${o.userRating ? '⭐'+o.userRating : '-'}</td>
+                    <td class="text-center">${actions || '-'}</td>
                 </tr>`;
             }).join('');
         };
 
-        window.cancelOrder = async (id) => { if(confirm("Batal?")) { await updateDoc(doc(db,"orders",id), {status:'Cancelled'}); playSound('error'); showDashboardMessage("❌ Dibatalkan", 'error'); } };
-        window.completeOrder = async (id) => { await updateDoc(doc(db,"orders",id), {status:'Completed', deliveryStatus:'Delivered'}); playSound('success'); showDashboardMessage("✅ Selesai!", 'success'); };
-        window.rateOrder = async (id) => { const r=prompt("Rating (1-5):","5"); if(r) { await updateDoc(doc(db,"orders",id),{userRating:parseInt(r)}); playSound('success'); } };
-        window.reorder = (id) => { const order = allUserOrders.find(o => o.id === id); if(order) { cart = [...cart, ...order.items]; document.getElementById('cart-count').innerText = cart.length; playSound('success'); showDashboardMessage("🛒 Item ditambah!", 'success'); } };
+        window.cancelOrder = async (id) => { 
+            if(!confirm("Batal pesanan ini?")) return;
+            try {                await updateDoc(doc(db, "orders", id), {status: 'Cancelled', category: 'Cancelled', updatedAt: serverTimestamp()}); 
+                showToast('❌ Pesanan dibatalkan', 'warning'); 
+            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
+        };
+        
+        window.completeOrder = async (id) => { 
+            try {
+                await updateDoc(doc(db, "orders", id), {status: 'Completed', deliveryStatus: 'Delivered', category: 'Completed', updatedAt: serverTimestamp()}); 
+                showToast('✅ Pesanan selesai!', 'success'); 
+            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
+        };
+        
+        window.rateOrder = async (id) => { 
+            const r = prompt("Rating (1-5):", "5"); 
+            if(r && !isNaN(r) && r >= 1 && r <= 5) { 
+                await updateDoc(doc(db, "orders", id), {userRating: parseInt(r)}); 
+                showToast('⭐ Terima kasih untuk rating!', 'success'); 
+            } 
+        };
+        
+        window.reorder = (id) => { 
+            const order = allUserOrders.find(o => o.id === id); 
+            if(order?.items) { 
+                cart = [...cart, ...order.items]; 
+                document.getElementById('cart-count').innerText = cart.length; 
+                showToast('🛒 Item ditambah ke cart!', 'success'); 
+            } 
+        };
 
-        // Chat Functions
+        // ==================== ADMIN FUNCTIONS - PRODUCTION READY ====================
+        
+        window.loadAdminData = async () => {
+            if(userData.role !== 'admin') {
+                showToast('❌ Akses ditolak', 'error');
+                return navTo('home');
+            }
+            
+            // Load stats with error handling
+            try {
+                const [usersSnap, ordersSnap, productsSnap] = await Promise.all([
+                    getDocs(collection(db, "users")),
+                    getDocs(collection(db, "orders")),
+                    getDocs(collection(db, "products"))
+                ]);
+                
+                allUsers = usersSnap.docs.map(d => ({id: d.id, ...d.data()}));
+                const allOrders = ordersSnap.docs.map(d => ({id: d.id, ...d.data()}));
+                
+                // Update stats cards
+                document.getElementById('stat-total-users').innerText = allUsers.length;                document.getElementById('stat-total-orders').innerText = allOrders.length;
+                const revenue = allOrders.filter(o => o.status === 'Completed').reduce((sum, o) => sum + (o.total || 0), 0);
+                document.getElementById('stat-revenue').innerText = formatRM(revenue);
+                document.getElementById('stat-pending').innerText = allOrders.filter(o => o.status === 'To Pay').length;
+                
+            } catch(e) {
+                console.error('Stats load error:', e);
+                showToast('⚠️ Gagal memuat statistik', 'warning');
+            }
+            
+            // Real-time orders listener
+            if(unsubscribeOrders) unsubscribeOrders();
+            const q = query(collection(db, "orders"), orderBy("createdAt", "desc"), limit(100));
+            unsubscribeOrders = onSnapshot(q, (snap) => {
+                allAdminOrders = [];
+                snap.forEach(d => allAdminOrders.push({id: d.id, ...d.data()}));
+                filterVerifyOrders('all');
+                filterManageOrders();
+                renderAdminProducts();
+            });
+            
+            // Initial render
+            renderAdminUsers();
+            renderBlacklist();
+            if(document.getElementById('tab-chat')?.classList.contains('hidden-section') === false) {
+                loadChatList();
+            }
+        };
+
+        // Render Admin Users Table
+        function renderAdminUsers() {
+            const tbody = document.getElementById('admin-user-list');
+            if(!tbody) return;
+            
+            const search = (document.getElementById('user-search')?.value || '').toLowerCase().trim();
+            const statusFilter = document.getElementById('user-status-filter')?.value || 'all';
+            
+            let filtered = allUsers.filter(u => {
+                const matchSearch = !search || u.username?.toLowerCase().includes(search) || u.uac?.toLowerCase().includes(search) || u.phone?.includes(search);
+                const matchStatus = statusFilter === 'all' || u.status === statusFilter;
+                return matchSearch && matchStatus;
+            });
+            
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-8 text-gray-500">Tiada pengguna dijumpai.</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(u => {
+                const userOrders = allAdminOrders.filter(o => o.userId === u.id || o.uac === u.uac);                const totalOrders = userOrders.length;
+                const totalCheckout = userOrders.filter(o => o.status === 'Completed').length;
+                const cartItems = userOrders.filter(o => o.status === 'To Pay').length;
+                const isInUse = u.logCache ? (new Date() - new Date(u.logCache.toDate?.() || u.logCache)) < 30*60*1000 : false;
+                
+                return `<tr>
+                    <td class="font-mono text-[10px]">${u.uac || '-'}</td>
+                    <td class="font-bold text-xs">${u.username || '-'}</td>
+                    <td><span class="password-blur" title="Klik untuk lihat" onclick="this.classList.toggle('password-blur');this.classList.toggle('revealed')">••••••••</span></td>
+                    <td>${u.phone || '-'}</td>
+                    <td class="max-w-xs truncate" title="${u.address || '-'}">${u.address || '-'}</td>
+                    <td><span class="badge ${u.status === 'ACTIVE' ? 'badge-active' : u.status === 'BLOCKED' ? 'badge-blocked' : 'badge-inactive'}">${u.status || 'UNKNOWN'}</span></td>
+                    <td class="text-center">${cartItems}</td>
+                    <td class="text-center">${totalOrders}</td>
+                    <td class="text-center">${totalCheckout}</td>
+                    <td class="text-center"><span class="${isInUse ? 'text-green-600 font-bold' : 'text-gray-400'}" title="${isInUse ? 'Aktif dalam 30min lepas' : 'Tidak aktif'}">${isInUse ? '🟢' : '⚪'}</span></td>
+                    <td class="text-[10px]">${formatDate(u.logCache)}</td>
+                    <td class="text-center space-y-1">
+                        ${u.status !== 'BLOCKED' ? `<button onclick="blockUser('${u.id}')" class="action-btn btn-delete block">Block</button>` : `<button onclick="unblockUser('${u.id}')" class="action-btn" style="background:#9ae6b4;color:#22543d;">Unblock</button>`}
+                        <button onclick="deleteUser('${u.id}')" class="action-btn btn-delete block">Delete</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        window.filterAdminUsers = () => renderAdminUsers();
+
+        // Render Verify Orders Table
+        window.filterVerifyOrders = (status) => {
+            const tbody = document.getElementById('admin-verify-order-list');
+            if(!tbody) return;
+            
+            const filtered = status === 'all' ? allAdminOrders : allAdminOrders.filter(o => o.status === status || o.category === status);
+            
+            // Update active tab styling
+            document.querySelectorAll('#tab-orders-verify .admin-filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'ring-2', 'ring-purple-400');
+                if((status === 'all' && btn.innerText.trim() === 'All') || btn.innerText.includes(status)) {
+                    btn.classList.add('active', 'ring-2', 'ring-purple-400');
+                }
+            });
+
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="14" class="text-center py-8 text-gray-500">Tiada pesanan untuk status ini.</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(o => {
+                const itemNames = o.items?.map(i => i.name).join(', ') || '-';
+                const itemCodes = o.items?.map(i => i.uniqueCode || 'N/A').join(', ') || '-';                const totalQty = Object.values(o.itemCounts || {}).reduce((a,b) => a + b, 0) || o.items?.length || 0;
+                
+                let badgeClass = 'badge-to-pay';
+                if(o.status === 'To Ship') badgeClass = 'badge-to-ship';
+                else if(o.status === 'To Receive') badgeClass = 'badge-to-receive';
+                else if(o.status === 'Completed') badgeClass = 'badge-completed';
+                else if(o.status === 'Cancelled') badgeClass = 'badge-cancelled';
+                else if(o.status === 'Return/Refund') badgeClass = 'badge-refund';
+
+                return `<tr>
+                    <td class="font-mono text-[10px]">${o.uac || '-'}</td>
+                    <td class="font-bold text-xs">${o.username || '-'}</td>
+                    <td class="max-w-xs truncate" title="${itemNames}">${itemNames}</td>
+                    <td class="font-mono text-[10px]">${itemCodes}</td>
+                    <td class="max-w-xs truncate text-[10px]" title="${o.address || '-'}">${o.address || '-'}</td>
+                    <td class="text-center">${totalQty}</td>
+                    <td class="font-bold text-purple-600">${formatRM(o.total)}</td>
+                    <td class="text-[10px]">${o.paymentMethod || '-'}</td>
+                    <td>
+                        <select onchange="updateOrderField('${o.id}','paymentStatus',this.value)" class="text-[10px] p-1 rounded border bg-white/80" ${o.status === 'Completed' ? 'disabled' : ''}>
+                            <option ${o.paymentStatus === 'Not Verified' ? 'selected' : ''}>Not Verified</option>
+                            <option ${o.paymentStatus === 'Verified' ? 'selected' : ''}>Verified</option>
+                        </select>
+                    </td>
+                    <td><input value="${o.trackingNo || ''}" onchange="updateOrderField('${o.id}','trackingNo',this.value)" class="text-[10px] p-1 w-24 rounded border" placeholder="Tracking..."></td>
+                    <td class="font-mono text-[10px]">${o.orderId || '-'}</td>
+                    <td><input value="${o.currentStatus || o.status || ''}" onchange="updateOrderField('${o.id}','currentStatus',this.value)" class="text-[10px] p-1 w-32 rounded border" placeholder="Admin note..."></td>
+                    <td><span class="badge ${badgeClass}">${o.category || o.status || '-'}</span></td>
+                    <td class="text-center">
+                        <select onchange="updateOrderStatus('${o.id}', this.value)" class="text-[10px] font-bold p-1 rounded border border-purple-300 bg-purple-50 text-purple-700" ${o.status === 'Completed' || o.status === 'Cancelled' ? 'disabled' : ''}>
+                            <option value="To Pay" ${o.status === 'To Pay' ? 'selected' : ''}>To Pay</option>
+                            <option value="To Ship" ${o.status === 'To Ship' ? 'selected' : ''}>To Ship</option>
+                            <option value="To Receive" ${o.status === 'To Receive' ? 'selected' : ''}>To Receive</option>
+                            <option value="Completed" ${o.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            <option value="Return/Refund" ${o.status === 'Return/Refund' ? 'selected' : ''}>Return</option>
+                            <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </td>
+                </tr>`;
+            }).join('');
+        };
+
+        // Render Manage Orders Table
+        window.filterManageOrders = () => {
+            const tbody = document.getElementById('admin-manage-order-list');
+            if(!tbody) return;
+            
+            const search = (document.getElementById('order-search')?.value || '').toLowerCase().trim();
+            const category = document.getElementById('order-category-filter')?.value || 'all';
+                        let filtered = allAdminOrders.filter(o => {
+                const matchSearch = !search || o.username?.toLowerCase().includes(search) || o.orderId?.toLowerCase().includes(search) || o.items?.some(i => i.name?.toLowerCase().includes(search));
+                const matchCategory = category === 'all' || o.status === category || o.category === category;
+                return matchSearch && matchCategory;
+            });
+            
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="13" class="text-center py-8 text-gray-500">Tiada pesanan dijumpai.</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(o => {
+                const itemNames = o.items?.map(i => i.name).join(', ') || '-';
+                const itemCodes = o.items?.map(i => i.uniqueCode || 'N/A').join(', ') || '-';
+                const totalQty = Object.values(o.itemCounts || {}).reduce((a,b) => a + b, 0) || o.items?.length || 0;
+                
+                return `<tr>
+                    <td class="font-mono text-[10px]">${o.uac || '-'}</td>
+                    <td class="font-bold text-xs">${o.username || '-'}</td>
+                    <td class="max-w-xs truncate" title="${itemNames}">${itemNames}</td>
+                    <td class="font-mono text-[10px]">${itemCodes}</td>
+                    <td class="max-w-xs truncate text-[10px]" title="${o.address || '-'}">${o.address || '-'}</td>
+                    <td class="text-center">${totalQty}</td>
+                    <td class="font-bold text-purple-600">${formatRM(o.total)}</td>
+                    <td class="text-[10px]">${o.paymentMethod || '-'}</td>
+                    <td><span class="badge ${o.paymentStatus === 'Verified' ? 'badge-completed' : 'badge-to-pay'}">${o.paymentStatus || '-'}</span></td>
+                    <td>
+                        <select onchange="updateOrderField('${o.id}','deliveryStatus',this.value)" class="text-[10px] p-1 rounded border bg-white/80">
+                            <option ${o.deliveryStatus === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option ${o.deliveryStatus === 'Shipping' ? 'selected' : ''}>Shipping</option>
+                            <option ${o.deliveryStatus === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                        </select>
+                    </td>
+                    <td><input value="${o.trackingNo || ''}" onchange="updateOrderField('${o.id}','trackingNo',this.value)" class="text-[10px] p-1 w-24 rounded border" placeholder="Tracking..."></td>
+                    <td class="font-mono text-[10px]">${o.orderId || '-'}</td>
+                    <td class="text-center">
+                        ${o.status !== 'Cancelled' ? `<button onclick="cancelCustomerOrder('${o.id}')" class="action-btn btn-delete">Cancel</button>` : `<span class="text-gray-400 text-[10px]">Dibatalkan</span>`}
+                    </td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.cancelCustomerOrder = async (id) => {
+            if(!confirm("Batal pesanan pelanggan ini?")) return;
+            try {
+                await updateDoc(doc(db, "orders", id), { status: 'Cancelled', category: 'Cancelled', updatedAt: serverTimestamp() });
+                showToast('✅ Pesanan dibatalkan', 'success');
+            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
+        };
+        // Enhanced Product Functions
+        // Image preview
+        document.getElementById('prod-img-file')?.addEventListener('change', function(e) {
+            const file = e.target.files?.[0];
+            if(file) {
+                // Validate file
+                if(file.size > 5 * 1024 * 1024) {
+                    showToast('❌ Gambar terlalu besar (max 5MB)', 'error');
+                    this.value = '';
+                    return;
+                }
+                if(!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                    showToast('❌ Format tidak disokong (JPG/PNG/WebP)', 'error');
+                    this.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const preview = document.getElementById('prod-img-preview');
+                    preview.querySelector('img').src = event.target.result;
+                    preview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Auto-generate unique code
+        document.getElementById('prod-name')?.addEventListener('input', function() {
+            const codeEl = document.getElementById('prod-unique-code');
+            if(codeEl && !codeEl.value) {
+                codeEl.value = "ITEM-" + Math.random().toString(36).substr(2,6).toUpperCase();
+            }
+        });
+
+        window.addProductEnhanced = async () => {
+            const name = document.getElementById('prod-name')?.value?.trim();
+            const priceSell = parseFloat(document.getElementById('prod-price-sell')?.value);
+            const imgFile = document.getElementById('prod-img-file')?.files?.[0];
+            const imgUrl = document.getElementById('prod-img-url')?.value?.trim();
+            const btn = document.getElementById('add-product-btn');
+            
+            // Validation
+            if(!name) { showToast('❌ Nama Item diperlukan', 'error'); return; }
+            if(!priceSell || priceSell <= 0) { showToast('❌ Harga Jualan tidak sah', 'error'); return; }
+            if(!imgUrl && !imgFile) { showToast('❌ Sila upload atau paste URL gambar', 'error'); return; }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Uploading...';
+                        try {
+                let finalImgUrl = imgUrl;
+                
+                // Upload image if file selected
+                if(imgFile) {
+                    const storageRef = ref(storage, `products/${Date.now()}_${name.replace(/[^a-z0-9]/gi, '_')}_${imgFile.name}`);
+                    await uploadBytes(storageRef, imgFile);
+                    finalImgUrl = await getDownloadURL(storageRef);
+                }
+                
+                const priceCost = parseFloat(document.getElementById('prod-price-cost')?.value) || 0;
+                const uniqueCode = document.getElementById('prod-unique-code')?.value || "ITEM-" + Math.random().toString(36).substr(2,6).toUpperCase();
+                
+                await addDoc(collection(db, "products"), {
+                    name: name,
+                    price: priceCost,
+                    priceSell: priceSell,
+                    description: document.getElementById('prod-desc')?.value?.trim() || '',
+                    imageUrl: finalImgUrl,
+                    status: document.getElementById('prod-status')?.value || 'Public',
+                    country: document.getElementById('prod-country')?.value?.trim() || '',
+                    event: document.getElementById('prod-event')?.value?.trim() || '',
+                    label: document.getElementById('prod-label')?.value?.trim() || '',
+                    variation: document.getElementById('prod-variation')?.value?.trim() || '',
+                    uniqueCode: uniqueCode,
+                    link: document.getElementById('prod-link')?.value?.trim() || '',
+                    totalSold: 0,
+                    rating: 5.0,
+                    revenue: 0,
+                    allowReviews: document.getElementById('prod-allow-review')?.checked ?? true,
+                    featured: document.getElementById('prod-featured')?.checked ?? false,
+                    reviews: [],
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+                
+                showToast('✅ Produk berjaya dilancarkan!', 'success');
+                loadAdminData();
+                loadProducts();
+                
+                // Reset form
+                document.querySelectorAll('#tab-products input:not([readonly]), #tab-products textarea').forEach(i => { if(i.type !== 'checkbox') i.value = ''; });
+                document.getElementById('prod-img-preview')?.classList.add('hidden');
+                document.getElementById('prod-unique-code').value = '';
+                
+            } catch(e) {
+                console.error('Add product error:', e);
+                showToast('❌ Gagal: ' + (e.message || 'Unknown error'), 'error');
+            } finally {
+                btn.disabled = false;                btn.innerHTML = '<i class="fas fa-plus mr-2"></i>LANCAR PRODUK';
+            }
+        };
+
+        window.renderAdminProducts = () => {
+            const tbody = document.getElementById('admin-prod-list');
+            if(!tbody) return;
+            
+            const search = (document.getElementById('prod-search')?.value || '').toLowerCase().trim();
+            const statusFilter = document.getElementById('prod-status-filter')?.value || 'all';
+            
+            let filtered = allProducts.filter(p => {
+                const matchSearch = !search || p.name?.toLowerCase().includes(search) || p.uniqueCode?.toLowerCase().includes(search);
+                const matchStatus = statusFilter === 'all' || p.status === statusFilter;
+                return matchSearch && matchStatus;
+            });
+            
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-gray-500">Tiada produk dijumpai.</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map((p, i) => {
+                const revenue = (p.priceSell - p.price) * (p.totalSold || 0);
+                const reviewCount = p.reviews?.length || 0;
+                
+                return `<tr>
+                    <td>${i+1}</td>
+                    <td><img src="${p.imageUrl || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded object-cover bg-gray-200" onerror="this.src='https://via.placeholder.com/40'" loading="lazy"></td>
+                    <td class="font-bold text-xs max-w-xs truncate" title="${p.name || '-'}">${p.name || 'Unnamed'}</td>
+                    <td class="font-bold text-purple-600">${formatRM(p.priceSell)}</td>
+                    <td>⭐${(p.rating || 5.0).toFixed(1)}</td>
+                    <td><span class="badge ${p.status === 'Public' ? 'badge-active' : p.status === 'Private' ? 'badge-private' : 'badge-outstock'}">${p.status || 'UNKNOWN'}</span></td>
+                    <td class="text-center">${p.totalSold || 0}</td>
+                    <td class="font-bold text-green-600">${formatRM(revenue)}</td>
+                    <td class="text-center">
+                        ${reviewCount > 0 ? `<button onclick="showProductReviews('${p.id}')" class="action-btn btn-view">${reviewCount} reviews</button>` : '<span class="text-gray-400 text-[10px]">-</span>'}
+                    </td>
+                    <td><button onclick="editProduct('${p.id}')" class="action-btn btn-edit">Edit</button></td>
+                    <td><button onclick="deleteProduct('${p.id}')" class="action-btn btn-delete">Padam</button></td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.showProductReviews = (productId) => {
+            const product = allProducts.find(p => p.id === productId);
+            if(!product || !product.reviews?.length) {
+                showToast('Tiada reviews', 'warning');
+                return;
+            }            
+            const content = document.getElementById('reviews-content');
+            content.innerHTML = product.reviews.map(r => `
+                <div class="p-2 bg-gray-50 rounded text-xs">
+                    <div class="flex justify-between"><span class="font-bold">${r.username || 'Anonymous'}</span><span class="text-yellow-500">⭐${r.rating || 5}</span></div>
+                    <p class="text-gray-600 mt-1">${r.comment || ''}</p>
+                    <span class="text-[10px] text-gray-400">${r.date ? formatDate(r.date) : '-'}</span>
+                </div>
+            `).join('');
+            
+            document.getElementById('modal-reviews').classList.remove('hidden-section');
+        };
+
+        window.closeReviewsModal = () => {
+            document.getElementById('modal-reviews').classList.add('hidden-section');
+        };
+
+        window.editProduct = async (id) => {
+            const product = allProducts.find(p => p.id === id);
+            if(!product) return;
+            
+            const newName = prompt("Nama baru:", product.name);
+            const newPrice = prompt("Harga jualan baru (RM):", product.priceSell);
+            const newStatus = prompt("Status (Public/Private/Out of Stock):", product.status);
+            
+            if(newName && newPrice && newStatus) {
+                try {
+                    await updateDoc(doc(db, "products", id), {
+                        name: newName,
+                        priceSell: parseFloat(newPrice),
+                        status: newStatus,
+                        updatedAt: serverTimestamp()
+                    });
+                    showToast('✅ Produk dikemaskini', 'success');
+                    loadAdminData();
+                    loadProducts();
+                } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
+            }
+        };
+
+        window.deleteProduct = async (id) => {
+            if(!confirm("⚠️ Padam produk ini? Tindakan tidak boleh dipulihkan.")) return;
+            try {
+                await deleteDoc(doc(db, "products", id));
+                showToast('✅ Produk dipadam', 'success');
+                loadAdminData();
+                loadProducts();
+            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
+        };
+        // Blacklist Functions
+        function renderBlacklist() {
+            const tbody = document.getElementById('admin-blacklist-list');
+            if(!tbody) return;
+            
+            const blocked = allUsers.filter(u => u.status === 'BLOCKED');
+            
+            if(blocked.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-500">Tiada akaun dalam blacklist.</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = blocked.map(u => `
+                <tr>
+                    <td class="font-mono text-[10px]">${u.uac || '-'}</td>
+                    <td class="font-bold text-red-600">${u.username || '-'}</td>
+                    <td>-</td>
+                    <td><span class="badge badge-blocked">BLOCKED</span></td>
+                    <td class="text-[10px]">${formatDate(u.logCache)}</td>
+                    <td class="max-w-xs truncate">${u.blockComment || '-'}</td>
+                    <td class="text-center space-y-1">
+                        <button onclick="unblockUser('${u.id}')" class="action-btn" style="background:#9ae6b4;color:#22543d;">Unblock</button>
+                        <button onclick="deleteUser('${u.id}')" class="action-btn btn-delete block">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        window.searchForBlock = async () => {
+            const search = document.getElementById('block-search')?.value?.toLowerCase().trim();
+            const results = document.getElementById('block-search-results');
+            const btn = document.getElementById('search-block-btn');
+            
+            if(!search) { results.innerHTML = ''; return; }
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            try {
+                const matches = allUsers.filter(u => 
+                    u.status !== 'BLOCKED' && 
+                    (u.username?.toLowerCase().includes(search) || u.uac?.toLowerCase().includes(search) || u.phone?.includes(search))
+                );
+                
+                if(matches.length === 0) {
+                    results.innerHTML = `<p class="text-center text-gray-500 text-xs">Tiada akaun dijumpai.</p>`;
+                    return;
+                }
+                
+                results.innerHTML = matches.map(u => `                    <div class="flex justify-between items-center p-2 bg-white/50 rounded text-xs">
+                        <div>
+                            <span class="font-bold">${u.username || '-'}</span> 
+                            <span class="text-gray-500">(${u.uac || '-'})</span>
+                            <span class="text-[10px] text-gray-400 ml-2">${u.phone || ''}</span>
+                        </div>
+                        <button onclick="blockUser('${u.id}')" class="action-btn btn-delete">Block</button>
+                    </div>
+                `).join('');
+            } catch(e) {
+                showToast('❌ Gagal mencari: ' + e.message, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Cari';
+            }
+        };
+
+        window.blockUser = async (uid) => {
+            const comment = prompt("Sebab block akaun ini (optional):") || '';
+            if(!confirm("Block akaun ini?\n\nPengguna tidak boleh login, order, atau chat.")) return;
+            
+            try {
+                await updateDoc(doc(db, "users", uid), { 
+                    status: 'BLOCKED', 
+                    blockComment: comment,
+                    logCache: serverTimestamp(),
+                    blockedAt: serverTimestamp()
+                });
+                showToast('✅ Akaun diblock', 'success');
+                loadAdminData();
+            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
+        };
+
+        window.unblockUser = async (uid) => {
+            if(!confirm("Unblock akaun ini?")) return;
+            try {
+                await updateDoc(doc(db, "users", uid), { 
+                    status: 'ACTIVE', 
+                    blockComment: '', 
+                    logCache: serverTimestamp(),
+                    unblockedAt: serverTimestamp()
+                });
+                showToast('✅ Akaun diunblock', 'success');
+                loadAdminData();
+            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
+        };
+
+        window.deleteUser = async (uid) => {
+            if(!confirm("⚠️ PADAM akaun ini secara PERMANEN?\n\nSemua data pesanan dan profil akan hilang.\n\nTindakan ini TIDAK BOLEH dipulihkan.")) return;
+                        try {
+                // Delete user orders first
+                const orders = await getDocs(query(collection(db, "orders"), where("userId", "==", uid)));
+                const batchDelete = orders.docs.map(d => deleteDoc(d.ref));
+                await Promise.all(batchDelete);
+                
+                // Delete user
+                await deleteDoc(doc(db, "users", uid));
+                showToast('✅ Akaun dipadamkan secara kekal', 'success');
+                loadAdminData();
+            } catch(e) { 
+                console.error('Delete user error:', e);
+                showToast('❌ Gagal: ' + e.message, 'error'); 
+            }
+        };
+
+        // Order update functions
+        window.updateOrderField = async (id, field, val) => {
+            try {
+                await updateDoc(doc(db, "orders", id), {[field]: val, updatedAt: serverTimestamp()});
+                playSound('click');
+            } catch(e) { showToast('❌ Gagal update: ' + e.message, 'error'); }
+        };
+
+        window.updateOrderStatus = async (id, newStatus) => {
+            if(!confirm(`Tukar status pesanan ini kepada ${newStatus}?`)) {
+                loadAdminData(); // Refresh to revert UI
+                return;
+            }
+            try {
+                await updateDoc(doc(db, "orders", id), { 
+                    status: newStatus, 
+                    category: newStatus,
+                    updatedAt: serverTimestamp() 
+                });
+                showToast('✅ Status dikemaskini', 'success');
+            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
+        };
+
+        // ==================== CHAT FUNCTIONS ====================
+        
         async function loadChatList() {
             if(!currentUser) return navTo('login');
             const listEl = document.getElementById('chat-list-view');
+            if(!listEl) return;
+            
             if(userData.role === 'admin') {
                 listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div></div>';
                 const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
-                onSnapshot(q, (snap) => {
+                                if(unsubscribeChat) unsubscribeChat();
+                unsubscribeChat = onSnapshot(q, (snap) => {
                     listEl.innerHTML = "";
                     if(snap.empty) { listEl.innerHTML = "<p class='text-center text-gray-500 mt-10'>Tiada perbualan.</p>"; return; }
+                    
                     snap.forEach(docSnap => {
                         const data = docSnap.data();
-                        const partnerId = data.participants.find(id => id !== currentUser.uid);
-                        getDoc(doc(db, "users", partnerId)).then(pSnap => {
-                            if(pSnap.exists()) {
-                                const p = pSnap.data();
-                                listEl.innerHTML += `<div onclick="openChat('${partnerId}', '${p.username}')" class="p-3 bg-white/50 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center">
-                                    <div class="flex items-center gap-3"><div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white">${p.username[0]}</div>
-                                    <div><h4 class="font-bold text-sm">${p.username}</h4><p class="text-xs text-gray-500 truncate w-40">${data.lastMessage||'-'}</p></div></div>
-                                    <span class="text-[10px] text-gray-400">${data.lastTime?new Date(data.lastTime.toDate()).toLocaleTimeString():''}</span></div>`;
-                            }
-                        });
+                        const partnerId = data.participants?.find(id => id !== currentUser.uid);
+                        if(partnerId) {
+                            getDoc(doc(db, "users", partnerId)).then(pSnap => {
+                                if(pSnap.exists()) {
+                                    const p = pSnap.data();
+                                    listEl.innerHTML += `<div onclick="openChat('${partnerId}', '${p.username || 'Unknown'}')" class="p-3 bg-white/50 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition">
+                                        <div class="flex items-center gap-3"><div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white">${(p.username || '?')[0]}</div>
+                                        <div><h4 class="font-bold text-sm">${p.username || 'Unknown'}</h4><p class="text-xs text-gray-500 truncate w-40">${data.lastMessage || '-'}</p></div></div>
+                                        <span class="text-[10px] text-gray-400">${data.lastTime ? new Date(data.lastTime.toDate?.()).toLocaleTimeString() : ''}</span></div>`;
+                                }
+                            }).catch(() => {});
+                        }
                     });
                 });
             } else {
+                // Customer view - connect to admin
                 const adminQuery = query(collection(db, "users"), where("role", "==", "admin"), limit(1));
-                const adminSnap = await getDocs(adminQuery);
-                if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500'>Tiada Admin.</p>"; return; }
-                const adminDoc = adminSnap.docs[0];
-                listEl.innerHTML = `<div onclick="openChat('${adminDoc.id}', '${adminDoc.data().username}')" class="p-4 bg-white/80 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500">
-                    <div class="flex items-center gap-3"><div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div>
-                    <div><h4 class="font-bold">MFD Support</h4><p class="text-xs text-green-600">● Online</p></div></div><i class="fas fa-chevron-right"></i></div>`;
+                try {
+                    const adminSnap = await getDocs(adminQuery);
+                    if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500'>Tiada Admin tersedia.</p>"; return; }
+                    const adminDoc = adminSnap.docs[0];
+                    listEl.innerHTML = `<div onclick="openChat('${adminDoc.id}', '${adminDoc.data().username || 'Support'}')" class="p-4 bg-white/80 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500 hover:shadow transition">
+                        <div class="flex items-center gap-3"><div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div>
+                        <div><h4 class="font-bold">MFD Support</h4><p class="text-xs text-green-600">● Online</p></div></div><i class="fas fa-chevron-right"></i></div>`;
+                } catch(e) {
+                    listEl.innerHTML = "<p class='text-center text-red-500'>Gagal memuat support.</p>";
+                }
             }
         }
 
         window.openChat = (partnerId, partnerName) => {
             currentChatPartner = partnerId;
-            document.getElementById('chat-list-view').classList.add('hidden-section');
-            document.getElementById('active-chat-view').classList.remove('hidden-section');
-            document.getElementById('chat-partner-name').innerText = partnerName;            const chatId = [currentUser.uid, partnerId].sort().join('_');
+            document.getElementById('chat-list-view')?.classList.add('hidden-section');
+            document.getElementById('active-chat-view')?.classList.remove('hidden-section');
+            document.getElementById('chat-partner-name').innerText = partnerName;
+            
+            const chatId = [currentUser.uid, partnerId].sort().join('_');
             const msgContainer = document.getElementById('chat-messages');
+            
             if(unsubscribeChat) unsubscribeChat();
-            const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
-            unsubscribeChat = onSnapshot(q, (snap) => {
-                msgContainer.innerHTML = "";
+            const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"), limit(100));
+            
+            unsubscribeChat = onSnapshot(q, (snap) => {                msgContainer.innerHTML = "";
                 snap.forEach(d => {
                     const m = d.data();
                     const isMe = m.senderId === currentUser.uid;
                     let content = '';
-                    if(m.type === 'text') content = `<p class="text-sm">${m.text}</p>`;
-                    else if(m.type === 'image') content = `<img src="${m.url}" class="msg-img">`;
-                    else if(m.type === 'location') content = `<div class="msg-location"><i class="fas fa-map-marker-alt"></i> ${m.address}</div>`;
-                    msgContainer.innerHTML += `<div class="message-bubble ${isMe?'msg-me':'msg-other'}">${content}<div class="text-[9px] opacity-70 text-right">${m.timestamp?new Date(m.timestamp.toDate()).toLocaleTimeString():''}</div></div>`;
+                    if(m.type === 'text') content = `<p class="text-sm">${m.text || ''}</p>`;
+                    else if(m.type === 'image') content = `<img src="${m.url || ''}" class="msg-img" alt="Image">`;
+                    else if(m.type === 'location') content = `<div class="msg-location"><i class="fas fa-map-marker-alt"></i> ${m.address || ''}</div>`;
+                    
+                    msgContainer.innerHTML += `<div class="message-bubble ${isMe ? 'msg-me' : 'msg-other'}">${content}<div class="text-[9px] opacity-70 text-right">${m.timestamp ? new Date(m.timestamp.toDate?.()).toLocaleTimeString() : ''}</div></div>`;
                 });
                 msgContainer.scrollTop = msgContainer.scrollHeight;
                 if(snap.size > 0) playSound('msg');
             });
         };
 
-        window.closeChat = () => { if(unsubscribeChat) unsubscribeChat(); document.getElementById('active-chat-view').classList.add('hidden-section'); document.getElementById('chat-list-view').classList.remove('hidden-section'); };
-        window.closeAdminChat = () => { if(unsubscribeChat) unsubscribeChat(); document.getElementById('admin-active-chat').classList.add('hidden-section'); document.getElementById('admin-chat-list').classList.remove('hidden-section'); };
+        window.closeChat = () => { 
+            if(unsubscribeChat) unsubscribeChat(); 
+            document.getElementById('active-chat-view')?.classList.add('hidden-section'); 
+            document.getElementById('chat-list-view')?.classList.remove('hidden-section'); 
+        };
+        
+        window.closeAdminChat = () => { 
+            if(unsubscribeChat) unsubscribeChat(); 
+            document.getElementById('admin-active-chat')?.classList.add('hidden-section'); 
+            document.getElementById('admin-chat-list')?.classList.remove('hidden-section'); 
+        };
 
-        window.sendMessage = async () => { const input = document.getElementById('msg-input'); const text = input.value.trim(); if(!text || !currentChatPartner) return; await saveMessage(text, 'text'); input.value = ''; };
+        window.sendMessage = async () => { 
+            const input = document.getElementById('msg-input'); 
+            const text = input?.value?.trim(); 
+            if(!text || !currentChatPartner) return; 
+            await saveMessage(text, 'text'); 
+            if(input) input.value = ''; 
+        };
 
         async function saveMessage(text, type, url = null, address = null) {
             const chatId = [currentUser.uid, currentChatPartner].sort().join('_');
-            await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, text, type, url, address, timestamp: serverTimestamp(), read: false, isPinned: false });
-            await setDoc(doc(db, "chats", chatId), { participants: [currentUser.uid, currentChatPartner], lastMessage: type==='text'?text:'[Media]', lastTime: serverTimestamp() }, {merge:true});
+            await addDoc(collection(db, `chats/${chatId}/messages`), { 
+                senderId: currentUser.uid, 
+                text: text || '',
+                type, 
+                url, 
+                address, 
+                timestamp: serverTimestamp(), 
+                read: false, 
+                isPinned: false 
+            });
+            await setDoc(doc(db, "chats", chatId), { 
+                participants: [currentUser.uid, currentChatPartner],                 lastMessage: type === 'text' ? text : '[Media]', 
+                lastTime: serverTimestamp() 
+            }, {merge: true});
             playSound('msg');
         }
 
         window.handleFileUpload = async (input) => {
-            const file = input.files[0];
+            const file = input?.files?.[0];
             if(!file || !currentChatPartner) return;
+            
+            // Validate
+            if(file.size > 5 * 1024 * 1024) { showToast('❌ Gambar terlalu besar (max 5MB)', 'error'); input.value = ''; return; }
+            if(!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { showToast('❌ Format tidak disokong', 'error'); input.value = ''; return; }
+            
             try {
                 const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
                 await uploadBytes(storageRef, file);
                 const url = await getDownloadURL(storageRef);
                 await saveMessage('', 'image', url);
-                playSound('success');
-            } catch(e) { alert("Upload gagal: " + e.message); }
-            input.value = '';
+                showToast('✅ Gambar dihantar', 'success', 1500);
+            } catch(e) { 
+                showToast('❌ Upload gagal: ' + e.message, 'error'); 
+            } finally {
+                if(input) input.value = '';
+            }
         };
 
-        window.handleAdminFileUpload = async (input) => {
-            const file = input.files[0];
-            if(!file || !currentChatPartner) return;
+        window.handleAdminFileUpload = window.handleFileUpload; // Same function
+
+        window.sendLocation = async () => { 
+            const addr = prompt("Masukkan alamat/lokasi:"); 
+            if(addr?.trim()) { await saveMessage('', 'location', null, addr.trim()); } 
+        };
+        
+        window.sendAdminMessage = async () => { 
+            const input = document.getElementById('admin-msg-input'); 
+            const text = input?.value?.trim(); 
+            if(!text || !currentChatPartner) return; 
+            await saveMessage(text, 'text'); 
+            if(input) input.value = ''; 
+        };
+        
+        window.deleteConversation = async () => { 
+            if(!confirm("Padam perbualan ini? Tindakan tidak boleh dipulihkan.")) return;
+            alert("Sila padam manual di Firebase Console > Firestore > chats collection"); 
+        };
+        
+        window.copyChatID = () => { 
+            if(currentChatPartner) {
+                navigator.clipboard.writeText(currentChatPartner);                 showToast('✅ ID disalin!', 'success', 1500); 
+            }
+        };
+        
+        window.blockContact = async () => { 
+            if(!confirm("Block pengguna ini?")) return;
             try {
-                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);                await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(storageRef);
-                await saveMessage('', 'image', url);
-                playSound('success');
-            } catch(e) { alert("Upload gagal: " + e.message); }
-            input.value = '';
+                await updateDoc(doc(db, "users", currentChatPartner), {status: 'BLOCKED'}); 
+                showToast('✅ Pengguna diblock', 'success');
+                closeChat(); 
+            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
         };
 
-        window.sendLocation = async () => { const addr = prompt("Alamat/lokasi:"); if(addr) { await saveMessage('', 'location', null, addr); } };
-
-        // Admin Functions
-        window.loadAdminData = async () => {
-            if(userData.role !== 'admin') return navTo('home');
+        // ==================== UI UTILITIES ====================
+        
+        // QR Code blur toggle
+        window.toggleQRBlur = () => {
+            const qr = document.getElementById('qr-payment');
+            const hint = document.getElementById('qr-hint');
+            if(!qr || !hint) return;
             
-            const q = query(collection(db, "orders"), orderBy("createdAt","desc"));
-            onSnapshot(q, (snap) => {
-                allAdminOrders = [];
-                snap.forEach(d => allAdminOrders.push({id: d.id, ...d.data()}));
-                filterAdminOrders('all');
-            });
-
-            const usrSnap = await getDocs(collection(db, "users"));
-            const users = usrSnap.docs.map(d=>({id:d.id, ...d.data()}));
-            document.getElementById('admin-user-list').innerHTML = users.filter(u=>u.status!=='BLOCKED').map(u=>`<tr><td>${u.uac}</td><td>${u.username}</td><td>${u.phone}</td><td class="truncate max-w-xs">${u.address||'-'}</td><td><span class="badge badge-active">${u.status}</span></td><td>-</td><td><button onclick="blockUser('${u.id}')" class="action-btn btn-delete">Block</button></td></tr>`).join('');
-            document.getElementById('admin-blacklist-list').innerHTML = users.filter(u=>u.status==='BLOCKED').map(u=>`<tr><td>${u.uac}</td><td class="text-red-600">${u.username}</td><td><span class="badge badge-blocked">BLOCKED</span></td><td>${u.logCache?new Date(u.logCache.toDate()).toLocaleString():'-'}</td><td><button onclick="unblockUser('${u.id}')" class="action-btn" style="background:#9ae6b4;color:#22543d;">Unblock</button></td></tr>`).join('');
-            
-            const prodSnap = await getDocs(collection(db, "products"));
-            document.getElementById('admin-prod-list').innerHTML = prodSnap.docs.map((d,i)=>{ const p=d.data();
-                return `<tr><td>${i+1}</td><td><img src="${p.imageUrl}" class="w-8 h-8 rounded"></td><td>${p.name}</td><td>RM ${p.price}</td><td>⭐${p.rating||5}</td><td><span class="badge ${p.status==='Public'?'badge-active':'badge-cancelled'}">${p.status}</span></td><td>${p.totalSold||0}</td>
-                <td><button onclick="editProduct('${d.id}')" class="action-btn btn-edit">Edit</button></td><td><button onclick="deleteProduct('${d.id}')" class="action-btn btn-delete">Padam</button></td></tr>`;
-            }).join('');
-            loadChatList();
-        };
-
-        window.filterAdminOrders = (status) => {
-            const tbody = document.getElementById('admin-order-list');
-            const filtered = status === 'all' ? allAdminOrders : allAdminOrders.filter(o => o.status === status);
-            
-            document.querySelectorAll('.admin-filter-btn').forEach(btn => {
-                btn.classList.remove('active', 'ring-2', 'ring-purple-400');
-                if((status === 'all' && btn.innerText === 'All') || btn.innerText.includes(status)) {
-                    btn.classList.add('active', 'ring-2', 'ring-purple-400');
-                }
-            });
-
-            if(filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="13" class="text-center py-8 text-gray-500">Tiada pesanan untuk status ini.</td></tr>`;
-                return;
-            }
-            tbody.innerHTML = filtered.map(o => {
-                const itemNames = o.items.map(i=>i.name).join(', ');
-                const totalQty = Object.values(o.itemCounts||{}).reduce((a,b)=>a+b,0) || o.items.length;
-                
-                let badgeClass = 'badge-to-pay';
-                if(o.status==='To Ship') badgeClass='badge-to-ship';
-                else if(o.status==='To Receive') badgeClass='badge-to-receive';
-                else if(o.status==='Completed') badgeClass='badge-completed';
-                else if(o.status==='Cancelled') badgeClass='badge-cancelled';
-                else if(o.status==='Return/Refund') badgeClass='badge-refund';
-
-                const statuses = ['To Pay', 'To Ship', 'To Receive', 'Completed', 'Return/Refund', 'Cancelled'];
-                const statusOptions = statuses.map(s => `<option value="${s}" ${o.status === s ? 'selected' : ''}>${s}</option>`).join('');
-
-                return `<tr>
-                    <td class="font-mono text-[10px]">${o.uac}</td>
-                    <td class="font-bold text-xs">${o.username}</td>
-                    <td class="text-[10px] max-w-xs truncate" title="${itemNames}">${itemNames}</td>
-                    <td class="text-[10px] truncate max-w-xs" title="${o.address}">${o.address}</td>
-                    <td class="text-center">${totalQty}</td>
-                    <td class="font-bold text-purple-600">RM ${o.total}</td>
-                    <td class="text-[10px]">${o.paymentMethod}</td>
-                    <td>
-                        <select onchange="updateOrderField('${o.id}','paymentStatus',this.value)" class="text-[10px] p-1 rounded border border-gray-300 bg-white/80">
-                            <option ${o.paymentStatus==='Not Verified'?'selected':''}>Not Verified</option>
-                            <option ${o.paymentStatus==='Verified'?'selected':''}>Verified</option>
-                        </select>
-                    </td>
-                    <td>
-                        <select onchange="updateOrderField('${o.id}','deliveryStatus',this.value)" class="text-[10px] p-1 rounded border border-gray-300 bg-white/80">
-                            <option ${o.deliveryStatus==='Pending'?'selected':''}>Pending</option>
-                            <option ${o.deliveryStatus==='Shipping'?'selected':''}>Shipping</option>
-                            <option ${o.deliveryStatus==='Delivered'?'selected':''}>Delivered</option>
-                        </select>
-                    </td>
-                    <td><input value="${o.trackingNo||''}" onchange="updateOrderField('${o.id}','trackingNo',this.value)" class="text-[10px] p-1 w-20 rounded border border-gray-300"></td>
-                    <td class="font-mono text-[10px]">${o.orderId}</td>
-                    <td>
-                        <span class="badge ${badgeClass}">${o.status}</span>
-                    </td>
-                    <td class="text-center">
-                        <select onchange="updateOrderStatus('${o.id}', this.value)" class="text-[10px] font-bold p-1 rounded border border-purple-300 bg-purple-50 text-purple-700 cursor-pointer hover:bg-purple-100 transition">
-                            ${statusOptions}
-                        </select>
-                        <br>
-                        <button onclick="deleteOrder('${o.id}')" class="action-btn btn-delete mt-1">Hapus</button>
-                    </td>
-                </tr>`;
-            }).join('');
-        };
-        window.updateOrderField = async (id, field, val) => {
-            await updateDoc(doc(db, "orders", id), {[field]: val});
-            playSound('click');
-        };
-
-        window.updateOrderStatus = async (id, newStatus) => {
-            if(confirm(`Tukar status pesanan ini kepada ${newStatus}?`)) {
-                await updateDoc(doc(db, "orders", id), { status: newStatus });
-                playSound('success');
+            if(qr.classList.contains('blur-md')) {
+                qr.classList.remove('blur-md'); qr.classList.add('blur-none');
+                hint.innerHTML = '✅ QR Jelas - Sila scan!'; hint.classList.replace('text-purple-600', 'text-green-600');
             } else {
-                loadAdminData();
+                qr.classList.add('blur-md'); qr.classList.remove('blur-none');
+                hint.innerHTML = '👆 Klik untuk jelas'; hint.classList.replace('text-green-600', 'text-purple-600');
             }
         };
 
-        window.deleteOrder = async (id) => {
-            if(confirm("Adakah anda pasti mahu MEMADAM pesanan ini secara kekal?")) {
-                await deleteDoc(doc(db, "orders", id));
-                playSound('error');
-            }
+        // Reset QR when modal closes
+        const originalToggleCartModal = window.toggleCartModal;
+        window.toggleCartModal = function() {
+            if(originalToggleCartModal) originalToggleCartModal();
+            setTimeout(() => {
+                const modal = document.getElementById('modal-cart');
+                if(modal && modal.classList.contains('hidden-section')) {
+                    const qr = document.getElementById('qr-payment');
+                    const hint = document.getElementById('qr-hint');
+                    if(qr) { qr.classList.add('blur-md'); qr.classList.remove('blur-none'); }
+                    if(hint) { hint.innerHTML = '👆 Klik untuk jelas'; hint.classList.remove('text-green-600'); hint.classList.add('text-purple-600'); }
+                }
+            }, 300);
         };
 
-        window.blockUser = async (uid) => { if(confirm("Block?")) { await updateDoc(doc(db, "users", uid), {status: 'BLOCKED'}); playSound('error'); loadAdminData(); } };
-        window.unblockUser = async (uid) => { await updateDoc(doc(db, "users", uid), {status: 'ACTIVE'}); playSound('success'); loadAdminData(); };
-
-        window.addProduct = async () => {
-            const imgUrl = document.getElementById('prod-img-url').value;
-            if(!imgUrl) return alert("Paste Image URL");
-            await addDoc(collection(db, "products"), {
-                name: document.getElementById('prod-name').value, price: document.getElementById('prod-price').value, description: document.getElementById('prod-desc').value,
-                imageUrl: imgUrl, status: document.getElementById('prod-status').value, country: document.getElementById('prod-country').value,
-                event: document.getElementById('prod-event').value, variation: document.getElementById('prod-variation').value,
-                uniqueCode: "ITEM-"+Math.random().toString(36).substr(2,6).toUpperCase(), totalSold: 0, rating: 5.0, createdAt: serverTimestamp()
-            });
-            playSound('success'); alert("Produk dilancarkan!"); loadAdminData(); loadProducts();
-            document.querySelectorAll('#tab-products input, #tab-products textarea').forEach(i=>i.value='');
-        };
-        window.editProduct = async (id) => { const newPrice = prompt("Harga baru:"); if(newPrice) { await updateDoc(doc(db, "products", id), {price: newPrice}); playSound('success'); loadAdminData(); loadProducts(); } };
-        window.deleteProduct = async (id) => { if(confirm("Padam?")) { await deleteDoc(doc(db, "products", id)); playSound('click'); loadAdminData(); loadProducts(); } };
-        window.sendAdminMessage = async () => { const input = document.getElementById('admin-msg-input'); const text = input.value.trim(); if(!text || !currentChatPartner) return; await saveMessage(text, 'text'); input.value = ''; };
-        window.deleteConversation = async () => { alert("Padam manual di Firebase Console > chats collection"); };
-        window.copyChatID = () => { navigator.clipboard.writeText(currentChatPartner); playSound('success'); alert("ID copied!"); };
-        window.blockContact = async () => { if(confirm("Block?")) { await updateDoc(doc(db, "users", currentChatPartner), {status: 'BLOCKED'}); playSound('error'); closeChat(); } };
-
+        // ==================== AUTH STATE LISTENER ====================
+        
         onAuthStateChanged(auth, async (user) => {
             currentUser = user;
-            if(user) {
-                document.getElementById('auth-nav').classList.add('hidden-section');
-                document.getElementById('user-nav').classList.remove('hidden-section');
-                const snap = await getDoc(doc(db, "users", user.uid));                if(snap.exists()) {
-                    userData = snap.data();
-                    if(userData.status === 'BLOCKED') { playSound('error'); alert("Akaun diblokir."); signOut(auth); return; }
-                    if(userData.role === 'admin') navTo('admin'); else navTo('dashboard');
+                        if(user) {
+                document.getElementById('auth-nav')?.classList.add('hidden-section');
+                document.getElementById('user-nav')?.classList.remove('hidden-section');
+                
+                try {
+                    const snap = await getDoc(doc(db, "users", user.uid));
+                    if(snap.exists()) {
+                        userData = snap.data();
+                        
+                        // Security check
+                        if(userData.status === 'BLOCKED') { 
+                            showToast('❌ Akaun anda diblokir. Hubungi admin.', 'error'); 
+                            signOut(auth); 
+                            return; 
+                        }
+                        
+                        // Route based on role
+                        if(userData.role === 'admin') {
+                            navTo('admin');
+                            loadAdminData();
+                        } else {
+                            navTo('dashboard');
+                            loadUserData();
+                        }
+                    } else {
+                        // User doc not found - create minimal one
+                        await setDoc(doc(db, "users", user.uid), {
+                            username: user.email?.split('@')[0] || 'User',
+                            email: user.email || '',
+                            uac: "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase(),
+                            role: 'customer',
+                            status: 'ACTIVE',
+                            createdAt: serverTimestamp()
+                        });
+                        navTo('dashboard');
+                    }
+                } catch(e) {
+                    console.error('Auth state error:', e);
+                    navTo('home');
                 }
-            } else { document.getElementById('auth-nav').classList.remove('hidden-section'); document.getElementById('user-nav').classList.add('hidden-section'); navTo('home'); }
+            } else { 
+                document.getElementById('auth-nav')?.classList.remove('hidden-section'); 
+                document.getElementById('user-nav')?.classList.add('hidden-section'); 
+                navTo('home'); 
+            }
+            
+            // Always load products for catalog
             loadProducts();
         });
+        // ==================== INITIALIZATION ====================
+        
+        // Ensure QR is blurred on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const qr = document.getElementById('qr-payment');
+            const hint = document.getElementById('qr-hint');
+            if(qr) { qr.classList.add('blur-md'); }
+            if(hint) { hint.innerHTML = '👆 Klik untuk jelas'; }
+            
+            // Preload sounds
+            document.querySelectorAll('audio').forEach(audio => {
+                audio.load();
+            });
+        });
+
+        // Handle page visibility change (pause/resume listeners if needed)
+        document.addEventListener('visibilitychange', () => {
+            if(document.hidden) {
+                // Optional: pause real-time listeners to save bandwidth
+                console.log('Page hidden - consider pausing listeners');
+            } else {
+                // Optional: resume listeners
+                console.log('Page visible - resume listeners');
+            }
+        });
+
     </script>
     
+    <!-- QR Reset Script (fallback) -->
+    <script>
+        // Ensure QR resets on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const qr = document.getElementById('qr-payment');
+            const hint = document.getElementById('qr-hint');
+            if(qr) { qr.classList.add('blur-md'); }
+            if(hint) { hint.innerHTML = '👆 Klik untuk jelas'; }
+        });
+    </script>
 </body>
 </html>
