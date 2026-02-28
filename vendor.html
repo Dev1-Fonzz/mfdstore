@@ -467,8 +467,28 @@
 
         // --- DASHBOARD LOGIC ---
         async function loadVendorDashboard() {
-            if(!currentUser) return;
-            
+  if (!currentUser) return;
+  
+  // SHOW LOADING STATE
+  toast('🔄 Loading vendor data...', 'info');
+  
+  // 1. Load Vendor Profile FIRST (wait for it)
+  const vendorDoc = await getDoc(doc(db, "users", currentUser.uid));
+  if (vendorDoc.exists()) {
+    vendorData = vendorDoc.data();
+    console.log('Vendor data loaded:', vendorData.venId); // Debug
+  } else {
+    toast('❌ Vendor data tidak dijumpai', 'error');
+    return;
+  }
+  
+  // 2. THEN setup real-time listeners
+  onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
+    if (doc.exists()) {
+      vendorData = doc.data();
+      // ... update UI code ...
+    }
+  });
             // Listen to Vendor Profile
             onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
                 if(doc.exists()) {
@@ -552,35 +572,64 @@
             };
             reader.readAsDataURL(file);
         };
+// GANTI fungsi addProduct() dengan kod ini:
 
-        window.addProduct = async () => {
-            const name = document.getElementById('prod-name').value.trim();
-            const price = parseFloat(document.getElementById('prod-price').value);
-            const imgUrl = document.getElementById('prod-img-url').value.trim() || window.tempImgBase64;
-            
-            if(!name || !price || !imgUrl) return toast('Nama, Harga & Gambar wajib', 'error');
-            
-            const uniqueCode = genUC(vendorData.venId);
-            
-            try {
-                await addDoc(collection(db, "products"), {
-                    name, priceSell: price, imageUrl: imgUrl, 
-                    description: document.getElementById('prod-desc').value,
-                    variation: document.getElementById('prod-variation').value,
-                    country: document.getElementById('prod-country').value,
-                    status: document.getElementById('prod-status').value,
-                    uniqueCode, vendorId: vendorData.venId, vendorName: vendorData.businessName,
-                    totalSold: 0, rating: 5.0, createdAt: serverTimestamp()
-                });
-                toast('✅ Produk dilancarkan');
-                document.getElementById('prod-name').value = '';
-                document.getElementById('prod-price').value = '';
-                document.getElementById('prod-img-url').value = '';
-                document.getElementById('prod-preview').classList.add('hidden');
-                window.tempImgBase64 = null;
-            } catch(e) { toast('❌ ' + e.message, 'error'); }
-        };
-
+window.addProduct = async () => {
+  // 1. VALIDATE - Pastikan vendor data dah load
+  if (!vendorData || !vendorData.venId) {
+    toast('❌ Sila tunggu data vendor dimuatkan...', 'error');
+    // Force reload vendor data
+    await loadVendorDashboard();
+    return;
+  }
+  
+  const name = document.getElementById('prod-name').value.trim();
+  const price = parseFloat(document.getElementById('prod-price').value);
+  const imgUrl = document.getElementById('prod-img-url').value.trim() || window.tempImgBase64;
+  
+  if (!name || !price || !imgUrl) return toast('Nama, Harga & Gambar wajib', 'error');
+  
+  // 2. GENERATE UNIQUE CODE dengan vendorId yang sah
+  // Pastikan function ini handle undefined
+const genUC = (vid) => {
+  if (!vid) {
+    console.error('genUC called with undefined vendorId!');
+    return `ITEM-UNKNOWN-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+  }
+  return `ITEM-${vid}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+};
+  const uniqueCode = genUC(vendorData.venId);
+  
+  console.log('Adding product with vendorId:', vendorData.venId); // Debug log
+  
+  try {
+    await addDoc(collection(db, "products"), {
+      name,
+      priceSell: price,
+      imageUrl: imgUrl,
+      description: document.getElementById('prod-desc').value,
+      variation: document.getElementById('prod-variation').value,
+      country: document.getElementById('prod-country').value,
+      status: document.getElementById('prod-status').value,
+      uniqueCode,
+      vendorId: vendorData.venId, // ✅ Pastikan ini ada value
+      vendorName: vendorData.businessName || vendorData.username,
+      totalSold: 0,
+      rating: 5.0,
+      createdAt: serverTimestamp()
+    });
+    toast('✅ Produk dilancarkan');
+    // Reset form
+    document.getElementById('prod-name').value = '';
+    document.getElementById('prod-price').value = '';
+    document.getElementById('prod-img-url').value = '';
+    document.getElementById('prod-preview').classList.add('hidden');
+    window.tempImgBase64 = null;
+  } catch (e) {
+    console.error('Add product error:', e);
+    toast('❌ ' + e.message, 'error');
+  }
+};
         // Auto gen UC
         document.getElementById('prod-name').addEventListener('input', function() {
             if(vendorData.venId) document.getElementById('prod-uc').value = genUC(vendorData.venId);
