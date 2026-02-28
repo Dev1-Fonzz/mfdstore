@@ -2,8 +2,10 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MFD Store • Vendor Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="google-site-verification" content="v7koD54-JpANjYbZKCN46QWnVK7Q3a7sSdQnCcAVczo" />
+    <title>MFD Store • Vendor Manager</title>
+    
     <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -45,9 +47,9 @@
             background-size: 300% auto;
             animation: shine 4s linear infinite;
             font-weight: 800;
-        }
-        @keyframes shine { to { background-position: 300% center; } }
-        .btn-glitter {            background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2);
+        }        @keyframes shine { to { background-position: 300% center; } }
+        .btn-glitter {
+            background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2);
             background-size: 300% 300%;
             animation: gradientMove 4s ease infinite;
             color: white;
@@ -61,58 +63,69 @@
         
         .hidden-section { display: none !important; }
         
-        /* Table & Badges */
-        .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1); background: rgba(255,255,255,0.6); }
-        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1000px; font-size: 0.75rem; }
-        .custom-table th { background: var(--primary-gradient); padding: 12px 8px; text-align: left; font-weight: 700; color: white; position: sticky; top: 0; }
-        .custom-table td { padding: 10px 8px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.5); }
+        /* Tables */
+        .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1); background: rgba(255,255,255,0.6); margin-top: 1rem; }
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1200px; font-size: 0.75rem; }
+        .custom-table th { background: var(--primary-gradient); padding: 12px 8px; text-align: left; font-weight: 700; color: white; position: sticky; top: 0; z-index: 10; }
+        .custom-table td { padding: 10px 8px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.5); vertical-align: middle; }
+        .custom-table tr:hover td { background: rgba(255,255,255,0.9); }
         
+        /* Badges */
         .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.6rem; font-weight: bold; text-transform: uppercase; }
         .badge-active { background: #c6f6d5; color: #22543d; }
         .badge-blocked { background: #fed7d7; color: #822727; }
-        .badge-to-pay { background: #feebc8; color: #744210; }
-        .badge-completed { background: #9ae6b4; color: #22543d; }
+        .badge-pending { background: #feebc8; color: #744210; }
+        .badge-paid { background: #9ae6b4; color: #22543d; }
         .badge-vendor { background: #e9d8fd; color: #553c9a; }
 
         .unique-code { font-family: monospace; background: rgba(102, 126, 234, 0.1); padding: 2px 6px; border-radius: 4px; cursor: pointer; border: 1px solid rgba(102, 126, 234, 0.2); }
-        .unique-code:hover { background: rgba(102, 126, 234, 0.2); }
+        
+        /* Chat */
+        .chat-box { height: 400px; overflow-y: auto; background: rgba(255,255,255,0.5); border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 10px; }
+        .msg-bubble { max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 0.85rem; }
+        .msg-me { align-self: flex-end; background: #667eea; color: white; border-bottom-right-radius: 2px; }
+        .msg-other { align-self: flex-start; background: white; color: #333; border-bottom-left-radius: 2px; }
 
         /* Toast */
         .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 10px; color: white; z-index: 1000; animation: slideIn 0.3s ease; }
         .toast.success { background: #38a169; }
         .toast.error { background: #e53e3e; }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Loader */
+        .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #9D50BB; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
-</head>
-<body class="p-0 md:p-4">
+</head><body class="p-0 md:p-4">
 
     <!-- AUDIO -->
     <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3"></audio>
     <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3"></audio>
     <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+    <audio id="snd-msg" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3"></audio>
 
     <!-- TOAST -->
     <div id="toast-container" class="fixed bottom-4 right-4 z-50"></div>
 
     <!-- NAVBAR -->
-    <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 flex justify-between items-center shadow-lg">
-        <div class="text-xl font-bold glitter-text cursor-pointer" onclick="navTo('home')">            <i class="fas fa-gem"></i> MFD STORE <span class="text-xs font-normal opacity-80">• Vendor</span>
+    <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 flex justify-between items-center shadow-lg flex-wrap gap-3">
+        <div class="text-xl font-bold glitter-text cursor-pointer flex items-center gap-2" onclick="navTo('dashboard')">
+            <i class="fas fa-store"></i> MFD VENDOR MANAGER
         </div>
         <div class="flex items-center gap-3">
             <button onclick="navTo('chat')" class="p-2 hover:bg-white/40 rounded-full relative"><i class="fas fa-comments text-purple-600"></i><span id="chat-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full hidden">!</span></button>
-            <button onclick="toggleCart()" class="p-2 hover:bg-white/40 rounded-full relative"><i class="fas fa-shopping-cart text-pink-600"></i><span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full">0</span></button>
             
             <div id="auth-nav">
                 <button onclick="navTo('login')" class="px-4 py-2 rounded-xl bg-white/60 text-purple-600 font-bold text-sm">Login</button>
-                <button onclick="navTo('register')" class="px-4 py-2 rounded-xl btn-glitter ml-2 text-sm">Register</button>
+                <button onclick="navTo('register')" class="px-4 py-2 rounded-xl btn-glitter ml-2 text-sm">Register Vendor</button>
             </div>
             
             <div id="user-nav" class="hidden-section flex items-center gap-3">
                 <div class="text-right hidden md:block">
-                    <div id="nav-username" class="font-bold text-sm"></div>
-                    <div id="nav-role" class="text-[10px] text-purple-600 font-bold badge badge-vendor"></div>
+                    <div id="nav-username" class="font-bold text-sm truncate max-w-[100px]"></div>
+                    <div id="nav-venid" class="text-[10px] text-purple-600 font-mono"></div>
                 </div>
-                <button onclick="navTo('dashboard')" class="px-3 py-2 bg-purple-500 text-white rounded-xl text-sm"><i class="fas fa-user"></i></button>
+                <button onclick="navTo('dashboard')" class="px-3 py-2 bg-purple-500 text-white rounded-xl text-sm"><i class="fas fa-tachometer-alt"></i></button>
                 <button onclick="logout()" class="px-3 py-2 bg-red-500 text-white rounded-xl text-sm"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
@@ -120,182 +133,207 @@
 
     <!-- MAIN CONTENT -->
     <main class="container mx-auto p-2 md:p-4 pb-20">
-        
-        <!-- 1. HOME / CATALOG -->
-        <section id="view-home">
-            <div class="glass-panel p-4 mb-6 flex gap-2 flex-col md:flex-row">
-                <input type="text" id="search-bar" placeholder="Cari Produk atau Kode Unik..." class="flex-1 p-2 rounded-lg border-none focus:ring-2 focus:ring-purple-400" onkeyup="renderCatalog()">
-                <select id="filter-sort" class="p-2 rounded-lg border-none" onchange="renderCatalog()">
-                    <option value="default">🔥 Trending</option>
-                    <option value="vendor">🏪 Produk Vendor Saya</option>
-                    <option value="highest">💰 Jualan Tertinggi</option>
-                </select>
-            </div>
-            <div id="product-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="col-span-full text-center py-10"><div class="loader mx-auto mb-2"></div>Loading...</div>
-            </div>
-        </section>
 
-        <!-- 2. AUTH -->
+        <!-- 1. AUTH -->
         <section id="view-login" class="hidden-section max-w-md mx-auto mt-10">
             <div class="glass-panel p-8">
-                <h2 class="text-2xl font-bold text-center mb-6 glitter-text">Login</h2>
-                <input type="email" id="login-email" placeholder="Email" class="w-full mb-3">
-                <input type="password" id="login-pass" placeholder="Password" class="w-full mb-4">
+                <h2 class="text-2xl font-bold text-center mb-6 glitter-text">Vendor Login</h2>
+                <input type="email" id="login-email" placeholder="Email" class="w-full mb-3 p-2 rounded border">
+                <input type="password" id="login-pass" placeholder="Password" class="w-full mb-4 p-2 rounded border">
                 <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl">LOGIN</button>
-                <p class="text-center mt-4 text-sm">Belum ada akaun? <span class="text-purple-600 font-bold cursor-pointer" onclick="navTo('register')">Daftar</span></p>
+                <div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300"></div></div><div class="relative flex justify-center text-xs"><span class="px-2 bg-transparent text-gray-500">ATAU</span></div></div>
+                <button onclick="doGoogleSignIn()" class="w-full py-2 rounded-xl font-bold shadow flex items-center justify-center gap-2 bg-white border border-gray-300"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> Google Login</button>
+                <p class="text-center mt-4 text-sm">Belum ada akaun penjual? <span class="text-purple-600 font-bold cursor-pointer" onclick="navTo('register')">Daftar Vendor</span></p>
             </div>
         </section>
         <section id="view-register" class="hidden-section max-w-md mx-auto mt-10">
             <div class="glass-panel p-8">
-                <h2 class="text-2xl font-bold text-center mb-6 glitter-text">Daftar Akaun</h2>
-                <input type="text" id="reg-name" placeholder="Nama Penuh" class="w-full mb-3">
-                <input type="tel" id="reg-phone" placeholder="No Telefon" class="w-full mb-3">
-                <input type="email" id="reg-email" placeholder="Email (Optional)" class="w-full mb-3">
-                <input type="password" id="reg-pass" placeholder="Password" class="w-full mb-3">
-                
-                <label class="flex items-center gap-2 mb-4 p-3 bg-purple-50 rounded-lg cursor-pointer border border-purple-200">
-                    <input type="checkbox" id="reg-vendor" class="w-4 h-4 accent-purple-600">
-                    <div>
-                        <span class="font-bold text-purple-700 block">Daftar sebagai Vendor</span>
-                        <span class="text-xs text-purple-500">Boleh jual produk & urus pesanan sendiri</span>
-                    </div>
-                </label>
-
+                <h2 class="text-2xl font-bold text-center mb-6 glitter-text">Daftar Vendor Baharu</h2>
+                <input type="text" id="reg-name" placeholder="Nama Penjual / Owner" class="w-full mb-3 p-2 rounded border">
+                <input type="text" id="reg-business" placeholder="Nama Bisnes / Kedai" class="w-full mb-3 p-2 rounded border">
+                <input type="tel" id="reg-phone" placeholder="No Telefon" class="w-full mb-3 p-2 rounded border">
+                <input type="email" id="reg-email" placeholder="Email" class="w-full mb-3 p-2 rounded border">
+                <input type="password" id="reg-pass" placeholder="Password" class="w-full mb-4 p-2 rounded border">
                 <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl">DAFTAR SEKARANG</button>
-                <p class="text-center mt-4 text-sm">Ada akaun? <span class="text-purple-600 font-bold cursor-pointer" onclick="navTo('login')">Login</span></p>
+                <p class="text-center mt-4 text-sm">Sudah ada akaun? <span class="text-purple-600 font-bold cursor-pointer" onclick="navTo('login')">Login</span></p>
             </div>
         </section>
 
-        <!-- 3. DASHBOARD -->
+        <!-- 2. DASHBOARD OVERVIEW -->
         <section id="view-dashboard" class="hidden-section">
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <!-- Profile -->
-                <div class="glass-panel p-6 lg:col-span-1 h-fit">
-                    <div class="text-center mb-4">
-                        <div class="w-20 h-20 bg-gradient-to-tr from-purple-500 to-pink-500 rounded-full mx-auto flex items-center justify-center text-3xl text-white shadow-lg mb-2"><i class="fas fa-user"></i></div>
-                        <h3 id="dash-name" class="font-bold text-lg">Loading...</h3>
-                        <p id="dash-uac" class="text-xs text-purple-500 font-mono mb-2"></p>
-                        <span id="dash-status" class="badge badge-active">ACTIVE</span>
-                    </div>
-                    <div class="space-y-3 text-sm">
-                        <div><strong>Telefon:</strong> <span id="dash-phone"></span></div>
-                        <label class="block font-bold mt-2">📭 Alamat Penghantaran</label>
-                        <textarea id="dash-address" rows="3" class="w-full p-2 rounded border text-xs"></textarea>
-                        <button onclick="updateProfile()" class="bg-purple-600 text-white px-4 py-2 rounded w-full text-sm hover:bg-purple-700">Simpan Alamat</button>
-                        <button onclick="deleteAccount()" class="bg-red-100 text-red-600 px-4 py-2 rounded w-full text-sm mt-2 hover:bg-red-200">Padam Akaun</button>
-                    </div>
+            <!-- Stats Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="glass-panel p-4 text-center">
+                    <div class="text-2xl font-bold text-purple-600" id="stat-sales">RM 0.00</div>
+                    <div class="text-[10px] text-gray-600">💰 Total Sales</div>
                 </div>
-
-                <!-- Orders -->
-                <div class="glass-panel p-6 lg:col-span-3">
-                    <h3 class="font-bold text-lg mb-4 flex justify-between items-center">
-                        <span>Sejarah Pesanan</span>
-                        <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Live Update</span>
-                    </h3>
-                    
-                    <div class="flex gap-2 mb-4 overflow-x-auto pb-2">                        <button onclick="filterOrders('all')" class="px-3 py-1 rounded bg-gray-200 text-xs font-bold whitespace-nowrap">Semua</button>
-                        <button onclick="filterOrders('To Pay')" class="px-3 py-1 rounded bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap">To Pay</button>
-                        <button onclick="filterOrders('To Ship')" class="px-3 py-1 rounded bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap">To Ship</button>
-                        <button onclick="filterOrders('Completed')" class="px-3 py-1 rounded bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap">Completed</button>
-                        <button onclick="filterOrders('Cancelled')" class="px-3 py-1 rounded bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap">Cancelled</button>
-                    </div>
-
-                    <div class="table-container">
-                        <table class="custom-table">
-                            <thead>
-                                <tr>
-                                    <th>Item</th>
-                                    <th>Kode Unik</th>
-                                    <th>Qty</th>
-                                    <th>Harga</th>
-                                    <th>Status</th>
-                                    <th>Tracking</th>
-                                    <th>Tindakan</th>
-                                </tr>
-                            </thead>
-                            <tbody id="user-order-list"></tbody>
-                        </table>
-                    </div>
+                <div class="glass-panel p-4 text-center">
+                    <div class="text-2xl font-bold text-orange-600" id="stat-pending">0</div>
+                    <div class="text-[10px] text-gray-600">⏳ Pending Orders</div>
                 </div>
-            </div>
-        </section>
-
-        <!-- 4. ADMIN / VENDOR PANEL -->
-        <section id="view-admin" class="hidden-section">
-            <div class="glass-panel p-6 mb-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl shadow-xl">
-                <h2 class="text-2xl font-bold">🎛️ Panel Pengurusan</h2>
-                <p class="text-sm opacity-90">Urus produk, pesanan dan pelanggan secara real-time</p>
+                <div class="glass-panel p-4 text-center">
+                    <div class="text-2xl font-bold text-green-600" id="stat-income">RM 0.00</div>
+                    <div class="text-[10px] text-gray-600">💵 Net Income (After MFD Fee)</div>
+                </div>
+                <div class="glass-panel p-4 text-center">
+                    <div class="text-2xl font-bold text-blue-600" id="stat-products">0</div>
+                    <div class="text-[10px] text-gray-600">📦 Active Products</div>
+                </div>
             </div>
 
             <div class="flex gap-2 mb-4 overflow-x-auto">
                 <button onclick="showTab('tab-products')" class="px-4 py-2 bg-white rounded-xl text-purple-600 font-bold text-sm shadow whitespace-nowrap">📦 Produk Saya</button>
                 <button onclick="showTab('tab-orders')" class="px-4 py-2 bg-white rounded-xl text-purple-600 font-bold text-sm shadow whitespace-nowrap">📋 Pesanan Masuk</button>
-                <button onclick="showTab('tab-users')" id="btn-admin-users" class="px-4 py-2 bg-white rounded-xl text-purple-600 font-bold text-sm shadow whitespace-nowrap hidden">👥 Semua Users</button>
+                <button onclick="showTab('tab-finance')" class="px-4 py-2 bg-white rounded-xl text-purple-600 font-bold text-sm shadow whitespace-nowrap">💰 Kewangan & Gaji</button>
+                <button onclick="showTab('tab-profile')" class="px-4 py-2 bg-white rounded-xl text-purple-600 font-bold text-sm shadow whitespace-nowrap">👤 Profil Kedai</button>
+                <button onclick="showTab('tab-admin')" id="btn-admin" class="px-4 py-2 bg-white rounded-xl text-red-600 font-bold text-sm shadow whitespace-nowrap hidden">👑 Admin Panel</button>
             </div>
 
-            <!-- TAB PRODUK -->
+            <!-- TAB: PRODUCTS -->
             <div id="tab-products" class="glass-panel p-6 mb-6">
                 <h3 class="font-bold text-purple-700 mb-4">➕ Tambah Produk Baharu</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4 bg-white/50 p-4 rounded-xl">
-                    <input type="text" id="prod-name" placeholder="Nama Item *" class="md:col-span-2">
-                    <input type="number" id="prod-price" placeholder="Harga Jualan (RM) *" step="0.01">
-                    <input type="text" id="prod-variation" placeholder="Variasi (Saiz/Warna)">
-                    <textarea id="prod-desc" placeholder="Deskripsi" class="md:col-span-2" rows="2"></textarea>
-                    <input type="url" id="prod-img" placeholder="URL Gambar (http://...)" class="md:col-span-2">
-                    <select id="prod-status" class="md:col-span-2">                        <option value="Public">✅ Public</option>
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-bold">Gambar Produk (URL atau Upload)</label>                        <div class="flex gap-2">
+                            <input type="url" id="prod-img-url" placeholder="Paste URL Gambar (Disyorkan)" class="flex-1 p-2 rounded border text-xs">
+                            <input type="file" id="prod-img-file" accept="image/*" class="flex-1 text-xs p-1" onchange="handleImageUpload(this)">
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-1">*Jika upload, gambar akan ditukar ke kod (Base64) dan simpan dalam Database.</p>
+                        <img id="prod-preview" class="w-20 h-20 object-cover rounded mt-2 hidden border">
+                    </div>
+                    <input type="text" id="prod-name" placeholder="Nama Item *" class="p-2 rounded border">
+                    <input type="number" id="prod-price" placeholder="Harga Jualan (RM) *" step="0.01" class="p-2 rounded border">
+                    <input type="text" id="prod-variation" placeholder="Variasi (Saiz/Warna)" class="p-2 rounded border">
+                    <input type="text" id="prod-country" placeholder="Negara Asal" class="p-2 rounded border">
+                    <textarea id="prod-desc" placeholder="Deskripsi" class="md:col-span-2 p-2 rounded border" rows="2"></textarea>
+                    <select id="prod-status" class="p-2 rounded border">
+                        <option value="Public">✅ Public</option>
                         <option value="Private">🔒 Private</option>
                         <option value="Out of Stock">❌ Out of Stock</option>
                     </select>
-                    <input type="text" id="prod-uc" readonly class="bg-gray-100 text-xs font-mono text-gray-500 md:col-span-2" placeholder="Kode Unik akan dijana automatik">
+                    <input type="text" id="prod-uc" readonly class="bg-gray-100 text-xs font-mono text-gray-500 p-2 rounded border" placeholder="Kode Unik (Auto)">
                 </div>
                 <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg shadow-lg"><i class="fas fa-plus"></i> LANJAR PRODUK</button>
 
-                <h3 class="font-bold text-purple-700 mt-8 mb-4">📋 Senarai Produk</h3>
+                <h3 class="font-bold text-purple-700 mt-8 mb-4">📋 Senarai Produk Dilancarkan</h3>
                 <div class="table-container">
                     <table class="custom-table">
-                        <thead><tr><th>Gambar</th><th>Nama</th><th>Kode Unik</th><th>Harga</th><th>Sold</th><th>Status</th><th>Tindakan</th></tr></thead>
-                        <tbody id="admin-prod-list"></tbody>
+                        <thead><tr><th>Gambar</th><th>Nama Item</th><th>Kode Unik</th><th>Harga</th><th>Status</th><th>Sold</th><th>Revenue</th><th>Tindakan</th></tr></thead>
+                        <tbody id="vendor-prod-list"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- TAB PESANAN -->
+            <!-- TAB: ORDERS -->
             <div id="tab-orders" class="hidden-section glass-panel p-6 mb-6">
                 <h3 class="font-bold text-purple-700 mb-4">📦 Pesanan Masuk (Perlu Tindakan)</h3>
                 <div class="table-container">
                     <table class="custom-table">
-                        <thead><tr><th>Customer</th><th>Item</th><th>Kode Unik</th><th>Total</th><th>Status</th><th>Tracking No</th><th>Action</th></tr></thead>
-                        <tbody id="admin-order-list"></tbody>
+                        <thead><tr><th>UAC</th><th>Customer</th><th>Item</th><th>Kode Unik</th><th>Total</th><th>Payment</th><th>Status</th><th>Tracking</th><th>Tindakan</th></tr></thead>
+                        <tbody id="vendor-order-list"></tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- TAB USERS (ADMIN ONLY) -->
-            <div id="tab-users" class="hidden-section glass-panel p-6 mb-6">
-                <h3 class="font-bold text-purple-700 mb-4">👥 Database Pengguna</h3>
-                <input type="text" id="user-search" placeholder="Cari user..." class="mb-4 p-2 rounded w-full md:w-1/3" onkeyup="renderAdminUsers()">
+            <!-- TAB: FINANCE -->
+            <div id="tab-finance" class="hidden-section glass-panel p-6 mb-6">
+                <h3 class="font-bold text-purple-700 mb-4">💰 Kewangan & Gaji Penjual</h3>
+                <div class="grid md:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-white/60 p-4 rounded-xl">
+                        <h4 class="font-bold text-sm mb-2">Maklumat Pembayaran Gaji</h4>
+                        <input type="text" id="fin-holder" placeholder="Nama Pemegang Akaun" class="w-full mb-2 p-2 rounded border text-sm">
+                        <input type="text" id="fin-bank" placeholder="Nama Bank / TNG / DuitNow" class="w-full mb-2 p-2 rounded border text-sm">
+                        <input type="text" id="fin-acc" placeholder="Nombor Akaun / No Telefon" class="w-full mb-2 p-2 rounded border text-sm">                        <input type="url" id="fin-qr" placeholder="URL Gambar QR Code (Optional)" class="w-full mb-2 p-2 rounded border text-sm">
+                        <button onclick="updateFinanceInfo()" class="bg-purple-600 text-white px-4 py-2 rounded w-full text-sm">Simpan Maklumat</button>
+                    </div>
+                    <div class="bg-white/60 p-4 rounded-xl">
+                        <h4 class="font-bold text-sm mb-2">Status Income</h4>
+                        <div class="flex justify-between text-sm mb-2"><span>Total Sales:</span> <span class="font-bold" id="fin-total-sales">RM 0.00</span></div>
+                        <div class="flex justify-between text-sm mb-2 text-red-600"><span>MFD Commission Deducted:</span> <span class="font-bold" id="fin-commission">- RM 0.00</span></div>
+                        <div class="flex justify-between text-lg font-bold text-green-600 border-t pt-2"><span>Net Income:</span> <span id="fin-net">RM 0.00</span></div>
+                        <div class="mt-4">
+                            <label class="text-xs font-bold">Status Pembayaran:</label>
+                            <select id="fin-status" class="w-full p-2 rounded border text-sm bg-white">
+                                <option value="Not yet paid">⚪ Not yet paid</option>
+                                <option value="Process 5 working days">🟡 Process (5 working days)</option>
+                                <option value="Already paid">🟢 Already paid</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="font-bold text-sm mb-2">📜 Transaction History</h4>
                 <div class="table-container">
                     <table class="custom-table">
-                        <thead><tr><th>UAC</th><th>Nama</th><th>Role</th><th>Status</th><th>Tindakan</th></tr></thead>
-                        <tbody id="admin-user-list"></tbody>
+                        <thead><tr><th>Tarikh</th><th>Order ID</th><th>Gross</th><th>Commission</th><th>Net</th><th>Status</th></tr></thead>
+                        <tbody id="fin-history-list"></tbody>
                     </table>
                 </div>
             </div>
+
+            <!-- TAB: PROFILE -->
+            <div id="tab-profile" class="hidden-section glass-panel p-6 mb-6">
+                <h3 class="font-bold text-purple-700 mb-4">👤 Profil Kedai & Penjual</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-bold">Seller Name</label>
+                        <input type="text" id="prof-name" class="w-full p-2 rounded border text-sm">
+                        <label class="text-xs font-bold">Business Name</label>
+                        <input type="text" id="prof-business" class="w-full p-2 rounded border text-sm">
+                        <label class="text-xs font-bold">Deskripsi Business</label>
+                        <textarea id="prof-desc" class="w-full p-2 rounded border text-sm" rows="3"></textarea>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold">Phone Number</label>
+                        <input type="tel" id="prof-phone" class="w-full p-2 rounded border text-sm">
+                        <label class="text-xs font-bold">Email Address</label>
+                        <input type="email" id="prof-email" class="w-full p-2 rounded border text-sm">
+                        <label class="text-xs font-bold">Shop Address</label>
+                        <textarea id="prof-addr" class="w-full p-2 rounded border text-sm" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="mt-4 flex gap-2">
+                    <button onclick="updateProfile()" class="bg-purple-600 text-white px-6 py-2 rounded-lg">Simpan Profil</button>                    <button onclick="deleteAccount()" class="bg-red-100 text-red-600 px-6 py-2 rounded-lg border border-red-200">Padam Akaun Kekal</button>
+                </div>
+            </div>
+
+            <!-- TAB: ADMIN (Vendor Admin Only) -->
+            <div id="tab-admin" class="hidden-section glass-panel p-6 mb-6">
+                <h3 class="font-bold text-red-700 mb-4">👑 Admin Panel (Urus Vendor Lain)</h3>
+                <div class="mb-4 p-3 bg-red-50 rounded border border-red-200 text-xs text-red-700">
+                    <i class="fas fa-info-circle"></i> Tetapkan kadar komisen MFD Store (0.01 - 5.00 RM setiap jualan).
+                </div>
+                <div class="flex gap-2 mb-4 items-center">
+                    <label class="font-bold text-sm">Kadar Komisen (RM):</label>
+                    <input type="number" id="admin-comm-rate" step="0.01" min="0.01" max="5.00" class="w-24 p-2 rounded border">
+                    <button onclick="updateCommissionRate()" class="bg-red-500 text-white px-4 py-2 rounded text-sm">Update Rate</button>
+                </div>
+                
+                <h4 class="font-bold text-sm mb-2">Database Vendor</h4>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead><tr><th>VENFD ID</th><th>Business</th><th>Sales</th><th>Commission</th><th>Income Status</th><th>Tindakan</th></tr></thead>
+                        <tbody id="admin-vendor-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
         </section>
 
-        <!-- 5. CHAT -->
+        <!-- 3. CHAT -->
         <section id="view-chat" class="hidden-section">
             <div class="glass-panel p-4 h-[70vh] flex flex-col">
-                <h3 class="font-bold glitter-text mb-4"><i class="fas fa-headset"></i> Live Chat</h3>
-                <div id="chat-list" class="flex-1 overflow-y-auto space-y-2"></div>
+                <h3 class="font-bold glitter-text mb-4"><i class="fas fa-headset"></i> Live Agent (Vendor)</h3>
+                <div id="chat-list" class="flex-1 overflow-y-auto space-y-2 mb-4 border rounded-lg p-2 bg-white/40"></div>
                 <div id="chat-window" class="hidden-section flex-1 flex flex-col">
                     <div class="flex justify-between items-center border-b pb-2 mb-2">
                         <span id="chat-partner" class="font-bold"></span>
-                        <button onclick="closeChat()" class="text-xs text-red-500">Tutup</button>                    </div>
-                    <div id="chat-messages" class="flex-1 overflow-y-auto bg-white/40 rounded-lg p-2 mb-2 space-y-2"></div>
+                        <button onclick="closeChat()" class="text-xs text-red-500">Tutup</button>
+                    </div>
+                    <div id="chat-messages" class="chat-box flex-1 mb-2"></div>
                     <div class="flex gap-2">
-                        <textarea id="chat-input" rows="1" class="flex-1 p-2 rounded text-sm" placeholder="Taip mesej..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
+                        <button onclick="document.getElementById('chat-file').click()" class="p-2 bg-gray-200 rounded"><i class="fas fa-image"></i></button>
+                        <input type="file" id="chat-file" class="hidden" accept="image/*" onchange="sendChatImage(this)">
+                        <textarea id="chat-input" rows="1" class="flex-1 p-2 rounded border text-sm" placeholder="Taip mesej..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"></textarea>
                         <button onclick="sendMsg()" class="btn-glitter px-4 rounded">Hantar</button>
                     </div>
                 </div>
@@ -303,36 +341,13 @@
         </section>
 
     </main>
-
-    <!-- CART MODAL -->
-    <div id="modal-cart" class="fixed inset-0 bg-black/60 hidden-section z-50 flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
-            <button onclick="toggleCart()" class="absolute top-4 right-4 text-2xl">&times;</button>
-            <h2 class="text-2xl font-bold glitter-text mb-4">Checkout</h2>
-            <div id="cart-items" class="space-y-3 mb-4"></div>
-            <div class="border-t pt-3 flex justify-between font-bold text-lg">
-                <span>Jumlah:</span>
-                <span id="cart-total" class="text-purple-600">RM 0.00</span>
-            </div>
-            <div class="mt-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
-                <p class="font-bold text-sm mb-2">💳 Cara Bayaran:</p>
-                <ol class="text-xs space-y-1 list-decimal pl-4">
-                    <li>Online: <a href="https://sociabuzz.com/fareezonzz_019/give" target="_blank" class="text-blue-600 underline">Sociabuzz</a></li>
-                    <li>TNG eWallet: <strong class="font-mono bg-white px-1 rounded">161489981218</strong></li>
-                    <li class="text-red-600 font-bold mt-2">⚠️ WAJIB: Hantar resit ke WhatsApp <a href="https://wa.me/60145400413" class="underline">+60145400413</a></li>
-                </ol>
-            </div>
-            <button onclick="submitOrder()" class="btn-glitter w-full py-3 rounded-xl mt-4 font-bold text-lg">KONFIRM PESANAN</button>
-        </div>
-    </div>
-
     <!-- FIREBASE LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        // CONFIG ANDA
+        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
             authDomain: "mfd-store.firebaseapp.com",
@@ -341,22 +356,22 @@
             messagingSenderId: "1039564529069",
             appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
         };
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
         let currentUser = null;
-        let userData = {};
-        let cart = [];
+        let vendorData = {};
         let products = [];
         let orders = [];
-        let users = [];
         let chatSub = null;
+        let globalCommissionRate = 1.00; // Default RM 1.00
 
         // --- UTILS ---
         const fmtRM = n => 'RM ' + parseFloat(n||0).toFixed(2);
-        const genUAC = () => "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
-        const genUC = (vid) => `ITEM-${vid ? vid.substr(0,6).toUpperCase() : 'MFD'}-${Math.random().toString(36).substr(2, 8).toUpperCase()}`;
+        const genVENFD = () => "VENFD-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+        const genUC = (vid) => `ITEM-${vid}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
         
         function toast(msg, type='success') {
             const t = document.createElement('div');
@@ -364,10 +379,8 @@
             t.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'} mr-2"></i>${msg}`;
             document.getElementById('toast-container').appendChild(t);
             setTimeout(() => t.remove(), 3000);
-            if(type==='success') document.getElementById('snd-success').play().catch(()=>{});
-            else document.getElementById('snd-error').play().catch(()=>{});
+            document.getElementById(type==='success'?'snd-success':'snd-error').play().catch(()=>{});
         }
-
         window.playSound = () => document.getElementById('snd-click').play().catch(()=>{});
 
         // --- NAV ---
@@ -375,55 +388,41 @@
             playSound();
             document.querySelectorAll('section').forEach(el => el.classList.add('hidden-section'));
             document.getElementById(`view-${view}`).classList.remove('hidden-section');
-            if(view === 'home') loadProducts();
-            if(view === 'dashboard' && currentUser) loadUserData();
-            if(view === 'admin' && currentUser) loadAdminData();
+            if(view === 'dashboard' && currentUser) loadVendorDashboard();
             if(view === 'chat' && currentUser) loadChatList();
         };
-
         window.showTab = (id) => {
-            ['tab-products', 'tab-orders', 'tab-users'].forEach(t => document.getElementById(t).classList.add('hidden-section'));
+            ['tab-products', 'tab-orders', 'tab-finance', 'tab-profile', 'tab-admin'].forEach(t => document.getElementById(t).classList.add('hidden-section'));
             document.getElementById(id).classList.remove('hidden-section');
         };
 
-        window.toggleCart = () => {
-            const m = document.getElementById('modal-cart');
-            if(m.classList.contains('hidden-section')) { renderCart(); m.classList.remove('hidden-section'); } 
-            else { m.classList.add('hidden-section'); }
-        };
         // --- AUTH ---
         window.doRegister = async () => {
             const name = document.getElementById('reg-name').value.trim();
+            const business = document.getElementById('reg-business').value.trim();
             const phone = document.getElementById('reg-phone').value.trim();
             const email = document.getElementById('reg-email').value.trim();
             const pass = document.getElementById('reg-pass').value;
-            const isVendor = document.getElementById('reg-vendor').checked;
 
-            if(!name || !phone || pass.length < 6) return toast('Isi semua field & password min 6', 'error');
+            if(!name || !business || !phone || pass.length < 6) return toast('Isi semua field & password min 6', 'error');
 
             try {
-                const cred = await createUserWithEmailAndPassword(auth, email || `user${Date.now()}@mfd.local`, pass);
+                const cred = await createUserWithEmailAndPassword(auth, email, pass);
                 const uid = cred.user.uid;
-                const uac = genUAC();
-                const vendorId = isVendor ? `VND-${Math.random().toString(36).substr(2,6).toUpperCase()}` : null;
+                const venId = genVENFD();
+                const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
 
-                // Create User Doc
                 await setDoc(doc(db, "users", uid), {
-                    uid, username: name.replace(/\s+/g,'_'), customerName: name, email, phone, uac,
-                    role: isVendor ? 'vendor' : 'customer', status: 'ACTIVE', address: '',
+                    uid, username: name, role: 'vendor', status: 'ACTIVE',
+                    venId, uac, businessName: business, phone, email,
                     createdAt: serverTimestamp(),
-                    ...(vendorId && { vendorId, shopName: name, commissionRate: 0.10 })
+                    // Finance defaults
+                    totalSales: 0, totalCommission: 0, netIncome: 0,
+                    paymentInfo: { holder: '', bank: '', acc: '', qr: '' },
+                    incomeStatus: 'Not yet paid'
                 });
 
-                // Create Vendor Doc if applicable
-                if(vendorId) {
-                    await setDoc(doc(db, "vendors", vendorId), {
-                        uid, vendorId, shopName: name, username: name, status: 'ACTIVE',
-                        totalProducts: 0, totalSales: 0, joinedAt: serverTimestamp()
-                    });
-                }
-
-                toast('✅ Pendaftaran Berjaya! Sila Login');
+                toast('✅ Pendaftaran Vendor Berjaya!');
                 navTo('login');
             } catch(e) { toast('❌ ' + e.message, 'error'); }
         };
@@ -436,334 +435,324 @@
             catch(e) { toast('❌ ' + e.message, 'error'); }
         };
 
-        window.logout = () => { signOut(auth); toast('✅ Logout'); navTo('home'); };
-        
-        window.deleteAccount = async () => {
-            if(!confirm('Padam akaun kekal?')) return;            await updateDoc(doc(db, "users", currentUser.uid), { status: 'INACTIVE', deletedAt: serverTimestamp() });
-            signOut(auth); toast('✅ Akaun dinyahaktif'); navTo('home');
-        };
-
-        // --- PRODUCTS ---
-        async function loadProducts() {
-            let q = query(collection(db, "products"), where("status", "==", "Public"));
-            // Jika vendor login, boleh filter produk sendiri di tab admin, tapi catalog tetap public
-            const snap = await getDocs(q);
-            products = snap.docs.map(d => ({id: d.id, ...d.data()}));
-            renderCatalog();
-        }
-
-        window.renderCatalog = () => {
-            const search = document.getElementById('search-bar').value.toLowerCase();
-            const sort = document.getElementById('filter-sort').value;
-            const grid = document.getElementById('product-grid');
-
-            let filtered = products.filter(p => {
-                if(p.status !== 'Public') return false;
-                if(sort === 'vendor' && userData.vendorId && p.vendorId !== userData.vendorId) return true; // Show my products only if selected
-                if(sort === 'vendor' && !userData.vendorId) return false;
-                return !search || p.name.toLowerCase().includes(search) || (p.uniqueCode && p.uniqueCode.toLowerCase().includes(search));
-            });
-
-            if(sort === 'highest') filtered.sort((a,b) => (b.totalSold||0) - (a.totalSold||0));
-            if(sort === 'vendor') filtered = products.filter(p => p.vendorId === userData.vendorId); // Force filter
-
-            if(filtered.length === 0) { grid.innerHTML = '<p class="col-span-full text-center py-10">Tiada produk.</p>'; return; }
-
-            grid.innerHTML = filtered.map(p => `
-                <div class="glass-panel p-3 flex flex-col h-full">
-                    <img src="${p.imageUrl || 'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg mb-2 bg-gray-200">
-                    <h3 class="font-bold text-sm leading-tight">${p.name}</h3>
-                    ${p.vendorName ? `<span class="text-[10px] text-purple-600 font-bold mb-1">🏪 ${p.vendorName}</span>` : ''}
-                    <p class="text-[10px] text-gray-500 line-clamp-2 flex-grow">${p.description||''}</p>
-                    <div class="unique-code text-[10px] my-1" onclick="navigator.clipboard.writeText('${p.uniqueCode}');toast('Kode disalin!')">${p.uniqueCode||'N/A'}</div>
-                    <div class="flex justify-between items-center mt-2">
-                        <span class="font-bold text-purple-600">${fmtRM(p.priceSell)}</span>
-                        <span class="text-[10px]">⭐${p.rating||5} • 🛒${p.totalSold||0}</span>
-                    </div>
-                    <button onclick="addToCart('${p.id}')" class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-2">Add to Cart</button>
-                </div>
-            `).join('');
-        };
-
-        window.addToCart = (id) => {
-            const p = products.find(x => x.id === id);
-            if(p) {
-                const existing = cart.find(c => c.id === id);                if(existing) existing.qty++; else cart.push({...p, qty: 1});
-                document.getElementById('cart-count').innerText = cart.reduce((s,i)=>s+(i.qty||1),0);
-                toast('✅ Ditambah ke cart');
-            }
-        };
-
-        function renderCart() {
-            const container = document.getElementById('cart-items');
-            const totalEl = document.getElementById('cart-total');
-            if(cart.length === 0) { container.innerHTML = '<p class="text-center text-gray-500">Cart kosong</p>'; totalEl.innerText = fmtRM(0); return; }
-            let total = 0;
-            container.innerHTML = cart.map((item, idx) => {
-                total += (item.priceSell * item.qty);
-                return `<div class="flex justify-between items-center bg-white/60 p-2 rounded">
-                    <div><div class="font-bold text-sm">${item.name}</div><div class="text-[10px] text-gray-500">${item.uniqueCode}</div></div>
-                    <div class="flex items-center gap-2"><span class="font-bold text-purple-600">${fmtRM(item.priceSell*item.qty)}</span>
-                    <button onclick="rmCart(${idx})" class="text-red-500"><i class="fas fa-trash"></i></button></div>
-                </div>`;
-            }).join('');
-            totalEl.innerText = fmtRM(total);
-        }
-        window.rmCart = (i) => { cart.splice(i,1); renderCart(); document.getElementById('cart-count').innerText = cart.reduce((s,i)=>s+(i.qty||1),0); };
-
-        window.submitOrder = async () => {
-            if(!currentUser) return toast('Sila login', 'error'), navTo('login');
-            if(cart.length === 0) return toast('Cart kosong', 'error');
-            if(!userData.address) return toast('Isi alamat di Dashboard', 'error'), navTo('dashboard');
-
+        window.doGoogleSignIn = async () => {
+            const provider = new GoogleAuthProvider();
             try {
-                const total = cart.reduce((s,i) => s + (i.priceSell * i.qty), 0);
-                const orderId = "ORD-" + Date.now().toString().substr(-6);
-                const tracking = "TRK-" + Date.now().toString().substr(-8);
-
-                await addDoc(collection(db, "orders"), {
-                    userId: currentUser.uid, uac: userData.uac, username: userData.username,
-                    items: cart.map(i => ({ productId: i.id, name: i.name, uniqueCode: i.uniqueCode, vendorId: i.vendorId, vendorName: i.vendorName, price: i.priceSell, qty: i.qty })),
-                    total, address: userData.address, trackingNo: tracking, orderId,
-                    paymentStatus: "Not Verified", status: "To Pay", category: "To Pay",
-                    createdAt: serverTimestamp()
-                });
-
-                // Update stats
-                for(const item of cart) {
-                    if(item.vendorId) {
-                        updateDoc(doc(db, "products", item.productId), { totalSold: (item.totalSold||0)+item.qty }).catch(()=>{});
-                        updateDoc(doc(db, "vendors", item.vendorId), { totalSales: (item.totalSales||0)+item.qty, totalRevenue: (item.totalRevenue||0)+(item.price*item.qty) }).catch(()=>{});
-                    }
+                const res = await signInWithPopup(auth, provider);
+                const uid = res.user.uid;                const userDoc = await getDoc(doc(db, "users", uid));
+                if(!userDoc.exists()) {
+                    // Create vendor doc for new google user
+                    const venId = genVENFD();
+                    await setDoc(doc(db, "users", uid), {
+                        uid, username: res.user.displayName, role: 'vendor', status: 'ACTIVE',
+                        venId, uac: "MFD-G"+Math.random().toString(36).substr(2,6).toUpperCase(),
+                        businessName: res.user.displayName + "'s Shop",
+                        email: res.user.email, phone: '',
+                        createdAt: serverTimestamp(), totalSales: 0, totalCommission: 0, netIncome: 0,
+                        paymentInfo: { holder: '', bank: '', acc: '', qr: '' }, incomeStatus: 'Not yet paid'
+                    });
+                    toast('✅ Akaun Google Vendor Dicipta');
+                } else {
+                    toast('✅ Login Google Berjaya');
                 }
-
-                cart = []; document.getElementById('cart-count').innerText = 0; toggleCart();                toast('✅ Pesanan berjaya! Sila bayar & hantar resit.');
-                navTo('dashboard');
             } catch(e) { toast('❌ ' + e.message, 'error'); }
         };
 
-        // --- DASHBOARD & ORDERS ---
-        async function loadUserData() {
+        window.logout = () => { signOut(auth); toast('✅ Logout'); navTo('login'); };
+        window.deleteAccount = async () => {
+            if(!confirm('Padam akaun vendor kekal?')) return;
+            await updateDoc(doc(db, "users", currentUser.uid), { status: 'INACTIVE', deletedAt: serverTimestamp() });
+            signOut(auth); toast('✅ Akaun dinyahaktif'); navTo('login');
+        };
+
+        // --- DASHBOARD LOGIC ---
+        async function loadVendorDashboard() {
             if(!currentUser) return;
+            
+            // Listen to Vendor Profile
             onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
                 if(doc.exists()) {
-                    userData = doc.data();
-                    document.getElementById('nav-username').innerText = userData.username;
-                    document.getElementById('nav-role').innerText = userData.role === 'vendor' ? 'VENDOR' : (userData.role === 'admin' ? 'ADMIN' : 'CUSTOMER');
-                    document.getElementById('nav-role').className = `text-[10px] font-bold badge ${userData.role==='vendor'?'badge-vendor':'badge-active'}`;
-                    document.getElementById('dash-name').innerText = userData.customerName;
-                    document.getElementById('dash-uac').innerText = userData.uac;
-                    document.getElementById('dash-phone').innerText = userData.phone;
-                    document.getElementById('dash-address').value = userData.address || '';
+                    vendorData = doc.data();
+                    // Update UI Nav
+                    document.getElementById('nav-username').innerText = vendorData.businessName || vendorData.username;
+                    document.getElementById('nav-venid').innerText = vendorData.venId;
                     
-                    const sts = document.getElementById('dash-status');
-                    sts.innerText = userData.status;
-                    sts.className = `badge ${userData.status==='ACTIVE'?'badge-active':'badge-blocked'}`;
+                    // Update Stats
+                    document.getElementById('stat-sales').innerText = fmtRM(vendorData.totalSales);
+                    document.getElementById('stat-income').innerText = fmtRM(vendorData.netIncome);
+                    
+                    // Update Profile Form
+                    document.getElementById('prof-name').value = vendorData.username;
+                    document.getElementById('prof-business').value = vendorData.businessName;
+                    document.getElementById('prof-phone').value = vendorData.phone;
+                    document.getElementById('prof-email').value = vendorData.email;
+                    document.getElementById('prof-addr').value = vendorData.address || '';
+                    
+                    // Update Finance Form                    const p = vendorData.paymentInfo || {};
+                    document.getElementById('fin-holder').value = p.holder || '';
+                    document.getElementById('fin-bank').value = p.bank || '';
+                    document.getElementById('fin-acc').value = p.acc || '';
+                    document.getElementById('fin-qr').value = p.qr || '';
+                    document.getElementById('fin-status').value = vendorData.incomeStatus || 'Not yet paid';
+                    document.getElementById('fin-total-sales').innerText = fmtRM(vendorData.totalSales);
+                    document.getElementById('fin-commission').innerText = '- ' + fmtRM(vendorData.totalCommission);
+                    document.getElementById('fin-net').innerText = fmtRM(vendorData.netIncome);
 
-                    if(userData.role === 'admin') document.getElementById('btn-admin-users').classList.remove('hidden');
-                    if(userData.role === 'vendor' || userData.role === 'admin') setTimeout(()=>navTo('admin'), 500);
+                    if(vendorData.role === 'admin') document.getElementById('btn-admin').classList.remove('hidden');
                 }
             });
 
-            onSnapshot(query(collection(db, "orders"), where("userId", "==", currentUser.uid), orderBy("createdAt", "desc")), (snap) => {
-                orders = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                filterOrders('all');
-            });
-        }
-
-        window.updateProfile = async () => {
-            const addr = document.getElementById('dash-address').value.trim();
-            if(!addr) return toast('Alamat diperlukan', 'error');
-            await updateDoc(doc(db, "users", currentUser.uid), { address: addr, logCache: serverTimestamp() });
-            toast('✅ Alamat dikemaskini');
-        };
-
-        window.filterOrders = (status) => {
-            const tbody = document.getElementById('user-order-list');
-            const filtered = status === 'all' ? orders : orders.filter(o => o.status === status);
-            if(filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4">Tiada pesanan</td></tr>'; return; }
-            tbody.innerHTML = filtered.map(o => {
-                const item = o.items[0];
-                let action = '';
-                if(o.status === 'To Pay') action = `<button onclick="cancelOrder('${o.id}')" class="text-red-500 text-xs">Batal</button>`;
-                if(o.status === 'Completed' && !o.userRating) action = `<button onclick="rateOrder('${o.id}')" class="text-yellow-600 text-xs">Rate</button>`;                
-                return `<tr>
-                    <td class="font-bold text-xs">${item?.name||'-'}</td>
-                    <td><span class="unique-code text-[10px]">${item?.uniqueCode||'-'}</span></td>
-                    <td class="text-center">${o.items.reduce((s,i)=>s+(i.qty||1),0)}</td>
-                    <td class="font-bold text-purple-600">${fmtRM(o.total)}</td>
-                    <td class="text-center"><span class="badge ${o.status==='To Pay'?'badge-to-pay':o.status==='Completed'?'badge-completed':'badge-blocked'}">${o.status}</span></td>
-                    <td class="font-mono text-[10px]">${o.trackingNo||'-'}</td>
-                    <td class="text-center">${action||'-'}</td>
-                </tr>`;
-            }).join('');
-        };
-
-        window.cancelOrder = async (id) => { if(confirm('Batal?')) { await updateDoc(doc(db,"orders",id),{status:'Cancelled'}); toast('Pesanan dibatal'); }};
-        window.rateOrder = async (id) => { const r=prompt('Rating 1-5?','5'); if(r) { await updateDoc(doc(db,"orders",id),{userRating:r}); toast('Terima kasih!'); }};
-
-        // --- ADMIN / VENDOR LOGIC ---
-        async function loadAdminData() {
-            if(userData.role !== 'admin' && userData.role !== 'vendor') return;
-            
-            // Load Products (Realtime)
-            let pQuery = query(collection(db, "products"), orderBy("createdAt", "desc"));
-            if(userData.role === 'vendor') pQuery = query(pQuery, where("vendorId", "==", userData.vendorId));
-            
+            // Listen to Products
+            const pQuery = query(collection(db, "products"), where("vendorId", "==", vendorData.venId), orderBy("createdAt", "desc"));
             onSnapshot(pQuery, (snap) => {
                 products = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderAdminProducts();
-                if(document.getElementById('view-home').classList.contains('hidden-section')===false) renderCatalog();
+                document.getElementById('stat-products').innerText = products.filter(p=>p.status==='Public').length;
+                renderProducts();
             });
 
-            // Load Orders (Realtime)
-            let oQuery = query(collection(db, "orders"), orderBy("createdAt", "desc"));
-            // Vendor only see their orders
-            if(userData.role === 'vendor') {
-                // Note: Filtering array contains in query requires index, simpler to filter client side for small apps or use specific field
-                // For this single file, we fetch all recent and filter client side if needed, or rely on structure
-                // Better approach for vendor: query where "items.vendorId" == vid (needs composite index)
-                // Fallback: Fetch and filter
-            }
-            
+            // Listen to Orders (Filter by vendorId in items array)
+            // Note: Firestore doesn't support array-contains well with other filters in simple queries without indexes. 
+            // We fetch recent orders and filter client-side for simplicity in this single-file setup.
+            const oQuery = query(collection(db, "orders"), orderBy("createdAt", "desc"), limit(200));
             onSnapshot(oQuery, (snap) => {
                 let allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                if(userData.role === 'vendor') {
-                    allOrders = allOrders.filter(o => o.items.some(i => i.vendorId === userData.vendorId));
-                }
-                orders = allOrders; // Update global for dashboard too if needed
-                renderAdminOrders();
+                // Filter orders that contain items from THIS vendor
+                orders = allOrders.filter(o => o.items && o.items.some(i => i.vendorId === vendorData.venId));
+                
+                const pending = orders.filter(o => o.status === 'To Pay' || o.status === 'To Ship').length;
+                document.getElementById('stat-pending').innerText = pending;
+                
+                renderOrders();
+                renderFinanceHistory();
             });
 
-            if(userData.role === 'admin') {                onSnapshot(collection(db, "users"), (snap) => {
-                    users = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                    renderAdminUsers();
+            // Load Admin Data if Admin
+            if(vendorData.role === 'admin') {
+                loadAdminVendors();
+                // Get global commission rate from a config doc or default
+                getDoc(doc(db, "config", "settings")).then(d => {
+                    if(d.exists()) {
+                        globalCommissionRate = d.data().commissionRate || 1.00;
+                        document.getElementById('admin-comm-rate').value = globalCommissionRate;
+                    }
                 });
             }
         }
+        // --- PRODUCTS ---
+        window.handleImageUpload = (input) => {
+            const file = input.files[0];
+            if(!file) return;
+            if(file.size > 500000) return toast('❌ Gambar terlalu besar (Max 500KB untuk Firestore)', 'error');
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.getElementById('prod-preview').src = e.target.result;
+                document.getElementById('prod-preview').classList.remove('hidden');
+                window.tempImgBase64 = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
 
         window.addProduct = async () => {
             const name = document.getElementById('prod-name').value.trim();
             const price = parseFloat(document.getElementById('prod-price').value);
-            const img = document.getElementById('prod-img').value.trim();
-            const status = document.getElementById('prod-status').value;
+            const imgUrl = document.getElementById('prod-img-url').value.trim() || window.tempImgBase64;
             
-            if(!name || !price) return toast('Nama & Harga wajib', 'error');
+            if(!name || !price || !imgUrl) return toast('Nama, Harga & Gambar wajib', 'error');
             
-            const uniqueCode = genUC(userData.vendorId);
+            const uniqueCode = genUC(vendorData.venId);
             
             try {
                 await addDoc(collection(db, "products"), {
-                    name, priceSell: price, imageUrl: img, description: document.getElementById('prod-desc').value,
-                    variation: document.getElementById('prod-variation').value, status, uniqueCode,
-                    vendorId: userData.vendorId || 'ADMIN', vendorName: userData.shopName || userData.username,
+                    name, priceSell: price, imageUrl: imgUrl, 
+                    description: document.getElementById('prod-desc').value,
+                    variation: document.getElementById('prod-variation').value,
+                    country: document.getElementById('prod-country').value,
+                    status: document.getElementById('prod-status').value,
+                    uniqueCode, vendorId: vendorData.venId, vendorName: vendorData.businessName,
                     totalSold: 0, rating: 5.0, createdAt: serverTimestamp()
                 });
-                
-                if(userData.vendorId) {
-                    const vRef = doc(db, "vendors", userData.vendorId);
-                    const vSnap = await getDoc(vRef);
-                    if(vSnap.exists()) await updateDoc(vRef, { totalProducts: (vSnap.data().totalProducts||0) + 1 });
-                }
-
                 toast('✅ Produk dilancarkan');
                 document.getElementById('prod-name').value = '';
                 document.getElementById('prod-price').value = '';
-                document.getElementById('prod-uc').value = '';
+                document.getElementById('prod-img-url').value = '';
+                document.getElementById('prod-preview').classList.add('hidden');
+                window.tempImgBase64 = null;
             } catch(e) { toast('❌ ' + e.message, 'error'); }
         };
 
-        // Auto generate UC preview
+        // Auto gen UC
         document.getElementById('prod-name').addEventListener('input', function() {
-            if(userData.vendorId) document.getElementById('prod-uc').value = genUC(userData.vendorId);
+            if(vendorData.venId) document.getElementById('prod-uc').value = genUC(vendorData.venId);
         });
 
-        function renderAdminProducts() {
-            const tbody = document.getElementById('admin-prod-list');
+        function renderProducts() {            const tbody = document.getElementById('vendor-prod-list');
             tbody.innerHTML = products.map(p => `
                 <tr>
-                    <td><img src="${p.imageUrl||'https://via.placeholder.com/40'}" class="w-10 h-10 rounded object-cover"></td>
+                    <td><img src="${p.imageUrl}" class="w-10 h-10 rounded object-cover border"></td>
                     <td class="font-bold text-xs">${p.name}</td>
-                    <td><span class="unique-code text-[10px]">${p.uniqueCode}</span></td>                    <td class="font-bold">${fmtRM(p.priceSell)}</td>
-                    <td class="text-center">${p.totalSold||0}</td>
+                    <td><span class="unique-code text-[10px]">${p.uniqueCode}</span></td>
+                    <td class="font-bold">${fmtRM(p.priceSell)}</td>
                     <td class="text-center"><span class="badge ${p.status==='Public'?'badge-active':'badge-blocked'}">${p.status}</span></td>
+                    <td class="text-center">${p.totalSold||0}</td>
+                    <td class="text-green-600 font-bold">${fmtRM((p.priceSell)* (p.totalSold||0))}</td>
                     <td class="text-center"><button onclick="deleteProduct('${p.id}')" class="text-red-500 text-xs">Padam</button></td>
                 </tr>
             `).join('');
         }
+        window.deleteProduct = async (id) => { if(confirm('Padam?')) { await deleteDoc(doc(db,"products",id)); toast('Dipadam'); }};
 
-        window.deleteProduct = async (id) => {
-            if(confirm('Padam produk?')) { await deleteDoc(doc(db,"products",id)); toast('Produk dipadam'); }
-        };
+        // --- ORDERS ---
+        function renderOrders() {
+            const tbody = document.getElementById('vendor-order-list');
+            // Filter items to show only this vendor's items in the order
+            const myOrders = orders.map(o => {
+                const myItems = o.items.filter(i => i.vendorId === vendorData.venId);
+                if(myItems.length === 0) return null;
+                return { ...o, myItems };
+            }).filter(o => o !== null);
 
-        function renderAdminOrders() {
-            const tbody = document.getElementById('admin-order-list');
-            tbody.innerHTML = orders.map(o => {
-                const item = o.items[0];
+            tbody.innerHTML = myOrders.map(o => {
+                const item = o.myItems[0]; // Show first item for summary
+                let actions = '';
+                if(o.status === 'To Pay') {
+                    actions = `<button onclick="updateOrderStatus('${o.id}', 'To Ship')" class="bg-blue-500 text-white px-2 py-1 rounded text-xs">Confirm Pay</button>`;
+                } else if (o.status === 'To Ship') {
+                    actions = `<button onclick="updateOrderStatus('${o.id}', 'Completed')" class="bg-green-500 text-white px-2 py-1 rounded text-xs">Ship</button>`;
+                }
+                
                 return `<tr>
-                    <td class="text-xs">${o.username}</td>
-                    <td class="text-xs font-bold">${item?.name}</td>
-                    <td><span class="unique-code text-[10px]">${item?.uniqueCode}</span></td>
+                    <td class="font-mono text-[10px]">${o.uac}</td>
+                    <td class="text-xs font-bold">${o.username}</td>
+                    <td class="text-xs">${item.name}</td>
+                    <td><span class="unique-code text-[10px]">${item.uniqueCode}</span></td>
                     <td class="font-bold">${fmtRM(o.total)}</td>
-                    <td class="text-center"><span class="badge badge-to-pay">${o.status}</span></td>
-                    <td><input type="text" value="${o.trackingNo||''}" onchange="updateField('${o.id}','trackingNo',this.value)" class="w-20 text-xs border rounded p-1" placeholder="Tracking"></td>
-                    <td>
-                        <select onchange="updateField('${o.id}','status',this.value)" class="text-xs border rounded p-1">
-                            <option value="To Pay" ${o.status==='To Pay'?'selected':''}>To Pay</option>
-                            <option value="To Ship" ${o.status==='To Ship'?'selected':''}>To Ship</option>
-                            <option value="Completed" ${o.status==='Completed'?'selected':''}>Completed</option>
-                            <option value="Cancelled" ${o.status==='Cancelled'?'selected':''}>Cancelled</option>
-                        </select>
-                    </td>
+                    <td class="text-center"><span class="badge ${o.paymentStatus==='Verified'?'badge-paid':'badge-pending'}">${o.paymentStatus}</span></td>
+                    <td class="text-center"><span class="badge badge-active">${o.status}</span></td>
+                    <td><input type="text" value="${o.trackingNo||''}" onchange="updateOrderField('${o.id}','trackingNo',this.value)" class="w-20 text-xs border rounded p-1" placeholder="Tracking"></td>
+                    <td>${actions}</td>
                 </tr>`;
             }).join('');
         }
 
-        window.updateField = async (id, field, val) => {
-            await updateDoc(doc(db,"orders",id), {[field]: val});
-            toast('✅ Dikemaskini');
+        window.updateOrderStatus = async (id, status) => {            await updateDoc(doc(db,"orders",id), { status, paymentStatus: 'Verified', updatedAt: serverTimestamp() });
+            
+            // If Completed, Update Vendor Finance
+            if(status === 'Completed') {
+                const orderSnap = await getDoc(doc(db, "orders", id));
+                const order = orderSnap.data();
+                if(!order.processedFinance) {
+                    // Calculate Commission
+                    const vendorItemsTotal = order.items.filter(i=>i.vendorId===vendorData.venId).reduce((sum, i) => sum + (i.price * i.qty), 0);
+                    const commission = vendorItemsTotal * (globalCommissionRate / 100); // Assuming rate is percentage or fixed? Prompt says 0.01 to 5 ringgit. Let's assume Fixed RM.
+                    // Actually prompt says "0.01 hingga 5 ringgit". So it's a fixed fee per sale or percentage? 
+                    // Let's assume Fixed Fee per transaction for simplicity based on "setiap jualan".
+                    const fixedComm = parseFloat(globalCommissionRate); 
+                    
+                    const net = vendorItemsTotal - fixedComm;
+
+                    await updateDoc(doc(db, "users", currentUser.uid), {
+                        totalSales: (vendorData.totalSales || 0) + vendorItemsTotal,
+                        totalCommission: (vendorData.totalCommission || 0) + fixedComm,
+                        netIncome: (vendorData.netIncome || 0) + net
+                    });
+                    
+                    await updateDoc(doc(db, "orders", id), { processedFinance: true });
+                    toast('✅ Order Completed & Finance Updated');
+                }
+            } else {
+                toast('✅ Status Updated');
+            }
         };
 
-        function renderAdminUsers() {
-            const search = document.getElementById('user-search').value.toLowerCase();
-            const tbody = document.getElementById('admin-user-list');
-            const filtered = users.filter(u => !search || u.username.toLowerCase().includes(search) || u.uac.toLowerCase().includes(search));
-            
-            tbody.innerHTML = filtered.map(u => `
-                <tr>
-                    <td class="font-mono text-[10px]">${u.uac}</td>
-                    <td class="text-xs font-bold">${u.customerName}</td>
-                    <td class="text-center">${u.role==='vendor'?'🏪 Vendor':u.role==='admin'?'👑 Admin':'👤 Customer'}</td>                    <td class="text-center"><span class="badge ${u.status==='ACTIVE'?'badge-active':'badge-blocked'}">${u.status}</span></td>
-                    <td class="text-center">
-                        ${u.status!=='BLOCKED' ? `<button onclick="blockUser('${u.id}')" class="text-red-500 text-xs">Block</button>` : `<button onclick="unblockUser('${u.id}')" class="text-green-600 text-xs">Unblock</button>`}
-                    </td>
-                </tr>
-            `).join('');
+        window.updateOrderField = async (id, field, val) => {
+            await updateDoc(doc(db,"orders",id), {[field]: val});
+        };
+
+        // --- FINANCE ---
+        window.updateFinanceInfo = async () => {
+            const info = {
+                holder: document.getElementById('fin-holder').value,
+                bank: document.getElementById('fin-bank').value,
+                acc: document.getElementById('fin-acc').value,
+                qr: document.getElementById('fin-qr').value
+            };
+            const status = document.getElementById('fin-status').value;
+            await updateDoc(doc(db, "users", currentUser.uid), { paymentInfo: info, incomeStatus: status });
+            toast('✅ Maklumat Kewangan Dikemaskini');
+        };
+
+        function renderFinanceHistory() {
+            // Show last 10 completed orders as history
+            const history = orders.filter(o => o.status === 'Completed' && o.processedFinance).slice(0, 10);            const tbody = document.getElementById('fin-history-list');
+            tbody.innerHTML = history.map(o => {
+                const vTotal = o.items.filter(i=>i.vendorId===vendorData.venId).reduce((s,i)=>s+(i.price*i.qty),0);
+                const comm = parseFloat(globalCommissionRate);
+                return `<tr>
+                    <td class="text-xs">${o.createdAt ? new Date(o.createdAt.toDate()).toLocaleDateString() : '-'}</td>
+                    <td class="font-mono text-[10px]">${o.orderId}</td>
+                    <td>${fmtRM(vTotal)}</td>
+                    <td class="text-red-500">-${fmtRM(comm)}</td>
+                    <td class="text-green-600 font-bold">${fmtRM(vTotal-comm)}</td>
+                    <td><span class="badge badge-paid">Paid to Balance</span></td>
+                </tr>`;
+            }).join('');
         }
 
-        window.blockUser = async (id) => { await updateDoc(doc(db,"users",id),{status:'BLOCKED'}); toast('User blocked'); };
-        window.unblockUser = async (id) => { await updateDoc(doc(db,"users",id),{status:'ACTIVE'}); toast('User unblocked'); };
+        // --- ADMIN ---
+        async function loadAdminVendors() {
+            const q = query(collection(db, "users"), where("role", "==", "vendor"));
+            onSnapshot(q, (snap) => {
+                const vendors = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                const tbody = document.getElementById('admin-vendor-list');
+                tbody.innerHTML = vendors.map(v => `
+                    <tr>
+                        <td class="font-mono text-[10px]">${v.venId}</td>
+                        <td class="font-bold text-xs">${v.businessName}</td>
+                        <td>${fmtRM(v.totalSales)}</td>
+                        <td class="text-red-500">-${fmtRM(v.totalCommission)}</td>
+                        <td><span class="badge ${v.incomeStatus==='Already paid'?'badge-paid':'badge-pending'}">${v.incomeStatus}</span></td>
+                        <td><button onclick="messageVendor('${v.uid}')" class="text-blue-500 text-xs">Message</button></td>
+                    </tr>
+                `).join('');
+            });
+        }
+
+        window.updateCommissionRate = async () => {
+            const rate = document.getElementById('admin-comm-rate').value;
+            await setDoc(doc(db, "config", "settings"), { commissionRate: parseFloat(rate) }, {merge:true});
+            globalCommissionRate = parseFloat(rate);
+            toast('✅ Kadar Komisen Dikemaskini');
+        };
+
+        // --- PROFILE ---
+        window.updateProfile = async () => {
+            const data = {
+                username: document.getElementById('prof-name').value,
+                businessName: document.getElementById('prof-business').value,
+                phone: document.getElementById('prof-phone').value,
+                email: document.getElementById('prof-email').value,
+                address: document.getElementById('prof-addr').value
+            };            await updateDoc(doc(db, "users", currentUser.uid), data);
+            toast('✅ Profil Dikemaskini');
+        };
 
         // --- CHAT ---
         async function loadChatList() {
             const list = document.getElementById('chat-list');
             list.innerHTML = '<div class="text-center py-4">Loading...</div>';
-            
-            // Simple logic: Customers chat with Admin/Vendors. Admin/Vendors see all customers.
             const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
-            
             if(chatSub) chatSub();
             chatSub = onSnapshot(q, (snap) => {
                 list.innerHTML = '';
                 if(snap.empty) { list.innerHTML = '<p class="text-center text-gray-500">Tiada perbualan</p>'; return; }
-                
                 snap.forEach(doc => {
                     const data = doc.data();
                     const partnerId = data.participants.find(id => id !== currentUser.uid);
                     getDoc(doc(db, "users", partnerId)).then(pSnap => {
                         if(pSnap.exists()) {
                             const p = pSnap.data();
-                            list.innerHTML += `<div onclick="openChat('${partnerId}', '${p.username}')" class="p-3 bg-white/50 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center">
+                            list.innerHTML += `<div onclick="openChat('${partnerId}', '${p.username}')" class="p-3 bg-white/60 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center">
                                 <div class="flex items-center gap-3"><div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">${p.username[0]}</div>
                                 <div><h4 class="font-bold text-sm">${p.username}</h4><p class="text-xs text-gray-500 truncate w-40">${data.lastMessage||''}</p></div></div>
                             </div>`;
@@ -777,27 +766,22 @@
             document.getElementById('chat-list').classList.add('hidden-section');
             document.getElementById('chat-window').classList.remove('hidden-section');
             document.getElementById('chat-partner').innerText = partnerName;
-            
             const chatId = [currentUser.uid, partnerId].sort().join('_');
             const msgBox = document.getElementById('chat-messages');
-            
             const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
-            onSnapshot(q, (snap) => {                msgBox.innerHTML = '';
+            onSnapshot(q, (snap) => {
+                msgBox.innerHTML = '';
                 snap.forEach(d => {
                     const m = d.data();
                     const isMe = m.senderId === currentUser.uid;
-                    msgBox.innerHTML += `<div class="p-2 rounded-lg max-w-[80%] ${isMe?'bg-purple-500 text-white self-end ml-auto':'bg-white self-start'}">
-                        <p class="text-sm">${m.text}</p>
-                        <span class="text-[9px] opacity-70 block text-right">${m.timestamp ? new Date(m.timestamp.toDate()).toLocaleTimeString() : ''}</span>
-                    </div>`;
+                    let content = m.text ? `<p>${m.text}</p>` : (m.imageUrl ? `<img src="${m.imageUrl}" class="max-w-full rounded">` : '');
+                    msgBox.innerHTML += `<div class="msg-bubble ${isMe?'msg-me':'msg-other'}">${content}<div class="text-[9px] opacity-70 text-right mt-1">${m.timestamp?new Date(m.timestamp.toDate()).toLocaleTimeString():''}</div></div>`;
                 });
                 msgBox.scrollTop = msgBox.scrollHeight;
             });
-            
             window.currentChatId = chatId;
             window.currentPartnerId = partnerId;
         };
-
         window.closeChat = () => {
             document.getElementById('chat-window').classList.add('hidden-section');
             document.getElementById('chat-list').classList.remove('hidden-section');
@@ -807,33 +791,44 @@
             const input = document.getElementById('chat-input');
             const txt = input.value.trim();
             if(!txt || !window.currentChatId) return;
-            
-            await addDoc(collection(db, `chats/${window.currentChatId}/messages`), {
-                senderId: currentUser.uid, text: txt, timestamp: serverTimestamp()
-            });
-            await setDoc(doc(db, "chats", window.currentChatId), {
-                participants: [currentUser.uid, window.currentPartnerId],
-                lastMessage: txt, lastTime: serverTimestamp()
-            }, {merge:true});
-            
+            await addDoc(collection(db, `chats/${window.currentChatId}/messages`), { senderId: currentUser.uid, text: txt, timestamp: serverTimestamp() });
+            await setDoc(doc(db, "chats", window.currentChatId), { participants: [currentUser.uid, window.currentPartnerId], lastMessage: txt, lastTime: serverTimestamp() }, {merge:true});
             input.value = '';
+            document.getElementById('snd-msg').play().catch(()=>{});
+        };
+
+        window.sendChatImage = async (input) => {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const base64 = e.target.result;
+                await addDoc(collection(db, `chats/${window.currentChatId}/messages`), { senderId: currentUser.uid, imageUrl: base64, timestamp: serverTimestamp() });
+                await setDoc(doc(db, "chats", window.currentChatId), { participants: [currentUser.uid, window.currentPartnerId], lastMessage: '[Image]', lastTime: serverTimestamp() }, {merge:true});
+                toast('✅ Gambar dihantar');
+            };
+            reader.readAsDataURL(file);
+        };
+
+        window.messageVendor = (uid) => {
+            // Open chat with vendor
+            openChat(uid, 'Vendor');
+            navTo('chat');
         };
 
         // --- INIT ---
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if(user) {
                 document.getElementById('auth-nav').classList.add('hidden-section');
                 document.getElementById('user-nav').classList.remove('hidden-section');
-                // Data loaded in navTo functions
+                navTo('dashboard');
             } else {
                 document.getElementById('auth-nav').classList.remove('hidden-section');
                 document.getElementById('user-nav').classList.add('hidden-section');
-                navTo('home');
+                navTo('login');
             }
         });
-        // Start
-        navTo('home');
     </script>
 </body>
 </html>
