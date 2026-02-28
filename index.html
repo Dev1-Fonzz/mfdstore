@@ -249,6 +249,20 @@
                 <input type="email" id="login-email" placeholder="Email Address" autocomplete="email" required>
                 <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" required>
                 <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg" id="login-btn">LOGIN NOW</button>
+                <!-- GOOGLE SIGN IN -->
+<div class="relative my-5">
+  <div class="absolute inset-0 flex items-center">
+    <div class="w-full border-t border-gray-300"></div>
+  </div>
+  <div class="relative flex justify-center text-xs">
+    <span class="px-2 bg-transparent text-gray-500">ATAU</span>
+  </div>
+</div>
+<button onclick="playSound('click'); doGoogleSignIn()" 
+        class="w-full py-3 rounded-xl font-bold mt-2 shadow-lg flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 transition">
+  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G" class="w-5 h-5">
+  Continue with Google
+</button>
                 <p class="text-center mt-6 text-sm text-gray-600">New here? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('register')">Register Account</span></p>
             </div>
         </section>
@@ -260,6 +274,20 @@
                 <input type="email" id="reg-email" placeholder="Email Address (Optional)" autocomplete="email">
                 <input type="password" id="reg-pass" placeholder="Create Password (min 6 characters)" minlength="6" required>
                 <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg" id="register-btn">REGISTER FREE</button>
+                <!-- GOOGLE SIGN IN -->
+<div class="relative my-5">
+  <div class="absolute inset-0 flex items-center">
+    <div class="w-full border-t border-gray-300"></div>
+  </div>
+  <div class="relative flex justify-center text-xs">
+    <span class="px-2 bg-transparent text-gray-500">ATAU</span>
+  </div>
+</div>
+<button onclick="playSound('click'); doGoogleSignIn()" 
+        class="w-full py-3 rounded-xl font-bold mt-2 shadow-lg flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 transition">
+  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G" class="w-5 h-5">
+  Sign up with Google
+</button>
                 <p class="text-center mt-6 text-sm text-gray-600">Have account? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('login')">Login Here</span></p>
             </div>
         </section>
@@ -723,7 +751,7 @@
     <script type="module">
         // Import Firebase SDKs
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit, arrayUnion } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 
@@ -945,7 +973,75 @@
                 btn.innerHTML = 'LOGIN NOW';
             }
         };
-
+       // ==================== GOOGLE SIGN IN ====================
+window.doGoogleSignIn = async (e) => {
+  // Prevent default if called from event
+  if (e && e.preventDefault) e.preventDefault();
+  
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  
+  // Find button safely without relying on event
+  const btn = document.querySelector('button[onclick*="doGoogleSignIn"]');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Connecting...';
+  }
+  
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+    
+    // Check if user exists in Firestore
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    
+    if (!userSnap.exists()) {
+      // Create new user doc for Google sign-in
+      const uac = "MFD-" + Math.random().toString(36).substr(2, 8).toUpperCase();
+      await setDoc(userRef, {
+        username: user.displayName || `User_${uac.split('-')[1]}`,
+        email: user.email,
+        phone: '',
+        uac: uac,
+        role: 'customer',
+        status: 'ACTIVE',
+        address: '',
+        createdAt: serverTimestamp(),
+        logCache: serverTimestamp(),
+        provider: 'google',
+        photoURL: user.photoURL || ''
+      });
+      showToast('✅ Akaun Google berjaya didaftarkan!', 'success');
+    } else {
+      showToast('✅ Login dengan Google berjaya!', 'success');
+    }
+    
+  } catch (err) {
+    console.error('Google Sign-In Error:', err);
+    
+    // Show detailed error for debugging
+    let msg = 'Google login gagal';
+    if (err.code) {
+      if (err.code === 'auth/popup-closed-by-user') msg = 'Login dibatalkan oleh user';
+      else if (err.code === 'auth/popup-blocked') msg = 'Popup diblocker browser. Sila allow popup untuk site ini.';
+      else if (err.code === 'auth/operation-not-allowed') msg = 'Google Sign-In BELUM enabled di Firebase Console';
+      else if (err.code === 'auth/unauthorized-domain') msg = 'Domain tidak authorized. Tambah di Firebase Console → Authorized domains';
+      else if (err.code === 'auth/network-request-failed') msg = 'Sambungan internet bermasalah';
+      else msg = 'Error: ' + err.code + ' - ' + err.message;
+    }
+    showToast('❌ ' + msg, 'error');
+    
+  } finally {
+    // Reset button state
+    const buttons = document.querySelectorAll('button[onclick*="doGoogleSignIn"]');
+    buttons.forEach(b => {
+      b.disabled = false;
+      const isRegister = b.innerText.includes('Sign up');
+      b.innerHTML = `<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> ${isRegister ? 'Sign up with Google' : 'Continue with Google'}`;
+    });
+  }
+}; 
         window.logout = () => {
             signOut(auth);
             playSound('click');
@@ -1147,7 +1243,12 @@
             unsubscribeUsers = onSnapshot(doc(db, "users", currentUser.uid), (d) => {
                 if(d.exists()) { 
                     userData = d.data(); 
-                    updateDashUI(); 
+                    updateDashUI();
+                    // Handle Google profile picture
+const avatarEl = document.querySelector('#view-dashboard .w-16.h-16, #view-dashboard .w-20.h-20');
+if (avatarEl && userData.photoURL) {
+  avatarEl.innerHTML = `<img src="${userData.photoURL}" class="w-full h-full rounded-full object-cover" alt="Profile">`;
+}
                 } else { 
                     showToast('❌ Data pengguna tidak dijumpai', 'error'); 
                 }
