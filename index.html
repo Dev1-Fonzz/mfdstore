@@ -371,7 +371,7 @@
         <!-- 4. LIVE CHAT SYSTEM -->
         <section id="view-chat-list" class="hidden-section">            <div class="glass-panel p-4 h-[80vh] flex flex-col">
                 <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2">
-                    <i class="fas fa-headset"></i> Live Agent🟢
+                    <i class="fas fa-headset"></i> Contact MFD Seller
                 </h2>
                 <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
                     <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>
@@ -398,7 +398,7 @@
                         <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}" maxlength="1000"></textarea>
                         <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg" title="Send"><i class="fas fa-paper-plane"></i></button>
                     </div>
-                    <div class="text-[10px] text-gray-400 mt-1 text-center">Auto-update • Sound Effects Enabled • All Data Encrypted</div>
+                    <div class="text-[10px] text-gray-400 mt-1 text-center">Auto-update • Sound Effects Enabled • All Data Encrypted • Copyright reserved since 2025</div>
                 </div>
             </div>
         </section>
@@ -418,19 +418,19 @@
             <!-- Admin Stats Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
                 <div class="glass-panel p-3 text-center cursor-pointer hover:shadow-lg transition" onclick="showAdminTab('tab-users')">
-                    <div class="text-2xl font-bold text-purple-600" id="stat-total-users">-</div>                    <div class="text-[10px] text-gray-600">Total Users</div>
+                    <div class="text-2xl font-bold text-purple-600" id="stat-total-users">-</div>                    <div class="text-[10px] text-gray-600">🫂Total Registered Users</div>
                 </div>
                 <div class="glass-panel p-3 text-center cursor-pointer hover:shadow-lg transition" onclick="showAdminTab('tab-orders-verify')">
                     <div class="text-2xl font-bold text-pink-600" id="stat-total-orders">-</div>
-                    <div class="text-[10px] text-gray-600">Total Orders</div>
+                    <div class="text-[10px] text-gray-600">📥Total Orders</div>
                 </div>
                 <div class="glass-panel p-3 text-center">
                     <div class="text-2xl font-bold text-green-600" id="stat-revenue">RM -</div>
-                    <div class="text-[10px] text-gray-600">Total Revenue</div>
+                    <div class="text-[10px] text-gray-600">📮Total Revenue</div>
                 </div>
                 <div class="glass-panel p-3 text-center cursor-pointer hover:shadow-lg transition" onclick="showAdminTab('tab-orders-manage')">
                     <div class="text-2xl font-bold text-orange-600" id="stat-pending">-</div>
-                    <div class="text-[10px] text-gray-600">Pending Orders</div>
+                    <div class="text-[10px] text-gray-600">⏳Pending Orders</div>
                 </div>
             </div>
             
