@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta name="google-site-verification" content="v7koD54-JpANjYbZKCN46QWnVK7Q3a7sSdQnCcAVczo" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Vendors Manager | MFD Store</title>
+    
+    <!-- Libraries - SAME AS index.html -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ===== COPY PASTE CSS DARI index.html ===== */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-dark: #2d3748;
+            --error-red: #e53e3e;
+            --success-green: #38a169;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #FF9A9E 75%, #FECFEF 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(102, 126, 234, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .glass-panel:hover { transform: translateY(-2px); box-shadow: 0 12px 40px 0 rgba(102, 126, 234, 0.35); }
+        .glitter-text {
+            background: linear-gradient(to right, #9D50BB, #FF69B4, #6E48AA, #9D50BB);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 300% auto;
+            animation: shine 4s linear infinite;            font-weight: 800;
+        }
+        @keyframes shine { to { background-position: 300% center; } }
+        .btn-glitter {
+            background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2);
+            background-size: 300% 300%;
+            animation: gradientMove 4s ease infinite;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(110, 72, 170, 0.4);
+        }
+        .btn-glitter:active { transform: scale(0.95); }
+        .btn-glitter:hover { filter: brightness(1.2); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(110, 72, 170, 0.5); }
+        @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+        
+        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; scroll-behavior: smooth; }
+        .message-bubble { max-width: 80%; padding: 10px 15px; border-radius: 15px; margin-bottom: 10px; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); word-wrap: break-word; cursor: pointer; }
+        .message-bubble:active { transform: scale(0.98); }
+        .msg-me { align-self: flex-end; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom-right-radius: 2px; margin-left: auto; box-shadow: 0 4px 10px rgba(118, 75, 162, 0.4); }
+        .msg-other { align-self: flex-start; background: white; color: #333; border-bottom-left-radius: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .msg-img { max-width: 100%; border-radius: 10px; margin-top: 5px; cursor: pointer; display: block; }
+        .msg-location { background: #e2e8f0; padding: 10px; border-radius: 10px; margin-top: 5px; font-size: 0.8rem; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.1); background: rgba(255,255,255,0.6); -webkit-overflow-scrolling: touch; }
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1600px; font-size: 0.62rem; }
+        .custom-table th { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            padding: 12px 8px; text-align: left; font-weight: 700; 
+            border-bottom: 2px solid #e2e8f0; color: white; 
+            position: sticky; top: 0; z-index: 10; white-space: nowrap;
+        }
+        .custom-table td { 
+            padding: 10px 8px; border-bottom: 1px solid #edf2f7; 
+            background: rgba(255,255,255,0.5); vertical-align: middle; 
+            color: #2d3748; white-space: nowrap; max-width: 180px; 
+            overflow: hidden; text-overflow: ellipsis;
+        }
+        .custom-table tr:hover td { background: rgba(255,255,255,0.9); }
+        
+        .hidden-section { display: none !important; }
+        input, select, textarea {
+            background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748;
+            border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #9D50BB; box-shadow: 0 0 0 3px rgba(157, 80, 187, 0.2); }
+        input:disabled, select:disabled, textarea:disabled { background: #edf2f7; cursor: not-allowed; }
+                .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.58rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; display: inline-block; }
+        .badge-to-pay { background: #feebc8; color: #744210; }
+        .badge-to-ship { background: #bee3f8; color: #2a4365; }
+        .badge-to-receive { background: #c6f6d5; color: #22543d; }
+        .badge-completed { background: #9ae6b4; color: #22543d; }
+        .badge-cancelled { background: #fed7d7; color: #822727; }
+        .badge-refund { background: #faf089; color: #744210; }
+        .badge-active { background: #c6f6d5; color: #22543d; }
+        .badge-blocked { background: #fed7d7; color: #822727; }
+        .badge-inactive { background: #e2e8f0; color: #4a5568; }
+        .badge-private { background: #e9d8fd; color: #553c9a; }
+        .badge-outstock { background: #cbd5e0; color: #4a5568; }
+        .badge-pending { background: #feebc8; color: #744210; }
+        .badge-approved { background: #c6f6d5; color: #22543d; }
+        .badge-rejected { background: #fed7d7; color: #822727; }
+        .badge-draft { background: #e2e8f0; color: #4a5568; }
+        .badge-verified { background: #bee3f8; color: #2a4365; }
+        .badge-notverified { background: #fed7d7; color: #822727; }
+        
+        .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #9D50BB; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
+        ::-webkit-scrollbar-thumb { background: #9D50BB; border-radius: 3px; }
+        
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .action-btn { padding: 4px 8px; border-radius: 4px; font-size: 0.6rem; font-weight: bold; cursor: pointer; margin: 0 2px; border: none; }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-edit { background: #bee3f8; color: #2a4365; }
+        .btn-delete { background: #fed7d7; color: #c53030; }
+        .btn-view { background: #c6f6d5; color: #22543d; }
+        
+        .admin-filter-btn { transition: all 0.2s; border: 1px solid transparent; }
+        .admin-filter-btn.active { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: rgba(255,255,255,0.5); }
+        
+        .password-blur { filter: blur(4px); cursor: pointer; transition: filter 0.2s; user-select: none; }
+        .password-blur:hover { filter: blur(0); }
+        .password-blur.revealed { filter: none; cursor: default; }
+        
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 10px; color: white; font-size: 0.85rem; z-index: 100; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast.success { background: var(--success-green); }
+        .toast.error { background: var(--error-red); }
+        .toast.warning { background: #dd6b20; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        @media (max-width: 768px) {
+            .custom-table { min-width: 1200px; font-size: 0.58rem; }            .custom-table th, .custom-table td { padding: 8px 6px; }
+            .glass-panel { border-radius: 16px; }
+            .btn-glitter { padding: 10px 16px; }
+        }
+        
+        .stat-card { transition: all 0.2s; cursor: default; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(102,126,234,0.3); }
+        
+        /* Loading optimization */
+        .lazy-load { opacity: 0; transition: opacity 0.3s ease; }
+        .lazy-load.loaded { opacity: 1; }
+    </style>
+</head>
+<body class="p-0 md:p-4">
+
+    <!-- AUDIO EFFECTS (Preloaded for fast response) -->
+    <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3" preload="auto"></audio>
+    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3" preload="auto"></audio>
+    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+    <audio id="snd-msg" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-start-2574.mp3" preload="auto"></audio>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+    <!-- NAVBAR -->
+    <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 md:p-4 flex justify-between items-center flex-wrap gap-3 shadow-lg">
+        <div class="text-xl md:text-2xl font-bold glitter-text cursor-pointer flex items-center gap-2" onclick="navTo('dashboard')">
+            <i class="fas fa-store"></i> MFD VENDORS
+        </div>
+        <div class="flex items-center gap-2 md:gap-4">
+            <button onclick="playSound('click'); navTo('chat')" class="relative p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Live Chat">
+                <i class="fas fa-comments text-purple-600 text-lg group-hover:scale-110 transition"></i>
+                <span id="chat-notif" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden animate-pulse">!</span>
+            </button>
+            <button onclick="playSound('click'); window.open('https://mfdstore.vercel.app','_blank')" class="p-2 md:p-3 hover:bg-white/40 rounded-full transition group" title="Buka MFD Store">
+                <i class="fas fa-external-link-alt text-pink-600 text-lg group-hover:scale-110 transition"></i>
+            </button>
+            <div id="auth-nav">
+                <button onclick="playSound('click'); navTo('login')" class="px-3 md:px-4 py-2 rounded-xl bg-white/60 hover:bg-white text-purple-600 font-bold text-xs md:text-sm transition shadow-sm">Login</button>
+                <button onclick="playSound('click'); navTo('register')" class="px-3 md:px-4 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-xs md:text-sm">Register Account</button>
+            </div>
+            <div id="vendor-nav" class="hidden-section flex items-center gap-2 md:gap-3">
+                <div class="text-right hidden md:block">
+                    <div id="nav-username" class="font-bold text-xs md:text-sm text-gray-700 truncate max-w-[100px]"></div>
+                    <div id="nav-uac" class="text-[10px] text-purple-500 font-mono"></div>
+                </div>
+                <button onclick="playSound('click'); navTo('dashboard')" class="px-3 md:px-4 py-2 bg-purple-500 text-white rounded-xl shadow hover:bg-purple-600 transition text-xs md:text-sm" title="Dashboard"><i class="fas fa-home"></i></button>
+                <button onclick="playSound('click'); logout()" class="px-3 md:px-4 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition text-xs md:text-sm" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="container mx-auto p-2 md:p-4 pb-20 fade-in">
+
+        <!-- 1. LOGIN -->
+        <section id="view-login" class="max-w-md mx-auto mt-10">
+            <div class="glass-panel p-8">
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Login Account</h2>
+                <input type="email" id="login-email" placeholder="Email Address" autocomplete="email" required>
+                <input type="password" id="login-pass" placeholder="Password" autocomplete="current-password" required>
+                <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg" id="login-btn">LOGIN NOW</button>
+                <div class="relative my-5">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300"></div></div>
+                    <div class="relative flex justify-center text-xs"><span class="px-2 bg-transparent text-gray-500">ATAU</span></div>
+                </div>
+                <button onclick="playSound('click'); doGoogleSignIn()" class="w-full py-3 rounded-xl font-bold mt-2 shadow-lg flex items-center justify-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-300 transition">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G" class="w-5 h-5"> Continue with Google
+                </button>
+                <p class="text-center mt-6 text-sm text-gray-600">New here? <span class="text-purple-600 font-bold cursor-pointer underline" onclick="playSound('click'); navTo('register')">Register Account</span></p>
+            </div>
+        </section>
+
+        <!-- 2. REGISTER -->
+        <section id="view-register" class="hidden-section max-w-lg mx-auto mt-6">
+            <div class="glass-panel p-6 md:p-8">
+                <h2 class="text-2xl md:text-3xl font-bold text-center mb-4 glitter-text">Register Account</h2>
+                <p class="text-center text-xs text-gray-600 mb-4">Sertai rangkaian penjual MFD Store • Komisen adil • Support 24/7</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="text" id="reg-seller" placeholder="Seller Name (Auto: VENFD-XXX)" readonly class="bg-gray-100">
+                    <input type="text" id="reg-business" placeholder="Business Name *" required maxlength="50">
+                    <input type="tel" id="reg-phone" placeholder="Phone Number (Active) *" pattern="[0-9+\-\s()]{10,}" required>
+                    <input type="email" id="reg-email" placeholder="Email Address (Optional)" autocomplete="email">
+                    <input type="password" id="reg-pass" placeholder="Password (min 6 characters) *" minlength="6" required>
+                    <input type="text" id="reg-ic" placeholder="IC/Passport (Optional)" maxlength="20" class="md:col-span-2">
+                    <textarea id="reg-desc" placeholder="Business Description" class="md:col-span-2" maxlength="200" rows="2"></textarea>
+                </div>
+                <div class="bg-purple-50 p-3 rounded-lg mt-4 text-xs text-purple-800 border border-purple-200">
+                    <strong>📋 Terma & Syarat:</strong>
+                    <ul class="list-disc pl-4 mt-1 space-y-1">
+                        <li>Komisen platform: <strong>RM0.01 - RM5.00</strong> setiap jualan (ditetapkan admin)</li>
+                        <li>Produk perlu diluluskan admin sebelum live</li>
+                        <li>Withdrawal minimum: <strong>RM50</strong>, diproses 1-3 hari bekerja</li>
+                        <li>Vendor bertanggungjawab atas stok & penghantaran</li>
+                    </ul>
+                </div>
+                <label class="flex items-center gap-2 mt-4 text-xs">
+                    <input type="checkbox" id="reg-agree" required class="w-4 h-4 accent-purple-500">
+                    <span>Saya bersetuju dengan <a href="#" class="text-purple-600 underline" onclick="alert('Terma lengkap disediakan oleh admin.')">Terma & Syarat MFD Store</a></span>
+                </label>                <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold mt-4 shadow-lg" id="register-btn">REGISTER FREE</button>
+                <p class="text-center mt-4 text-xs text-gray-500">✅ Permohonan disemak dalam 24-48 jam</p>
+            </div>
+        </section>
+
+        <!-- 3. VENDOR DASHBOARD -->
+        <section id="view-dashboard" class="hidden-section">
+            <div id="approval-notice" class="hidden-section glass-panel p-4 mb-4 bg-yellow-50 border-l-4 border-yellow-400">
+                <div class="flex items-start gap-3"><i class="fas fa-clock text-yellow-600 mt-1"></i><div><h4 class="font-bold text-yellow-800">Permohonan Dalam Semakan</h4><p class="text-xs text-yellow-700">Akaun vendor sedang diproses. Anda akan dimaklumkan melalui email apabila diluluskan.</p></div></div>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                <div class="glass-panel p-4 stat-card"><div class="text-2xl font-bold text-purple-600" id="stat-total-sales">RM 0.00</div><div class="text-[10px] text-gray-600">📈 Total Sales</div></div>
+                <div class="glass-panel p-4 stat-card"><div class="text-2xl font-bold text-green-600" id="stat-earnings">RM 0.00</div><div class="text-[10px] text-gray-600">💰 Net Earnings</div></div>
+                <div class="glass-panel p-4 stat-card"><div class="text-2xl font-bold text-blue-600" id="stat-pending">0</div><div class="text-[10px] text-gray-600">📦 Pending Orders</div></div>
+                <div class="glass-panel p-4 stat-card"><div class="text-2xl font-bold text-pink-600" id="stat-products">0</div><div class="text-[10px] text-gray-600">🛍️ Active Products</div></div>
+            </div>
+
+            <div class="glass-panel p-4 mb-6">
+                <h3 class="font-bold text-purple-700 mb-3 text-sm">⚡ Quick Actions</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <button onclick="navTo('products')" class="p-3 bg-white/60 hover:bg-white rounded-xl text-center transition shadow-sm"><i class="fas fa-plus-circle text-purple-600 mb-1"></i><div class="text-[10px] font-bold">Add Product</div></button>
+                    <button onclick="navTo('orders-verify')" class="p-3 bg-white/60 hover:bg-white rounded-xl text-center transition shadow-sm"><i class="fas fa-receipt text-blue-600 mb-1"></i><div class="text-[10px] font-bold">Verify Orders</div></button>
+                    <button onclick="navTo('orders-manage')" class="p-3 bg-white/60 hover:bg-white rounded-xl text-center transition shadow-sm"><i class="fas fa-truck text-green-600 mb-1"></i><div class="text-[10px] font-bold">Fulfill Orders</div></button>
+                    <button onclick="navTo('profile')" class="p-3 bg-white/60 hover:bg-white rounded-xl text-center transition shadow-sm"><i class="fas fa-cog text-gray-600 mb-1"></i><div class="text-[10px] font-bold">Settings</div></button>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4">
+                <div class="flex justify-between items-center mb-3"><h3 class="font-bold text-purple-700 text-sm">🕐 Recent Orders</h3><button onclick="navTo('orders-verify')" class="text-[10px] text-purple-600 hover:underline">View All →</button></div>
+                <div id="recent-orders-list" class="space-y-2 max-h-60 overflow-y-auto"><div class="text-center text-gray-500 py-4 text-xs"><div class="loader mx-auto mb-2"></div>Loading...</div></div>
+            </div>
+        </section>
+
+        <!-- 4. ORDER VERIFICATION -->
+        <section id="view-orders-verify" class="hidden-section">
+            <div class="glass-panel p-4 md:p-6 mb-6">
+                <h2 class="text-xl font-bold glitter-text mb-4">✅ Order Verification</h2>
+                <div class="flex overflow-x-auto gap-2 mb-4 pb-2 border-b border-gray-200">
+                    <button onclick="filterVerifyOrders('all')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-gray-200 text-gray-700 text-xs font-bold whitespace-nowrap hover:bg-gray-300 active">All</button>
+                    <button onclick="filterVerifyOrders('To Pay')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-orange-100 text-orange-800 text-xs font-bold whitespace-nowrap hover:bg-orange-200">To Pay</button>
+                    <button onclick="filterVerifyOrders('To Ship')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-blue-100 text-blue-800 text-xs font-bold whitespace-nowrap hover:bg-blue-200">To Ship</button>
+                    <button onclick="filterVerifyOrders('To Receive')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-green-100 text-green-800 text-xs font-bold whitespace-nowrap hover:bg-green-200">To Receive</button>
+                    <button onclick="filterVerifyOrders('Completed')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-800 text-xs font-bold whitespace-nowrap hover:bg-emerald-200">Completed</button>
+                    <button onclick="filterVerifyOrders('Cancelled')" class="admin-filter-btn px-3 py-1.5 rounded-lg bg-red-100 text-red-800 text-xs font-bold whitespace-nowrap hover:bg-red-200">Cancelled</button>
+                </div>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead><tr>
+                            <th>UAC</th><th>Username</th><th>Item</th><th>Code</th><th>Address</th><th>Qty</th><th>Total</th>                            <th>Payment</th><th>Payment Status</th><th>Tracking</th><th>Order ID</th><th>Status</th><th>Category</th><th>Actions</th>
+                        </tr></thead>
+                        <tbody id="verify-order-list"><tr><td colspan="14" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. ORDER MANAGEMENT -->
+        <section id="view-orders-manage" class="hidden-section">
+            <div class="glass-panel p-4 md:p-6 mb-6">
+                <h2 class="text-xl font-bold glitter-text mb-4">📦 Order Fulfillment</h2>
+                <div class="flex gap-2 mb-4"><input type="text" id="order-search" placeholder="Search orders..." class="w-40 text-xs py-1 m-0" onkeyup="filterManageOrders()"><select id="order-category" class="w-36 text-xs py-1 m-0" onchange="filterManageOrders()"><option value="all">All</option><option value="To Pay">To Pay</option><option value="To Ship">To Ship</option><option value="To Receive">To Receive</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option></select></div>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead><tr>
+                            <th>UAC</th><th>Customer</th><th>Item</th><th>Code</th><th>Address</th><th>Qty</th><th>Total</th><th>Payment</th><th>Payment Status</th><th>Delivery</th><th>Tracking</th><th>Order ID</th><th>Cancel</th><th>Chat</th>
+                        </tr></thead>
+                        <tbody id="manage-order-list"><tr><td colspan="14" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. PRODUCT MANAGEMENT -->
+        <section id="view-products" class="hidden-section">
+            <div class="glass-panel p-4 md:p-6 mb-6">
+                <h2 class="text-xl font-bold glitter-text mb-4">🛍️ Product Management</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 bg-white/30 p-4 rounded-xl">
+                    <div class="md:col-span-2 lg:col-span-3">
+                        <label class="block text-xs font-bold mb-1">🖼️ Product Image URL (PostImages.org)</label>
+                        <input type="url" id="prod-img-url" placeholder="https://i.postimg.cc/xxxx/product.jpg" class="m-0">
+                        <div id="prod-img-preview" class="mt-2 hidden"><img class="w-20 h-20 object-cover rounded-lg border"></div>
+                        <p class="text-[10px] text-gray-500 mt-1">💡 Upload di <a href="https://postimages.org/" target="_blank" class="text-purple-600 underline">postimages.org</a> → Copy "Direct link" → Paste sini</p>
+                    </div>
+                    <input type="text" id="prod-name" placeholder="Item Name *" required maxlength="100">
+                    <input type="number" id="prod-price" placeholder="Cost Price (RM) - Optional" min="0" step="0.01">
+                    <input type="number" id="prod-sell" placeholder="Selling Price (RM) *" required min="0.01" step="0.01">
+                    <input type="text" id="prod-variation" placeholder="Variation (Size/Color)" maxlength="50">
+                    <textarea id="prod-desc" placeholder="Description" class="md:col-span-2 lg:col-span-3" maxlength="500" rows="2"></textarea>
+                    <input type="text" id="prod-country" placeholder="Country of Origin" maxlength="50">
+                    <input type="url" id="prod-link" placeholder="Optional Link" maxlength="200">
+                    <input type="text" id="prod-label" placeholder="Label (e.g. Best Seller)" maxlength="30">
+                    <input type="text" id="prod-event" placeholder="Event (e.g. Ramadan)" maxlength="30">
+                    <input type="text" id="prod-unique" placeholder="Unique Code (Auto)" readonly class="bg-gray-100">
+                    <select id="prod-status"><option value="draft">💾 Draft</option><option value="pending">📤 Submit for Approval</option></select>
+                    <div class="md:col-span-2 lg:col-span-3 flex gap-4 text-xs"><label class="flex items-center gap-1"><input type="checkbox" id="prod-review" checked> Allow Reviews</label><label class="flex items-center gap-1"><input type="checkbox" id="prod-featured"> Featured</label></div>
+                </div>
+                <button onclick="addProduct()" class="btn-glitter px-6 py-2 rounded-lg mt-4 shadow-lg disabled:opacity-50" id="add-prod-btn"><i class="fas fa-plus mr-2"></i>LAUNCH PRODUCT</button>
+            </div>            <div class="glass-panel p-4 md:p-6">
+                <div class="flex justify-between items-center mb-4 flex-wrap gap-2"><h3 class="font-bold text-purple-700">📋 My Products</h3><div class="flex gap-2"><input type="text" id="prod-search" placeholder="Search..." class="w-32 text-xs py-1 m-0" onkeyup="renderProducts()"><select id="prod-filter" class="w-28 text-xs py-1 m-0" onchange="renderProducts()"><option value="all">All</option><option value="Public">Public</option><option value="Private">Private</option><option value="Out of Stock">Out of Stock</option></select></div></div>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead><tr><th>#</th><th>Image</th><th>Name</th><th>Price</th><th>Rating</th><th>Status</th><th>Sold</th><th>Revenue</th><th>Reviews</th><th>Edit</th><th>Delete</th></tr></thead>
+                        <tbody id="product-list"><tr><td colspan="11" class="text-center py-8"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. PROFILE & SETTINGS -->
+        <section id="view-profile" class="hidden-section max-w-3xl mx-auto">
+            <div class="glass-panel p-6">
+                <h2 class="text-xl font-bold glitter-text mb-6">⚙️ Seller Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div><label class="block text-xs font-bold mb-1">Seller Name</label><input type="text" id="prof-seller" disabled class="bg-gray-100"></div>
+                    <div><label class="block text-xs font-bold mb-1">Business Name</label><input type="text" id="prof-business"></div>
+                    <div><label class="block text-xs font-bold mb-1">Description</label><textarea id="prof-desc" rows="2" maxlength="200"></textarea></div>
+                    <div><label class="block text-xs font-bold mb-1">Phone Number</label><input type="tel" id="prof-phone"></div>
+                    <div><label class="block text-xs font-bold mb-1">Email</label><input type="email" id="prof-email" disabled class="bg-gray-100"></div>
+                    <div><label class="block text-xs font-bold mb-1">UAC</label><input type="text" id="prof-uac" disabled class="bg-gray-100 font-mono"></div>
+                    <div class="md:col-span-2"><label class="block text-xs font-bold mb-1">Shop Address</label><textarea id="prof-address" rows="3" maxlength="500" placeholder="House No, Building, Street, Unit, Postal Code, Full Name, Phone"></textarea><div class="flex gap-2 mt-1"><label class="text-[10px] flex items-center gap-1"><input type="checkbox" id="prof-frequent"> Frequent</label><select class="w-auto py-0 px-1 text-[10px] m-0"><option>Home</option><option>Work</option></select></div></div>
+                    <div class="md:col-span-2"><h4 class="font-bold text-sm text-purple-700 mb-2 mt-4">💳 Payment Information</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-3"><input type="text" id="prof-bank-name" placeholder="Account Holder Name"><select id="prof-bank-type"><option value="">Select...</option><option value="Maybank">Maybank</option><option value="CIMB">CIMB</option><option value="Public Bank">Public Bank</option><option value="Touch 'n Go eWallet">Touch 'n Go eWallet</option><option value="DuitNow QR">DuitNow QR</option></select><input type="text" id="prof-bank-num" placeholder="Account Number / QR Link" class="md:col-span-2"></div></div>
+                </div>
+                <div class="mt-6 flex gap-3"><button onclick="updateProfile()" class="btn-glitter px-6 py-2 rounded-lg shadow-lg">💾 Save Changes</button><button onclick="deleteAccount()" class="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 text-xs">🗑️ Delete Account</button></div>
+                <div class="mt-4 p-3 bg-purple-50 rounded-lg text-xs text-purple-800"><strong>🔐 Account Status:</strong> <span id="prof-status" class="badge badge-active">ACTIVE</span> | <strong>Log Cache:</strong> <span id="prof-log">-</span></div>
+            </div>
+        </section>
+
+        <!-- 8. LIVE CHAT -->
+        <section id="view-chat" class="hidden-section">
+            <div class="glass-panel p-4 h-[80vh] flex flex-col">
+                <h2 class="text-xl font-bold glitter-text mb-4 flex items-center gap-2"><i class="fas fa-headset"></i> Live Chat</h2>
+                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2"><div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div></div>
+                <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
+                    <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2">
+                        <div class="flex items-center gap-2"><button onclick="closeChat()" class="text-gray-500 hover:text-purple-600 transition"><i class="fas fa-arrow-left"></i></button><div><h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3><span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span></div></div>
+                        <div class="flex gap-1"><button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded"><i class="fas fa-copy"></i> ID</button><button onclick="blockContact()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded"><i class="fas fa-ban"></i></button></div>
+                    </div>
+                    <div id="chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 border border-white/50"></div>
+                    <div class="flex gap-2 items-end bg-white/50 p-2 rounded-xl">
+                        <button onclick="document.getElementById('file-input').click()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Attach Image"><i class="fas fa-image text-gray-600"></i></button>
+                        <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
+                        <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Send Location"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
+                        <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}" maxlength="1000"></textarea>
+                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg" title="Send"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                    <p class="text-[10px] text-gray-400 mt-1 text-center">Auto-update • Sound Effects • All Data Encrypted • © MFD Store 2025</p>
+                </div>            </div>
+        </section>
+
+    </main>
+
+    <!-- FIREBASE LOGIC - OPTIMIZED & ERROR-FREE -->
+    <script type="module">
+        // ===== FIREBASE SETUP =====
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
+            authDomain: "mfd-store.firebaseapp.com",
+            projectId: "mfd-store",
+            storageBucket: "mfd-store.firebasestorage.app",
+            messagingSenderId: "1039564529069",
+            appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // ===== GLOBAL STATE =====
+        let currentUser = null, vendorData = {}, allProducts = [], allOrders = [];
+        let currentChatPartner = null, unsubscribeChat = null, unsubscribeOrders = null, unsubscribeProducts = null;
+        const COMMISSION_DEFAULT = 0.10;
+
+        // ===== UTILITY FUNCTIONS (Optimized) =====
+        window.playSound = (type) => { 
+            try { 
+                const s = {click:document.getElementById('snd-click'),success:document.getElementById('snd-success'),error:document.getElementById('snd-error'),msg:document.getElementById('snd-msg')}; 
+                if(s[type]){s[type].currentTime=0;s[type].play().catch(()=>{});} 
+            } catch(e){} 
+        };
+        
+        function showToast(msg,type='success',dur=3000){
+            const c=document.getElementById('toast-container'),t=document.createElement('div');
+            t.className=`toast ${type}`;
+            t.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'} mr-2"></i>${msg}`;
+            c.appendChild(t);
+            setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(100%)';setTimeout(()=>t.remove(),300);},dur);
+        }
+        
+        function formatRM(a){return'RM '+parseFloat(a||0).toFixed(2);}
+        function formatDate(ts){if(!ts)return'-';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleString('ms-MY',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+        
+        function isValidImageUrl(u){            if(!u||!u.startsWith('https://'))return false;
+            const ext=['.jpg','.jpeg','.png','.webp','.gif'];
+            if(!ext.some(e=>u.toLowerCase().endsWith(e)))return false;
+            const dom=['postimg.cc','i.postimg.cc','postimages.org'];
+            try{if(!dom.includes(new URL(u).hostname))return false;}catch(e){return false;}
+            return u.length<500;
+        }
+        
+        function genUAC(){return"VENFD-"+Math.random().toString(36).substr(2,8).toUpperCase();}
+        function genItemCode(){return"ITEM-"+Math.random().toString(36).substr(2,6).toUpperCase();}
+
+        // ===== NAVIGATION =====
+        window.navTo = (v) => { 
+            playSound('click'); 
+            document.querySelectorAll('section').forEach(e=>e.classList.add('hidden-section')); 
+            const t=document.getElementById(`view-${v}`); 
+            if(t)t.classList.remove('hidden-section'); 
+            window.scrollTo(0,0); 
+            if(v==='dashboard'&&currentUser)loadDashboard(); 
+            if(v==='products'&&currentUser)loadProducts(); 
+            if(v==='orders-verify'&&currentUser)loadOrders('verify'); 
+            if(v==='orders-manage'&&currentUser)loadOrders('manage'); 
+            if(v==='profile'&&currentUser)loadProfile(); 
+            if(v==='chat'&&currentUser)loadChatList(); 
+        };
+
+        // ===== AUTH =====
+        window.doRegister = async () => {
+            const seller = genUAC(), business = document.getElementById('reg-business').value.trim(), phone = document.getElementById('reg-phone').value.trim(), email = document.getElementById('reg-email').value.trim(), pass = document.getElementById('reg-pass').value, agree = document.getElementById('reg-agree').checked, btn = document.getElementById('register-btn');
+            if(!business||!phone||!pass){showToast('Lengkapkan field wajib','error');return;} if(!agree){showToast('Sila bersetuju dengan Terma','error');return;}
+            btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Processing...';
+            try{
+                const cred = await createUserWithEmailAndPassword(auth, email||`vendor-${Date.now()}@mfd.local`, pass);
+                await setDoc(doc(db,"users",cred.user.uid),{username:seller,email:email||'',phone:phone,uac:seller,role:'vendor',status:'PENDING',vendorProfile:{sellerName:seller,businessName:business,description:document.getElementById('reg-desc').value.trim()||'',icNumber:document.getElementById('reg-ic').value.trim()||'',approvalStatus:'pending',commissionRate:COMMISSION_DEFAULT,bankDetails:{},address:''},createdAt:serverTimestamp(),logCache:serverTimestamp()});
+                showToast('✅ Pendaftaran berjaya! Sila login.','success'); navTo('login');
+            }catch(e){console.error(e);let m='Pendaftaran gagal';if(e.code==='auth/email-already-in-use')m='Email sudah digunakan';showToast(`❌ ${m}`,'error');}
+            finally{btn.disabled=false;btn.innerHTML='REGISTER FREE';}
+        };
+        
+        window.doLogin = async () => {
+            const email=document.getElementById('login-email').value.trim(),pass=document.getElementById('login-pass').value,btn=document.getElementById('login-btn');
+            if(!email||!pass){showToast('Masukkan email & password','error');return;}
+            btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Loading...';
+            try{await signInWithEmailAndPassword(auth,email,pass);showToast('✅ Login berjaya!','success');}
+            catch(e){let m='Login gagal';if(e.code==='auth/user-not-found'||e.code==='auth/wrong-password')m='Email/password salah';showToast(`❌ ${m}`,'error');}
+            finally{btn.disabled=false;btn.innerHTML='LOGIN NOW';}
+        };
+        
+        window.doGoogleSignIn = async (e) => { 
+            if(e&&e.preventDefault)e.preventDefault();             const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
+            const btn=document.querySelector('button[onclick*="doGoogleSignIn"]');
+            if(btn){btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin mr-2"></i>Connecting...';} 
+            try{
+                const result=await signInWithPopup(auth,provider),user=result.user;
+                const userRef=doc(db,"users",user.uid),userSnap=await getDoc(userRef);
+                if(!userSnap.exists()){
+                    const uac=genUAC();
+                    await setDoc(userRef,{username:user.displayName||`User_${uac.split('-')[1]}`,email:user.email,phone:'',uac:uac,role:'vendor',status:'PENDING',vendorProfile:{sellerName:uac,businessName:user.displayName||'New Business',description:'',approvalStatus:'pending',commissionRate:COMMISSION_DEFAULT,bankDetails:{}},createdAt:serverTimestamp(),logCache:serverTimestamp(),provider:'google',photoURL:user.photoURL||''});
+                    showToast('✅ Akaun Google didaftarkan!','success');
+                }else{showToast('✅ Login dengan Google berjaya!','success');}
+            }catch(err){
+                console.error('Google Sign-In Error:',err);
+                let msg='Google login gagal';
+                if(err.code){
+                    if(err.code==='auth/popup-closed-by-user')msg='Login dibatalkan';
+                    else if(err.code==='auth/popup-blocked')msg='Popup diblocker browser';
+                    else if(err.code==='auth/operation-not-allowed')msg='Google Sign-In belum enabled di Firebase';
+                    else if(err.code==='auth/unauthorized-domain')msg='Domain tidak authorized';
+                    else msg='Error: '+err.code;
+                }
+                showToast('❌ '+msg,'error');
+            }finally{
+                const buttons=document.querySelectorAll('button[onclick*="doGoogleSignIn"]');
+                buttons.forEach(b=>{b.disabled=false;const isReg=b.innerText.includes('Register');b.innerHTML=`<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> ${isReg?'Sign up with Google':'Continue with Google'}`;});
+            }
+        };
+        
+        window.logout = () => { signOut(auth); playSound('click'); showToast('✅ Logged out','success'); navTo('login'); };
+        window.deleteAccount = async () => { if(!confirm("⚠️ Padam akaun secara kekal?"))return; try{await updateDoc(doc(db,"users",currentUser.uid),{status:'INACTIVE',deletedAt:serverTimestamp(),logCache:serverTimestamp()});await signOut(auth);showToast('✅ Akaun dinyahaktifkan','success');navTo('login');}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
+
+        // ===== AUTH STATE LISTENER =====
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if(user){
+                document.getElementById('auth-nav').classList.add('hidden-section');
+                document.getElementById('vendor-nav').classList.remove('hidden-section');
+                try{
+                    const snap = await getDoc(doc(db,"users",user.uid));
+                    if(snap.exists()){
+                        vendorData = snap.data();
+                        if(vendorData.status==='BLOCKED'){showToast('❌ Akaun diblokir','error');signOut(auth);return;}
+                        document.getElementById('nav-username').innerText = vendorData.username;
+                        document.getElementById('nav-uac').innerText = vendorData.uac;
+                        const notice = document.getElementById('approval-notice');
+                        if(vendorData.vendorProfile?.approvalStatus==='pending')notice.classList.remove('hidden-section');
+                        else notice.classList.add('hidden-section');
+                        navTo('dashboard');
+                    }
+                }catch(e){console.error('Auth error:',e);navTo('login');}            }else{
+                document.getElementById('auth-nav').classList.remove('hidden-section');
+                document.getElementById('vendor-nav').classList.add('hidden-section');
+                navTo('login');
+            }
+        });
+
+        // ===== DASHBOARD =====
+        async function loadDashboard(){
+            if(!currentUser||vendorData.role!=='vendor')return;
+            try{
+                const [prodSnap,ordSnap] = await Promise.all([
+                    getDocs(query(collection(db,"products"),where("vendorId","==",currentUser.uid))),
+                    getDocs(query(collection(db,"orders"),where("vendorId","==",currentUser.uid),orderBy("createdAt","desc"),limit(5)))
+                ]);
+                let sales=0,earn=0,active=0,pending=0;
+                prodSnap.forEach(d=>{const p=d.data();if(p.status==='Public'||p.status==='approved')active++;});
+                ordSnap.forEach(d=>{const o=d.data();if(o.status==='To Ship')pending++; if(o.status==='Completed'){const it=o.items?.find(i=>i.vendorId===currentUser.uid);if(it){sales+=(it.priceSell||0)*(it.qty||1);earn+=((it.priceSell||0)*(1-(vendorData.vendorProfile?.commissionRate||COMMISSION_DEFAULT)))*(it.qty||1);}}});
+                document.getElementById('stat-total-sales').innerText=formatRM(sales);
+                document.getElementById('stat-earnings').innerText=formatRM(earn);
+                document.getElementById('stat-pending').innerText=pending;
+                document.getElementById('stat-products').innerText=active;
+                const list=document.getElementById('recent-orders-list');
+                if(ordSnap.empty){list.innerHTML='<p class="text-center text-gray-500 py-4 text-xs">Tiada pesanan terkini</p>';}
+                else{list.innerHTML=ordSnap.docs.slice(0,3).map(d=>{const o=d.data(),it=o.items?.find(i=>i.vendorId===currentUser.uid);return`<div class="p-2 bg-white/50 rounded text-xs flex justify-between items-center"><div><strong class="text-purple-700">${it?.name||'Produk'}</strong><br><span class="text-gray-500">${formatDate(o.createdAt)}</span></div><span class="badge ${o.status==='To Ship'?'badge-to-ship':o.status==='Completed'?'badge-completed':'badge-pending'}">${o.status}</span></div>`;}).join('');}
+            }catch(e){console.error('Dashboard error:',e);}
+        }
+
+        // ===== PRODUCTS =====
+        document.getElementById('prod-img-url')?.addEventListener('input',function(e){const u=e.target.value.trim(),pv=document.getElementById('prod-img-preview'),img=pv.querySelector('img');if(isValidImageUrl(u)){img.src=u;img.onerror=()=>showToast('⚠️ Link gambar tidak valid','warning');pv.classList.remove('hidden');}else{pv.classList.add('hidden');}});
+        document.getElementById('prod-name')?.addEventListener('input',function(){const el=document.getElementById('prod-unique');if(el&&!el.value)el.value=genItemCode();});
+
+        window.addProduct = async () => {
+            const name=document.getElementById('prod-name').value.trim(),sell=parseFloat(document.getElementById('prod-sell').value),img=document.getElementById('prod-img-url').value.trim(),btn=document.getElementById('add-prod-btn');
+            if(!name||!sell||!img){showToast('Lengkapkan field wajib','error');return;} if(!isValidImageUrl(img)){showToast('URL gambar tidak sah','error');return;}
+            btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Processing...';
+            try{
+                await addDoc(collection(db,"products"),{name:name,price:parseFloat(document.getElementById('prod-price').value)||0,priceSell:sell,imageUrl:img,stock:100,status:document.getElementById('prod-status').value||'draft',vendorId:currentUser.uid,vendorName:vendorData.username,description:document.getElementById('prod-desc').value.trim()||'',variation:document.getElementById('prod-variation').value.trim()||'',country:document.getElementById('prod-country').value.trim()||'',link:document.getElementById('prod-link').value.trim()||'',label:document.getElementById('prod-label').value.trim()||'',event:document.getElementById('prod-event').value.trim()||'',uniqueCode:document.getElementById('prod-unique').value||genItemCode(),totalSold:0,rating:5.0,revenue:0,allowReviews:document.getElementById('prod-review').checked,featured:document.getElementById('prod-featured').checked,reviews:[],createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+                showToast('✅ Produk berjaya dihantar!','success');
+                document.querySelectorAll('#view-products input:not([readonly]), #view-products textarea').forEach(i=>{if(i.type!=='checkbox')i.value='';});
+                document.getElementById('prod-img-preview').classList.add('hidden');document.getElementById('prod-unique').value='';
+                loadProducts();
+            }catch(e){console.error('Add product error:',e);showToast('❌ Gagal: '+(e.message||'Unknown'),'error');}
+            finally{btn.disabled=false;btn.innerHTML='<i class="fas fa-plus mr-2"></i>LAUNCH PRODUCT';}
+        };
+
+        async function loadProducts(){
+            if(!currentUser)return; if(unsubscribeProducts)unsubscribeProducts();
+            unsubscribeProducts=onSnapshot(query(collection(db,"products"),where("vendorId","==",currentUser.uid),orderBy("createdAt","desc")),(snap)=>{allProducts=[];snap.forEach(d=>allProducts.push({id:d.id,...d.data()}));renderProducts();});
+        }        
+        window.renderProducts = () => {
+            const tbody=document.getElementById('product-list'),search=(document.getElementById('prod-search')?.value||'').toLowerCase(),filter=document.getElementById('prod-filter')?.value||'all';
+            let filtered=allProducts.filter(p=>{const s=!search||p.name?.toLowerCase().includes(search);const f=filter==='all'||p.status===filter;return s&&f;});
+            if(filtered.length===0){tbody.innerHTML=`<tr><td colspan="11" class="text-center py-8 text-gray-500 text-xs">Tiada produk</td></tr>`;return;}
+            tbody.innerHTML=filtered.map((p,i)=>{const sold=p.totalSold||0,rev=sold*(p.priceSell||0)*(1-(vendorData.vendorProfile?.commissionRate||COMMISSION_DEFAULT)),badge=p.status==='Public'?'badge-active':p.status==='Private'?'badge-private':'badge-outstock';return`<tr><td>${i+1}</td><td><img src="${p.imageUrl||'https://via.placeholder.com/40'}" class="w-10 h-10 rounded object-cover bg-gray-200 lazy-load" onload="this.classList.add('loaded')" onerror="this.src='https://via.placeholder.com/40'"></td><td class="font-bold text-xs max-w-[150px] truncate" title="${p.name}">${p.name}</td><td class="font-bold text-purple-600">${formatRM(p.priceSell)}</td><td>⭐${(p.rating||5).toFixed(1)}</td><td><span class="badge ${badge}">${p.status}</span></td><td class="text-center">${sold}</td><td class="font-bold text-green-600">${formatRM(rev)}</td><td class="text-center">${(p.reviews?.length||0)}</td><td><button onclick="editProduct('${p.id}')" class="action-btn btn-edit">Edit</button></td><td><button onclick="deleteProduct('${p.id}')" class="action-btn btn-delete">Padam</button></td></tr>`;}).join('');
+        };
+        
+        window.editProduct = (id) => { showToast('Edit produk: Sila hubungi admin untuk update','warning'); };
+        window.deleteProduct = async (id) => { if(!confirm('Padam produk ini?'))return; try{await updateDoc(doc(db,"products",id),{status:'deleted',deletedAt:serverTimestamp()});showToast('✅ Produk dipadam','success');loadProducts();}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
+
+        // ===== ORDERS =====
+        async function loadOrders(type){
+            if(!currentUser)return; if(unsubscribeOrders)unsubscribeOrders();
+            unsubscribeOrders=onSnapshot(query(collection(db,"orders"),where("vendorId","==",currentUser.uid),orderBy("createdAt","desc")),(snap)=>{allOrders=[];snap.forEach(d=>allOrders.push({id:d.id,...d.data()}));if(type==='verify')filterVerifyOrders('all');else filterManageOrders();});
+        }
+        
+        window.filterVerifyOrders = (status) => {
+            const tbody=document.getElementById('verify-order-list'),filtered=status==='all'?allOrders:allOrders.filter(o=>o.status===status);
+            if(filtered.length===0){tbody.innerHTML=`<tr><td colspan="14" class="text-center py-8 text-gray-500 text-xs">Tiada pesanan</td></tr>`;return;}
+            tbody.innerHTML=filtered.map(o=>{const it=o.items?.find(i=>i.vendorId===currentUser.uid);if(!it)return'';const badgeP=o.paymentStatus==='Verified'?'badge-verified':'badge-notverified',badgeC=o.status==='To Ship'?'badge-to-ship':o.status==='Completed'?'badge-completed':o.status==='Cancelled'?'badge-cancelled':'badge-to-pay';return`<tr><td class="font-mono text-[10px]">${o.uac||'-'}</td><td class="text-xs">${o.username||'-'}</td><td class="text-xs max-w-[120px] truncate" title="${it.name}">${it.name}</td><td class="font-mono text-[10px]">${it.uniqueCode||'-'}</td><td class="text-[10px] max-w-[100px] truncate" title="${o.address}">${o.address}</td><td class="text-center">${it.qty||1}</td><td class="font-bold">${formatRM((it.priceSell||0)*(it.qty||1))}</td><td class="text-[10px]">${o.paymentMethod||'-'}</td><td><span class="badge ${badgeP}">${o.paymentStatus||'-'}</span></td><td class="font-mono text-[10px]">${o.trackingNo||'-'}</td><td class="font-mono text-[10px]">${o.orderId||'-'}</td><td><input value="${o.currentStatus||o.status||''}" onchange="updateOrderField('${o.id}','currentStatus',this.value)" class="text-[10px] p-1 w-28 rounded border" placeholder="Status..."></td><td><span class="badge ${badgeC}">${o.category||o.status||'-'}</span></td><td class="text-center"><select onchange="updateOrderStatus('${o.id}',this.value)" class="text-[10px] font-bold p-1 rounded border border-purple-300 bg-purple-50 text-purple-700"><option value="To Pay" ${o.status==='To Pay'?'selected':''}>To Pay</option><option value="To Ship" ${o.status==='To Ship'?'selected':''}>To Ship</option><option value="To Receive" ${o.status==='To Receive'?'selected':''}>To Receive</option><option value="Completed" ${o.status==='Completed'?'selected':''}>Completed</option><option value="Cancelled" ${o.status==='Cancelled'?'selected':''}>Cancelled</option></select></td></tr>`;}).join('');
+        };
+        
+        window.filterManageOrders = () => {
+            const tbody=document.getElementById('manage-order-list'),search=(document.getElementById('order-search')?.value||'').toLowerCase(),cat=document.getElementById('order-category')?.value||'all';
+            let filtered=allOrders.filter(o=>{const s=!search||o.username?.toLowerCase().includes(search)||o.items?.some(i=>i.name?.toLowerCase().includes(search));const c=cat==='all'||o.status===cat;return s&&c;});
+            if(filtered.length===0){tbody.innerHTML=`<tr><td colspan="14" class="text-center py-8 text-gray-500 text-xs">Tiada pesanan</td></tr>`;return;}
+            tbody.innerHTML=filtered.map(o=>{const it=o.items?.find(i=>i.vendorId===currentUser.uid);if(!it)return'';const badgeP=o.paymentStatus==='Verified'?'badge-verified':'badge-notverified',badgeD=o.deliveryStatus==='Delivered'?'badge-completed':'badge-to-ship';return`<tr><td class="font-mono text-[10px]">${o.uac||'-'}</td><td class="text-xs">${o.username||'-'}</td><td class="text-xs max-w-[120px] truncate" title="${it.name}">${it.name}</td><td class="font-mono text-[10px]">${it.uniqueCode||'-'}</td><td class="text-[10px] max-w-[100px] truncate" title="${o.address}">${o.address}</td><td class="text-center">${it.qty||1}</td><td class="font-bold">${formatRM((it.priceSell||0)*(it.qty||1))}</td><td class="text-[10px]">${o.paymentMethod||'-'}</td><td><span class="badge ${badgeP}">${o.paymentStatus||'-'}</span></td><td><span class="badge ${badgeD}">${o.deliveryStatus||'Pending'}</span></td><td><input value="${o.trackingNo||''}" onchange="updateOrderField('${o.id}','trackingNo',this.value)" class="text-[10px] p-1 w-20 rounded border" placeholder="Tracking..."></td><td class="font-mono text-[10px]">${o.orderId||'-'}</td><td class="text-center">${o.status!=='Cancelled'?`<button onclick="cancelOrder('${o.id}')" class="action-btn btn-delete">Cancel</button>`:'<span class="text-gray-400 text-[10px]">Dibatalkan</span>'}</td><td class="text-center"><button onclick="openChatWithCustomer('${o.userId}','${o.username}')" class="action-btn btn-view">Chat</button></td></tr>`;}).join('');
+        };
+        
+        window.updateOrderField = async (id,field,val) => { try{await updateDoc(doc(db,"orders",id),{[field]:val,updatedAt:serverTimestamp()});playSound('click');}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
+        window.updateOrderStatus = async (id,newStatus) => { if(!confirm(`Tukar status kepada ${newStatus}?`)){loadOrders('verify');return;} try{await updateDoc(doc(db,"orders",id),{status:newStatus,category:newStatus,updatedAt:serverTimestamp()});showToast('✅ Status dikemaskini','success');}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
+        window.cancelOrder = async (id) => { if(!confirm('Batal pesanan ini?'))return; try{await updateDoc(doc(db,"orders",id),{status:'Cancelled',category:'Cancelled',updatedAt:serverTimestamp()});showToast('❌ Pesanan dibatalkan','warning');}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
+        window.openChatWithCustomer = (uid,name) => { currentChatPartner=uid; document.getElementById('chat-list-view').classList.add('hidden-section'); document.getElementById('active-chat-view').classList.remove('hidden-section'); document.getElementById('chat-partner-name').innerText=name; loadChatMessages(uid); };
+
+        // ===== PROFILE =====
+        async function loadProfile(){
+            if(!currentUser)return; const vp=vendorData.vendorProfile||{};
+            document.getElementById('prof-seller').value=vendorData.username;document.getElementById('prof-business').value=vp.businessName||'';document.getElementById('prof-desc').value=vp.description||'';document.getElementById('prof-phone').value=vendorData.phone||'';document.getElementById('prof-email').value=vendorData.email||'';document.getElementById('prof-uac').value=vendorData.uac;document.getElementById('prof-address').value=vp.address||'';document.getElementById('prof-status').innerText=vendorData.status;document.getElementById('prof-status').className=`badge ${vendorData.status==='ACTIVE'?'badge-active':vendorData.status==='BLOCKED'?'badge-blocked':'badge-inactive'}`;document.getElementById('prof-log').innerText=formatDate(vendorData.logCache);
+            const bd=vp.bankDetails||{};document.getElementById('prof-bank-name').value=bd.accountName||'';document.getElementById('prof-bank-type').value=bd.bankName||'';document.getElementById('prof-bank-num').value=bd.accountNumber||'';
+        }
+        
+        window.updateProfile = async () => {
+            const phone=document.getElementById('prof-phone').value.trim(),desc=document.getElementById('prof-desc').value.trim(),addr=document.getElementById('prof-address').value.trim(),bn=document.getElementById('prof-bank-name').value.trim(),bt=document.getElementById('prof-bank-type').value,bn2=document.getElementById('prof-bank-num').value.trim();
+            try{await updateDoc(doc(db,"users",currentUser.uid),{phone, 'vendorProfile.description':desc, 'vendorProfile.address':addr, 'vendorProfile.bankDetails':{accountName:bn,bankName:bt,accountNumber:bn2,updatedAt:serverTimestamp()},logCache:serverTimestamp()});showToast('✅ Profil dikemaskini!','success');loadProfile();}catch(e){showToast('❌ Gagal: '+e.message,'error');}
+        };
+
+        // ===== CHAT =====
+        async function loadChatList(){
+            if(!currentUser)return; const list=document.getElementById('chat-list-view');            const adminQ=query(collection(db,"users"),where("role","==","admin"),limit(1));
+            try{const adminSnap=await getDocs(adminQ);if(adminSnap.empty){list.innerHTML="<p class='text-center text-red-500'>Tiada Admin tersedia.</p>";return;}const adminDoc=adminSnap.docs[0];list.innerHTML=`<div onclick="openChat('${adminDoc.id}','${adminDoc.data().username||'Support'}')" class="p-4 bg-white/80 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500 hover:shadow transition"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div><div><h4 class="font-bold">MFD Support</h4><p class="text-xs text-green-600">● Online</p></div></div><i class="fas fa-chevron-right"></i></div>`;}catch(e){list.innerHTML="<p class='text-center text-red-500'>Gagal memuat support.</p>";}
+        }
+        
+        function loadChatMessages(partnerId){
+            const chatId=[currentUser.uid,partnerId].sort().join('_'),msgContainer=document.getElementById('chat-messages');
+            if(unsubscribeChat)unsubscribeChat();
+            unsubscribeChat=onSnapshot(query(collection(db,`chats/${chatId}/messages`),orderBy("timestamp","asc"),limit(100)),(snap)=>{msgContainer.innerHTML="";snap.forEach(d=>{const m=d.data(),isMe=m.senderId===currentUser.uid;let c='';if(m.type==='text')c=`<p class="text-sm">${m.text||''}</p>`;else if(m.type==='image')c=`<img src="${m.url||''}" class="msg-img lazy-load" onload="this.classList.add('loaded')" alt="Image">`;else if(m.type==='location')c=`<div class="msg-location"><i class="fas fa-map-marker-alt"></i> ${m.address||''}</div>`;msgContainer.innerHTML+=`<div class="message-bubble ${isMe?'msg-me':'msg-other'}">${c}<div class="text-[9px] opacity-70 text-right">${m.timestamp?new Date(m.timestamp.toDate?.()).toLocaleTimeString():''}</div></div>`;});msgContainer.scrollTop=msgContainer.scrollHeight;if(snap.size>0)playSound('msg');});
+        }
+        
+        window.openChat = (pid,name) => { currentChatPartner=pid; document.getElementById('chat-list-view').classList.add('hidden-section'); document.getElementById('active-chat-view').classList.remove('hidden-section'); document.getElementById('chat-partner-name').innerText=name; loadChatMessages(pid); };
+        window.closeChat = () => { if(unsubscribeChat)unsubscribeChat(); document.getElementById('active-chat-view').classList.add('hidden-section'); document.getElementById('chat-list-view').classList.remove('hidden-section'); };
+        window.sendMessage = async () => { const input=document.getElementById('msg-input'),text=input?.value?.trim(); if(!text||!currentChatPartner)return; await saveMessage(text,'text'); input.value=''; };
+        
+        async function saveMessage(text,type,url=null,address=null){
+            const chatId=[currentUser.uid,currentChatPartner].sort().join('_');
+            await addDoc(collection(db,`chats/${chatId}/messages`),{senderId:currentUser.uid,text:text||'',type,url,address,timestamp:serverTimestamp(),read:false,isPinned:false});
+            await setDoc(doc(db,"chats",chatId),{participants:[currentUser.uid,currentChatPartner],lastMessage:type==='text'?text:'[Media]',lastTime:serverTimestamp()},{merge:true});
+            playSound('msg');
+        }
+        
+        window.handleFileUpload = async (input) => { const file=input?.files?.[0]; if(!file||!currentChatPartner)return; if(file.size>5*1024*1024){showToast('❌ Gambar terlalu besar (max 5MB)','error');input.value='';return;} if(!['image/jpeg','image/png','image/webp'].includes(file.type)){showToast('❌ Format tidak disokong','error');input.value='';return;} try{const u=URL.createObjectURL(file);await saveMessage('','image',u);showToast('✅ Gambar dihantar','success',1500);}catch(e){showToast('❌ Upload gagal: '+e.message,'error');}finally{if(input)input.value='';} };
+        window.sendLocation = async () => { const addr=prompt("Masukkan alamat/lokasi:"); if(addr?.trim()){await saveMessage('','location',null,addr.trim());} };
+        window.copyChatID = () => { if(currentChatPartner){navigator.clipboard.writeText(currentChatPartner);showToast('✅ ID disalin!','success',1500);} };
+        window.blockContact = async () => { if(!confirm("Block pengguna ini?"))return; try{await updateDoc(doc(db,"users",currentChatPartner),{status:'BLOCKED'});showToast('✅ Pengguna diblock','success');closeChat();}catch(e){showToast('❌ Gagal: '+e.message,'error');} };
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded',()=>{
+            document.querySelectorAll('audio').forEach(a=>a.load());
+            // Lazy load images for performance
+            document.querySelectorAll('.lazy-load').forEach(img=>{
+                if(img.complete)img.classList.add('loaded');
+            });
+        });
+        document.addEventListener('visibilitychange',()=>{if(document.hidden)console.log('Page hidden');else console.log('Page visible');});
+    </script>
+</body>
+</html>
