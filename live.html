@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta name="google-site-verification" content="v7koD54-JpANjYbZKCN46QWnVK7Q3a7sSdQnCcAVczo" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Live System Dashboard | MFD Store</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-dark: #2d3748;
+            --error-red: #e53e3e;
+            --success-green: #38a169;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #FF9A9E 75%, #FECFEF 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(102, 126, 234, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .glass-panel:hover { transform: translateY(-2px); box-shadow: 0 12px 40px 0 rgba(102, 126, 234, 0.35); }
+        .glitter-text {
+            background: linear-gradient(to right, #9D50BB, #FF69B4, #6E48AA, #9D50BB);
+            -webkit-background-clip: text;
+            background-clip: text;            color: transparent;
+            background-size: 300% auto;
+            animation: shine 4s linear infinite;
+            font-weight: 800;
+        }
+        @keyframes shine { to { background-position: 300% center; } }
+        .btn-glitter {
+            background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2);
+            background-size: 300% 300%;
+            animation: gradientMove 4s ease infinite;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(110, 72, 170, 0.4);
+        }
+        .btn-glitter:active { transform: scale(0.95); }
+        .btn-glitter:hover { filter: brightness(1.2); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(110, 72, 170, 0.5); }
+        @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+        
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .stat-card { 
+            transition: all 0.3s ease; 
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .stat-card:hover::before { opacity: 1; }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(102,126,234,0.4); }
+        
+        .pulse-dot {
+            width: 10px; height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+            margin-right: 6px;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }        }
+        
+        .loader { 
+            border: 4px solid rgba(255,255,255,0.3); 
+            border-left-color: #9D50BB; 
+            border-radius: 50%; 
+            width: 40px; height: 40px; 
+            animation: spin 1s linear infinite; 
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .last-update {
+            font-size: 0.75rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            transition: all 0.3s ease;
+        }
+        .stat-value.updating {
+            animation: flash 0.5s ease;
+        }
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .stat-label {
+            font-size: 0.875rem;
+            color: #4b5563;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+        
+        .stat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+            opacity: 0.8;
+        }
+                .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: #059669;
+        }
+        .connection-status.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+        }
+        
+        @media (max-width: 768px) {
+            .stat-value { font-size: 2rem; }
+            .stat-icon { font-size: 1.25rem; }
+            .glass-panel { border-radius: 16px; }
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
+        ::-webkit-scrollbar-thumb { background: #9D50BB; border-radius: 3px; }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- NAVBAR -->
+    <nav class="glass-panel sticky top-4 z-50 mx-auto max-w-6xl p-4 flex justify-between items-center shadow-lg">
+        <div class="text-xl md:text-2xl font-bold glitter-text flex items-center gap-2">
+            <i class="fas fa-satellite-dish animate-pulse"></i> MFD LIVE MONITOR
+        </div>
+        <div class="flex items-center gap-3">
+            <div id="connection-status" class="connection-status">
+                <span class="pulse-dot"></span>
+                <span>Connected to Firebase</span>
+            </div>
+            <a href="https://mfdstore.vercel.app" target="_blank" class="px-4 py-2 bg-white/60 hover:bg-white text-purple-600 rounded-xl font-bold text-sm transition shadow-sm flex items-center gap-2">
+                <i class="fas fa-store"></i> Buka Store
+            </a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="container mx-auto max-w-6xl mt-6 md:mt-10 fade-in">
+        
+        <!-- Header -->        <div class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold glitter-text mb-3">📊 System Overview</h1>
+            <p class="text-gray-600 text-sm md:text-base">Real-time statistics for MFD Store ecosystem</p>
+            <div class="last-update mt-2 justify-center">
+                <i class="fas fa-clock"></i>
+                <span>Auto-update every 2 seconds • Last update: <span id="last-update-time">--:--:--</span></span>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            
+            <!-- Customer Accounts -->
+            <div class="glass-panel p-6 stat-card">
+                <div class="stat-icon text-blue-500">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value" id="stat-customers">--</div>
+                <div class="stat-label">Total Customer Accounts</div>
+                <div class="mt-3 text-xs text-gray-500 flex items-center gap-1">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Role: customer</span>
+                </div>
+            </div>
+
+            <!-- Vendor Accounts -->
+            <div class="glass-panel p-6 stat-card">
+                <div class="stat-icon text-purple-500">
+                    <i class="fas fa-store"></i>
+                </div>
+                <div class="stat-value" id="stat-vendors">--</div>
+                <div class="stat-label">Total Vendor Accounts</div>
+                <div class="mt-3 text-xs text-gray-500 flex items-center gap-1">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Role: vendor</span>
+                </div>
+            </div>
+
+            <!-- Products -->
+            <div class="glass-panel p-6 stat-card">
+                <div class="stat-icon text-pink-500">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <div class="stat-value" id="stat-products">--</div>
+                <div class="stat-label">Total Products</div>
+                <div class="mt-3 text-xs text-gray-500 flex items-center gap-1">
+                    <i class="fas fa-info-circle"></i>
+                    <span>All statuses included</span>
+                </div>
+            </div>
+            <!-- Orders -->
+            <div class="glass-panel p-6 stat-card">
+                <div class="stat-icon text-green-500">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-value" id="stat-orders">--</div>
+                <div class="stat-label">Total Orders (All Time)</div>
+                <div class="mt-3 text-xs text-gray-500 flex items-center gap-1">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Since launch</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer Info -->
+        <div class="glass-panel p-4 md:p-6 mt-8 text-center">
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4 text-sm text-gray-600">
+                <span><i class="fas fa-database mr-1"></i> Data source: Firebase Firestore</span>
+                <span class="hidden md:inline">•</span>
+                <span><i class="fas fa-sync-alt mr-1"></i> Refresh interval: 2 seconds</span>
+                <span class="hidden md:inline">•</span>
+                <span><i class="fas fa-shield-alt mr-1"></i> Read-only access</span>
+            </div>
+            <div class="mt-4 pt-4 border-t border-gray-200 text-xs text-gray-400">
+                <p>© 2025 MFD Store • Live System Monitor • All rights reserved</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FIREBASE LOGIC -->
+    <script type="module">
+        // Import Firebase SDKs (v9.22.0 - SAME AS index.html & vendor.html)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // Firebase Config - GANTI DENGAN CONFIG ANDA SENDIRI
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
+            authDomain: "mfd-store.firebaseapp.com",
+            projectId: "mfd-store",
+            storageBucket: "mfd-store.firebasestorage.app",
+            messagingSenderId: "1039564529069",
+            appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);        const db = getFirestore(app);
+
+        // DOM Elements
+        const elements = {
+            customers: document.getElementById('stat-customers'),
+            vendors: document.getElementById('stat-vendors'),
+            products: document.getElementById('stat-products'),
+            orders: document.getElementById('stat-orders'),
+            lastUpdate: document.getElementById('last-update-time'),
+            connectionStatus: document.getElementById('connection-status')
+        };
+
+        // State
+        let stats = {
+            customers: 0,
+            vendors: 0,
+            products: 0,
+            orders: 0
+        };
+        let unsubscribeUsers = null;
+        let unsubscribeProducts = null;
+        let unsubscribeOrders = null;
+        let isUpdating = false;
+
+        // ===== UTILITY FUNCTIONS =====
+        
+        function formatNumber(num) {
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toLocaleString('ms-MY');
+        }
+
+        function updateTime() {
+            const now = new Date();
+            elements.lastUpdate.textContent = now.toLocaleTimeString('ms-MY', {
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
+
+        function updateStatDisplay(key, value, animate = true) {
+            const el = elements[key];
+            if (!el) return;
+            
+            const formatted = formatNumber(value);
+            
+            if (animate && el.textContent !== formatted) {
+                el.classList.add('updating');
+                setTimeout(() => el.classList.remove('updating'), 500);
+            }
+            el.textContent = formatted;        }
+
+        function setConnectionStatus(connected, message = null) {
+            if (connected) {
+                elements.connectionStatus.className = 'connection-status';
+                elements.connectionStatus.innerHTML = `<span class="pulse-dot"></span><span>${message || 'Connected to Firebase'}</span>`;
+            } else {
+                elements.connectionStatus.className = 'connection-status error';
+                elements.connectionStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>${message || 'Connection error'}</span>`;
+            }
+        }
+
+        // ===== DATA FETCHING =====
+        
+        async function loadCustomersCount() {
+            try {
+                const q = query(collection(db, "users"), where("role", "==", "customer"));
+                const snap = await getDocs(q);
+                return snap.size;
+            } catch (e) {
+                console.error('Error loading customers:', e);
+                return 0;
+            }
+        }
+
+        async function loadVendorsCount() {
+            try {
+                const q = query(collection(db, "users"), where("role", "==", "vendor"));
+                const snap = await getDocs(q);
+                return snap.size;
+            } catch (e) {
+                console.error('Error loading vendors:', e);
+                return 0;
+            }
+        }
+
+        function setupRealtimeListeners() {
+            // Listen to Products (real-time)
+            if (unsubscribeProducts) unsubscribeProducts();
+            unsubscribeProducts = onSnapshot(
+                collection(db, "products"),
+                (snap) => {
+                    stats.products = snap.size;
+                    updateStatDisplay('products', stats.products);
+                    updateTime();
+                },
+                (error) => {
+                    console.error('Products listener error:', error);
+                    setConnectionStatus(false, 'Error loading products');
+                }            );
+
+            // Listen to Orders (real-time)
+            if (unsubscribeOrders) unsubscribeOrders();
+            unsubscribeOrders = onSnapshot(
+                collection(db, "orders"),
+                (snap) => {
+                    stats.orders = snap.size;
+                    updateStatDisplay('orders', stats.orders);
+                    updateTime();
+                },
+                (error) => {
+                    console.error('Orders listener error:', error);
+                    setConnectionStatus(false, 'Error loading orders');
+                }
+            );
+
+            setConnectionStatus(true);
+        }
+
+        // Polling function for users (customers & vendors) - every 2 seconds
+        async function pollUsersCount() {
+            if (isUpdating) return;
+            isUpdating = true;
+            
+            try {
+                const [customers, vendors] = await Promise.all([
+                    loadCustomersCount(),
+                    loadVendorsCount()
+                ]);
+                
+                stats.customers = customers;
+                stats.vendors = vendors;
+                
+                updateStatDisplay('customers', customers);
+                updateStatDisplay('vendors', vendors);
+                updateTime();
+                
+                setConnectionStatus(true);
+            } catch (e) {
+                console.error('Error polling users:', e);
+                setConnectionStatus(false, 'Error loading user data');
+            } finally {
+                isUpdating = false;
+            }
+        }
+
+        // ===== INITIALIZATION =====
+        
+        async function init() {            // Initial load
+            setConnectionStatus(true, 'Connecting...');
+            
+            // Setup real-time listeners for products & orders
+            setupRealtimeListeners();
+            
+            // Initial poll for users
+            await pollUsersCount();
+            
+            // Set up 2-second polling for users count
+            setInterval(pollUsersCount, 2000);
+            
+            // Update time display every second
+            setInterval(updateTime, 1000);
+            
+            console.log('✅ Live Monitor initialized - Auto-update every 2 seconds');
+        }
+
+        // Start when DOM is ready
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (unsubscribeProducts) unsubscribeProducts();
+            if (unsubscribeOrders) unsubscribeOrders();
+        });
+    </script>
+</body>
+</html>
