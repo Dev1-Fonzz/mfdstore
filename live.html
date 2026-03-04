@@ -162,6 +162,28 @@
             color: #dc2626;
         }
         
+        /* Logo Styles */
+        .main-logo {
+            max-height: 50px;
+            width: auto;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        .main-logo:hover {
+            transform: scale(1.05);
+        }
+        .main-logo-large {
+            max-height: 120px;
+            width: auto;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 12px rgba(102,126,234,0.3));
+        }
+        @media (max-width: 768px) {
+            .main-logo { max-height: 40px; }
+            .main-logo-large { max-height: 80px; }
+        }
+        
         @media (max-width: 768px) {
             .stat-value { font-size: 2rem; }
             .stat-icon { font-size: 1.25rem; }
@@ -172,21 +194,25 @@
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
         ::-webkit-scrollbar-thumb { background: #9D50BB; border-radius: 3px; }
     </style>
-</head>
-<body class="p-4 md:p-8">
+</head><body class="p-4 md:p-8">
 
     <!-- NAVBAR -->
-    <nav class="glass-panel sticky top-4 z-50 mx-auto max-w-6xl p-4 flex justify-between items-center shadow-lg">
-        <div class="text-xl md:text-2xl font-bold glitter-text flex items-center gap-2">
-            <i class="fas fa-satellite-dish animate-pulse"></i> MFD LIVE MONITOR
-        </div>
+    <nav class="glass-panel sticky top-4 z-50 mx-auto max-w-6xl p-3 md:p-4 flex justify-between items-center shadow-lg">
+        <!-- LOGO UTAMA KEDAI -->
+        <a href="https://mfdstore.vercel.app" target="_blank" class="flex items-center gap-2 md:gap-3 group" title="Buka MFD Store">
+            <img src="https://i.postimg.cc/G3Qjxkmt/20250410-212750-(1).png" 
+                 alt="MFD Store Logo" 
+                 class="main-logo"
+                 onerror="this.src='https://via.placeholder.com/150x50?text=MFD+STORE'; this.classList.add('bg-white/50');">
+        </a>
+        
         <div class="flex items-center gap-3">
             <div id="connection-status" class="connection-status">
                 <span class="pulse-dot"></span>
-                <span>Connected to Firebase</span>
+                <span class="hidden sm:inline">Connected</span>
             </div>
-            <a href="https://mfdstore.vercel.app" target="_blank" class="px-4 py-2 bg-white/60 hover:bg-white text-purple-600 rounded-xl font-bold text-sm transition shadow-sm flex items-center gap-2">
-                <i class="fas fa-store"></i> Buka Store
+            <a href="https://mfdstore.vercel.app" target="_blank" class="px-3 md:px-4 py-2 bg-white/60 hover:bg-white text-purple-600 rounded-xl font-bold text-xs md:text-sm transition shadow-sm flex items-center gap-1 md:gap-2">
+                <i class="fas fa-store"></i> <span class="hidden sm:inline">Buka Store</span>
             </a>
         </div>
     </nav>
@@ -194,7 +220,15 @@
     <!-- MAIN CONTENT -->
     <main class="container mx-auto max-w-6xl mt-6 md:mt-10 fade-in">
         
-        <!-- Header -->        <div class="text-center mb-8 md:mb-12">
+        <!-- Header dengan Logo Besar -->
+        <div class="text-center mb-8 md:mb-12">
+            <!-- LOGO BESAR DI HEADER -->
+            <div class="mb-4">
+                <img src="https://i.postimg.cc/G3Qjxkmt/20250410-212750-(1).png" 
+                     alt="MFD Store Logo" 
+                     class="main-logo-large mx-auto"
+                     onerror="this.src='https://via.placeholder.com/200x120?text=MFD+STORE'; this.classList.add('bg-white/50');">
+            </div>
             <h1 class="text-3xl md:text-4xl font-bold glitter-text mb-3">📊 System Overview</h1>
             <p class="text-gray-600 text-sm md:text-base">Real-time statistics for MFD Store ecosystem</p>
             <div class="last-update mt-2 justify-center">
@@ -209,8 +243,7 @@
             <!-- Customer Accounts -->
             <div class="glass-panel p-6 stat-card">
                 <div class="stat-icon text-blue-500">
-                    <i class="fas fa-users"></i>
-                </div>
+                    <i class="fas fa-users"></i>                </div>
                 <div class="stat-value" id="stat-customers">--</div>
                 <div class="stat-label">Total Customer Accounts</div>
                 <div class="mt-3 text-xs text-gray-500 flex items-center gap-1">
@@ -244,6 +277,7 @@
                     <span>All statuses included</span>
                 </div>
             </div>
+
             <!-- Orders -->
             <div class="glass-panel p-6 stat-card">
                 <div class="stat-icon text-green-500">
@@ -258,7 +292,6 @@
             </div>
 
         </div>
-
         <!-- Footer Info -->
         <div class="glass-panel p-4 md:p-6 mt-8 text-center">
             <div class="flex flex-col md:flex-row justify-center items-center gap-4 text-sm text-gray-600">
@@ -292,7 +325,8 @@
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);        const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
         // DOM Elements
         const elements = {
@@ -307,11 +341,9 @@
         // State
         let stats = {
             customers: 0,
-            vendors: 0,
-            products: 0,
+            vendors: 0,            products: 0,
             orders: 0
         };
-        let unsubscribeUsers = null;
         let unsubscribeProducts = null;
         let unsubscribeOrders = null;
         let isUpdating = false;
@@ -341,15 +373,16 @@
                 el.classList.add('updating');
                 setTimeout(() => el.classList.remove('updating'), 500);
             }
-            el.textContent = formatted;        }
+            el.textContent = formatted;
+        }
 
         function setConnectionStatus(connected, message = null) {
             if (connected) {
                 elements.connectionStatus.className = 'connection-status';
-                elements.connectionStatus.innerHTML = `<span class="pulse-dot"></span><span>${message || 'Connected to Firebase'}</span>`;
+                elements.connectionStatus.innerHTML = `<span class="pulse-dot"></span><span class="hidden sm:inline">${message || 'Connected'}</span>`;
             } else {
                 elements.connectionStatus.className = 'connection-status error';
-                elements.connectionStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span>${message || 'Connection error'}</span>`;
+                elements.connectionStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i><span class="hidden sm:inline">${message || 'Error'}</span>`;
             }
         }
 
@@ -357,8 +390,7 @@
         
         async function loadCustomersCount() {
             try {
-                const q = query(collection(db, "users"), where("role", "==", "customer"));
-                const snap = await getDocs(q);
+                const q = query(collection(db, "users"), where("role", "==", "customer"));                const snap = await getDocs(q);
                 return snap.size;
             } catch (e) {
                 console.error('Error loading customers:', e);
@@ -390,7 +422,8 @@
                 (error) => {
                     console.error('Products listener error:', error);
                     setConnectionStatus(false, 'Error loading products');
-                }            );
+                }
+            );
 
             // Listen to Orders (real-time)
             if (unsubscribeOrders) unsubscribeOrders();
@@ -406,7 +439,6 @@
                     setConnectionStatus(false, 'Error loading orders');
                 }
             );
-
             setConnectionStatus(true);
         }
 
@@ -439,7 +471,8 @@
 
         // ===== INITIALIZATION =====
         
-        async function init() {            // Initial load
+        async function init() {
+            // Initial load
             setConnectionStatus(true, 'Connecting...');
             
             // Setup real-time listeners for products & orders
@@ -456,7 +489,6 @@
             
             console.log('✅ Live Monitor initialized - Auto-update every 2 seconds');
         }
-
         // Start when DOM is ready
         document.addEventListener('DOMContentLoaded', init);
 
