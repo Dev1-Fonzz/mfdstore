@@ -190,636 +190,10 @@
 @media (max-width: 768px) {
     .nav-logo { max-height: 40px; }
 }
-/* ===== PRODUCT DETAIL MODAL ===== */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    animation: fadeIn 0.3s ease;
-}
-
-.modal-content {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(102,126,234,0.4);
-    max-width: 900px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    position: relative;
-    animation: slideUp 0.4s ease;
-}
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.modal-close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.8);
-    border: none;
-    font-size: 1.25rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;    z-index: 10;
-}
-.modal-close:hover { background: #fed7d7; color: #c53030; transform: rotate(90deg); }
-
-/* Product Detail Layout */
-.product-detail-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-    padding: 1.5rem;
-}
-@media (min-width: 768px) {
-    .product-detail-grid {
-        grid-template-columns: 1fr 1.2fr;
-        padding: 2rem;
-    }
-}
-
-/* Product Image */
-.product-main-image {
-    width: 100%;
-    aspect-ratio: 1/1;
-    border-radius: 16px;
-    object-fit: cover;
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    box-shadow: 0 8px 25px rgba(102,126,234,0.3);
-    transition: transform 0.3s ease;
-}
-.product-main-image:hover { transform: scale(1.02); }
-
-/* Product Info */
-.product-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 0.5rem;
-    line-height: 1.3;
-}
-.product-variation {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    display: inline-block;
-    margin-bottom: 1rem;
-}
-.product-pricing {
-    display: flex;    align-items: baseline;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-}
-.product-price-sell {
-    font-size: 1.75rem;
-    font-weight: 800;
-    color: #764ba2;
-}
-.product-price-cost {
-    font-size: 1rem;
-    color: #a0aec0;
-    text-decoration: line-through;
-}
-
-/* Product Meta Grid */
-.product-meta-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-    margin: 1rem 0;
-}
-.meta-item {
-    background: rgba(255,255,255,0.6);
-    padding: 0.75rem;
-    border-radius: 10px;
-    font-size: 0.75rem;
-}
-.meta-label {
-    color: #718096;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-}
-.meta-value {
-    color: var(--text-dark);
-    font-weight: 600;
-    word-break: break-word;
-}
-
-/* Status Badge */
-.status-badge {
-    padding: 0.35rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-}.status-public { background: #c6f6d5; color: #22543d; }
-.status-private { background: #e9d8fd; color: #553c9a; }
-.status-outstock { background: #cbd5e0; color: #4a5568; }
-
-/* Rating Stars */
-.rating-stars {
-    color: #f6ad55;
-    font-size: 1rem;
-    letter-spacing: 2px;
-}
-.rating-count {
-    font-size: 0.75rem;
-    color: #718096;
-    margin-left: 0.5rem;
-}
-
-/* Description */
-.product-description {
-    background: rgba(255,255,255,0.6);
-    padding: 1rem;
-    border-radius: 12px;
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: #4a5568;
-    margin: 1rem 0;
-    max-height: 150px;
-    overflow-y: auto;
-}
-
-/* Reviews Section */
-.reviews-section {
-    margin-top: 1.5rem;
-    border-top: 1px solid rgba(0,0,0,0.1);
-    padding-top: 1.5rem;
-}
-.reviews-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-.review-item {
-    background: rgba(255,255,255,0.5);
-    padding: 0.875rem;
-    border-radius: 10px;
-    margin-bottom: 0.75rem;
-}
-.review-header {
-    display: flex;
-    justify-content: space-between;    margin-bottom: 0.5rem;
-}
-.review-username {
-    font-weight: 600;
-    color: var(--text-dark);
-    font-size: 0.875rem;
-}
-.review-rating {
-    color: #f6ad55;
-    font-size: 0.875rem;
-}
-.review-comment {
-    font-size: 0.8125rem;
-    color: #4a5568;
-    line-height: 1.5;
-}
-.review-date {
-    font-size: 0.6875rem;
-    color: #a0aec0;
-    margin-top: 0.35rem;
-}
-
-/* Action Buttons */
-.product-actions {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-    flex-wrap: wrap;
-}
-.btn-add-cart {
-    flex: 1;
-    min-width: 150px;
-    padding: 0.875rem 1.5rem;
-    border-radius: 12px;
-    font-weight: 700;
-    font-size: 0.875rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    transition: all 0.3s;
-}
-.btn-add-cart:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none !important;
-}
-.btn-buy-now {
-    padding: 0.875rem 1.5rem;
-    border-radius: 12px;    font-weight: 600;
-    font-size: 0.875rem;
-    background: white;
-    color: #764ba2;
-    border: 2px solid #764ba2;
-    transition: all 0.3s;
-}
-.btn-buy-now:hover {
-    background: #764ba2;
-    color: white;
-}
-
-/* Unique Code */
-.unique-code {
-    font-family: monospace;
-    background: rgba(157,80,187,0.1);
-    padding: 0.35rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    color: #6b46c1;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-}
-
-/* Event & Label Tags */
-.tag-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.35rem 0.75rem;
-    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    color: #744210;
-    margin-right: 0.5rem;
-}
-
-/* Scrollbar for description & reviews */
-.product-description::-webkit-scrollbar,
-.reviews-section::-webkit-scrollbar {
-    width: 4px;
-}
-.product-description::-webkit-scrollbar-track,
-.reviews-section::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.05);
-    border-radius: 2px;
-}
-.product-description::-webkit-scrollbar-thumb,.reviews-section::-webkit-scrollbar-thumb {
-    background: #9D50BB;
-    border-radius: 2px;
-}
-
-/* Responsive */
-@media (max-width: 640px) {
-    .product-title { font-size: 1.25rem; }
-    .product-price-sell { font-size: 1.5rem; }
-    .product-meta-grid { grid-template-columns: 1fr; }
-    .product-actions { flex-direction: column; }
-    .btn-add-cart, .btn-buy-now { width: 100%; }
-}
-/* ===== VOUCHER SPIN WHEEL ===== */
-.voucher-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.8);
-    backdrop-filter: blur(10px);
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    animation: fadeIn 0.3s ease;
-}
-
-.voucher-content {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    border-radius: 24px;
-    padding: 2rem;
-    max-width: 500px;
-    width: 100%;
-    text-align: center;
-    color: white;
-    position: relative;
-    box-shadow: 0 25px 80px rgba(102,126,234,0.6);
-    animation: slideUp 0.4s ease;
-}
-
-@keyframes slideUp {
-    from { opacity: 0; transform: translateY(50px) scale(0.95); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-.voucher-close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: white;
-    font-size: 1.25rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.voucher-close:hover { background: rgba(255,255,255,0.4); transform: rotate(90deg); }
-
-/* Spin Wheel Container */
-.wheel-container {    position: relative;
-    width: 280px;
-    height: 280px;
-    margin: 1.5rem auto;
-}
-
-.wheel {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    border: 8px solid white;
-    position: relative;
-    overflow: hidden;
-    transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    background: conic-gradient(
-        #FFD700 0deg 90deg,
-        #C0C0C0 90deg 180deg,
-        #FF6B6B 180deg 270deg,
-        #9D50BB 270deg 360deg
-    );
-}
-
-/* Wheel Segments Labels */
-.wheel-segment {
-    position: absolute;
-    width: 50%;
-    height: 50%;
-    transform-origin: bottom right;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-left: 60px;
-    box-sizing: border-box;
-    font-weight: 700;
-    font-size: 0.7rem;
-    color: white;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-    pointer-events: none;
-}
-.wheel-segment:nth-child(1) { transform: rotate(45deg); }
-.wheel-segment:nth-child(2) { transform: rotate(135deg); }
-.wheel-segment:nth-child(3) { transform: rotate(225deg); }
-.wheel-segment:nth-child(4) { transform: rotate(315deg); }
-
-/* Pointer/Triangle */
-.wheel-pointer {
-    position: absolute;
-    top: -15px;
-    left: 50%;    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-    border-top: 35px solid white;
-    z-index: 10;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
-}
-
-/* Center Button */
-.wheel-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-    background: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 800;
-    color: #764ba2;
-    font-size: 0.75rem;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-    cursor: pointer;
-    transition: all 0.2s;
-    z-index: 5;
-}
-.wheel-center:hover { transform: translate(-50%, -50%) scale(1.1); }
-.wheel-center:active { transform: translate(-50%, -50%) scale(0.95); }
-.wheel-center.spinning { cursor: not-allowed; opacity: 0.7; }
-
-/* Voucher Result */
-.voucher-result {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background: rgba(255,255,255,0.15);
-    border-radius: 16px;
-    display: none;
-}
-.voucher-result.show { display: block; animation: popIn 0.4s ease; }
-
-.voucher-code {
-    font-family: monospace;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #FFD700;    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    margin: 0.5rem 0;
-    letter-spacing: 2px;
-}
-
-.voucher-details {
-    font-size: 0.8rem;
-    opacity: 0.9;
-    margin-top: 0.5rem;
-}
-
-/* Claim Limits Info */
-.claim-info {
-    background: rgba(255,255,255,0.1);
-    padding: 0.75rem;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    margin: 1rem 0;
-}
-.claim-info strong { color: #FFD700; }
-
-/* My Vouchers Section */
-.my-vouchers {
-    margin-top: 1.5rem;
-    text-align: left;
-}
-.my-vouchers h4 {
-    font-size: 1rem;
-    margin-bottom: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-.voucher-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-.voucher-chip {
-    background: rgba(255,255,255,0.2);
-    padding: 0.5rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}.voucher-chip:hover { background: rgba(255,255,255,0.35); transform: translateY(-2px); }
-.voucher-chip.used { opacity: 0.5; text-decoration: line-through; }
-
-/* Cart Voucher Input */
-.voucher-input-group {
-    display: flex;
-    gap: 0.5rem;
-    margin: 1rem 0;
-}
-.voucher-input-group input {
-    flex: 1;
-    padding: 0.75rem;
-    border-radius: 10px;
-    border: 2px solid #e2e8f0;
-    font-size: 0.875rem;
-    transition: all 0.2s;
-}
-.voucher-input-group input:focus {
-    border-color: #9D50BB;
-    box-shadow: 0 0 0 3px rgba(157,80,187,0.2);
-    outline: none;
-}
-.voucher-input-group button {
-    padding: 0.75rem 1.25rem;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border: none;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.voucher-input-group button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
-.voucher-input-group button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-
-.voucher-applied {
-    background: #c6f6d5;
-    color: #22543d;
-    padding: 0.75rem;
-    border-radius: 10px;
-    font-size: 0.875rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 0.5rem 0;
-}
-.voucher-applied .remove-voucher {
-    color: #c53030;
-    cursor: pointer;
-    font-weight: 600;}
-
-/* Confetti Animation */
-.confetti {
-    position: fixed;
-    width: 10px;
-    height: 10px;
-    background: #FFD700;
-    animation: confetti-fall 3s ease-in-out forwards;
-    pointer-events: none;
-    z-index: 201;
-}
-@keyframes confetti-fall {
-    0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-    .wheel-container { width: 240px; height: 240px; }
-    .wheel-segment { font-size: 0.6rem; padding-left: 45px; }
-    .wheel-center { width: 60px; height: 60px; font-size: 0.7rem; }
-    .voucher-code { font-size: 1.25rem; }
-}
     </style>
 </head>
-<!-- VOUCHER SPIN WHEEL MODAL -->
-<div id="voucher-modal" class="voucher-modal hidden-section">
-    <div class="voucher-content glass-panel">
-        <button onclick="closeVoucherModal()" class="voucher-close" title="Tutup">&times;</button>
-        
-        <h3 class="text-2xl font-bold mb-2">🎁 Spin & Win Voucher!</h3>
-        <p class="text-sm opacity-90">Claim sehingga 2 voucher sehari</p>
-        
-        <!-- Claim Info -->
-        <div class="claim-info">
-            📊 Claim hari ini: <strong id="claim-count">0/2</strong>
-            <br><span class="text-xs opacity-80">Reset pada 12:00 AM</span>
-        </div>
-        
-        <!-- Spin Wheel -->
-        <div class="wheel-container">
-            <div class="wheel-pointer"></div>
-            <div class="wheel" id="spin-wheel">
-                <div class="wheel-segment">🥉 10% OFF<br><small><RM20</small></div>
-                <div class="wheel-segment">🥈 20% OFF<br><small><RM15</small></div>
-                <div class="wheel-segment">🎁 95% OFF<br><small>New User</small></div>
-                <div class="wheel-segment">💰 -RM1<br><small><RM5</small></div>
-            </div>
-            <div class="wheel-center" id="spin-btn" onclick="spinWheel()">
-                SPIN<br>NOW!
-            </div>
-        </div>
-        
-        <!-- Result Display -->
-        <div id="voucher-result" class="voucher-result">
-            <p class="text-sm">🎉 Tahniah! Anda dapat:</p>
-            <div class="voucher-code" id="won-code">CODE123</div>
-            <p class="voucher-details" id="won-details">10% OFF • Max spend RM20</p>
-            <button onclick="copyVoucherCode()" class="mt-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg text-sm font-bold transition">
-                <i class="fas fa-copy"></i> Copy Code
-            </button>
-        </div>
-        
-        <!-- My Vouchers -->
-        <div class="my-vouchers">
-            <h4><i class="fas fa-ticket-alt"></i> Voucher Saya</h4>
-            <div id="my-voucher-list" class="voucher-list">
-                <p class="text-xs opacity-70">Tiada voucher aktif</p>
-            </div>
-        </div>
-        
-        <button onclick="closeVoucherModal()" class="mt-4 px-6 py-2 bg-white/20 hover:bg-white/30 rounded-xl font-bold transition">
-            Close
-        </button>
-    </div>
-</div>
 <body class="p-0 md:p-4">
+
     <!-- AUDIO EFFECTS -->
     <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3" preload="auto"></audio>
     <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3" preload="auto"></audio>
@@ -1349,6 +723,7 @@
                 <span class="font-bold text-lg text-gray-700">Jumlah Keseluruhan:</span>
                 <span id="cart-total" class="text-2xl font-bold text-purple-600">RM 0.00</span>
             </div>
+            
            <!-- LOGO KECIL DI CHECKOUT MODAL -->
 <div class="text-center mb-4">
     <img src="https://i.postimg.cc/G3Qjxkmt/20250410-212750-(1).png" 
@@ -1370,34 +745,7 @@
                          loading="lazy">
                     <p id="qr-hint" class="text-xs text-purple-600 mt-2 font-medium">👆 Klik untuk jelas</p>
                 </div>
-                <!-- Dalam modal-cart, cari bahagian sebelum "KONFIRM PESANAN" button, tambah: -->
-
-<!-- VOUCHER SECTION -->
-<div class="mt-4 pt-4 border-t border-gray-200">
-    <p class="font-bold text-purple-700 mb-2 flex items-center gap-2">
-        <i class="fas fa-ticket-alt"></i> Ada Voucher?
-    </p>
-    
-    <!-- Input Manual Code -->
-    <div class="voucher-input-group">
-        <input type="text" id="voucher-code-input" placeholder="Enter code (e.g. SILVER10)" maxlength="20" class="text-sm">
-        <button onclick="applyManualVoucher()" id="apply-voucher-btn">Apply</button>
-    </div>
-    
-    <!-- Claim New Voucher Button -->
-    <button onclick="openVoucherModal()" class="w-full py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-sm font-bold hover:opacity-90 transition flex items-center justify-center gap-2">
-        <i class="fas fa-gift"></i> Claim Free Voucher (Spin!)
-    </button>
-    
-    <!-- Applied Voucher Display -->
-    <div id="applied-voucher-display" class="hidden">
-        <div class="voucher-applied">
-            <span><i class="fas fa-check-circle"></i> <strong id="applied-code">CODE</strong> applied! <span id="applied-discount">-RM0.00</span></span>
-            <span class="remove-voucher" onclick="removeAppliedVoucher()">✕ Remove</span>
-        </div>
-    </div>
-</div>
-
+                
                 <ol class="list-decimal pl-5 text-sm space-y-2 text-gray-700">
                     <li>Online: <a href="https://sociabuzz.com/fareezonzz_019/give" target="_blank" rel="noopener" class="text-blue-500 underline font-bold">Sociabuzz</a></li>
                     <li>TNG: <strong class="font-mono bg-white px-2 py-0.5 rounded border">161489981218</strong></li>
@@ -1775,45 +1123,91 @@ window.doGoogleSignIn = async (e) => {
                 grid.innerHTML = `<div class="col-span-full text-center py-10 text-gray-500">Tiada produk dijumpai.</div>`; 
                 return; 
             }
-            // Dalam renderCatalog(), ganti bahagian grid.innerHTML dengan:
-
-grid.innerHTML = filtered.map(p => `
-    <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition cursor-pointer" 
-         onclick="showProductDetail('${p.id}')"
-         title="Klik untuk lihat detail">
+            
+            grid.innerHTML = filtered.map(p => {
+    // 🔢 Kira revenue: (harga jualan - harga kos) × total sold
+    const revenue = ((p.priceSell || 0) - (p.price || 0)) * (p.totalSold || 0);
+    
+    return `
+    <div class="glass-panel p-3 flex flex-col h-full hover:shadow-lg transition relative">
         
+        <!-- 🖼️ GAMBAR PRODUK -->
         <div class="relative">
             <img src="${p.imageUrl || 'https://via.placeholder.com/150?text=No+Image'}" 
-                 class="w-full h-32 object-cover rounded-lg mb-2 bg-gray-200" 
+                 class="w-full h-40 object-cover rounded-lg mb-2 bg-gray-200" 
                  onerror="this.src='https://via.placeholder.com/150?text=Error'"
                  loading="lazy"
                  alt="${p.name || 'Product'}">
             
-            <!-- Status Badge on Image -->
-            ${p.status !== 'Public' ? `<span class="absolute top-2 right-2 ${p.status === 'Private' ? 'bg-purple-500' : 'bg-gray-500'} text-white text-[10px] px-2 py-0.5 rounded-full font-bold">${p.status}</span>` : ''}
-            ${p.event ? `<span class="absolute top-2 left-2 bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">#${p.event}</span>` : ''}
-        </div>
-        
-        <h3 class="font-bold text-sm text-gray-800 leading-tight line-clamp-2">${p.name || 'Unnamed'}</h3>
-        
-        <!-- Short Description -->
-        ${p.description ? `<p class="text-[10px] text-gray-500 line-clamp-2 my-1">${p.description}</p>` : ''}
-        
-        <!-- Price & Country -->
-        <div class="flex justify-between items-center mt-auto pt-2">
-            <span class="text-purple-600 font-bold text-sm">${formatRM(p.priceSell || p.price)}</span>
-            <span class="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded flex items-center gap-1">
-                <i class="fas fa-globe-asia text-[10px]"></i>${p.country || '-'}
+            <!-- 🏷️ STATUS BADGE (Public/Private/Out of Stock) -->
+            <span class="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-bold ${
+                p.status === 'Public' ? 'bg-green-100 text-green-700' : 
+                p.status === 'Private' ? 'bg-purple-100 text-purple-700' : 
+                'bg-gray-200 text-gray-600'
+            }">
+                ${p.status || 'Public'}
             </span>
         </div>
-        
-        <!-- Rating & Sold (small) -->
-        <div class="flex justify-between items-center mt-1 text-[10px] text-gray-400">
-            <span>⭐ ${(p.rating || 5).toFixed(1)}</span>
-            <span>📦 ${p.totalSold || 0} sold</span>
+
+        <!-- 📛 NAMA ITEM + LABEL + EVENT -->
+        <h3 class="font-bold text-sm text-gray-800 leading-tight mb-1">
+            ${p.name || 'Unnamed'}
+        </h3>
+        <div class="flex flex-wrap gap-1 mb-1">
+            ${p.label ? `<span class="text-[9px] bg-blue-100 text-blue-700 px-1 rounded">#${p.label}</span>` : ''}
+            ${p.event ? `<span class="text-[9px] bg-pink-100 text-pink-700 px-1 rounded">#${p.event}</span>` : ''}
         </div>
-    </div>
-`).join('');
+
+        <!-- 💰 HARGA: Cost + Selling + Revenue -->
+        <div class="text-xs space-y-0.5 mb-2">
+            ${p.price ? `<div class="text-gray-400 line-through">Kos: ${formatRM(p.price)}</div>` : ''}
+            <div class="text-purple-600 font-bold">Jualan: ${formatRM(p.priceSell || p.price)}</div>
+            ${revenue > 0 ? `<div class="text-green-600 text-[10px]">💰 Revenue: ${formatRM(revenue)}</div>` : ''}
+        </div>
+
+        <!-- 🎯 VARIASI (jika ada) -->
+        ${p.variation ? `<div class="text-[10px] text-gray-500 mb-1">🔹 ${p.variation}</div>` : ''}
+
+        <!-- 📝 DESKRIPSI (expandable) -->
+        <p class="text-[10px] text-gray-500 line-clamp-2 mb-2 cursor-pointer hover:line-clamp-none transition" 
+           title="${p.description || ''}">
+            ${p.description || 'Tiada deskripsi'}
+        </p>
+
+        <!-- 📊 STATS: Sold + Rating + Country + Unique Code -->
+        <div class="grid grid-cols-2 gap-1 text-[10px] text-gray-600 mb-2 bg-white/40 p-2 rounded">
+            <div>🛒 Sold: <strong>${p.totalSold || 0}</strong></div>
+            <div>⭐ Rating: <strong>${(p.rating || 0).toFixed(1)}</strong></div>
+            <div>🌍 ${p.country || '-'}</div>
+            <div class="font-mono">🔑 ${p.uniqueCode || '-'}</div>
+        </div>
+
+        <!-- 🔗 PAUTAN OPTIONAL -->
+        ${p.link ? `
+        <a href="${p.link}" target="_blank" class="text-[10px] text-blue-500 hover:underline mb-2 block truncate">
+            🔗 Lihat pautan
+        </a>` : ''}
+
+        <!-- 💬 BUYER REVIEWS (click to view) -->
+        ${p.allowReviews && p.reviews?.length > 0 ? `
+        <button onclick="showProductReviews('${p.id}')" 
+                class="text-[10px] text-purple-600 hover:underline mb-2 flex items-center gap-1">
+            💬 ${p.reviews.length} Reviews <i class="fas fa-chevron-right text-[8px]"></i>
+        </button>` : ''}
+
+        <!-- 🛒 ADD TO CART BUTTON (only if Public & In Stock) -->
+        ${p.status === 'Public' ? `
+        <button onclick="addToCart('${p.id}')" 
+                class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-auto shadow disabled:opacity-50"
+                ${p.status === 'Out of Stock' ? 'disabled' : ''}>
+            ${p.totalSold < 1 ? '🔥 New!' : '🛒 Add to Cart'}
+        </button>` : 
+        `<button disabled class="w-full py-1.5 rounded-lg text-xs mt-auto bg-gray-200 text-gray-400 cursor-not-allowed">
+            ${p.status === 'Out of Stock' ? '❌ Out of Stock' : '🔒 Private'}
+        </button>`}
+
+    </div>`;
+}).join('');
         };
 
         window.addToCart = (id) => { 
@@ -1858,226 +1252,79 @@ grid.innerHTML = filtered.map(p => `
             playSound('click');
         };
 
-// ==================== FIXED ORDER SUBMISSION ====================
-
-window.submitOrder = async () => {
-    console.log('🛒 Starting order submission...');
-    
-    // ===== VALIDATION 1: User Login =====
-    if (!currentUser) {
-        showToast('❌ Sila login dahulu', 'error');
-        navTo('login');
-        return;
-    }
-    
-    // ===== VALIDATION 2: Cart Not Empty =====
-    if (!cart || cart.length === 0) {
-        showToast('❌ Cart kosong', 'error');
-        return;
-    }
-    
-    // ===== VALIDATION 3: User Data Exists =====
-    if (!userData || !userData.uac) {
-        showToast('❌ Data pengguna tidak lengkap. Sila update profil.', 'error');
-        navTo('dashboard');
-        return;
-    }
-    
-    // ===== VALIDATION 4: Address Required =====
-    const address = userData.address?.trim();
-    if (!address) {
-        showToast('❌ Sila masukkan alamat penghantaran di Dashboard dahulu', 'error');
-        navTo('dashboard');
-        return;
-    }
-    
-    // ===== CALCULATE TOTAL =====
-    let subtotal = 0;
-    try {
-        subtotal = cart.reduce((sum, item) => {
-            const price = parseFloat(item.priceSell || item.price || 0);
-            const qty = parseInt(item.qty || 1);
-            return sum + (price * qty);
-        }, 0);
-    } catch (e) {
-        console.error('Error calculating subtotal:', e);
-        showToast('❌ Ralat mengira jumlah. Sila cuba lagi.', 'error');
-        return;
-    }
-    
-    // Voucher discount
-    let voucherDiscount = 0;
-    if (window.voucherDiscount) {
-        voucherDiscount = parseFloat(window.voucherDiscount) || 0;
-        voucherDiscount = Math.min(voucherDiscount, subtotal);        voucherDiscount = Math.max(0, voucherDiscount);
-    }
-    
-    const total = Math.max(0, subtotal - voucherDiscount);
-    
-    // ===== PREPARE ORDER DATA =====
-    const tracking = "TRK-" + Date.now().toString().substr(-8);
-    const orderId = "ORD-" + Date.now().toString().substr(-6);
-    
-    // Build itemCounts properly
-    const itemCounts = {};
-    cart.forEach(item => {
-        const id = item.id || 'unknown';
-        itemCounts[id] = (itemCounts[id] || 0) + (parseInt(item.qty) || 1);
-    });
-    
-    // Build clean items array - PASTIKAN TIADA UNDEFINED
-    const cleanItems = cart.map(item => ({
-        id: item.id || 'unknown',
-        name: item.name || 'Unnamed Item',
-        price: parseFloat(item.price) || 0,
-        priceSell: parseFloat(item.priceSell) || 0,
-        qty: parseInt(item.qty) || 1,
-        imageUrl: item.imageUrl || '',
-        uniqueCode: item.uniqueCode || 'N/A',
-        variation: item.variation || '',
-        vendorId: item.vendorId || 'unknown',
-        vendorName: item.vendorName || 'Unknown Vendor'
-    }));
-    
-    // ===== BUILD ORDER OBJECT =====
-    const orderData = {
-        userId: currentUser.uid,
-        uac: userData.uac || 'UNKNOWN',
-        username: userData.username || 'Unknown User',
-        email: userData.email || '',
-        phone: userData.phone || '',
-        items: cleanItems,
-        itemCounts: itemCounts,
-        subtotal: subtotal,
-        voucherCode: appliedVoucher?.code || null,
-        voucherDiscount: voucherDiscount,
-        total: total,
-        address: address,
-        trackingNo: tracking,
-        orderId: orderId,
-        paymentMethod: "Manual Transfer",
-        paymentStatus: "Not Verified",
-        status: "To Pay",
-        deliveryStatus: "Pending",        adminNote: "",
-        currentStatus: "Pending Payment - Menunggu pembayaran",
-        userRating: null,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-        category: "To Pay"
-    };
-    
-    // 🔥 FIX: Remove all undefined values before saving
-    function removeUndefined(obj) {
-        Object.keys(obj).forEach(key => {
-            if (obj[key] === undefined) {
-                console.warn(`Removing undefined field: ${key}`);
-                delete obj[key];
-            } else if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-                removeUndefined(obj[key]);
+        window.submitOrder = async () => {
+            if(!currentUser) {
+                showToast('❌ Sila login dahulu', 'error');
+                navTo('login');
+                return;
             }
-        });
-        return obj;
-    }
-    
-    const cleanOrderData = removeUndefined(JSON.parse(JSON.stringify(orderData)));
-    
-    // ===== DISABLE CHECKOUT BUTTON =====
-    const btn = document.getElementById('checkout-btn');
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
-    }
-    
-    // ===== SUBMIT TO FIRESTORE =====
-    try {
-        console.log('📤 Submitting order to Firestore...', cleanOrderData);
-        
-        const orderRef = await addDoc(collection(db, "orders"), cleanOrderData);
-        
-        console.log('✅ Order created successfully:', orderRef.id);
-        
-        // ===== UPDATE PRODUCT SOLD COUNT =====
-        cart.forEach(async (item) => {
+            if(cart.length === 0) {
+                showToast('❌ Cart kosong', 'error');
+                return;
+            }
+            if(!userData?.address?.trim()) {
+                showToast('❌ Sila masukkan alamat di Dashboard dahulu', 'error');
+                navTo('dashboard');
+                return;            }
+            
+            const btn = document.getElementById('checkout-btn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            
             try {
-                if (item.id && item.id !== 'unknown') {
-                    await updateDoc(doc(db, "products", item.id), {
-                        totalSold: (parseInt(item.qty) || 1) + ((await getDoc(doc(db, "products", item.id))).data()?.totalSold || 0),
-                        updatedAt: serverTimestamp()
-                    });
-                }
-            } catch (e) {
-                console.error('Error updating product sold count:', e);
-            }        });
-        
-        // ===== MARK VOUCHER AS USED =====
-        if (appliedVoucher && currentUser) {
-            try {
-                const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-                const vouchers = userDoc.data()?.vouchers || [];
-                const updatedVouchers = vouchers.map(v => 
-                    v.code === appliedVoucher.code && !v.used 
-                        ? { ...v, used: true, usedAt: Date.now() } 
-                        : v
-                );
-                await updateDoc(doc(db, "users", currentUser.uid), {
-                    vouchers: updatedVouchers,
-                    logCache: serverTimestamp()
+                const total = cart.reduce((s,i) => s + parseFloat(i.priceSell || i.price || 0), 0);
+                const tracking = "TRK-" + Date.now().toString().substr(-8);
+                const orderId = "ORD-" + Date.now().toString().substr(-6);
+                const itemCounts = {};
+                cart.forEach(i => { itemCounts[i.id] = (itemCounts[i.id] || 0) + 1; });
+                
+                await addDoc(collection(db, "orders"), {
+                    userId: currentUser.uid, 
+                    uac: userData.uac, 
+                    username: userData.username, 
+                    items: cart, 
+                    itemCounts: itemCounts, 
+                    total: total, 
+                    address: userData.address,
+                    trackingNo: tracking, 
+                    orderId: orderId, 
+                    paymentMethod: "Manual Transfer", 
+                    paymentStatus: "Not Verified", 
+                    status: "To Pay", 
+                    deliveryStatus: "Pending",
+                    adminNote: "", 
+                    currentStatus: "Pending Payment - Menunggu pembayaran", 
+                    userRating: null, 
+                    createdAt: serverTimestamp(), 
+                    category: "To Pay",
+                    updatedAt: serverTimestamp()
                 });
-            } catch (e) {
-                console.error('Error marking voucher as used:', e);
+                
+                // Update product sold count (optional - can be done via Cloud Function)
+                cart.forEach(item => {
+                    updateDoc(doc(db, "products", item.id), {
+                        totalSold: (item.totalSold || 0) + 1
+                    }).catch(() => {}); // Silent fail
+                });
+                
+                cart = []; 
+                document.getElementById('cart-count').innerText = 0; 
+                toggleCartModal(); 
+                playSound('success');
+                showToast('✅ Pesanan berjaya! Sila buat pembayaran.', 'success', 5000);
+                
+                setTimeout(() => { 
+                    if(currentUser) loadUserData();                     navTo('dashboard'); 
+                }, 1000);
+                
+            } catch(e) { 
+                console.error('Order error:', e);
+                showToast('❌ Ralat: ' + (e.message || 'Unknown error'), 'error'); 
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>KONFIRM PESANAN';
             }
-        }
-        
-        // ===== SUCCESS =====
-        playSound('success');
-        showToast('✅ Pesanan berjaya! Sila buat pembayaran.', 'success', 5000);
-        
-        // Clear cart
-        cart = [];
-        document.getElementById('cart-count').innerText = 0;
-        appliedVoucher = null;
-        window.voucherDiscount = 0;
-        
-        // Reset voucher display
-        const voucherDisplay = document.getElementById('applied-voucher-display');
-        if (voucherDisplay) voucherDisplay.classList.add('hidden');
-        
-        // Close modal
-        toggleCartModal();
-        
-        // Redirect to dashboard after delay
-        setTimeout(() => {
-            if (currentUser) loadUserData();
-            navTo('dashboard');
-        }, 1000);
-        
-    } catch (e) {
-        console.error('❌ Order submission error:', e);
-        
-        let errorMsg = 'Ralat tidak diketahui';
-        
-        if (e.code === 'permission-denied') {            errorMsg = '❌ Access denied. Sila hubungi admin.';
-        } else if (e.code === 'unavailable') {
-            errorMsg = '❌ Sambungan Firebase terputus. Sila cuba lagi.';
-        } else if (e.code === 'invalid-argument') {
-            errorMsg = '❌ Data tidak sah. Sila refresh dan cuba lagi.';
-        } else if (e.message?.includes('undefined')) {
-            errorMsg = '❌ Ada data yang undefined. Sila check profil anda.';
-        } else {
-            errorMsg = `❌ Ralat: ${e.message || 'Unknown error'}`;
-        }
-        
-        showToast(errorMsg, 'error', 6000);
-        
-        // Re-enable button
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>KONFIRM PESANAN';
-        }
-    }
-};
-
-// ==================== END FIXED ORDER SUBMISSION ====================
+        };
 
         // ==================== USER DASHBOARD ====================
         
@@ -3052,649 +2299,6 @@ if (avatarEl && userData.photoURL) {
             // Always load products for catalog
             loadProducts();
         });
-        // ==================== PRODUCT DETAIL FUNCTIONS ====================
-
-let currentDetailProduct = null;
-
-window.showProductDetail = async (productId) => {
-    playSound('click');
-    
-    // Find product in loaded data or fetch from Firestore
-    let product = allProducts.find(p => p.id === productId);
-    
-    if (!product) {
-        // Fetch from Firestore if not in memory
-        try {
-            const docSnap = await getDoc(doc(db, "products", productId));
-            if (docSnap.exists()) {
-                product = { id: docSnap.id, ...docSnap.data() };
-            }
-        } catch (e) {
-            console.error('Error fetching product:', e);
-            showToast('❌ Gagal memuat detail produk', 'error');
-            return;
-        }
-    }
-    
-    if (!product) {
-        showToast('❌ Produk tidak dijumpai', 'error');
-        return;
-    }
-    
-    currentDetailProduct = product;
-    
-    // Populate modal fields
-    document.getElementById('detail-image').src = product.imageUrl || 'https://via.placeholder.com/400?text=No+Image';
-    document.getElementById('detail-name').textContent = product.name || 'Unnamed Product';
-    
-    // Tags: Event & Label
-    const tagsContainer = document.getElementById('detail-tags');
-    tagsContainer.innerHTML = '';
-    if (product.event) {
-        tagsContainer.innerHTML += `<span class="tag-pill"><i class="fas fa-gift"></i> ${product.event}</span>`;
-    }
-    if (product.label) {
-        tagsContainer.innerHTML += `<span class="tag-pill"><i class="fas fa-tag"></i> ${product.label}</span>`;
-    }
-    
-    // Pricing
-    document.getElementById('detail-price-sell').textContent = formatRM(product.priceSell || product.price || 0);
-    const costEl = document.getElementById('detail-price-cost');
-    if (product.price && product.price > 0 && product.price !== product.priceSell) {
-        costEl.textContent = formatRM(product.price);        costEl.classList.remove('hidden');
-    } else {
-        costEl.classList.add('hidden');
-    }
-    
-    // Rating
-    const rating = product.rating || 5;
-    const stars = '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating));
-    document.getElementById('detail-rating-stars').textContent = stars;
-    document.getElementById('detail-rating-count').textContent = `(${product.reviews?.length || 0} reviews)`;
-    
-    // Meta Grid
-    document.getElementById('detail-country').textContent = product.country || '-';
-    document.getElementById('detail-sold').textContent = product.totalSold || 0;
-    document.getElementById('detail-unique').querySelector('span').textContent = product.uniqueCode || 'N/A';
-    
-    // Status Badge
-    const statusEl = document.getElementById('detail-status');
-    const statusClass = product.status === 'Public' ? 'status-public' : product.status === 'Private' ? 'status-private' : 'status-outstock';
-    const statusIcon = product.status === 'Public' ? '✅' : product.status === 'Private' ? '🔒' : '❌';
-    statusEl.innerHTML = `<span class="status-badge ${statusClass}">${statusIcon} ${product.status || 'Unknown'}</span>`;
-    
-    // Optional Link
-    const linkContainer = document.getElementById('detail-link-container');
-    const linkEl = document.getElementById('detail-link');
-    if (product.link) {
-        linkEl.href = product.link;
-        linkContainer.classList.remove('hidden');
-    } else {
-        linkContainer.classList.add('hidden');
-    }
-    
-    // Description
-    document.getElementById('detail-desc').textContent = product.description || 'No description available.';
-    
-    // Variation Handling
-    const variationContainer = document.getElementById('detail-variation-container');
-    const variationSelect = document.getElementById('detail-variation-select');
-    if (product.variation) {
-        // Simple variation: show as text
-        variationContainer.classList.remove('hidden');
-        variationSelect.innerHTML = `<option value="${product.priceSell || product.price}">${product.variation} - ${formatRM(product.priceSell || product.price)}</option>`;
-    } else {
-        variationContainer.classList.add('hidden');
-    }
-    
-    // Add to Cart Button State
-    const cartBtn = document.getElementById('detail-add-cart-btn');
-    if (product.status === 'Out of Stock') {
-        cartBtn.disabled = true;        cartBtn.innerHTML = '<i class="fas fa-times-circle"></i> Out of Stock';
-    } else {
-        cartBtn.disabled = false;
-        cartBtn.innerHTML = '<i class="fas fa-cart-plus"></i> Add to Cart';
-    }
-    
-    // Reviews
-    renderProductReviews(product);
-    
-    // Show modal
-    document.getElementById('product-detail-modal').classList.remove('hidden-section');
-    document.body.style.overflow = 'hidden'; // Prevent background scroll
-};
-
-window.closeProductDetail = () => {
-    document.getElementById('product-detail-modal').classList.add('hidden-section');
-    document.body.style.overflow = '';
-    currentDetailProduct = null;
-};
-
-// Close modal when clicking outside
-document.getElementById('product-detail-modal')?.addEventListener('click', (e) => {
-    if (e.target.id === 'product-detail-modal') {
-        closeProductDetail();
-    }
-});
-
-// Close modal with Escape key
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeProductDetail();
-    }
-});
-
-function renderProductReviews(product) {
-    const list = document.getElementById('reviews-list');
-    const totalCount = document.getElementById('review-total-count');
-    
-    totalCount.textContent = product.reviews?.length || 0;
-    
-    if (!product.reviews || product.reviews.length === 0) {
-        list.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">No reviews yet. Be the first!</p>';
-        return;
-    }
-    
-    // Sort by newest first
-    const sortedReviews = [...product.reviews].sort((a, b) => {
-        const dateA = a.date?.toDate?.() || new Date(0);
-        const dateB = b.date?.toDate?.() || new Date(0);
-        return dateB - dateA;    }).slice(0, 10); // Show max 10 reviews
-    
-    list.innerHTML = sortedReviews.map(r => {
-        const stars = '★'.repeat(r.rating || 5) + '☆'.repeat(5 - (r.rating || 5));
-        const reviewDate = r.date ? formatDate(r.date) : 'Unknown';
-        return `
-            <div class="review-item">
-                <div class="review-header">
-                    <span class="review-username">${r.username || 'Anonymous'}</span>
-                    <span class="review-rating">${stars}</span>
-                </div>
-                <p class="review-comment">${r.comment || 'No comment'}</p>
-                <span class="review-date"><i class="fas fa-clock"></i> ${reviewDate}</span>
-            </div>
-        `;
-    }).join('');
-}
-
-window.updateVariationPrice = () => {
-    const select = document.getElementById('detail-variation-select');
-    const price = parseFloat(select.value) || 0;
-    document.getElementById('detail-price-sell').textContent = formatRM(price);
-};
-
-window.addToCartFromDetail = () => {
-    if (!currentDetailProduct) return;
-    
-    // Check stock
-    if (currentDetailProduct.status === 'Out of Stock') {
-        showToast('❌ Item ini Out of Stock', 'error');
-        return;
-    }
-    
-    // Get variation price if exists
-    let price = currentDetailProduct.priceSell || currentDetailProduct.price;
-    const variationSelect = document.getElementById('detail-variation-select');
-    if (variationSelect && !variationSelect.classList.contains('hidden')) {
-        price = parseFloat(variationSelect.value) || price;
-    }
-    
-    // Create cart item with all details
-    const cartItem = {
-        id: currentDetailProduct.id,
-        name: currentDetailProduct.name,
-        price: currentDetailProduct.price,
-        priceSell: price,
-        imageUrl: currentDetailProduct.imageUrl,
-        uniqueCode: currentDetailProduct.uniqueCode,
-        variation: currentDetailProduct.variation,
-        vendorId: currentDetailProduct.vendorId,        vendorName: currentDetailProduct.vendorName,
-        qty: 1
-    };
-    
-    cart.push(cartItem);
-    document.getElementById('cart-count').innerText = cart.length;
-    playSound('success');
-    showToast('✅ Ditambah ke cart!', 'success', 1500);
-    
-    // Optional: Close modal after adding
-    // closeProductDetail();
-};
-
-window.buyNowFromDetail = () => {
-    if (!currentDetailProduct) return;
-    
-    // Add to cart first
-    addToCartFromDetail();
-    
-    // Then open cart modal
-    setTimeout(() => {
-        toggleCartModal();
-        closeProductDetail();
-    }, 300);
-};
-// ==================== VOUCHER SYSTEM ====================
-
-// Voucher Configuration
-const VOUCHER_CONFIG = {
-    'SILVER10': { type: 'percent', value: 10, maxSpend: 20, isNewUserOnly: false, color: '#C0C0C0' },
-    'GOLD20': { type: 'percent', value: 20, maxSpend: 15, isNewUserOnly: false, color: '#FFD700' },
-    'MINI1': { type: 'fixed', value: 1, maxSpend: 5, isNewUserOnly: false, color: '#FF6B6B' },
-    'NEWBIE95': { type: 'percent', value: 95, maxSpend: 0.95, isNewUserOnly: true, color: '#9D50BB' }
-};
-
-// Spin Wheel Configuration
-const WHEEL_SEGMENTS = [
-    { code: 'SILVER10', angle: 45, label: '10% OFF' },
-    { code: 'GOLD20', angle: 135, label: '20% OFF' },
-    { code: 'NEWBIE95', angle: 225, label: '95% OFF' },
-    { code: 'MINI1', angle: 315, label: '-RM1' }
-];
-
-// State
-let appliedVoucher = null;
-let isSpinning = false;
-let userClaimedToday = 0;
-
-// ===== VOUCHER MODAL FUNCTIONS =====
-
-window.openVoucherModal = async () => {
-    if (!currentUser) {
-        showToast('❌ Sila login dahulu untuk claim voucher', 'error');
-        navTo('login');
-        return;
-    }
-    
-    playSound('click');
-    document.getElementById('voucher-modal').classList.remove('hidden-section');
-    document.body.style.overflow = 'hidden';
-    
-    // Load user's claim count & vouchers
-    await loadUserVoucherData();
-    
-    // Show confetti if first time
-    if (!localStorage.getItem('voucherModalSeen')) {
-        createConfetti();
-        localStorage.setItem('voucherModalSeen', 'true');
-    }
-};
-
-window.closeVoucherModal = () => {
-    document.getElementById('voucher-modal').classList.add('hidden-section');
-    document.body.style.overflow = '';
-        // Reset wheel
-    const wheel = document.getElementById('spin-wheel');
-    wheel.style.transform = 'rotate(0deg)';
-    document.getElementById('spin-btn').classList.remove('spinning');
-    document.getElementById('voucher-result').classList.remove('show');
-};
-
-// Close modal when clicking outside
-document.getElementById('voucher-modal')?.addEventListener('click', (e) => {
-    if (e.target.id === 'voucher-modal') closeVoucherModal();
-});
-
-// ===== LOAD USER VOUCHER DATA =====
-
-async function loadUserVoucherData() {
-    if (!currentUser) return;
-    
-    try {
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-        if (!userDoc.exists()) return;
-        
-        const userData = userDoc.data();
-        const vouchers = userData.vouchers || [];
-        const claimHistory = userData.voucherClaims || [];
-        
-        // Count claims today
-        const today = new Date().toISOString().split('T')[0];
-        userClaimedToday = claimHistory.filter(d => d.date === today).length;
-        document.getElementById('claim-count').textContent = `${userClaimedToday}/2`;
-        
-        // Render user's vouchers
-        renderUserVouchers(vouchers);
-        
-    } catch (e) {
-        console.error('Error loading voucher data:', e);
-    }
-}
-
-function renderUserVouchers(vouchers) {
-    const list = document.getElementById('my-voucher-list');
-    const activeVouchers = vouchers.filter(v => !v.used && v.expiresAt > Date.now());
-    
-    if (activeVouchers.length === 0) {
-        list.innerHTML = '<p class="text-xs opacity-70">Tiada voucher aktif</p>';
-        return;
-    }
-    
-    list.innerHTML = activeVouchers.map(v => {
-        const config = VOUCHER_CONFIG[v.code];
-        const discountText = config?.type === 'percent' ? `${config.value}% OFF` : `-${formatRM(config?.value || 0)}`;        return `
-            <div class="voucher-chip" onclick="applyVoucherToCart('${v.code}')" title="Klik untuk gunakan">
-                <i class="fas fa-ticket-alt"></i>
-                ${v.code}
-                <span class="text-xs opacity-80">• ${discountText}</span>
-            </div>
-        `;
-    }).join('');
-}
-
-// ===== SPIN WHEEL LOGIC =====
-
-window.spinWheel = async () => {
-    if (isSpinning) return;
-    if (!currentUser) {
-        showToast('❌ Sila login dahulu', 'error');
-        return;
-    }
-    
-    // Check claim limit
-    if (userClaimedToday >= 2) {
-        showToast('❌ Had claim hari ini sudah dicapai (2/2)', 'error');
-        return;
-    }
-    
-    // Check NEWBIE95 eligibility
-    const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-    const userData = userDoc.data();
-    const isNewUser = (userData.createdAt?.toDate?.() || new Date()) > new Date(Date.now() - 24*60*60*1000);
-    
-    isSpinning = true;
-    const spinBtn = document.getElementById('spin-btn');
-    spinBtn.classList.add('spinning');
-    spinBtn.innerHTML = 'SPINNING...';
-    
-    // Determine result (weighted random)
-    let possibleCodes = Object.keys(VOUCHER_CONFIG);
-    
-    // Filter NEWBIE95 if not eligible
-    if (!isNewUser) {
-        possibleCodes = possibleCodes.filter(c => c !== 'NEWBIE95');
-    }
-    
-    // Weighted probability: higher chance for smaller discounts
-    const weights = { 'SILVER10': 40, 'GOLD20': 25, 'MINI1': 30, 'NEWBIE95': 5 };
-    const weightedCodes = [];
-    possibleCodes.forEach(code => {
-        for (let i = 0; i < (weights[code] || 10); i++) {
-            weightedCodes.push(code);
-        }    });
-    
-    const wonCode = weightedCodes[Math.floor(Math.random() * weightedCodes.length)];
-    
-    // Calculate rotation (5 full spins + target segment)
-    const segment = WHEEL_SEGMENTS.find(s => s.code === wonCode);
-    const baseRotation = 360 * 5; // 5 full spins
-    const targetAngle = (360 - segment.angle + 90) % 360; // Adjust for pointer position
-    const totalRotation = baseRotation + targetAngle;
-    
-    // Animate wheel
-    const wheel = document.getElementById('spin-wheel');
-    wheel.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
-    wheel.style.transform = `rotate(${totalRotation}deg)`;
-    
-    // After spin completes
-    setTimeout(async () => {
-        // Award voucher
-        await awardVoucherToUser(wonCode);
-        
-        // Show result
-        const config = VOUCHER_CONFIG[wonCode];
-        const discountText = config.type === 'percent' ? `${config.value}% OFF` : `-${formatRM(config.value)}`;
-        const maxText = config.maxSpend < 1 ? `< RM${config.maxSpend}` : `< RM${config.maxSpend}`;
-        
-        document.getElementById('won-code').textContent = wonCode;
-        document.getElementById('won-details').innerHTML = `${discountText} • Max spend ${maxText}${config.isNewUserOnly ? ' • New User' : ''}`;
-        document.getElementById('voucher-result').classList.add('show');
-        
-        // Update claim count
-        userClaimedToday++;
-        document.getElementById('claim-count').textContent = `${userClaimedToday}/2`;
-        
-        // Reload vouchers list
-        await loadUserVoucherData();
-        
-        // Confetti celebration
-        createConfetti(30);
-        
-        // Reset button
-        isSpinning = false;
-        spinBtn.classList.remove('spinning');
-        spinBtn.innerHTML = 'SPIN<br>AGAIN!';
-        
-        playSound('success');
-        showToast(`🎉 Tahniah! ${wonCode} ditambah ke akaun anda`, 'success', 4000);
-        
-    }, 4000);
-};
-// ===== AWARD & APPLY VOUCHER =====
-
-async function awardVoucherToUser(code) {
-    if (!currentUser) return;
-    
-    const voucher = {
-        code: code,
-        claimedAt: Date.now(),
-        expiresAt: Date.now() + 7*24*60*60*1000, // 7 days expiry
-        used: false,
-        usedAt: null
-    };
-    
-    const claimRecord = {
-        code: code,
-        date: new Date().toISOString().split('T')[0]
-    };
-    
-    await updateDoc(doc(db, "users", currentUser.uid), {
-        vouchers: arrayUnion(voucher),
-        voucherClaims: arrayUnion(claimRecord),
-        logCache: serverTimestamp()
-    });
-}
-
-window.applyVoucherToCart = (code) => {
-    if (!currentUser) {
-        showToast('❌ Sila login dahulu', 'error');
-        return;
-    }
-    
-    const config = VOUCHER_CONFIG[code];
-    if (!config) {
-        showToast('❌ Voucher tidak sah', 'error');
-        return;
-    }
-    
-    // Check if user owns this voucher
-    // (In production, verify from Firestore)
-    
-    // Calculate cart total
-    const cartTotal = cart.reduce((sum, item) => sum + (item.priceSell || item.price) * (item.qty || 1), 0);
-    
-    // Validate max spend
-    if (cartTotal > config.maxSpend) {
-        showToast(`❌ Minimum spend untuk ${code}: ${formatRM(config.maxSpend)}`, 'error');
-        return;
-    }
-    
-    // Check new user only    if (config.isNewUserOnly) {
-        // Verify user is new (simplified check)
-        const isReallyNew = cart.length === 1 && cartTotal <= 0.95;
-        if (!isReallyNew) {
-            showToast('❌ Voucher ini untuk pengguna baharu sahaja', 'error');
-            return;
-        }
-    }
-    
-    // Apply voucher
-    appliedVoucher = { code, config, originalTotal: cartTotal };
-    updateCartDisplayWithVoucher();
-    
-    showToast(`✅ ${code} berjaya digunakan!`, 'success');
-    playSound('success');
-};
-
-window.applyManualVoucher = () => {
-    const code = document.getElementById('voucher-code-input')?.value?.trim().toUpperCase();
-    if (!code) {
-        showToast('❌ Masukkan kod voucher', 'error');
-        return;
-    }
-    applyVoucherToCart(code);
-};
-
-function updateCartDisplayWithVoucher() {
-    if (!appliedVoucher) return;
-    
-    const { code, config, originalTotal } = appliedVoucher;
-    let discount = 0;
-    
-    if (config.type === 'percent') {
-        discount = originalTotal * (config.value / 100);
-    } else {
-        discount = config.value;
-    }
-    
-    // Cap discount at total
-    discount = Math.min(discount, originalTotal);
-    
-    const newTotal = originalTotal - discount;
-    
-    // Update cart modal display
-    const display = document.getElementById('applied-voucher-display');
-    if (display) {
-        display.classList.remove('hidden');
-        document.getElementById('applied-code').textContent = code;
-        document.getElementById('applied-discount').textContent = `-${formatRM(discount)}`;
-    }    
-    // Update total display
-    const totalEl = document.getElementById('cart-total');
-    if (totalEl) {
-        totalEl.innerHTML = `${formatRM(newTotal)} <span class="text-sm text-gray-400 line-through">${formatRM(originalTotal)}</span>`;
-    }
-    
-    // Store discount for order submission
-    window.voucherDiscount = discount;
-}
-
-window.removeAppliedVoucher = () => {
-    appliedVoucher = null;
-    window.voucherDiscount = 0;
-    
-    // Reset display
-    const display = document.getElementById('applied-voucher-display');
-    if (display) display.classList.add('hidden');
-    
-    // Reset total
-    const cartTotal = cart.reduce((sum, item) => sum + (item.priceSell || item.price) * (item.qty || 1), 0);
-    const totalEl = document.getElementById('cart-total');
-    if (totalEl) totalEl.textContent = formatRM(cartTotal);
-    
-    showToast('🗑️ Voucher dialihkan', 'warning');
-};
-
-window.copyVoucherCode = () => {
-    const code = document.getElementById('won-code')?.textContent;
-    if (code) {
-        navigator.clipboard.writeText(code);
-        showToast('✅ Kod disalin!', 'success', 1500);
-    }
-};
-
-// ===== CONFETTI EFFECT =====
-
-function createConfetti(count = 50) {
-    const colors = ['#FFD700', '#C0C0C0', '#FF6B6B', '#9D50BB', '#667eea', '#f093fb'];
-    
-    for (let i = 0; i < count; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-        confetti.style.left = Math.random() * 100 + 'vw';
-        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-        confetti.style.animationDelay = Math.random() * 2 + 's';
-        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
-        document.body.appendChild(confetti);
-        
-        // Remove after animation        setTimeout(() => confetti.remove(), 4000);
-    }
-}
-
-// ===== INTEGRATE WITH ORDER SUBMISSION =====
-
-// Override submitOrder to include voucher discount
-const originalSubmitOrder = window.submitOrder;
-window.submitOrder = async () => {
-    // ... existing validation code ...
-    
-    // Calculate total with voucher discount
-    let total = cart.reduce((s,i) => s + parseFloat(i.priceSell || i.price || 0), 0);
-    if (window.voucherDiscount) {
-        total -= window.voucherDiscount;
-        total = Math.max(0, total); // Prevent negative
-    }
-    
-    // ... rest of original submitOrder code, use 'total' variable ...
-    
-    // After successful order, mark voucher as used
-    if (appliedVoucher && currentUser) {
-        try {
-            const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-            const vouchers = userDoc.data()?.vouchers || [];
-            const updatedVouchers = vouchers.map(v => 
-                v.code === appliedVoucher.code && !v.used 
-                    ? { ...v, used: true, usedAt: Date.now() } 
-                    : v
-            );
-            await updateDoc(doc(db, "users", currentUser.uid), {
-                vouchers: updatedVouchers,
-                logCache: serverTimestamp()
-            });
-        } catch (e) {
-            console.error('Error marking voucher as used:', e);
-        }
-    }
-    
-    // Reset voucher state
-    appliedVoucher = null;
-    window.voucherDiscount = 0;
-    if (document.getElementById('applied-voucher-display')) {
-        document.getElementById('applied-voucher-display').classList.add('hidden');
-    }
-};
-
-// ===== AUTO-OPEN VOUCHER MODAL FOR NEW USERS =====
-
-// Check if user is new and show voucher modal on first loginconst originalOnAuthChanged = onAuthStateChanged;
-// (This is already handled in your existing auth listener - add this logic there)
-
-async function checkNewUserVoucher() {
-    if (!currentUser) return;
-    
-    try {
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-        const userData = userDoc.data();
-        const createdAt = userData.createdAt?.toDate?.() || new Date();
-        const isWithin24h = (new Date() - createdAt) < 24*60*60*1000;
-        const hasClaimed = userData.voucherClaims?.length > 0;
-        
-        if (isWithin24h && !hasClaimed && !localStorage.getItem('newUserVoucherShown')) {
-            setTimeout(() => {
-                openVoucherModal();
-                localStorage.setItem('newUserVoucherShown', 'true');
-            }, 3000);
-        }
-    } catch (e) {
-        console.error('Error checking new user voucher:', e);
-    }
-}
-
-// Call this after auth state is resolved
-// Add to your existing onAuthStateChanged callback:
-// if (user) { ... existing code ... checkNewUserVoucher(); }
-
-// ==================== END VOUCHER SYSTEM ====================
-
         // ==================== INITIALIZATION ====================
         
         // Ensure QR is blurred on load
@@ -3732,133 +2336,6 @@ async function checkNewUserVoucher() {
             if(qr) { qr.classList.add('blur-md'); }
             if(hint) { hint.innerHTML = '👆 Klik untuk jelas'; }
         });
-        // ==================== GLOBAL ERROR HANDLER ====================
-
-// Catch unhandled promise rejections
-window.addEventListener('unhandledrejection', (event) => {
-    console.error('Unhandled Promise Rejection:', event.reason);
-    
-    // Show user-friendly error
-    if (event.reason?.code === 'permission-denied') {
-        showToast('❌ Access denied. Sila login semula.', 'error', 5000);
-    } else if (event.reason?.code === 'unavailable') {
-        showToast('❌ Sambungan terputus. Sila refresh halaman.', 'error', 5000);
-    } else {
-        showToast('⚠️ Ralat sistem. Sila cuba lagi.', 'warning', 4000);
-    }
-    
-    event.preventDefault();
-});
-
-// Catch JavaScript errors
-window.addEventListener('error', (event) => {
-    console.error('Global Error:', event.error);
-    
-    // Don't show for every small error (avoid spam)
-    if (event.error?.message?.includes('Firebase') ||
-        event.error?.message?.includes('fetch') ||
-        event.error?.message?.includes('network')) {
-        showToast('⚠️ Ralat sambungan. Sila check internet anda.', 'warning', 4000);
-    }
-});
-// ==================== END GLOBAL ERROR HANDLER ===================
-
     </script>
-    <!-- PRODUCT DETAIL MODAL -->
-<div id="product-detail-modal" class="modal-overlay hidden-section">
-    <div class="modal-content glass-panel">
-        <button onclick="closeProductDetail()" class="modal-close" title="Tutup">
-            <i class="fas fa-times"></i>
-        </button>
-        
-        <div class="product-detail-grid">
-            <!-- Left: Image -->
-            <div class="space-y-3">
-                <img id="detail-image" src="" alt="Product" class="product-main-image" onerror="this.src='https://via.placeholder.com/400?text=No+Image'">
-                
-                <!-- Variation Selector (if exists) -->
-                <div id="detail-variation-container" class="hidden">
-                    <label class="block text-xs font-bold text-gray-600 mb-1">Pilih Variasi:</label>
-                    <select id="detail-variation-select" class="w-full text-sm py-2 px-3 rounded-lg border border-purple-200 bg-white/80" onchange="updateVariationPrice()">
-                        <!-- Options will be populated by JS -->
-                    </select>
-                </div>
-            </div>
-            
-            <!-- Right: Info -->
-            <div>
-                <h2 id="detail-name" class="product-title">Loading...</h2>
-                
-                <!-- Tags: Event & Label -->
-                <div id="detail-tags" class="mb-3"></div>
-                
-                <!-- Pricing -->
-                <div class="product-pricing">
-                    <span id="detail-price-sell" class="product-price-sell">RM 0.00</span>
-                    <span id="detail-price-cost" class="product-price-cost hidden">RM 0.00</span>
-                </div>
-                
-                <!-- Rating -->
-                <div class="flex items-center mb-3">
-                    <span id="detail-rating-stars" class="rating-stars">★★★★★</span>
-                    <span id="detail-rating-count" class="rating-count">(0 reviews)</span>
-                </div>
-                
-                <!-- Meta Grid -->
-                <div class="product-meta-grid">
-                    <div class="meta-item">
-                        <div class="meta-label">🌍 Negara Asal</div>
-                        <div id="detail-country" class="meta-value">-</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">📦 Total Sold</div>
-                        <div id="detail-sold" class="meta-value">0</div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">🔖 Kod Unik</div>
-                        <div id="detail-unique" class="meta-value unique-code"><i class="fas fa-fingerprint"></i> <span>-</span></div>
-                    </div>
-                    <div class="meta-item">
-                        <div class="meta-label">📊 Status</div>
-                        <div id="detail-status" class="meta-value"><span class="status-badge status-public">Public</span></div>
-                    </div>
-                </div>
-                
-                <!-- Optional Link -->
-                <div id="detail-link-container" class="hidden mb-3">
-                    <a id="detail-link" href="#" target="_blank" rel="noopener" class="text-xs text-purple-600 hover:underline flex items-center gap-1">
-                        <i class="fas fa-external-link-alt"></i> <span>View External Link</span>
-                    </a>
-                </div>
-                
-                <!-- Description -->
-                <div class="product-description" id="detail-desc">Loading description...</div>
-                
-                <!-- Action Buttons -->
-                <div class="product-actions">
-                    <button id="detail-add-cart-btn" onclick="addToCartFromDetail()" class="btn-glitter btn-add-cart">
-                        <i class="fas fa-cart-plus"></i> Add to Cart
-                    </button>
-                    <button onclick="buyNowFromDetail()" class="btn-buy-now">
-                        <i class="fas fa-bolt"></i> Buy Now
-                    </button>
-                </div>
-                
-                <!-- Reviews Section -->
-                <div class="reviews-section">
-                    <div class="reviews-header">
-                        <h4 class="font-bold text-purple-700 flex items-center gap-2">
-                            <i class="fas fa-comments"></i> Buyer Reviews
-                        </h4>
-                        <span id="review-total-count" class="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">0</span>
-                    </div>
-                    <div id="reviews-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                        <p class="text-xs text-gray-500 text-center py-4">No reviews yet. Be the first!</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 </body>
 </html>
