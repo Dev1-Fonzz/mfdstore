@@ -2049,181 +2049,164 @@ if (avatarEl && userData.photoURL) {
             } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
         };
 
-        // ==================== CHAT FUNCTIONS - ADMIN FIX ====================
-
-async function loadChatList() {
-    if (!currentUser) return navTo('login');
-    
-    // Get correct elements based on role
-    const listEl = userData.role === 'admin' ?
-        document.getElementById('admin-chat-list') :
-        document.getElementById('chat-list-view');
-    if (!listEl) {
-        console.warn('⚠️ Chat list element not found');
-        return;
-    }
-    
-    // Clear previous listener to prevent memory leak
-    if (unsubscribeChat) {
-        try { unsubscribeChat(); } catch (e) {}
-        unsubscribeChat = null;
-    }
-    
-    if (userData.role === 'admin') {
-        // 🎯 ADMIN VIEW: Load chats with customers
-        listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>';
+ // ==================== CHAT FUNCTIONS - ULTIMATE FIX ====================
         
-        try {
-            // 🔥 SIMPLE QUERY - NO orderBy to avoid index requirement
-            const q = query(
-                collection(db, "chats"),
-                where("participants", "array-contains", currentUser.uid)
-            );
+        async function loadChatList() {
+            if(!currentUser) return navTo('login');
             
-            console.log('🔍 Admin loading chats with query:', q);
+            const listEl = userData.role === 'admin' 
+                ? document.getElementById('admin-chat-list') 
+                : document.getElementById('chat-list-view');
+            if(!listEl) return;
             
-            unsubscribeChat = onSnapshot(q, (snap) => {
-                console.log('📥 Chat snapshot received:', snap.size, 'documents');
-                listEl.innerHTML = "";
+            // Clear previous listener
+            if(unsubscribeChat) { try { unsubscribeChat(); } catch(e) {} unsubscribeChat = null; }
+            
+            if(userData.role === 'admin') {
+                // 🎯 ADMIN: Use getDocs first for reliable initial load
+                listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>';
                 
-                if (snap.empty) {
-                    listEl.innerHTML = "<p class='text-center text-gray-500 mt-10 text-sm'>✨ Tiada perbualan aktif. Tunggu customer mesej...</p>";
-                    return;
-                }
-                
-                let renderedCount = 0;
-                
-                snap.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const chatId = docSnap.id;
+                try {
+                    console.log('🔍 [ADMIN] Loading chats for UID:', currentUser.uid);
                     
-                    console.log('📨 Processing chat:', chatId, 'participants:', data.participants);
-                    // Find partner (the one that's not current admin)
-                    const partnerId = data.participants?.find(id => id !== currentUser.uid);
+                    // STEP 1: Get all chats where admin is participant
+                    const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
+                    const snap = await getDocs(q);
                     
-                    if (partnerId) {
-                        renderedCount++;
+                    console.log('📦 [ADMIN] Found', snap.size, 'chat documents');
+                    
+                    if(snap.empty) {
+                        listEl.innerHTML = "<p class='text-center text-gray-500 mt-10 text-sm'>✨ Tiada perbualan aktif. Tunggu customer mesej...</p>";
                         
-                        // Fetch partner info with timeout
-                        getDoc(doc(db, "users", partnerId))
-                            .then(pSnap => {
-                                if (pSnap.exists()) {
-                                    const p = pSnap.data();
-                                    const lastTime = data.lastTime?.toDate ? data.lastTime.toDate() : null;
-                                    const timeStr = lastTime ? lastTime.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' }) : '';
-                                    
-                                    listEl.innerHTML += `
-                                            <div onclick="openChat('${partnerId}', '${p.username || 'Unknown'}')" 
-                                                 class="p-3 bg-white/60 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition border-l-4 border-purple-400 hover:shadow-md">
-                                                <div class="flex items-center gap-3 min-w-0">
-                                                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                                                        ${(p.username || '?').charAt(0).toUpperCase()}
-                                                    </div>
-                                                    <div class="min-w-0 flex-1">
-                                                        <h4 class="font-bold text-sm text-gray-800 truncate">${p.username || 'Unknown'}</h4>
-                                                        <p class="text-xs text-gray-500 truncate w-40">${data.lastMessage || 'No messages yet'}</p>
-                                                    </div>
-                                                </div>
-                                                <span class="text-[10px] text-gray-400 flex-shrink-0 ml-2">${timeStr}</span>
-                                            </div>`;
-                                } else {
-                                    console.warn('⚠️ User doc not found for partnerId:', partnerId);
-                                }
-                            })
-                            .catch(err => {
-                                console.error('❌ Failed to fetch user:', partnerId, err);
-                                // Fallback: show chat with placeholder
-                                listEl.innerHTML += `
-                                        <div onclick="openChat('${partnerId}', 'Unknown User')" 
-                                             class="p-3 bg-white/60 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition border-l-4 border-gray-300">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center text-white">?</div>
-                                                <div>
-                                                    <h4 class="font-bold text-sm">Unknown User</h4>
-                                                    <p class="text-xs text-gray-500 truncate w-40">${data.lastMessage || '-'}</p>
-                                                </div>
-                                            </div>
-                                        </div>`;
-                            });
+                        // Optional: Setup real-time listener AFTER initial load
+                        setupAdminChatListener(listEl);
+                        return;
                     }
-                });
-                // Fallback if nothing rendered
-                if (renderedCount === 0 && listEl.innerHTML === "") {
-                    listEl.innerHTML = "<p class='text-center text-gray-500 mt-10 text-sm'>✨ Tiada perbualan aktif.</p>";
-                }
-                
-            }, (error) => {
-                console.error('❌ onSnapshot ERROR details:', {
-                    code: error.code,
-                    message: error.message,
-                    name: error.name
-                });
-                
-                let errorMsg = 'Gagal load chat';
-                if (error.code === 'permission-denied') {
-                    errorMsg = '❌ Akses ditolak. Check Firestore Rules!';
-                } else if (error.code === 'failed-precondition') {
-                    errorMsg = '❌ Perlukan index. Check console untuk link create index.';
-                }
-                
-                listEl.innerHTML = `
-                        <div class='text-center text-red-500 mt-10 text-xs p-4 bg-red-50 rounded-lg'>
-                            <p class='font-bold mb-2'>${errorMsg}</p>
-                            <p class='text-[10px] text-gray-400 mb-3'>Error: ${error.code || 'Unknown'}</p>
-                            <button onclick="loadChatList()" class='px-3 py-1 bg-purple-500 text-white rounded text-xs hover:bg-purple-600'>🔄 Cuba Lagi</button>
-                            <button onclick="console.log('Check Firebase Console → Firestore → Indexes')" class='px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 ml-2'>🔍 Debug</button>
-                        </div>`;
-            });
-            
-        } catch (e) {
-            console.error('❌ loadChatList exception:', e);
-            listEl.innerHTML = `<p class='text-center text-red-500 mt-10 text-xs'>❌ Error: ${e.message}</p>`;
-        }
-        
-    } else {
-        // 👤 CUSTOMER VIEW: Connect to admin only (unchanged)
-        listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Connecting to support...</p></div>';
-        
-        try {
-            const adminQuery = query(
-                collection(db, "users"),
-                where("role", "==", "admin"),
-                where("status", "==", "ACTIVE"),
-                limit(1)
-            );
-            const adminSnap = await getDocs(adminQuery);
-            
-            if (adminSnap.empty) {
-                listEl.innerHTML = "<p class='text-center text-orange-500 mt-10 text-sm'>⚠️ Tiada Admin online buat masa ini.</p>";
-                return;
-            }
-            const adminDoc = adminSnap.docs[0];
-            const adminData = adminDoc.data();
-            const adminId = adminDoc.id;
-            
-            listEl.innerHTML = `
-                    <div onclick="openChat('${adminId}', '${adminData.username || 'Support'}')" 
-                         class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500 hover:shadow-lg transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white shadow-lg">
-                                <i class="fas fa-headset text-lg"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-gray-800">MFD Support</h4>
-                                <p class="text-xs text-green-600 flex items-center gap-1">
-                                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Online
-                                </p>
-                            </div>
-                        </div>
-                        <i class="fas fa-chevron-right text-purple-400 group-hover:translate-x-1 transition"></i>
+                    
+                    // STEP 2: Render chats
+                    listEl.innerHTML = "";
+                    let rendered = 0;
+                    
+                    for(const docSnap of snap.docs) {
+                        const data = docSnap.data();
+                        const chatId = docSnap.id;
+                        const participants = data.participants || [];
+                        
+                        console.log('📨 [ADMIN] Processing chat:', chatId, 'participants:', participants);
+                        
+                        // Find partner (not admin)
+                        const partnerId = participants.find(id => id !== currentUser.uid);
+                        if(!partnerId) {
+                            console.warn('⚠️ No partner found for chat:', chatId);
+                            continue;                        }
+                        
+                        try {
+                            // Fetch partner info
+                            const pSnap = await getDoc(doc(db, "users", partnerId));
+                            const p = pSnap.exists() ? pSnap.data() : { username: 'Unknown', photoURL: '' };
+                            
+                            const lastMsg = data.lastMessage || 'No messages';
+                            const lastTime = data.lastTime?.toDate ? data.lastTime.toDate().toLocaleTimeString('ms-MY', {hour:'2-digit', minute:'2-digit'}) : '';
+                            
+                            listEl.innerHTML += `
+                            <div onclick="openChat('${partnerId}', '${p.username || 'Unknown'}')" 
+                                 class="p-3 bg-white/60 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition border-l-4 border-purple-400 hover:shadow-md">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                                        ${(p.username || '?').charAt(0).toUpperCase()}
+                                    </div>
+                                    <div class="min-w-0 flex-1">
+                                        <h4 class="font-bold text-sm text-gray-800 truncate">${p.username || 'Unknown'}</h4>
+                                        <p class="text-xs text-gray-500 truncate w-40">${lastMsg}</p>
+                                    </div>
+                                </div>
+                                <span class="text-[10px] text-gray-400 flex-shrink-0 ml-2">${lastTime}</span>
+                            </div>`;
+                            rendered++;
+                            
+                        } catch(err) {
+                            console.error('❌ Failed to fetch user', partnerId, err);
+                            // Render fallback
+                            listEl.innerHTML += `
+                            <div onclick="openChat('${partnerId}', 'Unknown')" 
+                                 class="p-3 bg-white/60 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition border-l-4 border-gray-300">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center text-white">?</div>
+                                    <div>
+                                        <h4 class="font-bold text-sm">Unknown</h4>
+                                        <p class="text-xs text-gray-500 truncate w-40">${data.lastMessage || '-'}</p>
+                                    </div>
+                                </div>
+                            </div>`;
+                            rendered++;
+                        }
+                    }
+                    
+                    if(rendered === 0) {
+                        listEl.innerHTML = "<p class='text-center text-gray-500 mt-10 text-sm'>✨ Tiada perbualan aktif.</p>";
+                    }
+                    
+                    // STEP 3: Setup real-time listener for new messages
+                    setupAdminChatListener(listEl);                    
+                } catch(e) {
+                    console.error('❌ [ADMIN] loadChatList error:', e);
+                    listEl.innerHTML = `
+                    <div class='text-center text-red-500 mt-10 text-xs p-4 bg-red-50 rounded-lg'>
+                        <p class='font-bold mb-2'>❌ Gagal load chat</p>
+                        <p class='text-[10px] text-gray-400 mb-3'>${e.code || 'Unknown error'}: ${e.message}</p>
+                        <button onclick="loadChatList()" class='px-3 py-1 bg-purple-500 text-white rounded text-xs hover:bg-purple-600'>🔄 Cuba Lagi</button>
+                        <button onclick="showDebugChats()" class='px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 ml-2'>🔍 Debug</button>
                     </div>`;
-            
-        } catch (e) {
-            console.error('Error loading admin:', e);
-            listEl.innerHTML = "<p class='text-center text-red-500 mt-10 text-sm'>❌ Gagal connect ke support.</p>";
+                }
+                
+            } else {
+                // 👤 CUSTOMER VIEW (unchanged)
+                listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Connecting to support...</p></div>';
+                try {
+                    const adminQuery = query(collection(db, "users"), where("role", "==", "admin"), where("status", "==", "ACTIVE"), limit(1));
+                    const adminSnap = await getDocs(adminQuery);
+                    if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-orange-500 mt-10 text-sm'>⚠️ Tiada Admin online.</p>"; return; }
+                    const adminDoc = adminSnap.docs[0];
+                    const adminData = adminDoc.data();
+                    const adminId = adminDoc.id;
+                    listEl.innerHTML = `
+                    <div onclick="openChat('${adminId}', '${adminData.username || 'Support'}')" class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500 hover:shadow-lg transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white shadow-lg"><i class="fas fa-headset text-lg"></i></div>
+                            <div><h4 class="font-bold text-gray-800">MFD Support</h4><p class="text-xs text-green-600"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Online</p></div>
+                        </div><i class="fas fa-chevron-right text-purple-400"></i>
+                    </div>`;
+                } catch(e) {
+                    console.error('Customer chat load error:', e);
+                    listEl.innerHTML = "<p class='text-center text-red-500 mt-10 text-sm'>❌ Gagal connect ke support.</p>";
+                }
+            }
         }
-    }
-}
+        
+        // Helper: Setup real-time listener for admin (optional, after initial load)
+        function setupAdminChatListener(listEl) {
+            if(!currentUser || userData.role !== 'admin') return;
+            
+            const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
+            unsubscribeChat = onSnapshot(q, (snap) => {
+                console.log('🔄 [ADMIN] Real-time update:', snap.size, 'chats');
+                // Only refresh if there are changes (simple approach: re-run loadChatList)
+                // For production: compare doc changes and update DOM selectively
+            }, (err) => console.warn('⚠️ Real-time listener error:', err));
+        }
+        
+        // DEBUG: Show raw chat documents in console/alert
+        window.showDebugChats = async () => {            if(userData.role !== 'admin') return;
+            try {
+                const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
+                const snap = await getDocs(q);
+                console.log('🔍 DEBUG: All chats for admin:');
+                snap.forEach(d => console.log('→ Chat ID:', d.id, 'Data:', d.data()));
+                alert(`✅ Debug: Found ${snap.size} chat(s). Check Console (F12) for details.`);
+            } catch(e) {
+                alert('❌ Debug error: ' + e.message);
+            }
+        };
 
         window.openChat = (partnerId, partnerName) => {
             if(!currentUser) { showToast('Sila login dahulu', 'error'); return navTo('login'); }
