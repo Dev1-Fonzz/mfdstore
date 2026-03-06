@@ -2024,7 +2024,7 @@ if (avatarEl && userData.photoURL) {
                 console.error('Delete user error:', e);
                 showToast('❌ Gagal: ' + e.message, 'error'); 
             }
-        };
+     };
 
         // Order update functions
         window.updateOrderField = async (id, field, val) => {
@@ -2049,177 +2049,234 @@ if (avatarEl && userData.photoURL) {
             } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
         };
 }
-
-        // ==================== CHAT FUNCTIONS ====================
+// ==================== CHAT FUNCTIONS - SIMPLE & RELIABLE ====================
         
+        let chatUnsub = null;
+        let currentChatPartner = null;
+        
+        // Load chat list for admin OR customer
         async function loadChatList() {
-            if(!currentUser) return navTo('login');
-            const listEl = document.getElementById('chat-list-view');
+            if(!currentUser) return;
+            
+            const listEl = userData.role === 'admin' 
+                ? document.getElementById('admin-chat-list') 
+                : document.getElementById('chat-list-view');
             if(!listEl) return;
             
-            if(userData.role === 'admin') {
-                listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div></div>';
-                const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
-                                if(unsubscribeChat) unsubscribeChat();
-                unsubscribeChat = onSnapshot(q, (snap) => {
-                    listEl.innerHTML = "";
-                    if(snap.empty) { listEl.innerHTML = "<p class='text-center text-gray-500 mt-10'>Tiada perbualan.</p>"; return; }
+            listEl.innerHTML = '<p class="text-center mt-10 text-xs">Loading...</p>';
+            
+            try {
+                if(userData.role === 'admin') {
+                    // Admin: show all chats with customers
+                    const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
+                    const snap = await getDocs(q);
                     
-                    snap.forEach(docSnap => {
-                        const data = docSnap.data();
+                    listEl.innerHTML = snap.empty 
+                        ? "<p class='text-center text-gray-500 mt-10 text-sm'>✨ Tiada mesej baru</p>" 
+                        : "";
+                    
+                    for(const doc of snap.docs) {
+                        const data = doc.data();
                         const partnerId = data.participants?.find(id => id !== currentUser.uid);
-                        if(partnerId) {
-                            getDoc(doc(db, "users", partnerId)).then(pSnap => {
-                                if(pSnap.exists()) {
-                                    const p = pSnap.data();
-                                    listEl.innerHTML += `<div onclick="openChat('${partnerId}', '${p.username || 'Unknown'}')" class="p-3 bg-white/50 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition">
-                                        <div class="flex items-center gap-3"><div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white">${(p.username || '?')[0]}</div>
-                                        <div><h4 class="font-bold text-sm">${p.username || 'Unknown'}</h4><p class="text-xs text-gray-500 truncate w-40">${data.lastMessage || '-'}</p></div></div>
-                                        <span class="text-[10px] text-gray-400">${data.lastTime ? new Date(data.lastTime.toDate?.()).toLocaleTimeString() : ''}</span></div>`;
-                                }
-                            }).catch(() => {});
-                        }
-                    });
-                });
-            } else {
-                // Customer view - connect to admin
-                const adminQuery = query(collection(db, "users"), where("role", "==", "admin"), limit(1));
-                try {
-                    const adminSnap = await getDocs(adminQuery);
-                    if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-red-500'>Tiada Admin tersedia.</p>"; return; }
-                    const adminDoc = adminSnap.docs[0];
-                    listEl.innerHTML = `<div onclick="openChat('${adminDoc.id}', '${adminDoc.data().username || 'Support'}')" class="p-4 bg-white/80 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500 hover:shadow transition">
-                        <div class="flex items-center gap-3"><div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div>
-                        <div><h4 class="font-bold">MFD Support</h4><p class="text-xs text-green-600">● Online</p></div></div><i class="fas fa-chevron-right"></i></div>`;
-                } catch(e) {
-                    listEl.innerHTML = "<p class='text-center text-red-500'>Gagal memuat support.</p>";
+                        if(!partnerId) continue;
+                        
+                        const pSnap = await getDoc(doc(db, "users", partnerId));
+                        const p = pSnap.exists() ? pSnap.data() : {username: 'Unknown'};
+                        
+                        listEl.innerHTML += `
+                        <div onclick="openChat('${partnerId}', '${p.username}')" 
+                             class="p-3 bg-white/60 rounded-lg cursor-pointer hover:bg-white transition border-l-4 border-purple-400">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold">
+                                    ${(p.username||'?')[0].toUpperCase()}
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-sm">${p.username}</h4>
+                                    <p class="text-xs text-gray-500 truncate w-40">${data.lastMessage || 'No messages'}</p>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                    
+                } else {                    // Customer: connect to admin only
+                    const adminSnap = await getDocs(query(collection(db, "users"), where("role", "==", "admin"), limit(1)));
+                    if(!adminSnap.empty) {
+                        const admin = adminSnap.docs[0].data();
+                        const adminId = adminSnap.docs[0].id;
+                        listEl.innerHTML = `
+                        <div onclick="openChat('${adminId}', '${admin.username||'Support'}')" 
+                             class="p-4 bg-purple-50 rounded-lg cursor-pointer hover:bg-purple-100 transition">
+                            <h4 class="font-bold">💬 Chat dengan Admin</h4>
+                            <p class="text-xs text-gray-500">Klik untuk mula mesej</p>
+                        </div>`;
+                    }
                 }
+            } catch(e) {
+                console.error('Chat load error:', e);
+                listEl.innerHTML = `<p class="text-center text-red-400 text-xs mt-10">❌ Gagal load chat</p>`;
             }
         }
-
+        
+        // Open chat with partner
         window.openChat = (partnerId, partnerName) => {
             currentChatPartner = partnerId;
+            
+            // Switch UI
             document.getElementById('chat-list-view')?.classList.add('hidden-section');
+            document.getElementById('admin-chat-list')?.classList.add('hidden-section');
             document.getElementById('active-chat-view')?.classList.remove('hidden-section');
-            document.getElementById('chat-partner-name').innerText = partnerName;
+            document.getElementById('admin-active-chat')?.classList.remove('hidden-section');
             
+            // Set name
+            const nameEl = document.getElementById('chat-partner-name') || document.getElementById('admin-chat-target');
+            if(nameEl) nameEl.innerText = partnerName;
+            
+            // Load messages
+            loadMessages(partnerId);
+        };
+        
+        // Load & listen to messages (real-time)
+        function loadMessages(partnerId) {
             const chatId = [currentUser.uid, partnerId].sort().join('_');
-            const msgContainer = document.getElementById('chat-messages');
+            const container = document.getElementById('chat-messages') || document.getElementById('admin-chat-messages');
+            if(!container) return;
             
-            if(unsubscribeChat) unsubscribeChat();
-            const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"), limit(100));
+            // Clear old listener
+            if(chatUnsub) { try { chatUnsub(); } catch(e) {} }
             
-            unsubscribeChat = onSnapshot(q, (snap) => {                msgContainer.innerHTML = "";
-                snap.forEach(d => {
-                    const m = d.data();
-                    const isMe = m.senderId === currentUser.uid;
-                    let content = '';
-                    if(m.type === 'text') content = `<p class="text-sm">${m.text || ''}</p>`;
-                    else if(m.type === 'image') content = `<img src="${m.url || ''}" class="msg-img" alt="Image">`;
-                    else if(m.type === 'location') content = `<div class="msg-location"><i class="fas fa-map-marker-alt"></i> ${m.address || ''}</div>`;
+            container.innerHTML = '<p class="text-center text-gray-400 mt-10">Loading messages...</p>';
+            
+            const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
+                        chatUnsub = onSnapshot(q, (snap) => {
+                container.innerHTML = "";
+                
+                if(snap.empty) {
+                    container.innerHTML = '<p class="text-center text-gray-400 mt-10">Mula perbualan...</p>';
+                    return;
+                }
+                
+                snap.forEach(doc => {
+                    const msg = doc.data();
+                    const isMe = msg.senderId === currentUser.uid;
+                    const text = msg.type === 'text' ? (msg.text || '') : '[Media]';
+                    const time = msg.timestamp?.toDate?.()?.toLocaleTimeString('ms-MY', {hour:'2-digit', minute:'2-digit'}) || '';
                     
-                    msgContainer.innerHTML += `<div class="message-bubble ${isMe ? 'msg-me' : 'msg-other'}">${content}<div class="text-[9px] opacity-70 text-right">${m.timestamp ? new Date(m.timestamp.toDate?.()).toLocaleTimeString() : ''}</div></div>`;
+                    container.innerHTML += `
+                    <div class="message-bubble ${isMe ? 'msg-me' : 'msg-other'}">
+                        <p class="text-sm break-words">${escapeHtml(text)}</p>
+                        <span class="text-[9px] opacity-70 block text-right mt-1">${time}</span>
+                    </div>`;
                 });
-                msgContainer.scrollTop = msgContainer.scrollHeight;
-                if(snap.size > 0) playSound('msg');
+                
+                container.scrollTop = container.scrollHeight;
+            }, (err) => {
+                console.warn('Message error:', err);
+                container.innerHTML = '<p class="text-center text-red-400 text-xs">❌ Gagal load mesej</p>';
             });
-        };
-
-        window.closeChat = () => { 
-            if(unsubscribeChat) unsubscribeChat(); 
-            document.getElementById('active-chat-view')?.classList.add('hidden-section'); 
-            document.getElementById('chat-list-view')?.classList.remove('hidden-section'); 
-        };
-        
-        window.closeAdminChat = () => { 
-            if(unsubscribeChat) unsubscribeChat(); 
-            document.getElementById('admin-active-chat')?.classList.add('hidden-section'); 
-            document.getElementById('admin-chat-list')?.classList.remove('hidden-section'); 
-        };
-
-        window.sendMessage = async () => { 
-            const input = document.getElementById('msg-input'); 
-            const text = input?.value?.trim(); 
-            if(!text || !currentChatPartner) return; 
-            await saveMessage(text, 'text'); 
-            if(input) input.value = ''; 
-        };
-
-        async function saveMessage(text, type, url = null, address = null) {
-            const chatId = [currentUser.uid, currentChatPartner].sort().join('_');
-            await addDoc(collection(db, `chats/${chatId}/messages`), { 
-                senderId: currentUser.uid, 
-                text: text || '',
-                type, 
-                url, 
-                address, 
-                timestamp: serverTimestamp(), 
-                read: false, 
-                isPinned: false 
-            });
-            await setDoc(doc(db, "chats", chatId), { 
-                participants: [currentUser.uid, currentChatPartner],                 lastMessage: type === 'text' ? text : '[Media]', 
-                lastTime: serverTimestamp() 
-            }, {merge: true});
-            playSound('msg');
         }
-
-        window.handleFileUpload = async (input) => {
-            const file = input?.files?.[0];
-            if(!file || !currentChatPartner) return;
+        
+        // Send text message
+        window.sendMessage = async () => {
+            const input = document.getElementById('msg-input');
+            const adminInput = document.getElementById('admin-msg-input');
+            const text = (input?.value || adminInput?.value || '').trim();
             
-            // Validate
-            if(file.size > 5 * 1024 * 1024) { showToast('❌ Gambar terlalu besar (max 5MB)', 'error'); input.value = ''; return; }
-            if(!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) { showToast('❌ Format tidak disokong', 'error'); input.value = ''; return; }
+            if(!text || !currentChatPartner) { 
+                showToast('Mesej tidak boleh kosong', 'warning'); 
+                return; 
+            }
+            
+            const chatId = [currentUser.uid, currentChatPartner].sort().join('_');
             
             try {
-                const storageRef = ref(storage, `chat_images/${Date.now()}_${file.name}`);
-                await uploadBytes(storageRef, file);
-                const url = await getDownloadURL(storageRef);
-                await saveMessage('', 'image', url);
-                showToast('✅ Gambar dihantar', 'success', 1500);
-            } catch(e) { 
-                showToast('❌ Upload gagal: ' + e.message, 'error'); 
-            } finally {
+                // Save message
+                await addDoc(collection(db, `chats/${chatId}/messages`), {
+                    senderId: currentUser.uid,
+                    type: 'text',
+                    text: text,
+                    timestamp: serverTimestamp()
+                });
+                                // Update chat list preview
+                await setDoc(doc(db, "chats", chatId), {
+                    participants: [currentUser.uid, currentChatPartner].sort(),
+                    lastMessage: text.substring(0, 50),
+                    lastTime: serverTimestamp()
+                }, {merge: true});
+                
+                // Clear input & play sound
                 if(input) input.value = '';
-            }
-        };
-
-        window.handleAdminFileUpload = window.handleFileUpload; // Same function
-
-        window.sendLocation = async () => { 
-            const addr = prompt("Masukkan alamat/lokasi:"); 
-            if(addr?.trim()) { await saveMessage('', 'location', null, addr.trim()); } 
-        };
-        
-        window.sendAdminMessage = async () => { 
-            const input = document.getElementById('admin-msg-input'); 
-            const text = input?.value?.trim(); 
-            if(!text || !currentChatPartner) return; 
-            await saveMessage(text, 'text'); 
-            if(input) input.value = ''; 
-        };
-        
-        window.deleteConversation = async () => { 
-            if(!confirm("Padam perbualan ini? Tindakan tidak boleh dipulihkan.")) return;
-            alert("Sila padam manual di Firebase Console > Firestore > chats collection"); 
-        };
-        
-        window.copyChatID = () => { 
-            if(currentChatPartner) {
-                navigator.clipboard.writeText(currentChatPartner);                 showToast('✅ ID disalin!', 'success', 1500); 
+                if(adminInput) adminInput.value = '';
+                playSound('msg');
+                
+            } catch(e) {
+                console.error('Send error:', e);
+                showToast('❌ Gagal hantar mesej', 'error');
             }
         };
         
-        window.blockContact = async () => { 
-            if(!confirm("Block pengguna ini?")) return;
-            try {
-                await updateDoc(doc(db, "users", currentChatPartner), {status: 'BLOCKED'}); 
-                showToast('✅ Pengguna diblock', 'success');
-                closeChat(); 
-            } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
+        // Close chat
+        window.closeChat = () => {
+            if(chatUnsub) { try { chatUnsub(); } catch(e) {} }
+            currentChatPartner = null;
+            document.getElementById('active-chat-view')?.classList.add('hidden-section');
+            document.getElementById('admin-active-chat')?.classList.add('hidden-section');
+            document.getElementById('chat-list-view')?.classList.remove('hidden-section');
+            document.getElementById('admin-chat-list')?.classList.remove('hidden-section');
+            loadChatList();
         };
-
+        window.closeAdminChat = window.closeChat;
+        
+        // Helper: Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            if(!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Auto-refresh chat list every 5 seconds (simple version)
+        let chatTimer = null;
+        function startChatAutoRefresh() {
+            if(chatTimer) clearInterval(chatTimer);
+            chatTimer = setInterval(() => {
+                if(document.visibilityState === 'visible' && !currentChatPartner) {
+                    loadChatList();
+                }
+            }, 5000);
+        }
+        
+        // Init chat system        function initSimpleChat() {
+            // Start auto-refresh
+            startChatAutoRefresh();
+            
+            // Refresh when tab becomes visible
+            document.addEventListener('visibilitychange', () => {
+                if(document.visibilityState === 'visible' && !currentChatPartner) {
+                    loadChatList();
+                }
+            });
+            
+            // Allow Enter key to send
+            ['msg-input', 'admin-msg-input'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    el.addEventListener('keydown', (e) => {
+                        if(e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendMessage();
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Run init
+        if(document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initSimpleChat);
+        } else {
+            initSimpleChat();
+        }
+       
         // ==================== UI UTILITIES ====================
         
         // QR Code blur toggle
