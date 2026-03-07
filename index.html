@@ -233,6 +233,45 @@
 .admin-status-btn.active { background: #667eea; color: white; }
 .fadeIn { animation: fadeIn 0.2s ease; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+/* ===== WHATSAPP CHAT BUTTON ===== */
+.whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #25D366;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow: 0 2px 6px rgba(37, 211, 102, 0.4);
+    margin-left: 8px;
+}
+.whatsapp-btn:hover {
+    background: #128C7E;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 211, 102, 0.6);
+}
+.whatsapp-btn img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+.whatsapp-btn.small img {
+    width: 14px;
+    height: 14px;
+}
+.whatsapp-btn.small {
+    padding: 4px 8px;
+    font-size: 10px;
+    gap: 4px;
+}
+@media (max-width: 768px) {
+    .whatsapp-btn { padding: 5px 10px; font-size: 10px; }
+    .whatsapp-btn img { width: 16px; height: 16px; }
+}
     </style>
 </head>
 <body class="p-0 md:p-4">
@@ -384,6 +423,12 @@
                 <!-- Orders Section -->
                 <div class="glass-panel p-4 md:p-6 lg:col-span-3">
                     <h3 class="text-lg md:text-xl font-bold mb-4 flex justify-between items-center">                        <span>My Orders</span>
+                    <!-- WHATSAPP LIVE AGENT BUTTON -->
+<a href="https://wa.me/60145400413" target="_blank" rel="noopener" 
+   class="whatsapp-btn small" title="Chat via WhatsApp">
+    <img src="https://i.postimg.cc/Bvb6HRzm/whatsapp-logo-3d-render-free-png.png" alt="WA">
+    <span class="hidden sm:inline">Chat Now</span>
+</a>
                         <span class="text-[10px] bg-purple-100 text-purple-600 px-2 py-1 rounded-full animate-pulse">Live Update</span>
                     </h3>
                     <div id="dashboard-message"></div>
@@ -440,6 +485,11 @@
             <span><i class="fas fa-headset mr-2"></i>Customer Service Live Agent</span>
             <button onclick="refreshChatList()" class="text-xs bg-purple-100 hover:bg-purple-200 px-3 py-1.5 rounded"><i class="fas fa-sync-alt"></i> Refresh</button>
         </h2>
+        <a href="https://wa.me/60145400413" target="_blank" rel="noopener" 
+   class="whatsapp-btn small" title="Chat via WhatsApp">
+    <img src="https://i.postimg.cc/Bvb6HRzm/whatsapp-logo-3d-render-free-png.png" alt="WA">
+    Chat Now
+</a>
 
         <!-- Chat List View -->
         <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
@@ -531,6 +581,15 @@
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-2xl md:text-3xl font-bold">ADMIN MANAGEMENT CENTER v2.0</h2>
+                        <!-- WHATSAPP LIVE AGENT BUTTON (ADMIN) -->
+<div class="flex items-center gap-2 mt-2">
+    <a href="https://wa.me/60145400413" target="_blank" rel="noopener" 
+       class="whatsapp-btn small" title="Chat via WhatsApp">
+        <img src="https://i.postimg.cc/Bvb6HRzm/whatsapp-logo-3d-render-free-png.png" alt="WA">
+        <span>Chat Now</span>
+    </a>
+    <span class="text-[10px] text-white/70">• Live Agent Support</span>
+</div>
                         <p class="text-white/80 text-xs md:text-sm">Urus Pesanan, Pelanggan, Produk & Live Chat - Production Ready</p>
                     </div>
                     <i class="fas fa-shield-alt text-4xl md:text-5xl opacity-50"></i>
