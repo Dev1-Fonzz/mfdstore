@@ -1,9 +1,8 @@
-// api/upload.js
+// api/upload.js - Vercel Serverless Function
 export const config = {
   api: {
-    bodyParser: true,  // ✅ Biar Vercel handle FormData
-    responseLimit: false
-  }
+    bodyParser: false,  // Raw body stream
+  },
 };
 
 export default async function handler(req, res) {
@@ -22,21 +21,24 @@ export default async function handler(req, res) {
   }
 
   try {
-    // ✅ Dapatkan file dari FormData
-    const formData = await req.formData();
-    const file = formData.get('file');
-
-    if (!file) {
-      return res.status(400).json({ error: 'No file received' });
+    // ✅ Baca raw body sebagai Buffer
+    const chunks = [];
+    for await (const chunk of req) {
+      chunks.push(chunk);
     }
+    const bodyBuffer = Buffer.concat(chunks);
 
-    // ✅ Forward ke PostImages
-    const postFormData = new FormData();
-    postFormData.append('file', file);
+    // ✅ Dapatkan content-type header (penting untuk multipart boundary)
+    const contentType = req.headers['content-type'];
 
+    // ✅ Forward ke PostImages dengan raw body
     const postResponse = await fetch('https://postimages.org/json', {
       method: 'POST',
-      body: postFormData
+      headers: {
+        'content-type': contentType,
+        'content-length': String(bodyBuffer.length),
+      },
+      body: bodyBuffer,
     });
 
     const responseData = await postResponse.json();
@@ -45,9 +47,9 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('❌ Upload Error:', error);
-    return res.status(500).json({ 
+    return res.status(500).json({
       error: 'Upload failed',
-      message: error.message || String(error)
+      message: error.message || String(error),
     });
   }
 }
