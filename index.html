@@ -272,6 +272,200 @@
     .whatsapp-btn { padding: 5px 10px; font-size: 10px; }
     .whatsapp-btn img { width: 16px; height: 16px; }
 }
+/* ===== ADS WIDGET PREMIUM - LARGE & READABLE ===== */
+.ads-widget {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 16px 0;
+    height: 140px; /* ✅ BESAR - boleh baca teks dalam gambar */
+    box-shadow: 
+        0 8px 32px rgba(102, 126, 234, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.ads-track {
+    display: flex;
+    animation: scrollLeft 25s linear infinite;
+    width: max-content;
+    gap: 20px;
+    padding: 10px 15px;
+    align-items: center;
+}
+
+.ads-widget:hover .ads-track {
+    animation-play-state: paused;
+}
+
+.ads-slide {
+    flex: 0 0 auto;
+    height: 120px; /* ✅ Gambar besar */
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    min-width: 200px; /* ✅ Lebar minimum supaya gambar tak nipis */
+}
+
+.ads-slide img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover; /* ✅ Gambar penuh, tak distort */
+    display: block;
+    transition: transform 0.5s ease;
+}
+
+/* Premium hover effect */.ads-slide:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 
+        0 20px 40px rgba(102, 126, 234, 0.3),
+        0 0 0 2px rgba(255, 255, 255, 0.5);
+    z-index: 10;
+}
+
+.ads-slide:hover img {
+    transform: scale(1.08);
+}
+
+/* Shine effect on hover */
+.ads-slide::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        110deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.4) 45%, 
+        transparent 55%
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+    pointer-events: none;
+}
+
+.ads-slide:hover::before {
+    transform: translateX(100%);
+}
+
+/* Glow pulse animation for attention */
+@keyframes glowPulse {
+    0%, 100% { box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    50% { box-shadow: 0 8px 25px rgba(102, 126, 234, 0.25); }
+}
+
+.ads-slide {
+    animation: glowPulse 3s ease-in-out infinite;
+}
+
+.ads-slide:hover {
+    animation: none; /* Stop pulse when hovering */
+}
+
+/* Infinite scroll animation */
+@keyframes scrollLeft {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }}
+
+/* Smooth fade edges */
+.ads-widget::before,
+.ads-widget::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 60px; /* ✅ Lebih lebar untuk fade smooth */
+    height: 100%;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.ads-widget::before {
+    left: 0;
+    background: linear-gradient(to right, 
+        rgba(255,255,255,0.95) 0%, 
+        rgba(255,255,255,0.6) 40%, 
+        transparent 100%);
+}
+
+.ads-widget::after {
+    right: 0;
+    background: linear-gradient(to left, 
+        rgba(255,255,255,0.95) 0%, 
+        rgba(255,255,255,0.6) 40%, 
+        transparent 100%);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .ads-widget {
+        background: linear-gradient(135deg, rgba(30,30,40,0.4), rgba(20,20,30,0.2));
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+    .ads-widget::before,
+    .ads-widget::after {
+        background: linear-gradient(to right, 
+            rgba(18,18,24,0.95) 0%, 
+            rgba(18,18,24,0.6) 40%, 
+            transparent 100%);
+    }
+    .ads-widget::after {
+        background: linear-gradient(to left, 
+            rgba(18,18,24,0.95) 0%, 
+            rgba(18,18,24,0.6) 40%, 
+            transparent 100%);
+    }
+}
+/* ✅ MOBILE RESPONSIVE - Masih besar tapi fit screen */
+@media (max-width: 768px) {
+    .ads-widget { 
+        height: 110px; 
+        margin: 12px 0; 
+        border-radius: 14px;
+    }
+    .ads-slide { 
+        height: 90px; 
+        min-width: 160px;
+        border-radius: 10px;
+    }
+    .ads-track { 
+        gap: 15px; 
+        padding: 8px 12px;
+    }
+    .ads-widget::before,
+    .ads-widget::after { 
+        width: 40px; 
+    }
+}
+
+@media (max-width: 480px) {
+    .ads-widget { 
+        height: 95px; 
+    }
+    .ads-slide { 
+        height: 75px; 
+        min-width: 140px;
+    }
+}
+
+/* Accessibility: Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .ads-track { animation: none !important; }
+    .ads-slide { 
+        transition: none !important; 
+        animation: none !important;
+    }
+    .ads-slide::before { display: none; }
+}
+
+/* Print friendly - hide ads */
+@media print {
+    .ads-widget { display: none !important; }
+}
     </style>
 </head>
 <body class="p-0 md:p-4">
@@ -337,6 +531,9 @@
                 <h2 class="text-2xl md:text-3xl font-bold glitter-text mb-2 drop-shadow-md">Recommendations For You</h2>
                 <p class="text-white/90 font-semibold text-sm md:text-base">Exclusive deals updated in real-time!</p>
             </div>
+    <!-- 🎨 ADS WIDGET PREMIUM - AUTO SCROLL -->
+<div id="ads-widget-container" class="ads-widget glass-panel" role="region" aria-label="Promosi Iklan"></div>
+<!-- END ADS WIDGET -->
             <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-6">
                 <div class="col-span-full text-center py-20">
                     <div class="loader mx-auto mb-4"></div>
@@ -2472,6 +2669,100 @@ function escapeHtml(t) { if(!t) return ''; const d=document.createElement('div')
 function formatSec(s) { const m=Math.floor(s/60); return `${m}:${(s%60).toString().padStart(2,'0')}`; }
 function playVoice(url) { new Audio(url).play().catch(()=>{}); }
 
+// ═══════════════════════════════════════════════════════
+// 🎨 ADS WIDGET CONFIG - PREMIUM & EASY TO EDIT
+// ═══════════════════════════════════════════════════════
+// ✅ Cara edit: Ubah nilai dalam ADS_CONFIG sahaja
+// ✅ Tambah gambar: Copy-paste object dalam array 'items'
+// ✅ Jangan ubah kod fungsi di bawah config ini!
+
+const ADS_CONFIG = {
+    // ⚙️ SETTINGS UTAMA
+    speed: 25, // Scroll speed (saat untuk 1 loop penuh) - smaller = faster
+    pauseOnHover: true, // Pause animation bila mouse hover
+    clickOpensNewTab: true, // true = buka link dalam tab baru
+    enableGlow: true, // true = ada glow pulse effect
+    enableShine: true, // true = ada shine effect bila hover
+    
+    // 🖼️ LIST GAMBAR ADS - EDIT SINI SAHAJA!
+    // Format: { url: 'link-destination', img: 'image-url', alt: 'deskripsi' }
+    items: [
+        {
+            url: 'https://mfdstore.vercel.app',
+            img: 'https://i.postimg.cc/QdXvMTYW/file_00000000cd8471faadb060ee16658225.png',
+            alt: 'Promosi Khas MFD Store - Klik untuk lihat'
+        },
+        {
+            url: 'https://mfdstore.vercel.app/vendor.html',
+            img: 'https://i.postimg.cc/QMCPQrr4/file_00000000375c71fa9a9eac33008ac40f.png',
+            alt: 'Deal Exclusive - Jangan lepaskan!'
+        },
+        // ─────────────────────────────────────────────
+        // ➕ NAK TAMBAH GAMBAR BARU? 
+        // Copy block bawah, paste di sini, dan ubah nilai:
+        // ─────────────────────────────────────────────
+        // {
+        //     url: 'https://link-destination-anda.com',
+        //     img: 'https://url-gambar-baru-anda.png',
+        //     alt: 'Deskripsi untuk accessibility'
+        // },
+    ]
+};
+
+// ═══════════════════════════════════════════════════════
+// 🚀 ADS WIDGET RENDERER - JANGAN UBAH KOD BAWAH INI
+// ═══════════════════════════════════════════════════════
+function renderAdsWidget(containerId = 'ads-widget-container') {
+    const container = document.getElementById(containerId);
+    if (!container || !ADS_CONFIG.items?.length) return;
+    
+    // Duplicate items untuk infinite scroll seamless
+    const allSlides = [...ADS_CONFIG.items, ...ADS_CONFIG.items];
+    
+    // Build HTML dengan effect config
+    let html = `<div class="ads-track" style="animation-duration: ${ADS_CONFIG.speed}s">`;
+    
+    allSlides.forEach((item, index) => {
+        const target = ADS_CONFIG.clickOpensNewTab ? '_blank' : '_self';
+        const rel = ADS_CONFIG.clickOpensNewTab ? 'noopener noreferrer' : '';
+        
+        html += `
+        <div class="ads-slide" 
+             onclick="window.open('${item.url}', '${target}', '${rel}')"
+             title="${item.alt}"
+             role="link"
+             tabindex="0"
+             onkeypress="if(event.key==='Enter') this.click()"
+             style="${ADS_CONFIG.enableGlow ? '' : 'animation: none'}">
+            <img src="${item.img}" 
+                 alt="${item.alt}" 
+                 loading="lazy" 
+                 onerror="this.parentElement.style.display='none'; console.warn('Image failed:', '${item.img}')"
+                 style="${ADS_CONFIG.enableShine ? '' : 'pointer-events: none'}">
+        </div>`;
+    });
+    
+    html += `</div>`;
+    container.innerHTML = html;
+    
+    // Hover pause logic
+    if (ADS_CONFIG.pauseOnHover) {
+        const track = container.querySelector('.ads-track');
+        if (track) {
+            container.addEventListener('mouseenter', () => track.style.animationPlayState = 'paused');
+            container.addEventListener('mouseleave', () => track.style.animationPlayState = 'running');
+        }
+    }
+    
+    console.log(`✅ Ads widget loaded: ${ADS_CONFIG.items.length} items, speed: ${ADS_CONFIG.speed}s`);
+}
+
+// Auto-render when DOM ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => renderAdsWidget());
+} else {
+    renderAdsWidget();
+}
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('mfd_chat_id');
