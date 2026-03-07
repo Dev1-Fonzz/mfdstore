@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Upload PostImages</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8f9ff;
+        }
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: #f0f2ff;
+        }        .upload-area.dragover {
+            border-color: #764ba2;
+            background: #e8ebff;
+        }
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .upload-text {
+            color: #555;
+            font-size: 14px;
+        }
+        #fileInput { display: none; }
+        
+        .progress {
+            margin-top: 20px;
+            display: none;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .result {
+            margin-top: 25px;
+            display: none;
+        }
+        .result.show { display: block; }
+        
+        .result-image {
+            width: 100%;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+        }
+        .result-link {            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            word-break: break-all;
+            margin-bottom: 10px;
+        }
+        .result-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .btn-copy {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        .btn-copy:hover { background: #764ba2; }
+        
+        .error {
+            background: #ffe6e6;
+            color: #cc0000;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 13px;
+            display: none;
+        }
+        .error.show { display: block; }
+        
+        .note {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📤 Upload ke PostImages</h1>
+        <p class="subtitle">Test integrasi API tidak rasmi</p>
+        <!-- Upload Area -->
+        <div class="upload-area" id="dropZone">
+            <div class="upload-icon">🖼️</div>
+            <p class="upload-text">
+                <strong>Klik untuk pilih gambar</strong><br>
+                atau drag & drop di sini<br>
+                <small style="color:#999">(JPG, PNG, GIF - Max 5MB)</small>
+            </p>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress" id="progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Mengupload... 0%</div>
+        </div>
+
+        <!-- Result -->
+        <div class="result" id="result">
+            <img id="preview" class="result-image" src="" alt="Preview">
+            <div class="result-link">
+                <strong>Link Imej:</strong><br>
+                <a id="imageUrl" href="#" target="_blank"></a>
+            </div>
+            <div class="result-link">
+                <strong>Direct Link:</strong><br>
+                <a id="directUrl" href="#" target="_blank"></a>
+            </div>
+            <button class="btn-copy" onclick="copyLink()">📋 Salin Link</button>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error" id="errorMsg"></div>
+
+        <!-- Nota Penting -->
+        <div class="note">
+            ⚠️ <strong>Nota:</strong> Ini menggunakan endpoint tidak rasmi PostImages. 
+            Jika upload gagal, mungkin disebabkan oleh <strong>CORS</strong>. 
+            Solusi: Gunakan backend proxy (PHP/Node.js) sebagai perantara.
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const progress = document.getElementById('progress');
+        const progressFill = document.getElementById('progressFill');        const progressText = document.getElementById('progressText');
+        const result = document.getElementById('result');
+        const preview = document.getElementById('preview');
+        const imageUrl = document.getElementById('imageUrl');
+        const directUrl = document.getElementById('directUrl');
+        const errorMsg = document.getElementById('errorMsg');
+
+        // Klik area upload
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // Drag & Drop effects
+        ['dragenter', 'dragover'].forEach(evt => 
+            dropZone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            })
+        );
+        ['dragleave', 'drop'].forEach(evt => 
+            dropZone.addEventListener(evt, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            })
+        );
+
+        // Handle file drop
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files.length) handleFile(files[0]);
+        });
+
+        // Handle file select
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        // Fungsi utama upload
+        async function handleFile(file) {
+            // Validate
+            if (!file.type.startsWith('image/')) {
+                showError('❌ Sila pilih fail imej sahaja (JPG/PNG/GIF)');
+                return;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                showError('❌ Saiz fail melebihi 5MB');
+                return;
+            }
+
+            // Reset UI
+            hideError();
+            result.classList.remove('show');            progress.style.display = 'block';
+            progressFill.style.width = '0%';
+            progressText.textContent = 'Mengupload... 0%';
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                // Optional: formData.append('optsize', 'original');
+                // Optional: formData.append('expiry', 'never');
+
+                // Upload ke PostImages
+                const response = await fetch('https://postimages.org/json', {
+                    method: 'POST',
+                    body: formData
+                    // Jangan set Content-Type header - browser auto set multipart
+                });
+
+                // Update progress (simulasi)
+                progressFill.style.width = '100%';
+                progressText.textContent = 'Selesai!';
+
+                const data = await response.json();
+                console.log('Response:', data);
+
+                if (data.status === 'success' && data.url) {
+                    // Paparkan hasil
+                    preview.src = data.url;
+                    imageUrl.href = data.url;
+                    imageUrl.textContent = data.url;
+                    directUrl.href = data.direct_link || data.url;
+                    directUrl.textContent = data.direct_link || data.url;
+                    result.classList.add('show');
+                } else {
+                    showError('❌ Upload gagal: ' + (data.error || 'Unknown error'));
+                }
+
+            } catch (err) {
+                console.error('Error:', err);
+                if (err.message.includes('Failed to fetch') || err.name === 'TypeError') {
+                    showError('❌ Ralat CORS: Browser block request direct ke PostImages.<br><br><strong>Solusi:</strong> Gunakan backend proxy (PHP/Node.js) untuk forward request.');
+                } else {
+                    showError('❌ Ralat: ' + err.message);
+                }
+            } finally {
+                // Hide progress selepas 1 saat
+                setTimeout(() => {
+                    progress.style.display = 'none';
+                    progressFill.style.width = '0%';
+                }, 1000);
+            }        }
+
+        function showError(msg) {
+            errorMsg.innerHTML = msg;
+            errorMsg.classList.add('show');
+        }
+
+        function hideError() {
+            errorMsg.classList.remove('show');
+        }
+
+        function copyLink() {
+            const link = imageUrl.href;
+            navigator.clipboard.writeText(link).then(() => {
+                const btn = document.querySelector('.btn-copy');
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Disalin!';
+                setTimeout(() => btn.textContent = originalText, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
