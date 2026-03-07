@@ -190,6 +190,49 @@
 @media (max-width: 768px) {
     .nav-logo { max-height: 40px; }
 }
+/* ===== CHAT SYSTEM SIMPLE ===== */
+.chat-bubble { position: relative; max-width: 85%; padding: 10px 14px; border-radius: 16px; margin: 4px 0; animation: fadeIn 0.2s; word-wrap: break-word; }
+.chat-bubble.me { background: linear-gradient(135deg, #667eea, #764ba2); color: white; margin-left: auto; border-bottom-right-radius: 4px; }
+.chat-bubble.other { background: white; color: #333; margin-right: auto; border-bottom-left-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+.chat-actions { position: absolute; top: -22px; right: 8px; display: none; gap: 4px; background: white; padding: 3px 6px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); font-size: 10px; }
+.chat-bubble:hover .chat-actions { display: flex; }
+.chat-action-btn { background: none; border: none; cursor: pointer; padding: 2px 4px; border-radius: 4px; }
+.chat-action-btn:hover { background: #f0f0f0; }
+.chat-action-btn.danger:hover { background: #fed7d7; color: #c53030; }
+.msg-time { font-size: 9px; opacity: 0.7; margin-top: 4px; text-align: right; }
+.msg-status { font-size: 9px; display: flex; align-items: center; gap: 3px; margin-top: 3px; }
+.msg-status.read { color: #68d391; }
+.msg-status.unread { color: #f6ad55; }
+.msg-status.sent { color: #a0aec0; }
+.pinned { position: absolute; top: -8px; left: 10px; background: #f6d365; color: #744210; font-size: 9px; padding: 2px 6px; border-radius: 10px; font-weight: bold; }
+.voice-msg { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 20px; min-width: 150px; }
+.voice-wave { display: flex; align-items: center; gap: 2px; height: 16px; }
+.voice-wave span { width: 2px; background: currentColor; border-radius: 2px; animation: wave 0.4s infinite alternate; }
+.voice-wave span:nth-child(2) { animation-delay: 0.1s; height: 10px; }
+.voice-wave span:nth-child(3) { animation-delay: 0.2s; height: 14px; }
+.voice-wave span:nth-child(4) { animation-delay: 0.3s; height: 8px; }
+@keyframes wave { from { height: 3px; } to { height: 16px; } }
+.chat-toolbar { display: flex; gap: 6px; padding: 6px; background: rgba(255,255,255,0.5); border-radius: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+.chat-tool-btn { padding: 6px 10px; background: #edf2f7; border: none; border-radius: 6px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+.chat-tool-btn:hover { background: #cbd5e0; }
+.chat-tool-btn.active { background: #667eea; color: white; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.status-dot.online { background: #48bb78; }
+.status-dot.busy { background: #ed8936; }
+.status-dot.offline { background: #a0aec0; }
+.chat-id { font-family: monospace; font-size: 9px; background: #edf2f7; padding: 2px 6px; border-radius: 4px; cursor: pointer; }
+.chat-id.copied { background: #9ae6b4; }
+.notify-badge { position: absolute; top: -4px; right: -4px; background: #f56565; color: white; font-size: 9px; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
+.recording-ui { display: none; align-items: center; justify-content: space-between; background: #fff5f5; border: 1px solid #feb2b2; border-radius: 8px; padding: 8px; margin-bottom: 6px; }
+.recording-ui.active { display: flex; }
+.recording-ui .timer { font-weight: bold; color: #c53030; }
+.edit-input { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 12px; margin-top: 4px; background: white; }
+.admin-controls { display: flex; gap: 4px; padding: 6px; background: rgba(102,126,234,0.1); border-radius: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.admin-status-btn { padding: 4px 8px; border: none; border-radius: 12px; font-size: 10px; cursor: pointer; background: #edf2f7; }
+.admin-status-btn.active { background: #667eea; color: white; }
+.fadeIn { animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="p-0 md:p-4">
@@ -389,45 +432,99 @@
         </section>
 
         <!-- 4. LIVE CHAT SYSTEM -->
-        <section id="view-chat-list" class="hidden-section">            <div class="glass-panel p-4 h-[80vh] flex flex-col">
-        <h2 class="text-xl font-bold glitter-text mb-4 flex items-center justify-between gap-2">
-    <span class="flex items-center gap-2">
-        <i class="fas fa-headset"></i> Contact MFD Seller
-    </span>
-    <button onclick="loadChatList()" class="text-xs bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1.5 rounded-lg transition flex items-center gap-1" title="Refresh chat list">
-        <i class="fas fa-sync-alt"></i> Refresh
-    </button>
-</h2>
-                <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
-                    <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>
-                </div>
-                <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
-                    <div class="flex items-center justify-between border-b border-gray-200 pb-2 mb-2">
+        <!-- LIVE CHAT SYSTEM - SIMPLE & WORKING -->
+<section id="view-chat-list" class="hidden-section">
+    <div class="glass-panel p-4 h-[80vh] flex flex-col">
+        <!-- Header -->
+        <h2 class="text-xl font-bold glitter-text mb-4 flex items-center justify-between">
+            <span><i class="fas fa-headset mr-2"></i>Customer Service Live Agent</span>
+            <button onclick="refreshChatList()" class="text-xs bg-purple-100 hover:bg-purple-200 px-3 py-1.5 rounded"><i class="fas fa-sync-alt"></i> Refresh</button>
+        </h2>
+
+        <!-- Chat List View -->
+        <div id="chat-list-view" class="flex-1 overflow-y-auto space-y-2">
+            <div class="text-center text-gray-500 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></div>
+        </div>
+
+        <!-- Active Chat View (Hidden by default) -->
+        <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
+            <!-- Chat Header -->
+            <div class="flex items-center justify-between border-b pb-2 mb-2">
+                <div class="flex items-center gap-2">
+                    <button onclick="closeActiveChat()" class="text-gray-500"><i class="fas fa-arrow-left"></i></button>
+                    <div>
+                        <h3 id="chat-partner-name" class="font-bold text-sm">Customer</h3>
                         <div class="flex items-center gap-2">
-                            <button onclick="closeChat()" class="text-gray-500 hover:text-purple-600 transition"><i class="fas fa-arrow-left"></i></button>
-                            <div>
-                                <h3 id="chat-partner-name" class="font-bold text-sm text-gray-800">Customer Name</h3>
-                                <span id="chat-partner-status" class="text-[10px] text-green-500 font-bold flex items-center gap-1"><span class="w-2 h-2 bg-green-500 rounded-full"></span> Online</span>
-                            </div>
-                        </div>
-                        <div class="flex gap-1">
-                            <button onclick="copyChatID()" class="text-[10px] bg-gray-200 hover:bg-gray-300 px-2 py-1 rounded transition"><i class="fas fa-copy"></i> ID</button>
-                            <button onclick="blockContact()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-600 px-2 py-1 rounded transition"><i class="fas fa-ban"></i></button>
+                            <span id="chat-status" class="text-[10px] flex items-center gap-1"><span class="status-dot online"></span> Online</span>
+                            <span id="chat-id-badge" class="chat-id" onclick="copyChatID()" title="Click to copy">ID: <span id="chat-id-text">...</span></span>
                         </div>
                     </div>
-                    <div id="chat-messages" class="chat-messages flex flex-col bg-white/30 rounded-xl mb-2 border border-white/50"></div>
-                    <div class="flex gap-2 items-end bg-white/50 p-2 rounded-xl">
-                        <button onclick="document.getElementById('file-input').click()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Attach Image"><i class="fas fa-image text-gray-600"></i></button>
-                        <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileUpload(this)">
-                        <button onclick="sendLocation()" class="p-2 bg-gray-200 hover:bg-gray-300 rounded-full transition" title="Send Location"><i class="fas fa-map-marker-alt text-gray-600"></i></button>
-                        <textarea id="msg-input" rows="1" placeholder="Type a message..." class="m-0 flex-1 resize-none text-sm py-2" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault(); sendMessage();}" maxlength="1000"></textarea>
-                        <button onclick="sendMessage()" class="p-2 btn-glitter rounded-full shadow-lg" title="Send"><i class="fas fa-paper-plane"></i></button>
-                    </div>
-                    <div class="text-[10px] text-gray-400 mt-1 text-center">Auto-update • Sound Effects Enabled • All Data Encrypted • Copyright reserved since 2025</div>
+                </div>
+                <div class="flex gap-1">
+                    <button onclick="copyChatID()" class="text-[10px] bg-gray-200 px-2 py-1 rounded"><i class="fas fa-copy"></i> Copy ID</button>
+                    <button id="admin-block-btn" onclick="blockContact()" class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded hidden"><i class="fas fa-ban"></i> Block</button>
                 </div>
             </div>
-        </section>
 
+            <!-- Admin Controls (Only for admin) -->
+            <div id="admin-chat-controls" class="admin-controls hidden">
+                <span class="text-[10px] font-bold mr-2">Status:</span>
+                <button class="admin-status-btn active" onclick="setAdminStatus('online',this)">🟢 Online</button>
+                <button class="admin-status-btn" onclick="setAdminStatus('busy',this)">🟡 Busy</button>
+                <button class="admin-status-btn" onclick="setAdminStatus('offline',this)">⚪ Offline</button>
+                <button onclick="deleteAllMessages()" class="text-[10px] bg-red-100 text-red-600 px-2 py-1 rounded ml-2"><i class="fas fa-trash"></i> Delete All</button>
+                <button onclick="adminSecureAction()" class="text-[10px] bg-purple-100 text-purple-700 px-2 py-1 rounded"><i class="fas fa-lock"></i> Secure</button>
+            </div>
+
+            <!-- Messages Area -->
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-2 space-y-1 bg-white/30 rounded-xl mb-2"></div>
+
+            <!-- Context Menu for Messages -->
+            <div id="msg-context" class="fixed bg-white rounded-lg shadow-lg p-1 z-50 hidden" style="min-width:160px;font-size:11px;">
+                <div class="p-2 hover:bg-gray-100 cursor-pointer" onclick="msgAction('reply')"><i class="fas fa-reply mr-2"></i>Reply</div>
+                <div class="p-2 hover:bg-gray-100 cursor-pointer" onclick="msgAction('edit')"><i class="fas fa-edit mr-2"></i>Edit</div>
+                <div class="p-2 hover:bg-gray-100 cursor-pointer" onclick="msgAction('pin')"><i class="fas fa-thumbtack mr-2"></i>Pin</div>
+                <div class="border-t my-1"></div>
+                <div class="p-2 hover:bg-gray-100 cursor-pointer" onclick="msgAction('delete-me')"><i class="fas fa-user-minus mr-2"></i>Delete for Me</div>
+                <div class="p-2 hover:bg-red-50 text-red-600 cursor-pointer" onclick="msgAction('delete-all')"><i class="fas fa-trash-alt mr-2"></i>Delete for Everyone</div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="bg-white/50 p-2 rounded-xl">
+                <!-- Toolbar -->
+                <div class="chat-toolbar">
+                    <button class="chat-tool-btn" onclick="document.getElementById('chat-file').click()"><i class="fas fa-image"></i> Foto</button>
+                    <input type="file" id="chat-file" class="hidden" accept="image/*" onchange="sendImage(this)">
+                    <button class="chat-tool-btn" id="voice-btn" onclick="toggleVoice()"><i class="fas fa-microphone"></i> Suara</button>
+                    <button class="chat-tool-btn" onclick="sendLocation()"><i class="fas fa-map-marker-alt"></i> Lokasi</button>
+                    <button class="chat-tool-btn" onclick="sendOrderInfo()"><i class="fas fa-box"></i> Order</button>
+                    <button class="chat-tool-btn" onclick="sendAccountInfo()"><i class="fas fa-user"></i> Akaun</button>
+                </div>
+
+                <!-- Voice Recording UI -->
+                <div id="voice-ui" class="recording-ui">
+                    <div><span class="timer" id="voice-time">00:00</span> <span class="text-xs text-gray-500">Recording...</span></div>
+                    <div class="flex gap-2">
+                        <button onclick="cancelVoice()" class="px-3 py-1 text-xs bg-gray-200 rounded">Cancel</button>
+                        <button onclick="sendVoice()" class="px-3 py-1 text-xs bg-red-500 text-white rounded">Send</button>
+                    </div>
+                </div>
+
+                <!-- Text Input -->
+                <div class="flex gap-2">
+                    <textarea id="msg-input" rows="1" placeholder="Type message..." class="flex-1 resize-none text-sm py-2 m-0" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendText()}"></textarea>
+                    <button onclick="sendText()" class="px-4 py-2 btn-glitter rounded-lg"><i class="fas fa-paper-plane"></i></button>
+                </div>
+
+                <!-- Footer -->
+                <div class="text-[9px] text-gray-400 mt-2 flex justify-between">
+                    <span>🔐 Auto-sync • 1s update</span>
+                    <span id="last-update">Updated: --:--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
         <!-- 5. ADMIN DASHBOARD - PRODUCTION READY -->
         <section id="view-admin" class="hidden-section">
             <div class="glass-panel p-4 md:p-6 mb-6 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 text-white shadow-xl rounded-2xl">
@@ -2024,7 +2121,7 @@ if (avatarEl && userData.photoURL) {
                 console.error('Delete user error:', e);
                 showToast('❌ Gagal: ' + e.message, 'error'); 
             }
-     };
+        };
 
         // Order update functions
         window.updateOrderField = async (id, field, val) => {
@@ -2048,165 +2145,283 @@ if (avatarEl && userData.photoURL) {
                 showToast('✅ Status dikemaskini', 'success');
             } catch(e) { showToast('❌ Gagal: ' + e.message, 'error'); }
         };
-}
-       // ==================== CHAT FUNCTIONS - ULTIMATE FIX ====================
+
+ // ==================== CHAT SYSTEM - INTELLECTUAL ARCHITECTURE ====================
         
-        async function loadChatList() {
-            if(!currentUser) return navTo('login');
-            
-            const listEl = userData.role === 'admin' 
-                ? document.getElementById('admin-chat-list') 
-                : document.getElementById('chat-list-view');
-            if(!listEl) return;
-            
-            // Clear previous listener
-            if(unsubscribeChat) { try { unsubscribeChat(); } catch(e) {} unsubscribeChat = null; }
-            
-            if(userData.role === 'admin') {
-                // 🎯 ADMIN: Use getDocs first for reliable initial load
-                listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading conversations...</p></div>';
-                
-                try {
-                    console.log('🔍 [ADMIN] Loading chats for UID:', currentUser.uid);
-                    
-                    // STEP 1: Get all chats where admin is participant
-                    const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
-                    const snap = await getDocs(q);
-                    
-                    console.log('📦 [ADMIN] Found', snap.size, 'chat documents');
-                    
-                    if(snap.empty) {
-                        listEl.innerHTML = "<p class='text-center text-gray-500 mt-10 text-sm'>✨ Tiada perbualan aktif. Tunggu customer mesej...</p>";
-                        
-                        // Optional: Setup real-time listener AFTER initial load
-                        setupAdminChatListener(listEl);
-                        return;
-                    }
-                    
-                    // STEP 2: Render chats
-                    listEl.innerHTML = "";
-                    let rendered = 0;
-                    
-                    for(const docSnap of snap.docs) {
-                        const data = docSnap.data();
-                        const chatId = docSnap.id;
-                        const participants = data.participants || [];
-                        
-                        console.log('📨 [ADMIN] Processing chat:', chatId, 'participants:', participants);
-                        
-                        // Find partner (not admin)
-                        const partnerId = participants.find(id => id !== currentUser.uid);
-                        if(!partnerId) {
-                            console.warn('⚠️ No partner found for chat:', chatId);
-                            continue;                        }
-                        
-                        try {
-                            // Fetch partner info
-                            const pSnap = await getDoc(doc(db, "users", partnerId));
-                            const p = pSnap.exists() ? pSnap.data() : { username: 'Unknown', photoURL: '' };
-                            
-                            const lastMsg = data.lastMessage || 'No messages';
-                            const lastTime = data.lastTime?.toDate ? data.lastTime.toDate().toLocaleTimeString('ms-MY', {hour:'2-digit', minute:'2-digit'}) : '';
-                            
-                            listEl.innerHTML += `
-                            <div onclick="openChat('${partnerId}', '${p.username || 'Unknown'}')" 
-                                 class="p-3 bg-white/60 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition border-l-4 border-purple-400 hover:shadow-md">
-                                <div class="flex items-center gap-3 min-w-0">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                                        ${(p.username || '?').charAt(0).toUpperCase()}
-                                    </div>
-                                    <div class="min-w-0 flex-1">
-                                        <h4 class="font-bold text-sm text-gray-800 truncate">${p.username || 'Unknown'}</h4>
-                                        <p class="text-xs text-gray-500 truncate w-40">${lastMsg}</p>
-                                    </div>
-                                </div>
-                                <span class="text-[10px] text-gray-400 flex-shrink-0 ml-2">${lastTime}</span>
-                            </div>`;
-                            rendered++;
-                            
-                        } catch(err) {
-                            console.error('❌ Failed to fetch user', partnerId, err);
-                            // Render fallback
-                            listEl.innerHTML += `
-                            <div onclick="openChat('${partnerId}', 'Unknown')" 
-                                 class="p-3 bg-white/60 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center transition border-l-4 border-gray-300">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center text-white">?</div>
-                                    <div>
-                                        <h4 class="font-bold text-sm">Unknown</h4>
-                                        <p class="text-xs text-gray-500 truncate w-40">${data.lastMessage || '-'}</p>
-                                    </div>
-                                </div>
-                            </div>`;
-                            rendered++;
-                        }
-                    }
-                    
-                    if(rendered === 0) {
-                        listEl.innerHTML = "<p class='text-center text-gray-500 mt-10 text-sm'>✨ Tiada perbualan aktif.</p>";
-                    }
-                    
-                    // STEP 3: Setup real-time listener for new messages
-                    setupAdminChatListener(listEl);                    
-                } catch(e) {
-                    console.error('❌ [ADMIN] loadChatList error:', e);
-                    listEl.innerHTML = `
-                    <div class='text-center text-red-500 mt-10 text-xs p-4 bg-red-50 rounded-lg'>
-                        <p class='font-bold mb-2'>❌ Gagal load chat</p>
-                        <p class='text-[10px] text-gray-400 mb-3'>${e.code || 'Unknown error'}: ${e.message}</p>
-                        <button onclick="loadChatList()" class='px-3 py-1 bg-purple-500 text-white rounded text-xs hover:bg-purple-600'>🔄 Cuba Lagi</button>
-                        <button onclick="showDebugChats()" class='px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 ml-2'>🔍 Debug</button>
-                    </div>`;
-                }
-                
-            } else {
-                // 👤 CUSTOMER VIEW (unchanged)
-                listEl.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Connecting to support...</p></div>';
-                try {
-                    const adminQuery = query(collection(db, "users"), where("role", "==", "admin"), where("status", "==", "ACTIVE"), limit(1));
-                    const adminSnap = await getDocs(adminQuery);
-                    if(adminSnap.empty) { listEl.innerHTML = "<p class='text-center text-orange-500 mt-10 text-sm'>⚠️ Tiada Admin online.</p>"; return; }
-                    const adminDoc = adminSnap.docs[0];
-                    const adminData = adminDoc.data();
-                    const adminId = adminDoc.id;
-                    listEl.innerHTML = `
-                    <div onclick="openChat('${adminId}', '${adminData.username || 'Support'}')" class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500 hover:shadow-lg transition group">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white shadow-lg"><i class="fas fa-headset text-lg"></i></div>
-                            <div><h4 class="font-bold text-gray-800">MFD Support</h4><p class="text-xs text-green-600"><span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> Online</p></div>
-                        </div><i class="fas fa-chevron-right text-purple-400"></i>
-                    </div>`;
-                } catch(e) {
-                    console.error('Customer chat load error:', e);
-                    listEl.innerHTML = "<p class='text-center text-red-500 mt-10 text-sm'>❌ Gagal connect ke support.</p>";
-                }
-            }
-        }
-        
-        // Helper: Setup real-time listener for admin (optional, after initial load)
-        function setupAdminChatListener(listEl) {
-            if(!currentUser || userData.role !== 'admin') return;
-            
-            const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
-            unsubscribeChat = onSnapshot(q, (snap) => {
-                console.log('🔄 [ADMIN] Real-time update:', snap.size, 'chats');
-                // Only refresh if there are changes (simple approach: re-run loadChatList)
-                // For production: compare doc changes and update DOM selectively
-            }, (err) => console.warn('⚠️ Real-time listener error:', err));
-        }
-        
-        // DEBUG: Show raw chat documents in console/alert
-        window.showDebugChats = async () => {            if(userData.role !== 'admin') return;
-            try {
-                const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
-                const snap = await getDocs(q);
-                console.log('🔍 DEBUG: All chats for admin:');
-                snap.forEach(d => console.log('→ Chat ID:', d.id, 'Data:', d.data()));
-                alert(`✅ Debug: Found ${snap.size} chat(s). Check Console (F12) for details.`);
-            } catch(e) {
-                alert('❌ Debug error: ' + e.message);
+        // ─────────────────────────────────────────────────────────────
+        // CONFIGURATION & CONSTANTS
+        // ─────────────────────────────────────────────────────────────
+        const CHAT = {
+            AUTO_REFRESH_MS: 5000,
+            MAX_TEXT_LENGTH: 1000,
+            MAX_IMAGE_MB: 5,
+            SUPPORTED_IMAGES: ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'],
+            MSG_TYPES: {
+                TEXT: 'text',
+                IMAGE: 'image', 
+                LOCATION: 'location',
+                ORDER: 'order_history',
+                ACCOUNT: 'account_info',
+                SYSTEM: 'system'
             }
         };
+        
+        // Global state
+        let chatRefreshTimer = null;
+        let chatMsgListener = null;
+        
+        // ─────────────────────────────────────────────────────────────
+        // CORE: Load Chat List (Admin & Customer)
+        // ─────────────────────────────────────────────────────────────
+        // ==================== CHAT SYSTEM - SIMPLE & WORKING ====================
+
+// Global variables
+let chatPartner = null;
+let chatId = null;
+let msgListener = null;
+let autoUpdate = null;
+let voiceRecorder = null;
+let voiceTimer = null;
+let voiceStart = null;
+let selectedMsg = null;
+let adminStatus = 'online';
+
+// Config
+const CFG = { AUTO_MS: 1000, MAX_VOICE: 60, ADMIN_PASS: 'admin123' }; // ⚠️ UBAH PASSWORD INI!
+
+// ==================== LOAD CHAT LIST ====================
+async function refreshChatList() {
+    if(!currentUser) return navTo('login');
+    const list = document.getElementById('chat-list-view');
+    list.innerHTML = '<div class="text-center mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading...</p></div>';
+    
+    try {
+        if(userData.role === 'admin') {
+            const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
+            const snap = await getDocs(q);
+            if(snap.empty) { list.innerHTML = '<p class="text-center text-gray-500 mt-10">✨ Tiada perbualan</p>'; return; }
+            list.innerHTML = '';
+            for(const d of snap.docs) {
+                const data = d.data();
+                const partnerId = data.participants.find(id => id !== currentUser.uid);
+                if(!partnerId) continue;
+                const pSnap = await getDoc(doc(db, "users", partnerId));
+                const p = pSnap.exists() ? pSnap.data() : {username: 'Unknown'};
+                list.innerHTML += `<div onclick="openChat('${partnerId}', '${p.username}')" class="p-3 bg-white/60 hover:bg-white rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-400"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">${(p.username||'?')[0].toUpperCase()}</div><div><div class="font-bold text-sm">${p.username}</div><div class="text-xs text-gray-500 truncate w-40">${data.lastMessage || 'No messages'}</div></div></div><span class="text-[10px] text-gray-400">${data.lastTime?.toDate?.()?.toLocaleTimeString('ms-MY',{hour:'2-digit',minute:'2-digit'})||''}</span></div>`;
+            }
+        } else {
+            const adminQ = query(collection(db, "users"), where("role", "==", "admin"), where("status", "==", "ACTIVE"), limit(1));
+            const adminSnap = await getDocs(adminQ);
+            if(adminSnap.empty) { list.innerHTML = '<p class="text-center text-orange-500 mt-10">⚠️ Tiada Admin online</p>'; return; }
+            const admin = adminSnap.docs[0].data();
+            list.innerHTML = `<div onclick="openChat('${adminSnap.docs[0].id}', '${admin.username||'Support'}')" class="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg cursor-pointer flex justify-between items-center border-l-4 border-purple-500"><div class="flex items-center gap-3"><div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-headset"></i></div><div><div class="font-bold">MFD Support</div><div class="text-xs text-green-600 flex items-center gap-1"><span class="status-dot online"></span> Online</div></div></div><i class="fas fa-chevron-right text-purple-400"></i></div>`;
+        }
+    } catch(e) { console.error('Chat list error:', e); list.innerHTML = '<p class="text-center text-red-500 mt-10 text-xs">❌ Gagal load chat</p>'; }
+}
+
+// ==================== OPEN CHAT ====================
+function openChat(partnerId, partnerName) {
+    if(!currentUser) return navTo('login');
+    chatPartner = partnerId;    chatId = [currentUser.uid, partnerId].sort().join('_');
+    document.getElementById('chat-partner-name').textContent = partnerName;
+    document.getElementById('chat-id-text').textContent = chatId.slice(0, 15) + '...';
+    document.getElementById('chat-list-view').classList.add('hidden-section');
+    document.getElementById('active-chat-view').classList.remove('hidden-section');
+    const adminCtrl = document.getElementById('admin-chat-controls');
+    const blockBtn = document.getElementById('admin-block-btn');
+    if(userData.role === 'admin') { adminCtrl.classList.remove('hidden'); blockBtn.classList.add('hidden'); } 
+    else { adminCtrl.classList.add('hidden'); blockBtn.classList.remove('hidden'); }
+    loadMessages();
+    startAutoUpdate();
+}
+
+function closeActiveChat() {
+    stopAutoUpdate();
+    if(msgListener) { try { msgListener(); } catch(e){} msgListener = null; }
+    chatPartner = null; chatId = null;
+    document.getElementById('active-chat-view').classList.add('hidden-section');
+    document.getElementById('chat-list-view').classList.remove('hidden-section');
+    refreshChatList();
+}
+
+// ==================== LOAD MESSAGES ====================
+function loadMessages() {
+    if(!chatId || !chatPartner) return;
+    const container = document.getElementById('chat-messages');
+    container.innerHTML = '<div class="text-center text-gray-400 mt-10"><div class="loader mx-auto"></div><p class="mt-2 text-xs">Loading messages...</p></div>';
+    if(msgListener) { try { msgListener(); } catch(e){} }
+    const q = query(collection(db, `chats/${chatId}/messages`), orderBy('timestamp', 'asc'), limit(100));
+    msgListener = onSnapshot(q, (snap) => {
+        container.innerHTML = '';
+        document.getElementById('last-update').textContent = 'Updated: ' + new Date().toLocaleTimeString('ms-MY');
+        if(snap.empty) { container.innerHTML = '<div class="text-center text-gray-400 mt-10"><i class="fas fa-comments text-3xl mb-2 opacity-50"></i><br>Mula perbualan...</div>'; return; }
+        snap.forEach(doc => {
+            const msg = { id: doc.id, ...doc.data() };
+            if(msg.deletedFor?.includes(currentUser.uid)) return;
+            const isMe = msg.senderId === currentUser.uid;
+            container.innerHTML += renderBubble(msg, isMe);
+        });
+        container.scrollTop = container.scrollHeight;
+        const last = snap.docs[snap.docs.length-1]?.data();
+        if(last && last.senderId !== currentUser.uid) playSound('msg');
+    });
+}
+
+function renderBubble(msg, isMe) {
+    const time = msg.timestamp?.toDate?.()?.toLocaleTimeString('ms-MY', {hour:'2-digit',minute:'2-digit'}) || '';
+    const status = msg.read ? 'read' : (msg.delivered ? 'unread' : 'sent');
+    const pinned = msg.pinned ? '<div class="pinned">📌 Pinned</div>' : '';
+    let content = '';    if(msg.type === 'image') { content = `<img src="${msg.url}" class="max-h-40 rounded-lg cursor-pointer" onclick="window.open('${msg.url}','_blank')" onerror="this.parentElement.innerHTML='<p class=\\'text-xs text-red-400\\'>❌ Failed</p>'">`; if(msg.caption) content += `<p class="text-[10px] mt-1 opacity-80">${msg.caption}</p>`; } 
+    else if(msg.type === 'voice') { content = `<div class="voice-msg"><button onclick="playVoice('${msg.url}')" class="w-7 h-7 rounded-full bg-white/30 flex items-center justify-center"><i class="fas fa-play text-xs"></i></button><div class="voice-wave"><span></span><span></span><span></span><span></span></div><span class="text-xs">${formatSec(msg.duration||0)}</span></div>`; } 
+    else if(msg.type === 'location') { const maps = msg.coords ? `https://maps.google.com?q=${msg.coords.lat},${msg.coords.lng}` : `https://maps.google.com/search/${encodeURIComponent(msg.address||'')}`; content = `<a href="${maps}" target="_blank" class="block bg-white/50 p-2 rounded"><i class="fas fa-map-marker-alt text-red-500 mr-1"></i>${msg.address||'Location'}${msg.coords?`<div class="text-[10px] text-gray-400">📍 ${msg.coords.lat.toFixed(4)}, ${msg.coords.lng.toFixed(4)}</div>`:''}</a>`; } 
+    else if(msg.type === 'order') { content = `<div class="bg-white/90 rounded p-2 text-xs border"><div class="font-bold">📦 Order #${msg.orderId?.slice(-6)||'...'}</div><div>${msg.items?.map(i=>i.name).join(', ')||''}</div><div class="font-bold text-purple-600">${formatRM(msg.total||0)}</div></div>`; } 
+    else if(msg.type === 'account') { content = `<div class="bg-white/90 rounded p-2 text-xs border"><div class="font-bold">👤 Account</div><div>UAC: ${msg.uac||'-'}</div><div>User: ${msg.username||'-'}</div><div>Phone: ${msg.phone||'-'}</div></div>`; } 
+    else { content = `<p class="text-sm break-words">${escapeHtml(msg.text||'')}</p>`; }
+    const actions = `<div class="chat-actions">${isMe ? `<button class="chat-action-btn" onclick="editMsg('${msg.id}')" title="Edit"><i class="fas fa-edit"></i></button>` : ''}<button class="chat-action-btn" onclick="pinMsg('${msg.id}')" title="Pin"><i class="fas fa-thumbtack ${msg.pinned?'text-yellow-500':''}"></i></button><button class="chat-action-btn" onclick="replyMsg('${msg.id}')" title="Reply"><i class="fas fa-reply"></i></button><button class="chat-action-btn" onclick="delMsg('${msg.id}','me')" title="Delete for me"><i class="fas fa-user-minus"></i></button>${(userData.role==='admin'||isMe) ? `<button class="chat-action-btn danger" onclick="delMsg('${msg.id}','all')" title="Delete for everyone"><i class="fas fa-trash-alt"></i></button>` : ''}</div>`;
+    const statusIcon = isMe ? (status==='read'?'<i class="fas fa-check-double"></i>':status==='unread'?'<i class="fas fa-check"></i>':'<i class="fas fa-clock"></i>') : '';
+    return `<div class="chat-bubble ${isMe?'me':'other'} group" data-id="${msg.id}" oncontextmenu="showContext(event,'${msg.id}')">${pinned}${actions}${content}<div class="msg-time">${time}${statusIcon?`<span class="msg-status ${status}">${statusIcon}</span>`:''}</div></div>`;
+}
+
+// ==================== SEND MESSAGES ====================
+async function sendText() {
+    const input = document.getElementById('msg-input');
+    const text = input.value.trim();
+    if(!text || !chatId) return;
+    try {
+        await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, type: 'text', text, timestamp: serverTimestamp(), delivered: false, read: false });
+        await updateDoc(doc(db, 'chats', chatId), { lastMessage: text.slice(0,40)+'...', lastTime: serverTimestamp() }, {merge:true});
+        input.value = ''; playSound('click');
+    } catch(e) { showToast('❌ Gagal hantar: '+e.message, 'error'); }
+}
+
+async function sendImage(input) {
+    const file = input.files[0];
+    if(!file || !chatId) { input.value=''; return; }
+    if(file.size > 5*1024*1024) { showToast('❌ Gambar terlalu besar (max 5MB)', 'error'); input.value=''; return; }
+    try {
+        const name = `chat_${Date.now()}_${file.name.replace(/[^a-z0-9.]/gi,'_')}`;
+        const ref = storageRef(storage, `chat_images/${currentUser.uid}/${name}`);
+        await uploadBytes(ref, file);
+        const url = await getDownloadURL(ref);
+        await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, type: 'image', url, timestamp: serverTimestamp(), delivered: false, read: false });
+        showToast('✅ Gambar dihantar', 'success', 1500);
+    } catch(e) { showToast('❌ Upload gagal: '+e.message, 'error'); }
+    input.value = '';
+}
+
+function toggleVoice() {
+    if(voiceRecorder) { cancelVoice(); return; }
+    if(!navigator.mediaDevices?.getUserMedia) { showToast('❌ Microphone not supported', 'error'); return; }
+    navigator.mediaDevices.getUserMedia({audio:true}).then(stream => {
+        voiceRecorder = new MediaRecorder(stream);
+        const chunks = [];
+        voiceRecorder.ondataavailable = e => chunks.push(e.data);
+        voiceRecorder.onstop = async () => { const blob = new Blob(chunks, {type:'audio/webm'}); await sendVoiceBlob(blob, Math.floor((Date.now()-voiceStart)/1000)); stream.getTracks().forEach(t=>t.stop()); };
+        voiceStart = Date.now();
+        document.getElementById('voice-ui').classList.add('active');
+        document.getElementById('voice-btn').classList.add('active', 'bg-red-500', 'text-white');
+        voiceTimer = setInterval(() => { const s = Math.floor((Date.now()-voiceStart)/1000); document.getElementById('voice-time').textContent = formatSec(s); if(s >= CFG.MAX_VOICE) sendVoice(); }, 1000);        voiceRecorder.start(); playSound('click');
+    }).catch(() => showToast('❌ Cannot access microphone', 'error'));
+}
+
+function cancelVoice() {
+    if(voiceRecorder?.state === 'recording') voiceRecorder.stop();
+    clearInterval(voiceTimer);
+    document.getElementById('voice-ui').classList.remove('active');
+    document.getElementById('voice-btn').classList.remove('active', 'bg-red-500', 'text-white');
+    voiceRecorder = null;
+}
+
+async function sendVoice() {
+    if(voiceRecorder?.state === 'recording') voiceRecorder.stop();
+    clearInterval(voiceTimer);
+    document.getElementById('voice-ui').classList.remove('active');
+    document.getElementById('voice-btn').classList.remove('active', 'bg-red-500', 'text-white');
+}
+
+async function sendVoiceBlob(blob, duration) {
+    if(!chatId) return;
+    try {
+        const name = `voice_${Date.now()}.webm`;
+        const ref = storageRef(storage, `chat_voice/${currentUser.uid}/${name}`);
+        await uploadBytes(ref, blob);
+        const url = await getDownloadURL(ref);
+        await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, type: 'voice', url, duration, timestamp: serverTimestamp(), delivered: false, read: false });
+        showToast('✅ Voice sent', 'success', 1500); playSound('voice-send');
+    } catch(e) { showToast('❌ Failed: '+e.message, 'error'); }
+    voiceRecorder = null;
+}
+
+function sendLocation() {
+    if(!chatId) return;
+    const addr = prompt('Masukkan alamat/lokasi:');
+    if(!addr?.trim()) return;
+    if(navigator.geolocation) { navigator.geolocation.getCurrentPosition(pos => { sendLoc(addr, {lat: pos.coords.latitude, lng: pos.coords.longitude}); }, () => sendLoc(addr, null), {timeout:5000}); } 
+    else { sendLoc(addr, null); }
+}
+
+async function sendLoc(address, coords) {
+    try { await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, type: 'location', address, coords, timestamp: serverTimestamp(), delivered: false, read: false }); showToast('✅ Location sent', 'success', 1500); } 
+    catch(e) { showToast('❌ Failed: '+e.message, 'error'); }
+}
+
+async function sendOrderInfo() {
+    if(!chatId) return;
+    const order = allUserOrders?.[0];
+    if(!order) { showToast('ℹ️ Tiada order untuk dihantar', 'warning'); return; }
+    if(confirm(`Hantar order #${order.orderId?.slice(-6)||'...'}?`)) {        try { await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, type: 'order', orderId: order.orderId, items: order.items, total: order.total, status: order.status, timestamp: serverTimestamp(), delivered: false, read: false }); showToast('✅ Order info sent', 'success'); } 
+        catch(e) { showToast('❌ Failed: '+e.message, 'error'); }
+    }
+}
+
+async function sendAccountInfo() {
+    if(!chatId) return;
+    if(!confirm('Hantar maklumat akaun kepada support?')) return;
+    try { await addDoc(collection(db, `chats/${chatId}/messages`), { senderId: currentUser.uid, type: 'account', uac: userData.uac, username: userData.username, phone: userData.phone, timestamp: serverTimestamp(), delivered: false, read: false }); showToast('✅ Account info sent', 'success'); } 
+    catch(e) { showToast('❌ Failed: '+e.message, 'error'); }
+}
+
+// ==================== MESSAGE ACTIONS ====================
+function showContext(e, msgId) { e.preventDefault(); selectedMsg = msgId; const menu = document.getElementById('msg-context'); menu.style.left = e.pageX + 'px'; menu.style.top = e.pageY + 'px'; menu.classList.remove('hidden'); setTimeout(() => document.addEventListener('click', hideContext, {once:true}), 10); }
+function hideContext() { document.getElementById('msg-context').classList.add('hidden'); selectedMsg = null; }
+function msgAction(action) { if(!selectedMsg || !chatId) return; hideContext(); switch(action) { case 'reply': const msg = findMsg(selectedMsg); document.getElementById('msg-input').value = `@${msg?.senderId===currentUser.uid?'Me':'User'}: ${msg?.text?.slice(0,30)||''}\n`; document.getElementById('msg-input').focus(); break; case 'edit': editMsg(selectedMsg); break; case 'pin': pinMsg(selectedMsg); break; case 'delete-me': delMsg(selectedMsg, 'me'); break; case 'delete-all': delMsg(selectedMsg, 'all'); break; } }
+
+async function editMsg(msgId) { const bubble = document.querySelector(`[data-id="${msgId}"]`); const msg = findMsg(msgId); if(!msg || msg.senderId !== currentUser.uid) { showToast('❌ Boleh edit mesej sendiri sahaja', 'error'); return; } const content = bubble.querySelector('p') || bubble.firstChild; if(!content) return; content.outerHTML = `<textarea class="edit-input" rows="2">${escapeHtml(msg.text||'')}</textarea><div class="flex gap-1 mt-1"><button onclick="saveEdit('${msgId}')" class="px-2 py-0.5 text-xs bg-green-500 text-white rounded">Save</button><button onclick="loadMessages()" class="px-2 py-0.5 text-xs bg-gray-300 rounded">Cancel</button></div>`; }
+
+async function saveEdit(msgId) { const txt = document.querySelector(`[data-id="${msgId}"] .edit-input`)?.value.trim(); if(!txt) return showToast('❌ Mesej tidak boleh kosong', 'error'); try { await updateDoc(doc(db, `chats/${chatId}/messages`, msgId), { text: txt, edited: true, editedAt: serverTimestamp() }); showToast('✅ Mesej dikemaskini', 'success', 1500); loadMessages(); } catch(e) { showToast('❌ Gagal: '+e.message, 'error'); } }
+
+async function pinMsg(msgId) { try { const ref = doc(db, `chats/${chatId}/messages`, msgId); const snap = await getDoc(ref); const pinned = !snap.data()?.pinned; await updateDoc(ref, { pinned, pinnedAt: pinned ? serverTimestamp() : null }); showToast(pinned ? '📌 Pinned' : '📍 Unpinned', 'success', 1500); loadMessages(); } catch(e) { showToast('❌ Failed: '+e.message, 'error'); } }
+
+async function delMsg(msgId, scope) { try { if(scope === 'me') { await updateDoc(doc(db, `chats/${chatId}/messages`, msgId), { deletedFor: arrayUnion(currentUser.uid) }); } else { if(userData.role !== 'admin') { const msg = findMsg(msgId); if(msg?.senderId !== currentUser.uid) return showToast('❌ Hanya admin atau penghantar boleh padam untuk semua', 'error'); } await deleteDoc(doc(db, `chats/${chatId}/messages`, msgId)); } showToast('✅ Mesej dipadam', 'success', 1500); loadMessages(); } catch(e) { showToast('❌ Failed: '+e.message, 'error'); } }
+
+async function deleteAllMessages() { if(userData.role !== 'admin') return; if(!confirm('⚠️ Padam SEMUA mesej dalam perbualan ini?')) return; const pass = prompt('🔐 Masukkan password admin:'); if(pass !== CFG.ADMIN_PASS) return showToast('❌ Password salah', 'error'); try { const snap = await getDocs(collection(db, `chats/${chatId}/messages`)); await Promise.all(snap.docs.map(d => deleteDoc(d.ref))); await deleteDoc(doc(db, 'chats', chatId)); showToast('✅ Perbualan dipadam', 'success'); closeActiveChat(); } catch(e) { showToast('❌ Failed: '+e.message, 'error'); } }
+
+// ==================== ADMIN FEATURES ====================
+function setAdminStatus(status, btn) { if(userData.role !== 'admin') return; adminStatus = status; document.querySelectorAll('.admin-status-btn').forEach(b => b.classList.remove('active')); btn?.classList.add('active'); const dot = document.getElementById('chat-status')?.querySelector('.status-dot'); const text = document.getElementById('chat-status'); if(dot && text) { dot.className = `status-dot ${status}`; text.innerHTML = `<span class="status-dot ${status}"></span> ${status.charAt(0).toUpperCase()+status.slice(1)}`; } updateDoc(doc(db, 'users', currentUser.uid), { adminStatus: status }).catch(()=>{}); }
+
+function adminSecureAction() { if(userData.role !== 'admin') return; const pass = prompt('🔐 Admin password:'); if(pass === CFG.ADMIN_PASS) { showToast('✅ Admin access granted', 'success'); } else { showToast('❌ Wrong password', 'error'); } }
+
+function blockContact() { if(!chatPartner || userData.role === 'admin') return; if(!confirm('Block pengguna ini?')) return; updateDoc(doc(db, 'users', chatPartner), { status: 'BLOCKED', blockedAt: serverTimestamp() }).then(() => { showToast('✅ Pengguna diblock', 'success'); closeActiveChat(); }).catch(e => showToast('❌ Failed: '+e.message, 'error')); }
+
+// ==================== UTILITIES ====================
+function copyChatID() { if(!chatId) return; navigator.clipboard.writeText(chatId).then(() => { const badge = document.getElementById('chat-id-badge'); badge?.classList.add('copied'); setTimeout(() => badge?.classList.remove('copied'), 1500); showToast('✅ Chat ID copied!', 'success', 1500); localStorage.setItem('mfd_chat_id', chatId); localStorage.setItem('mfd_chat_partner', chatPartner||''); }); }
+
+function startAutoUpdate() { stopAutoUpdate(); autoUpdate = setInterval(() => { if(document.visibilityState === 'visible' && chatId) { document.getElementById('last-update').textContent = 'Updated: ' + new Date().toLocaleTimeString('ms-MY'); } }, CFG.AUTO_MS); }
+function stopAutoUpdate() { if(autoUpdate) { clearInterval(autoUpdate); autoUpdate = null; } }
+function findMsg(id) { return { id, senderId: currentUser?.uid, text: '' }; }
+function escapeHtml(t) { if(!t) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+function formatSec(s) { const m=Math.floor(s/60); return `${m}:${(s%60).toString().padStart(2,'0')}`; }
+function playVoice(url) { new Audio(url).play().catch(()=>{}); }
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('mfd_chat_id');
+    const partner = localStorage.getItem('mfd_chat_partner');
+    if(saved && partner && currentUser) { /* optional auto-reconnect */ }
+    if('Notification' in window && Notification.permission === 'default') { Notification.requestPermission(); }});
+document.addEventListener('visibilitychange', () => { document.visibilityState === 'visible' ? startAutoUpdate() : stopAutoUpdate(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') hideContext(); });
+
         // ==================== UI UTILITIES ====================
         
         // QR Code blur toggle
