@@ -1,18 +1,18 @@
-// api/upload.js - Vercel Serverless Function
+// api/upload.js
 export const config = {
-  api: { 
-    bodyParser: false,  // Penting: handle raw body sendiri
-    responseLimit: false 
+  api: {
+    bodyParser: true,  // ✅ Biar Vercel handle FormData
+    responseLimit: false
   }
 };
 
 export default async function handler(req, res) {
-  // CORS headers
+  // CORS Headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight
+  // Preflight
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
@@ -22,31 +22,32 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 🔥 Baca raw body stream (multipart/form-data)
-    const chunks = [];
-    for await (const chunk of req) {
-      chunks.push(Buffer.from(chunk));
-    }
-    const bodyBuffer = Buffer.concat(chunks);
+    // ✅ Dapatkan file dari FormData
+    const formData = await req.formData();
+    const file = formData.get('file');
 
-    // 🔥 Forward ke PostImages dengan header yang sama
+    if (!file) {
+      return res.status(400).json({ error: 'No file received' });
+    }
+
+    // ✅ Forward ke PostImages
+    const postFormData = new FormData();
+    postFormData.append('file', file);
+
     const postResponse = await fetch('https://postimages.org/json', {
       method: 'POST',
-      headers: {
-        'content-type': req.headers['content-type']  // Penting: boundary mesti sama
-      },
-      body: bodyBuffer
+      body: postFormData
     });
 
     const responseData = await postResponse.json();
-    
+
     return res.status(200).json(responseData);
-    
+
   } catch (error) {
-    console.error('❌ Upload error:', error);
+    console.error('❌ Upload Error:', error);
     return res.status(500).json({ 
-      error: 'Upload failed', 
-      details: error.message 
+      error: 'Upload failed',
+      message: error.message || String(error)
     });
   }
 }
