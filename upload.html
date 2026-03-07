@@ -53,7 +53,6 @@
     </div>
 
     <div class="error" id="error"></div>
-    
     <div class="debug" id="debug"></div>
   </div>
 
@@ -87,7 +86,7 @@
     });
 
     async function upload(file) {
-      if (!file.type.startsWith('image/')) return showError('❌ Hanya fail imej dibenarkan (JPG/PNG/GIF)');
+      if (!file.type.startsWith('image/')) return showError('❌ Hanya fail imej dibenarkan');
       if (file.size > 5*1024*1024) return showError('❌ Saiz fail melebihi 5MB');
 
       hideError(); 
@@ -96,8 +95,8 @@
       loader.style.display = 'block'; 
       dropZone.style.display = 'none';
 
-      try {        const fd = new FormData();
-        fd.append('file', file);
+      try {
+        const fd = new FormData();        fd.append('file', file);
 
         debug.textContent = '📡 Menghantar ke /api/upload...';
 
@@ -116,13 +115,11 @@
           result.classList.add('show');
           debug.textContent += '\n✅ Berjaya!';
         } else {
-          // ✅ FIX: Papar error message yang betul
           const errMsg = data.error || data.message || data.details || JSON.stringify(data);
           showError('❌ ' + errMsg);
         }
       } catch (e) {
         console.error('Upload error:', e);
-        // ✅ FIX: Papar error message yang betul (bukan [object Object])
         const errMsg = e.message || String(e) || 'Unknown error';
         showError('❌ Ralat: ' + errMsg);
         debug.textContent = '🐛 Debug: ' + errMsg;
@@ -145,10 +142,10 @@
     function copy() {
       navigator.clipboard.writeText(linkEl.textContent).then(() => {
         copyBtn.textContent = '✅ Tersalin!';
-        copyBtn.classList.add('copied');        setTimeout(() => { 
+        copyBtn.classList.add('copied');
+        setTimeout(() => { 
           copyBtn.textContent = '📋 Salin Link'; 
-          copyBtn.classList.remove('copied'); 
-        }, 1500);
+          copyBtn.classList.remove('copied');         }, 1500);
       });
     }
   </script>
