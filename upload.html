@@ -25,8 +25,9 @@
     .btn{background:#6366f1;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:14px;cursor:pointer;width:100%;margin-top:12px;transition:.2s}
     .btn:hover{background:#4f46e5}
     .btn.copied{background:#059669}
-    .error{display:none;background:#3f1a1a;border:1px solid #7f1d1d;color:#fca5a5;padding:12px;border-radius:8px;font-size:13px;margin-top:16px;text-align:center}
+    .error{display:none;background:#3f1a1a;border:1px solid #7f1d1d;color:#fca5a5;padding:12px;border-radius:8px;font-size:13px;margin-top:16px;text-align:center;white-space:pre-wrap}
     .error.show{display:block}
+    .debug{margin-top:16px;padding:12px;background:#1a1a2e;border-radius:8px;font-size:11px;color:#666;font-family:monospace}
   </style>
 </head>
 <body>
@@ -46,12 +47,14 @@
       <div class="spinner"></div>
       <div style="color:#888;font-size:13px">Memuat naik...</div>
     </div>
-
-    <div class="result" id="result">      <div class="link" id="link"></div>
+    <div class="result" id="result">
+      <div class="link" id="link"></div>
       <button class="btn" id="copyBtn" onclick="copy()">📋 Salin Link</button>
     </div>
 
     <div class="error" id="error"></div>
+    
+    <div class="debug" id="debug"></div>
   </div>
 
   <script>
@@ -62,6 +65,7 @@
     const linkEl = document.getElementById('link');
     const copyBtn = document.getElementById('copyBtn');
     const error = document.getElementById('error');
+    const debug = document.getElementById('debug');
 
     dropZone.onclick = () => fileInput.click();
 
@@ -83,26 +87,45 @@
     });
 
     async function upload(file) {
-      if (!file.type.startsWith('image/')) return showError('❌ Hanya imej dibenarkan');
-      if (file.size > 5*1024*1024) return showError('❌ Maksimum 5MB');
+      if (!file.type.startsWith('image/')) return showError('❌ Hanya fail imej dibenarkan (JPG/PNG/GIF)');
+      if (file.size > 5*1024*1024) return showError('❌ Saiz fail melebihi 5MB');
 
-      hideError(); result.classList.remove('show'); loader.style.display = 'block'; dropZone.style.display = 'none';
+      hideError(); 
+      debug.textContent = '';
+      result.classList.remove('show'); 
+      loader.style.display = 'block'; 
+      dropZone.style.display = 'none';
 
-      try {
-        const fd = new FormData();
+      try {        const fd = new FormData();
         fd.append('file', file);
 
-        const res = await fetch('/api/upload', { method: 'POST', body: fd });
+        debug.textContent = '📡 Menghantar ke /api/upload...';
+
+        const res = await fetch('/api/upload', { 
+          method: 'POST', 
+          body: fd 
+        });
+
+        debug.textContent += '\n📥 Status: ' + res.status + ' ' + res.statusText;
+
         const data = await res.json();
+        debug.textContent += '\n📦 Response: ' + JSON.stringify(data, null, 2);
 
         if (res.ok && data.status === 'success' && data.url) {
-          linkEl.textContent = data.url;          result.classList.add('show');
+          linkEl.textContent = data.url;
+          result.classList.add('show');
+          debug.textContent += '\n✅ Berjaya!';
         } else {
-          showError('❌ ' + (data.error || data.details || 'Upload gagal'));
+          // ✅ FIX: Papar error message yang betul
+          const errMsg = data.error || data.message || data.details || JSON.stringify(data);
+          showError('❌ ' + errMsg);
         }
       } catch (e) {
-        console.error(e);
-        showError('❌ Ralat: ' + e.message);
+        console.error('Upload error:', e);
+        // ✅ FIX: Papar error message yang betul (bukan [object Object])
+        const errMsg = e.message || String(e) || 'Unknown error';
+        showError('❌ Ralat: ' + errMsg);
+        debug.textContent = '🐛 Debug: ' + errMsg;
       } finally {
         loader.style.display = 'none';
         dropZone.style.display = 'block';
@@ -113,13 +136,19 @@
       error.textContent = msg;
       error.classList.add('show');
     }
-    function hideError() { error.classList.remove('show'); }
+    
+    function hideError() { 
+      error.classList.remove('show'); 
+      error.textContent = '';
+    }
 
     function copy() {
       navigator.clipboard.writeText(linkEl.textContent).then(() => {
         copyBtn.textContent = '✅ Tersalin!';
-        copyBtn.classList.add('copied');
-        setTimeout(() => { copyBtn.textContent = '📋 Salin Link'; copyBtn.classList.remove('copied'); }, 1500);
+        copyBtn.classList.add('copied');        setTimeout(() => { 
+          copyBtn.textContent = '📋 Salin Link'; 
+          copyBtn.classList.remove('copied'); 
+        }, 1500);
       });
     }
   </script>
