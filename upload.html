@@ -3,151 +3,241 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload Gambar</title>
+  <title>📦 MFD Store - Link Gambar</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:system-ui,-apple-system,sans-serif;background:#0a0a1a;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-    .card{background:#16162a;border-radius:16px;padding:32px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4)}
-    h1{text-align:center;font-size:20px;margin-bottom:24px;font-weight:600}
-    .upload-box{border:2px dashed #3a3a5a;border-radius:12px;padding:40px 20px;text-align:center;cursor:pointer;transition:.2s;background:#1a1a2e}
-    .upload-box:hover{border-color:#6366f1;background:#1f1f3a}
-    .upload-box.dragover{border-color:#6366f1;background:#242444}
-    .icon{font-size:40px;margin-bottom:12px}
-    .hint{color:#888;font-size:13px}
-    .hint strong{color:#fff;display:block;margin-bottom:4px}
-    #file{display:none}
-    .loader{display:none;text-align:center;padding:20px}
-    .spinner{width:32px;height:32px;border:3px solid #333;border-top-color:#6366f1;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .result{display:none;margin-top:24px}
-    .result.show{display:block}
-    .link{background:#0a0a1a;border:1px solid #333;border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:#6366f1;word-break:break-all;line-height:1.4}
-    .btn{background:#6366f1;color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:14px;cursor:pointer;width:100%;margin-top:12px;transition:.2s}
-    .btn:hover{background:#4f46e5}
-    .btn.copied{background:#059669}
-    .error{display:none;background:#3f1a1a;border:1px solid #7f1d1d;color:#fca5a5;padding:12px;border-radius:8px;font-size:13px;margin-top:16px;text-align:center;white-space:pre-wrap}
-    .error.show{display:block}
-    .debug{margin-top:16px;padding:12px;background:#1a1a2e;border-radius:8px;font-size:11px;color:#666;font-family:monospace}
+    body{font-family:system-ui,-apple-system,sans-serif;background:#0a0a1a;color:#fff;min-height:100vh;padding:20px}
+    .container{max-width:800px;margin:0 auto}
+    
+    header{text-align:center;padding:20px 0;margin-bottom:30px}
+    h1{font-size:24px;margin-bottom:8px}
+    .subtitle{color:#888;font-size:14px}
+    
+    .card{background:#16162a;border-radius:16px;padding:24px;margin-bottom:20px}
+    .card-title{font-size:16px;font-weight:600;margin-bottom:16px;color:#fff}
+    
+    .btn-primary{
+      background:#6366f1;color:#fff;border:none;padding:12px 24px;
+      border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;
+      display:inline-flex;align-items:center;gap:8px;transition:.2s
+    }
+    .btn-primary:hover{background:#4f46e5}
+    
+    .steps{display:grid;gap:12px;margin-top:16px}
+    .step{display:flex;gap:12px;align-items:flex-start}
+    .step-num{
+      background:#6366f1;color:#fff;width:24px;height:24px;
+      border-radius:50%;display:flex;align-items:center;
+      justify-content:center;font-size:12px;font-weight:600;flex-shrink:0
+    }
+    .step-text{color:#aaa;font-size:13px;line-height:1.5}
+    
+    .input-group{margin-top:16px}
+    .input-label{display:block;color:#888;font-size:12px;margin-bottom:8px}
+    .input-field{
+      width:100%;background:#0f0f23;border:1px solid #333;
+      border-radius:8px;padding:12px;color:#fff;font-size:13px;
+      font-family:monospace
+    }
+    .input-field:focus{outline:none;border-color:#6366f1}
+    
+    .preview-box{
+      margin-top:16px;padding:16px;background:#0f0f23;
+      border-radius:8px;text-align:center;display:none
+    }
+    .preview-box.show{display:block}
+    .preview-img{max-width:100%;max-height:200px;border-radius:8px}
+        .btn-copy{
+      background:#059669;color:#fff;border:none;padding:10px 20px;
+      border-radius:8px;font-size:13px;cursor:pointer;margin-top:12px;
+      display:inline-flex;align-items:center;gap:6px;transition:.2s
+    }
+    .btn-copy:hover{background:#047857}
+    .btn-copy.copied{background:#374151}
+    
+    .link-list{margin-top:20px}
+    .link-item{
+      display:flex;gap:12px;align-items:center;
+      padding:12px;background:#0f0f23;border-radius:8px;
+      margin-bottom:8px;font-size:12px
+    }
+    .link-url{
+      flex:1;color:#6366f1;font-family:monospace;
+      word-break:break-all;text-decoration:none
+    }
+    .link-url:hover{text-decoration:underline}
+    .link-actions{display:flex;gap:8px}
+    .btn-sm{
+      background:#374151;color:#fff;border:none;padding:6px 12px;
+      border-radius:6px;font-size:11px;cursor:pointer
+    }
+    .btn-sm:hover{background:#4b5563}
+    
+    .note{
+      background:#1a1a2e;border-left:3px solid #6366f1;
+      padding:12px;margin-top:20px;font-size:12px;color:#888
+    }
+    
+    @media(max-width:600px){
+      .link-item{flex-direction:column;align-items:flex-start}
+      .link-actions{margin-top:8px}
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>📤 Upload Gambar</h1>
-    
-    <div class="upload-box" id="dropZone">
-      <div class="icon">🖼️</div>
-      <div class="hint">
-        <strong>Klik atau Drag & Drop</strong>
-        JPG • PNG • GIF (Max 5MB)
+  <div class="container">
+    <header>
+      <h1>📦 MFD Store - Link Gambar</h1>
+      <p class="subtitle">Upload manual di PostImages, kumpul link di sini</p>
+    </header>
+
+    <!-- Card 1: Cara Upload -->
+    <div class="card">
+      <div class="card-title">📤 Cara Upload Gambar</div>
+      <a href="https://postimages.org/" target="_blank" class="btn-primary">
+        🌐 Buka PostImages
+      </a>      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">Klik butang di atas, upload gambar secara manual</div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">Pilih <strong>"Never"</strong> untuk expiry (kekal selamanya)</div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">Copy <strong>"Direct link"</strong> (bukan HTML code)</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text">Paste link di bawah untuk simpan & preview</div>
+        </div>
       </div>
-      <input type="file" id="file" accept="image/*">
     </div>
 
-    <div class="loader" id="loader">
-      <div class="spinner"></div>
-      <div style="color:#888;font-size:13px">Memuat naik...</div>
-    </div>
-    <div class="result" id="result">
-      <div class="link" id="link"></div>
-      <button class="btn" id="copyBtn" onclick="copy()">📋 Salin Link</button>
+    <!-- Card 2: Paste & Preview Link -->
+    <div class="card">
+      <div class="card-title">🔗 Paste Link Gambar</div>
+      <div class="input-group">
+        <label class="input-label">Direct Link dari PostImages</label>
+        <input type="url" class="input-field" id="linkInput" placeholder="https://i.postimg.io/xxxxx/image.jpg">
+      </div>
+      <button class="btn-primary" onclick="addLink()" style="margin-top:12px">
+        ➕ Tambah Link
+      </button>
+      
+      <div class="preview-box" id="previewBox">
+        <img id="previewImg" class="preview-img" src="" alt="Preview">
+        <div style="margin-top:12px">
+          <button class="btn-copy" id="copyBtn" onclick="copyLink()">📋 Salin Link</button>
+        </div>
+      </div>
     </div>
 
-    <div class="error" id="error"></div>
-    <div class="debug" id="debug"></div>
+    <!-- Card 3: Senarai Link -->
+    <div class="card">
+      <div class="card-title">📋 Senarai Link Tersimpan</div>
+      <div id="linkList" class="link-list">
+        <!-- Link akan muncul di sini -->
+        <div style="color:#666;font-size:13px;text-align:center;padding:20px">
+          Tiada link disimpan lagi
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      ⚠️ <strong>Nota:</strong> Link disimpan dalam browser anda sahaja (localStorage). 
+      Jika clear browser data, link akan hilang. 
+      Untuk backup, copy link penting ke nota/Google Docs.
+    </div>
   </div>
 
   <script>
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('file');
-    const loader = document.getElementById('loader');
-    const result = document.getElementById('result');
-    const linkEl = document.getElementById('link');
-    const copyBtn = document.getElementById('copyBtn');
-    const error = document.getElementById('error');
-    const debug = document.getElementById('debug');
+    // Load saved links from localStorage
+    let savedLinks = JSON.parse(localStorage.getItem('mfd_image_links') || '[]');
+    
+    // Render saved links on load
+    renderLinkList();
 
-    dropZone.onclick = () => fileInput.click();
+    function addLink() {
+      const input = document.getElementById('linkInput');
+      const url = input.value.trim();
+      
+      if (!url) {
+        alert('Sila paste link dulu!');
+        return;
+      }
+      
+      if (!url.startsWith('https://i.postimg')) {
+        alert('⚠️ Link nampaknya bukan dari PostImages. Pastikan anda copy "Direct link".');
+        return;
+      }
 
-    ['dragenter','dragover'].forEach(e => 
-      dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('dragover'); })
-    );
-    ['dragleave','drop'].forEach(e => 
-      dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('dragover'); })
-    );
+      // Save to array & localStorage
+      if (!savedLinks.includes(url)) {
+        savedLinks.unshift(url); // Add to top
+        localStorage.setItem('mfd_image_links', JSON.stringify(savedLinks));
+        renderLinkList();
+      }
 
-    dropZone.addEventListener('drop', ev => {
-      const f = ev.dataTransfer.files[0];
-      if (f) upload(f);
-    });
+      // Show preview
+      document.getElementById('previewImg').src = url;
+      document.getElementById('previewBox').classList.add('show');
+      document.getElementById('copyBtn').dataset.link = url;
+      
+      // Clear input
+      input.value = '';
+    }
 
-    fileInput.addEventListener('change', ev => {
-      const f = ev.target.files[0];
-      if (f) upload(f);
-    });
+    function renderLinkList() {
+      const container = document.getElementById('linkList');
+      
+      if (savedLinks.length === 0) {
+        container.innerHTML = '<div style="color:#666;font-size:13px;text-align:center;padding:20px">Tiada link disimpan lagi</div>';
+        return;      }
 
-    async function upload(file) {
-      if (!file.type.startsWith('image/')) return showError('❌ Hanya fail imej dibenarkan');
-      if (file.size > 5*1024*1024) return showError('❌ Saiz fail melebihi 5MB');
+      container.innerHTML = savedLinks.map((url, index) => `
+        <div class="link-item">
+          <a href="${url}" target="_blank" class="link-url">${url}</a>
+          <div class="link-actions">
+            <button class="btn-sm" onclick="copySpecific('${url}')">📋</button>
+            <button class="btn-sm" onclick="deleteLink(${index})" style="background:#7f1d1d">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
 
-      hideError(); 
-      debug.textContent = '';
-      result.classList.remove('show'); 
-      loader.style.display = 'block'; 
-      dropZone.style.display = 'none';
+    function copyLink() {
+      const btn = document.getElementById('copyBtn');
+      const url = btn.dataset.link;
+      navigator.clipboard.writeText(url).then(() => {
+        btn.textContent = '✅ Tersalin!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.textContent = '📋 Salin Link';
+          btn.classList.remove('copied');
+        }, 1500);
+      });
+    }
 
-      try {
-        const fd = new FormData();        fd.append('file', file);
+    function copySpecific(url) {
+      navigator.clipboard.writeText(url).then(() => {
+        alert('✅ Link disalin!');
+      });
+    }
 
-        debug.textContent = '📡 Menghantar ke /api/upload...';
-
-        const res = await fetch('/api/upload', { 
-          method: 'POST', 
-          body: fd 
-        });
-
-        debug.textContent += '\n📥 Status: ' + res.status + ' ' + res.statusText;
-
-        const data = await res.json();
-        debug.textContent += '\n📦 Response: ' + JSON.stringify(data, null, 2);
-
-        if (res.ok && data.status === 'success' && data.url) {
-          linkEl.textContent = data.url;
-          result.classList.add('show');
-          debug.textContent += '\n✅ Berjaya!';
-        } else {
-          const errMsg = data.error || data.message || data.details || JSON.stringify(data);
-          showError('❌ ' + errMsg);
-        }
-      } catch (e) {
-        console.error('Upload error:', e);
-        const errMsg = e.message || String(e) || 'Unknown error';
-        showError('❌ Ralat: ' + errMsg);
-        debug.textContent = '🐛 Debug: ' + errMsg;
-      } finally {
-        loader.style.display = 'none';
-        dropZone.style.display = 'block';
+    function deleteLink(index) {
+      if (confirm('Padam link ini?')) {
+        savedLinks.splice(index, 1);
+        localStorage.setItem('mfd_image_links', JSON.stringify(savedLinks));
+        renderLinkList();
       }
     }
 
-    function showError(msg) {
-      error.textContent = msg;
-      error.classList.add('show');
-    }
-    
-    function hideError() { 
-      error.classList.remove('show'); 
-      error.textContent = '';
-    }
-
-    function copy() {
-      navigator.clipboard.writeText(linkEl.textContent).then(() => {
-        copyBtn.textContent = '✅ Tersalin!';
-        copyBtn.classList.add('copied');
-        setTimeout(() => { 
-          copyBtn.textContent = '📋 Salin Link'; 
-          copyBtn.classList.remove('copied');         }, 1500);
-      });
-    }
+    // Allow Enter key to add link
+    document.getElementById('linkInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') addLink();
+    });
   </script>
 </body>
 </html>
