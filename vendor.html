@@ -6,18 +6,22 @@
     <title>🛍️ Vendors Manager - MFD Store</title>
     <meta name="description" content="Platform pengurusan vendor MFD Store dengan Firestore database">
     
-    <!-- Firebase SDKs (Modular) -->
+    <!-- Firebase SDKs (Modular v12.10.0) - IMPORT SEMUA FUNGSI -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        
+        // Firestore Functions
         import { 
             getFirestore, collection, doc, setDoc, getDoc, updateDoc, deleteDoc, 
             query, where, orderBy, onSnapshot, addDoc, serverTimestamp, getDocs,
-            limit, startAfter, Timestamp 
+            limit, startAfter, Timestamp, runTransaction 
         } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+        
+        // Auth Functions - PENTING: Import fungsi, bukan instance sahaja!
         import { 
             getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, 
             signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, 
-            updatePassword, sendPasswordResetEmail 
+            updatePassword, sendPasswordResetEmail, createUser, signInAnonymously
         } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
         
         // 🔥 Firebase Configuration
@@ -30,55 +34,69 @@
             appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
         };
         
-        // Initialize Firebase
+        // Initialize Firebase ONCE
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
         const googleProvider = new GoogleAuthProvider();
         
-        // 🌐 Export to window for global access
-        window.mfd = { db, auth, googleProvider, serverTimestamp, Timestamp };
+        // 🌐 EXPORT SEMUA KE window.mfd UNTUK GLOBAL ACCESS
+        // Termasuk INSTANCES dan FUNCTIONS
+        window.mfd = { 
+            // Instances
+            app, db, auth, googleProvider,
+            
+            // Firestore Functions
+            collection, doc, setDoc, getDoc, updateDoc, deleteDoc,             query, where, orderBy, onSnapshot, addDoc, getDocs,
+            limit, startAfter, Timestamp, serverTimestamp, runTransaction,
+            
+            // Auth Functions - INI YANG BETUL!
+            signInWithEmailAndPassword, createUserWithEmailAndPassword, 
+            signInWithPopup, signOut, onAuthStateChanged, 
+            updatePassword, sendPasswordResetEmail, GoogleAuthProvider,
+            
+            // Utilities
+            generateId: () => `${Date.now().toString(36)}-${Math.random().toString(36).substr(2,5)}`
+        };
         
-        // 🔔 Auto-update notification system
+        // 🔔 Notification System
         window.mfd.notify = (msg, type = 'info') => {
+            if(typeof document === 'undefined') return;
             const notif = document.createElement('div');
             notif.className = `notification ${type} animate__animated animate__fadeInDown`;
             notif.innerHTML = `✨ ${msg}`;
+            notif.style.cssText = 'position:fixed;top:20px;right:20px;z-index:9999;padding:15px 25px;border-radius:12px;color:white;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,0.3);max-width:350px;animation:slideIn 0.3s ease;background:' + 
+                (type==='success'?'linear-gradient(135deg,#43e97b,#38f9d7)':type==='error'?'linear-gradient(135deg,#ff416c,#ff4b2b)':'linear-gradient(135deg,#4facfe,#00f2fe)');
             document.body.appendChild(notif);
-            setTimeout(() => notif.remove(), 4000);
-            playSound('notification');
-        };    </script>
+            setTimeout(() => { notif.style.opacity='0'; setTimeout(()=>notif.remove(),300); }, 4000);
+            if(window.playSound) playSound('notification');
+        };
+        
+        // ✅ Firebase Ready Callback
+        window.firebaseReady = true;
+        console.log('✅ Firebase initialized successfully!');
+    </script>
     
-    <!-- Animate.css for smooth animations -->
+    <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* 🎨 GRIDENT & SMOOTH GLITTER THEME */
         :root {
-            /* Gradients */
             --grad-primary: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             --grad-secondary: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
             --grad-success: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
             --grad-warning: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
             --grad-danger: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
-            
-            /* Glitter Effects */
             --glitter: radial-gradient(ellipse at center, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%);
             --sparkle: 0 0 20px rgba(255,255,255,0.3), 0 0 40px rgba(255,215,0,0.2);
-            
-            /* Bright Colors */
             --bright-1: #ff6b6b; --bright-2: #4ecdc4; --bright-3: #45b7d1;
             --bright-4: #f9ca24; --bright-5: #6c5ce7; --bright-6: #a29bfe;
-            
-            /* Base */
             --bg-dark: #0f0c29; --bg-mid: #302b63; --bg-light: #24243e;
             --text-primary: #ffffff; --text-secondary: #e0e0ff;
-            --card-bg: rgba(255,255,255,0.12); --card-border: rgba(255,255,255,0.2);
-            --shadow: 0 8px 32px rgba(0,0,0,0.3);
-            --radius: 16px;
+            --card-bg: rgba(255,255,255,0.12); --card-border: rgba(255,255,255,0.2);            --shadow: 0 8px 32px rgba(0,0,0,0.3); --radius: 16px;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -86,9 +104,7 @@
         body {
             font-family: 'Poppins', sans-serif;
             background: var(--bg-dark);
-            background-image: 
-                var(--grad-primary),
-                var(--glitter),
+            background-image: var(--grad-primary), var(--glitter),
                 repeating-radial-gradient(circle at 0 0, transparent 0, var(--bg-dark) 10px),
                 repeating-linear-gradient(45deg, rgba(255,255,255,0.03) 0, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 20px);
             background-blend-mode: overlay, screen, normal, normal;
@@ -96,31 +112,18 @@
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
-            line-height: 1.6;        }
+            line-height: 1.6;
+        }
         
-        /* ✨ Glitter Animation */
-        @keyframes glitter {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.8; }
-        }
-        .glitter-effect {
-            position: relative;
-            overflow: hidden;
-        }
+        @keyframes glitter { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+        .glitter-effect { position: relative; overflow: hidden; }
         .glitter-effect::after {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: var(--glitter);
-            animation: glitter 3s ease-in-out infinite;
-            pointer-events: none;
+            content: ''; position: absolute; top: -50%; left: -50%;
+            width: 200%; height: 200%; background: var(--glitter);
+            animation: glitter 3s ease-in-out infinite; pointer-events: none;
         }
         
-        /* 🎵 Sound Visualizer */
-        .sound-wave {
-            display: flex; gap: 2px; align-items: center; height: 20px;
-        }
+        .sound-wave { display: flex; gap: 2px; align-items: center; height: 20px; }
         .sound-wave span {
             width: 3px; background: var(--bright-2); border-radius: 2px;
             animation: wave 0.5s ease-in-out infinite alternate;
@@ -131,7 +134,6 @@
         .sound-wave span:nth-child(5){animation-delay:0.4s;height:10px}
         @keyframes wave { to { transform: scaleY(0.5); } }
         
-        /* 🔘 Buttons */
         .btn {
             padding: 12px 24px; border: none; border-radius: 50px;
             font-weight: 600; cursor: pointer; transition: all 0.3s ease;
@@ -143,17 +145,17 @@
         .btn::before {
             content: ''; position: absolute; top: 0; left: -100%;
             width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s;
-        }        .btn:hover::before { left: 100%; }
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);            transition: left 0.5s;
+        }
+        .btn:hover::before { left: 100%; }
         .btn:hover { transform: translateY(-2px); box-shadow: var(--sparkle), 0 8px 25px rgba(0,0,0,0.3); }
         .btn:active { transform: translateY(1px); }
         .btn-outline { background: transparent; border: 2px solid var(--bright-3); }
         .btn-sm { padding: 8px 16px; font-size: 0.9rem; }
         .btn-danger { background: var(--grad-danger); }
         .btn-success { background: var(--grad-success); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
         
-        /* 📦 Cards */
         .card {
             background: var(--card-bg); border: 1px solid var(--card-border);
             border-radius: var(--radius); padding: 20px; margin: 15px 0;
@@ -162,7 +164,6 @@
         }
         .card:hover { transform: translateY(-5px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
         
-        /* 🧭 Navigation */
         .nav-bar {
             position: sticky; top: 0; z-index: 1000;
             background: rgba(15,12,41,0.95); backdrop-filter: blur(10px);
@@ -177,10 +178,7 @@
         }
         .nav-link:hover, .nav-link.active { background: var(--grad-primary); }
         
-        /* 🔍 Search & Filters */
-        .search-container {
-            display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap;
-        }
+        .search-container { display: flex; gap: 10px; margin: 20px 0; flex-wrap: wrap; }
         .search-input {
             flex: 1; min-width: 200px; padding: 12px 20px; border-radius: 50px;
             border: 2px solid var(--card-border); background: rgba(255,255,255,0.1);
@@ -189,21 +187,19 @@
         .search-input:focus { outline: none; border-color: var(--bright-3); }
         .search-input::placeholder { color: var(--text-secondary); }
         
-        /* 🛍️ Product Grid */
         .product-grid {
             display: grid; gap: 20px;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             padding: 20px;
-        }        @media (max-width: 768px) {
-            .product-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
-            .nav-links { display: none; }
-            .nav-mobile-toggle { display: block; }
         }
+        @media (max-width: 768px) {
+            .product-grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+            .nav-links { display: none; }        }
         
         .product-card {
             background: var(--card-bg); border-radius: var(--radius);
             overflow: hidden; transition: all 0.3s ease;
-            border: 1px solid var(--card-border);
+            border: 1px solid var(--card-border); cursor: pointer;
         }
         .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
         .product-img {
@@ -224,7 +220,6 @@
         .status-private { background: var(--grad-warning); }
         .status-outofstock { background: var(--grad-danger); }
         
-        /* 📋 Tables */
         .data-table {
             width: 100%; border-collapse: collapse; margin: 15px 0;
             background: var(--card-bg); border-radius: var(--radius);
@@ -241,27 +236,20 @@
             .data-table th, .data-table td { padding: 8px 10px; }
         }
         
-        /* 💬 Chat Interface */
         .chat-container {
-            display: flex; flex-direction: column; height: calc(100vh - 150px);            max-width: 800px; margin: 20px auto;
+            display: flex; flex-direction: column; height: calc(100vh - 150px);
+            max-width: 800px; margin: 20px auto;
         }
         .chat-messages {
             flex: 1; overflow-y: auto; padding: 15px;
             display: flex; flex-direction: column; gap: 12px;
-        }
-        .message {
+        }        .message {
             max-width: 75%; padding: 12px 18px; border-radius: 20px;
             position: relative; animation: fadeIn 0.3s ease;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .message.sent {
-            background: var(--grad-primary); align-self: flex-end;
-            border-bottom-right-radius: 5px;
-        }
-        .message.received {
-            background: var(--card-bg); align-self: flex-start;
-            border-bottom-left-radius: 5px; border: 1px solid var(--card-border);
-        }
+        .message.sent { background: var(--grad-primary); align-self: flex-end; border-bottom-right-radius: 5px; }
+        .message.received { background: var(--card-bg); align-self: flex-start; border-bottom-left-radius: 5px; border: 1px solid var(--card-border); }
         .message-time { font-size: 0.75rem; opacity: 0.8; margin-top: 5px; }
         .chat-input {
             display: flex; gap: 10px; padding: 15px;
@@ -274,7 +262,6 @@
         }
         .chat-input input:focus { outline: none; }
         
-        /* 🔐 Auth Forms */
         .auth-container {
             max-width: 450px; margin: 50px auto; padding: 30px;
             background: var(--card-bg); border-radius: var(--radius);
@@ -292,18 +279,6 @@
         }
         .google-btn:hover { background: #f8f9fa; }
         
-        /* 🔔 Notifications */        .notification {
-            position: fixed; top: 20px; right: 20px; z-index: 9999;
-            padding: 15px 25px; border-radius: 12px; color: white;
-            font-weight: 500; box-shadow: var(--shadow);
-            max-width: 350px; animation: slideIn 0.3s ease;
-        }
-        .notification.info { background: var(--grad-secondary); }
-        .notification.success { background: var(--grad-success); }
-        .notification.error { background: var(--grad-danger); }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        
-        /* 🔄 Loading & States */
         .hidden { display: none !important; }
         .loading { text-align: center; padding: 40px; }
         .spinner {
@@ -313,35 +288,21 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* 🎨 Utility Classes */
         .text-center { text-align: center; }
         .text-gradient { background: var(--grad-secondary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 700; }
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .gap-2 { gap: 10px; }
-        .gap-4 { gap: 20px; }
-        .mt-4 { margin-top: 20px; }
-        .mb-4 { margin-bottom: 20px; }
-        .p-4 { padding: 20px; }
-        .w-full { width: 100%; }
+        .flex { display: flex; } .flex-col { flex-direction: column; }
+        .items-center { align-items: center; } .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 10px; } .gap-4 { gap: 20px; }        .mt-4 { margin-top: 20px; } .mb-4 { margin-bottom: 20px; }
+        .p-4 { padding: 20px; } .w-full { width: 100%; }
         
-        /* 🎵 Audio Elements (Base64 placeholder sounds) */
-        #clickSound, #notificationSound { display: none; }
+        /* Animations */
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
-    <!-- 🔊 Sound Effects -->
-    <audio id="clickSound" preload="auto">
-        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
-    </audio>
-    <audio id="notificationSound" preload="auto">
-        <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
-    </audio>
-    
     <!-- 🔔 Notification Container -->
-    <div id="notificationArea"></div>    
+    <div id="notificationArea"></div>
+    
     <!-- 🔐 AUTH SECTION -->
     <section id="authSection" class="auth-container glitter-effect animate__animated animate__fadeIn">
         <h2 class="text-gradient mb-4">✨ MFD Store Vendors</h2>
@@ -349,7 +310,7 @@
         
         <div id="loginForm" class="auth-form">
             <input type="email" id="loginEmail" placeholder="📧 Emel" required>
-            <input type="password" id="loginPassword" placeholder="🔑 Kata Laluan" required>
+            <input type="password" id="loginPassword" placeholder="🔑 Kata Laluan" required minlength="6">
             <button class="btn w-full mt-4" onclick="handleLogin()">🔓 Log Masuk</button>
             <button class="btn btn-outline w-full mt-2" onclick="toggleAuth('register')">📝 Daftar Akaun Baru</button>
         </div>
@@ -373,52 +334,41 @@
         </p>
     </section>
     
-    <!-- 🎛️ MAIN DASHBOARD (Hidden until authenticated) -->
+    <!-- 🎛️ MAIN DASHBOARD -->
     <section id="dashboardSection" class="hidden">
-        <!-- Navigation -->
         <nav class="nav-bar">
             <div class="nav-brand">🛍️ MFD Vendors</div>
             <div class="nav-links">
                 <div class="nav-link active" onclick="showPanel('showcase')">🏪 Showcase</div>
-                <div class="nav-link" onclick="showPanel('sellerInfo')">👤 Profil Saya</div>
-                <div class="nav-link" onclick="showPanel('products')">📦 Produk</div>
-                <div class="nav-link" onclick="showPanel('orders')">📋 Pesanan</div>
+                <div class="nav-link" onclick="showPanel('sellerInfo')">👤 Profil</div>
+                <div class="nav-link" onclick="showPanel('products')">📦 Produk</div>                <div class="nav-link" onclick="showPanel('orders')">📋 Pesanan</div>
                 <div class="nav-link" onclick="showPanel('business')">📊 Bisnes</div>
                 <div class="nav-link" id="adminLink" onclick="showPanel('admin')" style="display:none;">⚙️ Admin</div>
-                <div class="nav-link" onclick="showPanel('chat')">💬 Live Agent</div>
+                <div class="nav-link" onclick="showPanel('chat')">💬 Chat</div>
                 <button class="btn btn-sm btn-outline" onclick="handleLogout()">🚪 Keluar</button>
             </div>
         </nav>
         
-        <!-- 🏪 SHOWCASE PANEL -->        <div id="showcasePanel" class="panel active">
+        <!-- 🏪 SHOWCASE PANEL -->
+        <div id="showcasePanel" class="panel active">
             <div class="p-4">
                 <h3 class="text-gradient mb-4">✨ Katalog Produk MFD Store</h3>
-                
-                <!-- Search & Filters -->
                 <div class="search-container">
                     <input type="text" class="search-input" id="productSearch" placeholder="🔍 Cari produk..." onkeyup="filterProducts()">
                     <select class="search-input" id="categoryFilter" onchange="filterProducts()">
-                        <option value="">📂 Semua Kategori</option>
-                        <option value="event">🎉 Event-Based</option>
-                        <option value="popular">🔥 Paling Laris</option>
+                        <option value="">📂 Semua</option>
+                        <option value="event">🎉 Event</option>
+                        <option value="popular">🔥 Laris</option>
                         <option value="recommended">⭐ Disyorkan</option>
                     </select>
                     <button class="btn" onclick="refreshProducts()">🔄 Refresh</button>
                 </div>
-                
-                <!-- Recommendations Section -->
                 <div class="card mb-4">
-                    <h4>🌟 Disyorkan Untuk Anda</h4>
+                    <h4>🌟 Disyorkan</h4>
                     <div id="recommendations" class="product-grid"></div>
                 </div>
-                
-                <!-- Product Grid -->
                 <div id="productCatalog" class="product-grid">
-                    <!-- Products will be loaded here dynamically -->
-                    <div class="loading">
-                        <div class="spinner"></div>
-                        <p>Memuatkan produk...</p>
-                    </div>
+                    <div class="loading"><div class="spinner"></div><p>Memuatkan...</p></div>
                 </div>
             </div>
         </div>
@@ -428,132 +378,84 @@
             <div class="p-4">
                 <h3 class="text-gradient mb-4">👤 Maklumat Penjual</h3>
                 <div class="card">
-                    <form id="sellerInfoForm">
-                        <div class="flex gap-4 flex-col">
-                            <div>
-                                <label>Nama Penjual *</label>
-                                <input type="text" id="sellerName" class="search-input" placeholder="Auto-jana jika kosong">
-                                <small style="opacity:0.7">ID Format: VENFD-XXXXXX</small>
-                            </div>
-                            <div>
-                                <label>Nama Bisnes</label>
-                                <input type="text" id="businessName" class="search-input">
-                            </div>
-                            <div>                                <label>Deskripsi Bisnes</label>
-                                <textarea id="businessDesc" class="search-input" rows="3" style="resize:vertical"></textarea>
-                            </div>
-                            <div class="flex gap-2">
-                                <div style="flex:1">
-                                    <label>📱 Telefon</label>
-                                    <input type="tel" id="phoneNumber" class="search-input">
-                                </div>
-                                <div style="flex:1">
-                                    <label>📧 Emel (disyorkan)</label>
-                                    <input type="email" id="emailAddress" class="search-input">
-                                </div>
-                            </div>
-                            <div>
-                                <label>🔑 Tukar Kata Laluan</label>
-                                <input type="password" id="newPassword" class="search-input" placeholder="Kata laluan baru">
-                            </div>
-                            <div>
-                                <label>🏠 Alamat Kedai</label>
-                                <textarea id="shopAddress" class="search-input" rows="2" placeholder="No. Rumah, Jalan, Poskod, Negeri"></textarea>
-                                <div class="flex gap-2 mt-2">
-                                    <label><input type="checkbox" id="frequentAddress"> Alamat kerap</label>
-                                    <select id="addressLabel" class="search-input" style="width:auto">
-                                        <option value="Home">🏠 Rumah</option>
-                                        <option value="Work">💼 Pejabat</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <label>💳 Maklumat Pembayaran</label>
-                                <textarea id="paymentInfo" class="search-input" rows="3" placeholder="Nama pemegang akaun, Nama bank/TnG/DuitNow QR, Nombor akaun atau pautan QR"></textarea>
-                            </div>
-                            <div>
-                                <label>Status Akaun: <span id="accountStatus" class="status-public">ACTIVE</span></label>
-                            </div>
+                    <form id="sellerInfoForm" class="flex gap-4 flex-col">
+                        <div>
+                            <label>Nama Penjual *</label>
+                            <input type="text" id="sellerName" class="search-input" placeholder="Auto-jana jika kosong">
+                            <small style="opacity:0.7">ID: VENFD-XXXXXX</small>
                         </div>
+                        <div><label>Nama Bisnes</label><input type="text" id="businessName" class="search-input"></div>
+                        <div><label>Deskripsi Bisnes</label><textarea id="businessDesc" class="search-input" rows="3"></textarea></div>
+                        <div class="flex gap-2">
+                            <div style="flex:1"><label>📱 Telefon</label><input type="tel" id="phoneNumber" class="search-input"></div>
+                            <div style="flex:1"><label>📧 Emel</label><input type="email" id="emailAddress" class="search-input"></div>
+                        </div>
+                        <div><label>🔑 Tukar Kata Laluan</label><input type="password" id="newPassword" class="search-input" placeholder="Kata laluan baru (min 6)"></div>                        <div><label>🏠 Alamat Kedai</label><textarea id="shopAddress" class="search-input" rows="2" placeholder="No. Rumah, Jalan, Poskod"></textarea></div>
+                        <div><label>💳 Maklumat Pembayaran</label><textarea id="paymentInfo" class="search-input" rows="3" placeholder="Nama akaun, Bank/TnG/DuitNow QR"></textarea></div>
+                        <div><label>Status: <span id="accountStatus" class="status-public">ACTIVE</span></label></div>
                         <div class="flex gap-2 mt-4">
-                            <button type="button" class="btn btn-success" onclick="saveSellerInfo()">💾 Simpan Perubahan</button>
-                            <button type="button" class="btn btn-danger" onclick="confirmDeleteAccount()">🗑️ Padam Akaun Kekal</button>
+                            <button type="button" class="btn btn-success" onclick="saveSellerInfo()">💾 Simpan</button>
+                            <button type="button" class="btn btn-danger" onclick="confirmDeleteAccount()">🗑️ Padam Akaun</button>
                         </div>
                     </form>
                 </div>
-                
-                <!-- UAC Display -->
                 <div class="card mt-4">
-                    <h4>🔐 Unique Account Code (UAC)</h4>
+                    <h4>🔐 UAC</h4>
                     <p id="displayUAC" class="text-gradient" style="font-size:1.3rem; letter-spacing:2px">UAC-XXXX-XXXX</p>
-                    <small style="opacity:0.8">Gunakan kod ini untuk pengesahan data dan pautan dengan akaun pelanggan</small>
                 </div>
-            </div>        </div>
+            </div>
+        </div>
         
-        <!-- 📦 PRODUCTS MANAGEMENT PANEL -->
+        <!-- 📦 PRODUCTS PANEL -->
         <div id="productsPanel" class="panel hidden">
             <div class="p-4">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-gradient">📦 Pengurusan Produk</h3>
-                    <button class="btn" onclick="openAddProductModal()">➕ Tambah Produk Baru</button>
+                    <h3 class="text-gradient">📦 Produk</h3>
+                    <button class="btn" onclick="openAddProductModal()">➕ Tambah</button>
                 </div>
                 
-                <!-- Add/Edit Product Modal (Hidden by default) -->
                 <div id="productModal" class="card hidden">
-                    <h4 id="modalTitle">✨ Tambah Produk Baharu</h4>
+                    <h4 id="modalTitle">✨ Tambah Produk</h4>
                     <form id="productForm" class="flex gap-4 flex-col mt-4">
                         <input type="hidden" id="editProductId">
                         <div>
-                            <label>🖼️ Gambar Produk</label>
+                            <label>🖼️ Gambar</label>
                             <input type="file" id="productImage" class="search-input" accept="image/*" onchange="previewImage()">
-                            <div id="imagePreview" style="width:100%; height:150px; background:var(--card-bg); border-radius:12px; margin-top:10px; display:flex; align-items:center; justify-content:center; overflow:hidden"></div>
+                            <div id="imagePreview" style="width:100%;height:150px;background:var(--card-bg);border-radius:12px;margin-top:10px;display:flex;align-items:center;justify-content:center"></div>
                         </div>
                         <input type="text" id="itemName" class="search-input" placeholder="📛 Nama Item *" required>
                         <div class="flex gap-2">
-                            <input type="number" id="itemPrice" class="search-input" placeholder="💰 Harga Asal (opsyen)" step="0.01">
+                            <input type="number" id="itemPrice" class="search-input" placeholder="💰 Harga Asal" step="0.01">
                             <input type="number" id="itemSalePrice" class="search-input" placeholder="💸 Harga Jualan *" step="0.01" required>
                         </div>
-                        <div>
-                            <label>🔄 Variasi Item</label>
-                            <div id="variationsContainer"></div>
-                            <button type="button" class="btn btn-sm btn-outline mt-2" onclick="addVariationField()">➕ Tambah Variasi</button>
-                        </div>
-                        <textarea id="itemDesc" class="search-input" rows="3" placeholder="📝 Deskripsi Item"></textarea>
+                        <div><label>🔄 Variasi</label><div id="variationsContainer"></div><button type="button" class="btn btn-sm btn-outline mt-2" onclick="addVariationField()">➕ Variasi</button></div>
+                        <textarea id="itemDesc" class="search-input" rows="3" placeholder="📝 Deskripsi"></textarea>
                         <div class="flex gap-2">
                             <input type="text" id="itemCountry" class="search-input" placeholder="🌍 Negara Asal">
-                            <input type="url" id="itemLink" class="search-input" placeholder="🔗 Pautan (opsyen)">
+                            <input type="url" id="itemLink" class="search-input" placeholder="🔗 Pautan">
                         </div>
                         <div class="flex gap-2">
                             <select id="itemStatus" class="search-input">
                                 <option value="Public">✅ Public</option>
                                 <option value="Private">🔒 Private</option>
                                 <option value="Out of Stock">❌ Out of Stock</option>
-                            </select>
-                            <input type="text" id="itemLabel" class="search-input" placeholder="🏷️ Label Item">
+                            </select>                            <input type="text" id="itemLabel" class="search-input" placeholder="🏷️ Label">
                         </div>
-                        <input type="text" id="eventItem" class="search-input" placeholder="🎉 Event Item (jika ada)">
-                        <input type="text" id="uniqueItemCode" class="search-input" placeholder="🔑 Kod Item Unik (auto-jana)" readonly>
-                        
+                        <input type="text" id="eventItem" class="search-input" placeholder="🎉 Event">
+                        <input type="text" id="uniqueItemCode" class="search-input" placeholder="🔑 Kod Unik" readonly>
                         <div class="flex gap-2 mt-4">
-                            <button type="submit" class="btn btn-success">💾 Simpan Produk</button>
+                            <button type="submit" class="btn btn-success">💾 Simpan</button>
                             <button type="button" class="btn btn-outline" onclick="closeProductModal()">❌ Batal</button>
-                        </div>                    </form>
+                        </div>
+                    </form>
                 </div>
                 
-                <!-- Products List Table -->
                 <div class="card">
-                    <h4>📋 Senarai Produk Dilancarkan</h4>
+                    <h4>📋 Senarai Produk</h4>
                     <div style="overflow-x:auto">
                         <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>BIL</th><th>GAMBAR</th><th>NAMA ITEM</th><th>HARGA</th>
-                                    <th>RATING</th><th>STATUS</th><th>SOLD</th><th>ACTION</th>
-                                </tr>
-                            </thead>
-                            <tbody id="productsTableBody">
-                                <tr><td colspan="8" class="text-center">Memuatkan data...</td></tr>
-                            </tbody>
+                            <thead><tr><th>BIL</th><th>GAMBAR</th><th>NAMA</th><th>HARGA</th><th>RATING</th><th>STATUS</th><th>SOLD</th><th>ACTION</th></tr></thead>
+                            <tbody id="productsTableBody"><tr><td colspan="8" class="text-center">Memuatkan...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -563,360 +465,190 @@
         <!-- 📋 ORDERS PANEL -->
         <div id="ordersPanel" class="panel hidden">
             <div class="p-4">
-                <h3 class="text-gradient mb-4">📋 Pengurusan Pesanan</h3>
-                
-                <!-- Customer Verification Table -->
-                <div class="card mb-4">
-                    <h4>✅ Pengesahan Pembelian Pelanggan</h4>
+                <h3 class="text-gradient mb-4">📋 Pesanan</h3>
+                <div class="card">
+                    <h4>📦 Senarai Pesanan</h4>
                     <div style="overflow-x:auto">
                         <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>UAC</th><th>Username</th><th>Item</th><th>Kod Item</th>
-                                    <th>Alamat</th><th>Qty</th><th>Total</th><th>Bayaran</th>
-                                    <th>Status</th><th>Tracking</th><th>ID Pesanan</th><th>Status Order</th><th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="verificationTableBody">
-                                <tr><td colspan="13" class="text-center">Tiada data pengesahan</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Order Management Table -->
-                <div class="card">
-                    <h4>📦 Senarai Pesanan Pelanggan</h4>                    <div style="overflow-x:auto">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>UAC</th><th>Pelanggan</th><th>Item</th><th>Kuantiti</th>
-                                    <th>Jumlah</th><th>Bayaran</th><th>Status Bayaran</th>
-                                    <th>Delivery</th><th>Tracking</th><th>ID</th><th>Pesan</th><th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ordersTableBody">
-                                <tr><td colspan="12" class="text-center">Memuatkan pesanan...</td></tr>
-                            </tbody>
+                            <thead><tr><th>Pelanggan</th><th>Item</th><th>Qty</th><th>Total</th><th>Bayaran</th><th>Status</th><th>Tracking</th><th>Aksi</th></tr></thead>
+                            <tbody id="ordersTableBody"><tr><td colspan="8" class="text-center">Memuatkan...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- 📊 BUSINESS MANAGEMENT PANEL -->
+        <!-- 📊 BUSINESS PANEL -->
         <div id="businessPanel" class="panel hidden">
             <div class="p-4">
-                <h3 class="text-gradient mb-4">📊 Vendor Business Management</h3>
-                
+                <h3 class="text-gradient mb-4">📊 Statistik</h3>
                 <div class="card mb-4">
-                    <h4>📈 Statistik Bisnes</h4>
                     <div class="flex gap-4 flex-wrap">
-                        <div class="card" style="flex:1; min-width:200px; text-align:center">
-                            <div style="font-size:2rem; font-weight:700" id="totalOrdersToday">0</div>
-                            <div>📦 Pesanan Hari Ini</div>
+                        <div class="card" style="flex:1;min-width:150px;text-align:center">
+                            <div style="font-size:2rem;font-weight:700" id="totalOrdersToday">0</div><div>📦 Pesanan</div>
                         </div>
-                        <div class="card" style="flex:1; min-width:200px; text-align:center">
-                            <div style="font-size:2rem; font-weight:700; color:var(--bright-4)" id="totalSales">RM 0.00</div>
-                            <div>💰 Jumlah Jualan</div>
+                        <div class="card" style="flex:1;min-width:150px;text-align:center">
+                            <div style="font-size:2rem;font-weight:700;color:var(--bright-4)" id="totalSales">RM 0</div><div>💰 Jualan</div>                        </div>
+                        <div class="card" style="flex:1;min-width:150px;text-align:center">
+                            <div style="font-size:2rem;font-weight:700;color:var(--bright-2)" id="totalCommission">RM 0</div><div>🎯 Komisen</div>
                         </div>
-                        <div class="card" style="flex:1; min-width:200px; text-align:center">
-                            <div style="font-size:2rem; font-weight:700; color:var(--bright-2)" id="totalCommission">RM 0.00</div>
-                            <div>🎯 Komisen MFD</div>
-                        </div>
-                        <div class="card" style="flex:1; min-width:200px; text-align:center">
-                            <div style="font-size:2rem; font-weight:700" id="activeProducts">0</div>
-                            <div>✅ Produk Aktif</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card">
-                    <h4>💼 Maklumat Vendor</h4>
-                    <div style="overflow-x:auto">
-                        <table class="data-table">
-                            <thead>                                <tr>
-                                    <th>UAC</th><th>Nama</th><th>Bisnes</th><th>Telefon</th>
-                                    <th>Alamat</th><th>Status</th><th>Jualan</th>
-                                    <th>Komisen</th><th>Status Pendapatan</th><th>Mesej</th>
-                                </tr>
-                            </thead>
-                            <tbody id="vendorTableBody">
-                                <tr><td colspan="10" class="text-center">Memuatkan data vendor...</td></tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- ⚙️ ADMIN DASHBOARD (Only for admin users) -->
+        <!-- ⚙️ ADMIN PANEL -->
         <div id="adminPanel" class="panel hidden">
             <div class="p-4">
-                <h3 class="text-gradient mb-4">⚙️ Dashboard Admin MFD Store</h3>
-                
-                <!-- Commission Settings -->
+                <h3 class="text-gradient mb-4">⚙️ Admin Dashboard</h3>
                 <div class="card mb-4">
-                    <h4>⚙️ Tetapan Komisen</h4>
+                    <h4>⚙️ Komisen</h4>
                     <div class="flex gap-2 items-center">
-                        <label>Kadar Komisen per Jualan:</label>
-                        <input type="number" id="commissionRate" class="search-input" style="width:120px" min="0.01" max="5" step="0.01" value="1.00">
+                        <label>Kadar:</label>
+                        <input type="number" id="commissionRate" class="search-input" style="width:100px" min="0.01" max="5" step="0.01" value="1.00">
                         <span>RM</span>
                         <button class="btn btn-sm" onclick="updateCommission()">💾 Simpan</button>
                     </div>
-                    <small style="opacity:0.8">Julat: RM 0.01 - RM 5.00 setiap transaksi</small>
                 </div>
-                
-                <!-- Vendor Accounts Management -->
-                <div class="card mb-4">
-                    <h4>👥 Pengurusan Akaun Vendor</h4>
-                    <div style="overflow-x:auto">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>UAC</th><th>Nama</th><th>Bisnes</th><th>Emel</th>
-                                    <th>Status</th><th>Pesanan</th><th>Jualan</th>
-                                    <th>Komisen</th><th>Produk</th><th>Log</th><th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="adminVendorTableBody">
-                                <tr><td colspan="11" class="text-center">Memuatkan data...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>                
-                <!-- Salary Management -->
                 <div class="card">
-                    <h4>💰 Pengurusan Gaji Penjual</h4>
+                    <h4>👥 Vendor</h4>
                     <div style="overflow-x:auto">
                         <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>UAC</th><th>Nama</th><th>Bisnes</th><th>Jualan</th>
-                                    <th>Komisen</th><th>Maklumat Bayaran</th><th>Status Gaji</th>
-                                    <th>Sejarah</th><th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="salaryTableBody">
-                                <tr><td colspan="9" class="text-center">Tiada data gaji</td></tr>
-                            </tbody>
+                            <thead><tr><th>UAC</th><th>Nama</th><th>Bisnes</th><th>Status</th><th>Jualan</th><th>Aksi</th></tr></thead>
+                            <tbody id="adminVendorTableBody"><tr><td colspan="6" class="text-center">Memuatkan...</td></tr></tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- 💬 LIVE AGENT CHAT PANEL -->
+        <!-- 💬 CHAT PANEL -->
         <div id="chatPanel" class="panel hidden">
             <div class="p-4">
-                <h3 class="text-gradient mb-4">💬 Live Agent Customer Support</h3>
-                
+                <h3 class="text-gradient mb-4">💬 Live Chat</h3>
                 <div class="chat-container">
-                    <!-- Chat Header -->
                     <div class="card flex justify-between items-center">
-                        <div>
-                            <strong id="chatCustomerName">Pilih Pelanggan</strong>
-                            <div class="sound-wave" id="chatStatus">
-                                <span></span><span></span><span></span><span></span><span></span>
-                            </div>
-                        </div>
+                        <div><strong id="chatCustomerName">Pilih Pelanggan</strong><div class="sound-wave"><span></span><span></span><span></span><span></span><span></span></div></div>
                         <div class="flex gap-2">
-                            <button class="btn btn-sm btn-outline" onclick="copyChatId()">📋 Copy ID</button>
-                            <button class="btn btn-sm btn-danger" onclick="deleteChat()">🗑️ Padam</button>
+                            <button class="btn btn-sm btn-outline" onclick="copyChatId()">📋</button>
                         </div>
                     </div>
-                    
-                    <!-- Messages Area -->
                     <div class="card chat-messages" id="chatMessages">
-                        <div class="text-center" style="padding:40px; opacity:0.7">
-                            <p>💬 Pilih pelanggan untuk mula perbualan</p>
-                            <p style="font-size:0.9rem">ID Mesej: <span id="chatServiceId">-</span></p>
-                        </div>
+                        <div class="text-center" style="padding:40px;opacity:0.7"><p>💬 Pilih pelanggan</p></div>
                     </div>
-                                        <!-- Message Input -->
                     <div class="chat-input">
-                        <button class="btn btn-sm btn-outline" onclick="document.getElementById('chatFile').click()">📎</button>
-                        <input type="file" id="chatFile" hidden accept="image/*" onchange="sendChatImage()">
-                        <button class="btn btn-sm btn-outline" onclick="recordVoiceMessage()">🎤</button>
-                        <input type="text" id="chatInput" placeholder="Taip mesej..." onkeypress="if(event.key==='Enter')sendMessage()">
-                        <button class="btn btn-sm" onclick="sendMessage()">➤</button>
-                    </div>
-                    
-                    <!-- Chat Controls -->
-                    <div class="card flex gap-2 flex-wrap">
-                        <select id="agentStatus" class="search-input" style="width:auto" onchange="updateAgentStatus()">
-                            <option value="Online">🟢 Online</option>
-                            <option value="Busy">🟡 Busy</option>
-                            <option value="Away">🔴 Away</option>
-                        </select>
-                        <button class="btn btn-sm btn-outline" onclick="pinMessage()">📌 Pin</button>
-                        <button class="btn btn-sm btn-outline" onclick="blockContact()">🚫 Block</button>
-                        <button class="btn btn-sm btn-outline" onclick="sendOrderInfo()">📦 Hantar Maklumat Pesanan</button>
-                        <button class="btn btn-sm btn-outline" onclick="sendLocation()">📍 Hantar Lokasi</button>
+                        <input type="text" id="chatInput" placeholder="Taip mesej..." onkeypress="if(event.key==='Enter')sendMessage()">                        <button class="btn btn-sm" onclick="sendMessage()">➤</button>
                     </div>
                 </div>
             </div>
         </div>
     </section>
     
-    <!-- 🧠 MAIN JAVASCRIPT LOGIC -->
+    <!-- 🧠 MAIN JAVASCRIPT - CORRECTED FIREBASE USAGE -->
     <script type="module">
-        // Import Firebase functions (already initialized in head)
-        const { db, auth, googleProvider, serverTimestamp, Timestamp } = window.mfd;
+        // ✅ WAIT FOR FIREBASE TO BE READY
+        if(!window.firebaseReady) {
+            console.log('⏳ Waiting for Firebase...');
+            setTimeout(() => window.location.reload(), 2000);
+        }
+        
+        // ✅ DESTRUCTURE FROM window.mfd (SEMUA FUNCTIONS + INSTANCES)
         const { 
+            db, auth, googleProvider, serverTimestamp, Timestamp,
+            // Firestore Functions
             collection, doc, setDoc, getDoc, updateDoc, deleteDoc, 
             query, where, orderBy, onSnapshot, addDoc, getDocs,
-            limit, startAfter 
-        } = window.mfd.db;
-        const { 
+            limit, startAfter, runTransaction,
+            // ✅ Auth Functions - INI PENTING!
             signInWithEmailAndPassword, createUserWithEmailAndPassword, 
-            signInWithPopup, signOut, onAuthStateChanged, updatePassword 
-        } = window.mfd.auth;
+            signInWithPopup, signOut, onAuthStateChanged, 
+            updatePassword, sendPasswordResetEmail, GoogleAuthProvider
+        } = window.mfd;
         
-        // 🔊 Sound Effect System
+        // 🔊 Sound System
         function playSound(type) {
             try {
-                // Using Web Audio API for better control
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);                
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
                 if(type === 'click') {
-                    oscillator.frequency.value = 800;
-                    oscillator.type = 'sine';
-                    gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                    oscillator.start();
-                    oscillator.stop(audioCtx.currentTime + 0.1);
-                } else if(type === 'notification') {
-                    oscillator.frequency.value = 1200;
-                    oscillator.type = 'triangle';
-                    gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                    oscillator.start();
-                    oscillator.stop(audioCtx.currentTime + 0.3);
+                    osc.frequency.value = 800; osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                } else {
+                    osc.frequency.value = 1200; osc.type = 'triangle';
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                 }
-            } catch(e) {
-                console.log('Audio not supported:', e);
-            }
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            } catch(e) { console.log('Audio:', e); }
         }
-        
-        // Make playSound globally available
         window.playSound = playSound;
-        
-        // Add click sound to all interactive elements
         document.addEventListener('click', (e) => {
-            if(e.target.matches('button, .btn, .nav-link, .clickable, [onclick]')) {
-                playSound('click');
-            }
-        });
+            if(e.target.matches('button, .btn, .nav-link, [onclick]')) playSound('click');        });
         
-        // 🔄 Auto-update System with Firestore Real-time Listeners
-        let unsubscribeListeners = [];
-        
-        function setupRealtimeListeners(userId, userRole) {
-            // Clear previous listeners
-            unsubscribeListeners.forEach(unsub => unsub());
-            unsubscribeListeners = [];
-            
-            // Listen to products (auto-update catalog)
-            const productsQuery = query(collection(db, 'products'), where('sellerId', '==', userId));
-            const unsubProducts = onSnapshot(productsQuery, (snapshot) => {
-                renderProducts(snapshot.docs.map(doc => ({id: doc.id, ...doc.data()})));
-                window.mfd.notify('🔄 Katalog dikemaskini!', 'info');
-            });
-            unsubscribeListeners.push(unsubProducts);
-            
-            // Listen to orders (auto-update order tables)
-            const ordersQuery = query(collection(db, 'orders'), where('sellerId', '==', userId));
-            const unsubOrders = onSnapshot(ordersQuery, (snapshot) => {                renderOrders(snapshot.docs.map(doc => ({id: doc.id, ...doc.data()})));
-                const newOrders = snapshot.docChanges().filter(c => c.type === 'added');
-                if(newOrders.length > 0) {
-                    window.mfd.notify(`📦 ${newOrders.length} pesanan baru!`, 'success');
-                    playSound('notification');
-                }
-            });
-            unsubscribeListeners.push(unsubOrders);
-            
-            // Listen to chat messages if in chat panel
-            if(document.getElementById('chatPanel').classList.contains('active')) {
-                setupChatListener(userId);
-            }
-            
-            // Listen to admin data if admin
-            if(userRole === 'admin') {
-                setupAdminListeners();
-            }
-        }
-        
-        // 🔐 Authentication Functions
+        // 🔐 AUTH FUNCTIONS - CORRECTED!
         window.toggleAuth = (view) => {
             document.getElementById('loginForm').classList.toggle('hidden', view !== 'login');
             document.getElementById('registerForm').classList.toggle('hidden', view !== 'register');
         };
         
         window.handleRegister = async () => {
-            const email = document.getElementById('regEmail').value;
+            const email = document.getElementById('regEmail').value.trim();
             const password = document.getElementById('regPassword').value;
-            const sellerName = document.getElementById('regSellerName').value || `VENFD-${Math.random().toString(36).substr(2,6).toUpperCase()}`;
-            const phone = document.getElementById('regPhone').value;
+            const sellerName = document.getElementById('regSellerName').value.trim() || `VENFD-${Math.random().toString(36).substr(2,6).toUpperCase()}`;
+            const phone = document.getElementById('regPhone').value.trim();
+            
+            if(password.length < 6) return window.mfd.notify('❌ Kata laluan min 6 aksara', 'error');
             
             try {
+                // ✅ CORRECT: Use imported function, NOT auth.signInWithEmailAndPassword
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 
-                // Generate unique identifiers
                 const uac = `UAC-${Date.now().toString(36)}-${Math.random().toString(36).substr(2,4).toUpperCase()}`;
                 const sellerId = sellerName.startsWith('VENFD-') ? sellerName : `VENFD-${Math.random().toString(36).substr(2,6).toUpperCase()}`;
                 
-                // Save user data to Firestore
                 await setDoc(doc(db, 'users', user.uid), {
-                    uid: user.uid,
-                    email,
-                    sellerName,
-                    sellerId,
-                    uac,
-                    phoneNumber: phone,
-                    businessName: '',
-                    businessDesc: '',                    shopAddress: '',
-                    paymentInfo: '',
-                    accountStatus: 'ACTIVE',
-                    role: 'vendor',
-                    commissionRate: 1.00,
-                    createdAt: serverTimestamp(),
-                    lastLogin: serverTimestamp(),
-                    logCache: []
+                    uid: user.uid, email, sellerName, sellerId, uac,
+                    phoneNumber: phone, businessName: '', businessDesc: '',
+                    shopAddress: '', paymentInfo: '', accountStatus: 'ACTIVE',
+                    role: 'vendor', commissionRate: 1.00,
+                    createdAt: serverTimestamp(), lastLogin: serverTimestamp(), logCache: []
                 });
                 
-                window.mfd.notify('✅ Akaun berjaya didaftarkan!', 'success');
-                // Auth state observer will handle redirect
+                window.mfd.notify('✅ Akaun berjaya!', 'success');
             } catch(error) {
-                console.error('Registration error:', error);
-                window.mfd.notify(`❌ Ralat: ${error.message}`, 'error');
+                console.error('Register error:', error);
+                let msg = error.message;
+                if(error.code === 'auth/email-already-in-use') msg = 'Emel sudah digunakan';
+                if(error.code === 'auth/weak-password') msg = 'Kata laluan terlalu lemah';
+                window.mfd.notify(`❌ ${msg}`, 'error');
             }
         };
         
         window.handleLogin = async () => {
-            const email = document.getElementById('loginEmail').value;
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value;
             
             try {
+                // ✅ CORRECT: Use imported function
                 await signInWithEmailAndPassword(auth, email, password);
-                window.mfd.notify('✅ Log masuk berjaya!', 'success');
-            } catch(error) {
+                window.mfd.notify('✅ Log masuk!', 'success');            } catch(error) {
                 console.error('Login error:', error);
-                window.mfd.notify(`❌ Ralat: ${error.message}`, 'error');
+                let msg = error.message;
+                if(error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') msg = 'Emel/kata laluan salah';
+                window.mfd.notify(`❌ ${msg}`, 'error');
             }
         };
         
         window.handleGoogleLogin = async () => {
             try {
+                // ✅ CORRECT: Use imported signInWithPopup function
                 const result = await signInWithPopup(auth, googleProvider);
                 const user = result.user;
                 
-                // Check if user exists in Firestore, if not create new record
                 const userRef = doc(db, 'users', user.uid);
                 const userSnap = await getDoc(userRef);
                 
@@ -925,60 +657,47 @@
                     const sellerId = `VENFD-${Math.random().toString(36).substr(2,6).toUpperCase()}`;
                     
                     await setDoc(userRef, {
-                        uid: user.uid,
-                        email: user.email,
-                        sellerName: user.displayName || sellerId,
-                        sellerId,
-                        uac,                        phoneNumber: user.phoneNumber || '',
-                        businessName: '',
-                        businessDesc: '',
-                        accountStatus: 'ACTIVE',
-                        role: 'vendor',
-                        createdAt: serverTimestamp(),
-                        lastLogin: serverTimestamp()
+                        uid: user.uid, email: user.email,
+                        sellerName: user.displayName || sellerId, sellerId, uac,
+                        phoneNumber: user.phoneNumber || '', businessName: '', businessDesc: '',
+                        accountStatus: 'ACTIVE', role: 'vendor',
+                        createdAt: serverTimestamp(), lastLogin: serverTimestamp()
                     });
                 } else {
-                    // Update last login
                     await updateDoc(userRef, { lastLogin: serverTimestamp() });
                 }
-                
-                window.mfd.notify('✅ Log masuk dengan Google berjaya!', 'success');
+                window.mfd.notify('✅ Google login berjaya!', 'success');
             } catch(error) {
                 console.error('Google login error:', error);
-                window.mfd.notify(`❌ Ralat: ${error.message}`, 'error');
+                let msg = error.message;
+                if(error.code === 'auth/popup-closed-by-user') msg = 'Login dibatalkan';
+                if(error.code === 'auth/cancelled-popup-request') msg = 'Permintaan dibatalkan';
+                window.mfd.notify(`❌ ${msg}`, 'error');
             }
         };
         
         window.handleLogout = async () => {
             try {
-                await signOut(auth);
-                unsubscribeListeners.forEach(unsub => unsub());
-                unsubscribeListeners = [];
+                await signOut(auth); // ✅ CORRECT
                 window.mfd.notify('👋 Selamat tinggal!', 'info');
-            } catch(error) {
-                console.error('Logout error:', error);
-            }
+            } catch(error) { console.error('Logout:', error); }
         };
         
-        // 👤 Auth State Observer
-        onAuthStateChanged(auth, async (user) => {
-            const authSection = document.getElementById('authSection');
+        // 👤 AUTH STATE OBSERVER - CORRECTED!
+        onAuthStateChanged(auth, async (user) => { // ✅ CORRECT: onAuthStateChanged(auth, callback)            const authSection = document.getElementById('authSection');
             const dashboardSection = document.getElementById('dashboardSection');
             const adminLink = document.getElementById('adminLink');
             
             if(user) {
-                // User is signed in
                 authSection.classList.add('hidden');
                 dashboardSection.classList.remove('hidden');
                 
-                // Load user data
                 const userDoc = await getDoc(doc(db, 'users', user.uid));
                 if(userDoc.exists()) {
                     const userData = userDoc.data();
-                    
-                    // Populate seller info form
                     document.getElementById('sellerName').value = userData.sellerName || '';
-                    document.getElementById('businessName').value = userData.businessName || '';                    document.getElementById('businessDesc').value = userData.businessDesc || '';
+                    document.getElementById('businessName').value = userData.businessName || '';
+                    document.getElementById('businessDesc').value = userData.businessDesc || '';
                     document.getElementById('phoneNumber').value = userData.phoneNumber || '';
                     document.getElementById('emailAddress').value = userData.email || '';
                     document.getElementById('shopAddress').value = userData.shopAddress || '';
@@ -986,51 +705,59 @@
                     document.getElementById('accountStatus').textContent = userData.accountStatus || 'ACTIVE';
                     document.getElementById('displayUAC').textContent = userData.uac || 'N/A';
                     
-                    // Show admin panel if admin
-                    if(userData.role === 'admin') {
-                        adminLink.style.display = 'block';
-                    }
+                    if(userData.role === 'admin') adminLink.style.display = 'block';
                     
-                    // Setup real-time listeners
+                    // Setup listeners
                     setupRealtimeListeners(user.uid, userData.role);
-                    
-                    // Load initial data
                     loadProducts(userData.sellerId || user.uid);
                     loadOrders(userData.sellerId || user.uid);
-                    loadBusinessStats(userData.sellerId || user.uid);
                 }
             } else {
-                // User is signed out
                 authSection.classList.remove('hidden');
                 dashboardSection.classList.add('hidden');
                 adminLink.style.display = 'none';
             }
         });
         
-        // 🛍️ Product Management Functions
+        // 🔄 Realtime Listeners
+        let unsubscribeListeners = [];
+        function setupRealtimeListeners(userId, userRole) {
+            unsubscribeListeners.forEach(unsub => unsub());
+            unsubscribeListeners = [];
+            
+            const productsQuery = query(collection(db, 'products'), where('sellerId', '==', userId));
+            const unsubProducts = onSnapshot(productsQuery, (snapshot) => {
+                renderProducts(snapshot.docs.map(d => ({id: d.id, ...d.data()})));
+            });
+            unsubscribeListeners.push(unsubProducts);
+            
+            const ordersQuery = query(collection(db, 'orders'), where('sellerId', '==', userId));
+            const unsubOrders = onSnapshot(ordersQuery, (snapshot) => {
+                renderOrders(snapshot.docs.map(d => ({id: d.id, ...d.data()})));            });
+            unsubscribeListeners.push(unsubOrders);
+        }
+        
+        // 🛍️ Product Functions
         window.generateUniqueCode = () => `ITEM-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substr(2,4).toUpperCase()}`;
         
         window.openAddProductModal = () => {
-            document.getElementById('modalTitle').textContent = '✨ Tambah Produk Baharu';
+            document.getElementById('modalTitle').textContent = '✨ Tambah Produk';
             document.getElementById('productForm').reset();
             document.getElementById('editProductId').value = '';
             document.getElementById('uniqueItemCode').value = generateUniqueCode();
-            document.getElementById('imagePreview').innerHTML = '🖼️ Pratinjau gambar';
+            document.getElementById('imagePreview').innerHTML = '🖼️ Pilih gambar';
             document.getElementById('productModal').classList.remove('hidden');
             document.getElementById('variationsContainer').innerHTML = '';
         };
         
-        window.closeProductModal = () => {
-            document.getElementById('productModal').classList.add('hidden');
-        };
+        window.closeProductModal = () => document.getElementById('productModal').classList.add('hidden');
         
         window.previewImage = () => {
             const file = document.getElementById('productImage').files[0];
             const preview = document.getElementById('imagePreview');
-            if(file && file.type.startsWith('image/')) {                const reader = new FileReader();
-                reader.onload = (e) => {
-                    preview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;
-                };
+            if(file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => preview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover">`;
                 reader.readAsDataURL(file);
             }
         };
@@ -1039,29 +766,23 @@
             const container = document.getElementById('variationsContainer');
             const div = document.createElement('div');
             div.className = 'flex gap-2 mt-2';
-            div.innerHTML = `
-                <input type="text" class="search-input" placeholder="Nama variasi" style="flex:1">
-                <input type="number" class="search-input" placeholder="Harga" step="0.01" style="width:120px">
-                <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">✕</button>
-            `;
+            div.innerHTML = `<input type="text" class="search-input" placeholder="Nama variasi" style="flex:1"><input type="number" class="search-input" placeholder="Harga" step="0.01" style="width:120px"><button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">✕</button>`;
             container.appendChild(div);
         };
         
-        // 📦 Product CRUD with Firestore
-        window.saveProduct = async (e) => {
+        // 📦 Save Product
+        document.getElementById('productForm')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const user = auth.currentUser;
-            if(!user) return window.mfd.notify('❌ Sila log masuk dahulu', 'error');
+            if(!user) return window.mfd.notify('❌ Sila log masuk', 'error');
             
             const userData = await getDoc(doc(db, 'users', user.uid));
-            const sellerId = userData.data().sellerId || user.uid;
+            const sellerId = userData.data()?.sellerId || user.uid;
             
-            // Get form values
             const productData = {
                 sellerId,
                 itemName: document.getElementById('itemName').value,
-                price: parseFloat(document.getElementById('itemPrice').value) || null,
-                salePrice: parseFloat(document.getElementById('itemSalePrice').value),
+                price: parseFloat(document.getElementById('itemPrice').value) || null,                salePrice: parseFloat(document.getElementById('itemSalePrice').value),
                 description: document.getElementById('itemDesc').value,
                 country: document.getElementById('itemCountry').value,
                 link: document.getElementById('itemLink').value,
@@ -1069,312 +790,171 @@
                 label: document.getElementById('itemLabel').value,
                 event: document.getElementById('eventItem').value,
                 uniqueCode: document.getElementById('uniqueItemCode').value || generateUniqueCode(),
-                totalSold: 0,
-                rating: 0,
-                reviews: [],
-                revenue: 0,
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
+                totalSold: 0, rating: 0, reviews: [], revenue: 0,
+                createdAt: serverTimestamp(), updatedAt: serverTimestamp()
             };
-                        // Handle image (store as base64 for demo - in production use Firebase Storage)
+            
             const imageFile = document.getElementById('productImage').files[0];
             if(imageFile) {
                 const reader = new FileReader();
-                reader.onload = async (e) => {
-                    productData.image = e.target.result; // base64 string
+                reader.onload = async (ev) => {
+                    productData.image = ev.target.result;
                     await saveProductToFirestore(productData);
                 };
                 reader.readAsDataURL(imageFile);
             } else {
                 await saveProductToFirestore(productData);
             }
-        };
+        });
         
         async function saveProductToFirestore(productData) {
             try {
                 const editId = document.getElementById('editProductId').value;
                 if(editId) {
-                    // Update existing
-                    await updateDoc(doc(db, 'products', editId), {
-                        ...productData,
-                        updatedAt: serverTimestamp()
-                    });
+                    await updateDoc(doc(db, 'products', editId), {...productData, updatedAt: serverTimestamp()});
                     window.mfd.notify('✅ Produk dikemaskini!', 'success');
                 } else {
-                    // Create new
                     await addDoc(collection(db, 'products'), productData);
-                    window.mfd.notify('✅ Produk berjaya ditambah!', 'success');
+                    window.mfd.notify('✅ Produk ditambah!', 'success');
                 }
                 closeProductModal();
                 playSound('notification');
             } catch(error) {
-                console.error('Save product error:', error);
-                window.mfd.notify(`❌ Ralat: ${error.message}`, 'error');
+                console.error('Save error:', error);
+                window.mfd.notify(`❌ ${error.message}`, 'error');
             }
         }
         
-        // 📋 Order Management
-        window.updateOrderStatus = async (orderId, newStatus, note = '') => {
-            try {
-                await updateDoc(doc(db, 'orders', orderId), {
-                    status: newStatus,
-                    adminNote: note,
-                    updatedAt: serverTimestamp()
-                });
-                window.mfd.notify(`✅ Status dikemaskini: ${newStatus}`, 'success');
-            } catch(error) {
-                console.error('Update order error:', error);
-                window.mfd.notify(`❌ Ralat: ${error.message}`, 'error');
-            }        };
-        
-        // 💬 Live Chat Functions
-        window.sendMessage = async () => {
-            const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            if(!message) return;
-            
-            const user = auth.currentUser;
-            if(!user) return;
-            
-            try {
-                await addDoc(collection(db, 'chats'), {
-                    senderId: user.uid,
-                    senderName: 'Vendor',
-                    message,
-                    timestamp: serverTimestamp(),
-                    status: 'sent',
-                    type: 'text'
-                });
-                input.value = '';
-                playSound('click');
-            } catch(error) {
-                console.error('Send message error:', error);
-            }
-        };
-        
-        // 🎨 UI Rendering Functions
+        // 🎨 Render Functions
         function renderProducts(products) {
             const container = document.getElementById('productCatalog');
+            if(!container) return;
             if(products.length === 0) {
-                container.innerHTML = '<p class="text-center" style="grid-column:1/-1">Tiada produk dijumpai</p>';
-                return;
-            }
-            
-            container.innerHTML = products.map(product => `
-                <div class="product-card clickable" onclick="viewProductDetails('${product.id}')">
-                    <div class="product-img">
-                        ${product.image ? `<img src="${product.image}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'}
-                    </div>
+                container.innerHTML = '<p class="text-center" style="grid-column:1/-1">Tiada produk</p>';
+                return;            }
+            container.innerHTML = products.map(p => `
+                <div class="product-card" onclick="viewProduct('${p.id}')">
+                    <div class="product-img">${p.image ? `<img src="${p.image}" style="width:100%;height:100%;object-fit:cover">` : '🛍️'}</div>
                     <div class="product-info">
-                        <div class="product-title">${product.itemName || 'Tanpa Nama'}</div>
-                        <div class="product-price">RM ${product.salePrice?.toFixed(2) || '0.00'}</div>
-                        <div class="product-rating">⭐ ${product.rating?.toFixed(1) || '0.0'} (${product.totalSold || 0} terjual)</div>
-                        <span class="product-status status-${product.status?.toLowerCase().replace(' ','')}">${product.status || 'Public'}</span>
-                        ${product.label ? `<div style="margin-top:8px"><small>🏷️ ${product.label}</small></div>` : ''}
+                        <div class="product-title">${p.itemName || 'Tanpa Nama'}</div>
+                        <div class="product-price">RM ${p.salePrice?.toFixed(2) || '0.00'}</div>
+                        <div class="product-rating">⭐ ${p.rating?.toFixed(1) || '0.0'} (${p.totalSold||0})</div>
+                        <span class="product-status status-${p.status?.toLowerCase().replace(' ','')}">${p.status||'Public'}</span>
                     </div>
                 </div>
             `).join('');
-        }        
+        }
+        
         function renderOrders(orders) {
             const tbody = document.getElementById('ordersTableBody');
+            if(!tbody) return;
             if(orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="12" class="text-center">Tiada pesanan</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" class="text-center">Tiada pesanan</td></tr>';
                 return;
             }
-            
-            tbody.innerHTML = orders.map(order => `
+            tbody.innerHTML = orders.map(o => `
                 <tr>
-                    <td>${order.customerUAC?.slice(0,8)}...</td>
-                    <td>${order.customerName || 'Pelanggan'}</td>
-                    <td>${order.itemName?.slice(0,15)}...</td>
-                    <td>${order.quantity || 1}</td>
-                    <td>RM ${order.totalPrice?.toFixed(2) || '0.00'}</td>
-                    <td>${order.paymentMethod || '-'}</td>
-                    <td><span class="status-${order.paymentStatus?.toLowerCase()||'not-verified'}">${order.paymentStatus || 'Not Verified'}</span></td>
-                    <td>${order.deliveryStatus || 'Pending'}</td>
-                    <td>${order.trackingNumber || '-'}</td>
-                    <td><small>${order.orderId?.slice(0,8)}...</small></td>
-                    <td>
-                        <select class="search-input" style="width:auto;font-size:0.8rem" onchange="updateOrderStatus('${order.id}', this.value)">
-                            <option ${order.status==='To Pay'?'selected':''}>To Pay</option>
-                            <option ${order.status==='To Ship'?'selected':''}>To Ship</option>
-                            <option ${order.status==='To Receive'?'selected':''}>To Receive</option>
-                            <option ${order.status==='Completed'?'selected':''}>Completed</option>
-                            <option ${order.status==='Cancelled'?'selected':''}>Cancelled</option>
-                        </select>
-                    </td>
-                    <td><button class="btn btn-sm btn-outline" onclick="messageCustomer('${order.customerId}')">💬</button></td>
+                    <td>${o.customerName||'Pelanggan'}</td><td>${o.itemName?.slice(0,15)||'-'}</td>
+                    <td>${o.quantity||1}</td><td>RM ${o.totalPrice?.toFixed(2)||'0.00'}</td>
+                    <td>${o.paymentMethod||'-'}</td>
+                    <td><span class="product-status status-${o.status?.toLowerCase()||'public'}">${o.status||'To Pay'}</span></td>
+                    <td>${o.trackingNumber||'-'}</td>
+                    <td><button class="btn btn-sm btn-outline" onclick="messageCustomer('${o.customerId||''}')">💬</button></td>
                 </tr>
             `).join('');
         }
         
-        // 🌐 Responsive Layout Handler
-        function handleResponsiveLayout() {
-            const grid = document.querySelector('.product-grid');
-            if(window.innerWidth < 480) {
-                grid.style.gridTemplateColumns = '1fr';
-            } else if(window.innerWidth < 768) {
-                grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(220px, 1fr))';
-            } else {
-                grid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(280px, 1fr))';
-            }
-        }
-        window.addEventListener('resize', handleResponsiveLayout);
-        handleResponsiveLayout();
-        
-        // 🧭 Panel Navigation
-        window.showPanel = (panelName) => {            // Hide all panels
-            document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            
-            // Show selected panel
-            document.getElementById(`${panelName}Panel`).classList.remove('hidden');
-            event.target.classList.add('active');
-            
-            // Load data if needed
-            if(panelName === 'products') loadProducts();
-            if(panelName === 'orders') loadOrders();
-            if(panelName === 'business') loadBusinessStats();
-            
-            playSound('click');
-        };
-        
-        // 🔄 Data Loading Functions
+        // 🔄 Data Loaders
         async function loadProducts(sellerId) {
             if(!sellerId) return;
             try {
                 const q = query(collection(db, 'products'), where('sellerId', '==', sellerId));
                 const snapshot = await getDocs(q);
                 renderProducts(snapshot.docs.map(d => ({id: d.id, ...d.data()})));
-            } catch(e) {
-                console.error('Load products error:', e);
-            }
+            } catch(e) { console.error('Load products:', e); }
         }
         
         async function loadOrders(sellerId) {
             if(!sellerId) return;
             try {
-                const q = query(collection(db, 'orders'), where('sellerId', '==', sellerId), orderBy('createdAt', 'desc'));
+                const q = query(collection(db, 'orders'), where('sellerId', '==', sellerId), orderBy('createdAt', 'desc'), limit(20));
                 const snapshot = await getDocs(q);
                 renderOrders(snapshot.docs.map(d => ({id: d.id, ...d.data()})));
-            } catch(e) {
-                console.error('Load orders error:', e);
-            }
-        }
+            } catch(e) { console.error('Load orders:', e); }        }
         
-        async function loadBusinessStats(sellerId) {
-            if(!sellerId) return;
-            try {
-                // In production, use Firestore aggregations or cloud functions
-                document.getElementById('totalOrdersToday').textContent = Math.floor(Math.random() * 20);
-                document.getElementById('totalSales').textContent = `RM ${(Math.random() * 5000).toFixed(2)}`;
-                document.getElementById('totalCommission').textContent = `RM ${(Math.random() * 100).toFixed(2)}`;
-                document.getElementById('activeProducts').textContent = Math.floor(Math.random() * 50);
-            } catch(e) {
-                console.error('Load stats error:', e);
-            }        }
+        // 🧭 Navigation
+        window.showPanel = (name) => {
+            document.querySelectorAll('.panel').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById(`${name}Panel`).classList.remove('hidden');
+            event?.target?.classList?.add('active');
+            playSound('click');
+        };
         
-        // 🗑️ Account Deletion (Soft Delete - Set to INACTIVE)
+        // 🗑️ Delete Account
         window.confirmDeleteAccount = () => {
-            if(confirm('⚠️ Adakah anda pasti mahu memadam akaun secara kekal?\n\nAkaun akan ditukar status kepada INACTIVE dan tidak boleh dipulihkan.')) {
-                deactivateAccount();
-            }
+            if(confirm('⚠️ Padam akaun? Status akan jadi INACTIVE.')) deactivateAccount();
         };
         
         async function deactivateAccount() {
             const user = auth.currentUser;
             if(!user) return;
-            
             try {
-                await updateDoc(doc(db, 'users', user.uid), {
-                    accountStatus: 'INACTIVE',
-                    deletedAt: serverTimestamp()
-                });
+                await updateDoc(doc(db, 'users', user.uid), { accountStatus: 'INACTIVE', deletedAt: serverTimestamp() });
                 await signOut(auth);
-                window.mfd.notify('🗑️ Akaun telah dinyahaktifkan', 'info');
-            } catch(error) {
-                console.error('Deactivate error:', error);
-                window.mfd.notify(`❌ Ralat: ${error.message}`, 'error');
-            }
+                window.mfd.notify('🗑️ Akaun dinyahaktifkan', 'info');
+            } catch(e) { window.mfd.notify(`❌ ${e.message}`, 'error'); }
         }
         
-        // ✨ Initialize on DOM Load
+        // 💬 Chat
+        window.sendMessage = async () => {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if(!msg || !auth.currentUser) return;
+            try {
+                await addDoc(collection(db, 'chats'), {
+                    senderId: auth.currentUser.uid, senderName: 'Vendor',
+                    message: msg, timestamp: serverTimestamp(), status: 'sent', type: 'text'
+                });
+                input.value = '';
+                playSound('click');
+            } catch(e) { console.error('Chat error:', e); }
+        };
+        
+        // ✨ Init
         document.addEventListener('DOMContentLoaded', () => {
-            // Add event listeners
-            document.getElementById('productForm').addEventListener('submit', saveProduct);
-            
-            // Auto-generate unique code when modal opens
             document.getElementById('uniqueItemCode').value = generateUniqueCode();
-            
-            // Initial notification
-            setTimeout(() => {
-                if(!auth.currentUser) {
-                    window.mfd.notify('👋 Selamat datang! Sila daftar atau log masuk', 'info');
-                }
-            }, 1000);
+            setTimeout(() => { if(!auth?.currentUser) window.mfd.notify('👋 Selamat datang!', 'info'); }, 1000);
         });
         
-        // 🌟 Export functions for global access
+        // 🌟 Exports
         window.loadProducts = loadProducts;
-        window.loadOrders = loadOrders;
-        window.renderProducts = renderProducts;
+        window.loadOrders = loadOrders;        window.renderProducts = renderProducts;
         window.renderOrders = renderOrders;
         window.generateUniqueCode = generateUniqueCode;
         window.closeProductModal = closeProductModal;
-        window.playSound = playSound;    </script>
+        window.playSound = playSound;
+        window.firebaseReady = true;
+    </script>
     
-    <!-- 🚀 Performance & PWA Meta -->
+    <!-- ✨ Glitter Effect Script -->
     <script>
-        // Service Worker registration for offline support (optional)
-        if('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                // navigator.serviceWorker.register('/sw.js').catch(console.log);
-            });
-        }
-        
-        // Prevent zoom on mobile inputs
-        document.addEventListener('touchstart', function(event) {
-            if(event.touches.length > 1) event.preventDefault();
-        }, {passive: false});
-        
-        // Add glitter particles on click (visual feedback)
         document.addEventListener('click', (e) => {
-            if(e.target.closest('.btn, .product-card, .nav-link')) {
-                createGlitter(e.clientX, e.clientY);
-            }
+            if(e.target.closest('.btn, .product-card, .nav-link')) createGlitter(e.clientX, e.clientY);
         });
-        
         function createGlitter(x, y) {
             for(let i=0; i<8; i++) {
-                const sparkle = document.createElement('div');
-                sparkle.style.cssText = `
-                    position:fixed; left:${x}px; top:${y}px;
-                    width:8px; height:8px; border-radius:50%;
-                    background: ${['#ff6b6b','#4ecdc4','#f9ca24','#6c5ce7'][Math.floor(Math.random()*4)]};
-                    pointer-events:none; z-index:9999;
-                    animation: glitterFly 0.6s ease-out forwards;
-                `;
-                document.body.appendChild(sparkle);
-                
-                // Random direction
-                const angle = Math.random() * Math.PI * 2;
-                const distance = 30 + Math.random() * 40;
-                sparkle.style.setProperty('--tx', `${Math.cos(angle)*distance}px`);
-                sparkle.style.setProperty('--ty', `${Math.sin(angle)*distance}px`);
-                
-                setTimeout(() => sparkle.remove(), 600);
+                const s = document.createElement('div');
+                s.style.cssText = `position:fixed;left:${x}px;top:${y}px;width:8px;height:8px;border-radius:50%;background:${['#ff6b6b','#4ecdc4','#f9ca24','#6c5ce7'][Math.floor(Math.random()*4)]};pointer-events:none;z-index:9999;animation:glitterFly 0.6s ease-out forwards`;
+                document.body.appendChild(s);
+                const angle = Math.random() * Math.PI * 2, dist = 30 + Math.random() * 40;
+                s.style.setProperty('--tx', `${Math.cos(angle)*dist}px`);
+                s.style.setProperty('--ty', `${Math.sin(angle)*dist}px`);
+                setTimeout(() => s.remove(), 600);
             }
         }
-        
-        // Add glitter animation keyframes
         const style = document.createElement('style');
-        style.textContent = `
-            @keyframes glitterFly {
-                to {                    transform: translate(var(--tx, 0), var(--ty, -30px)) scale(0);
-                    opacity: 0;
-                }
-            }
-        `;
+        style.textContent = `@keyframes glitterFly { to { transform: translate(var(--tx,0), var(--ty,-30px)) scale(0); opacity: 0; }}`;
         document.head.appendChild(style);
     </script>
 </body>
