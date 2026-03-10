@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Upload produk anda ke MFD Store - Percuma & Mudah">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3180819938764995" crossorigin="anonymous"></script>
+    
+    <title>🚀 Upload Produk - MFD Store</title>
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text-dark: #2d3748;
+            --error-red: #e53e3e;
+            --success-green: #38a169;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #FF9A9E 75%, #FECFEF 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(102, 126, 234, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .glass-panel:hover { transform: translateY(-2px); box-shadow: 0 12px 40px 0 rgba(102, 126, 234, 0.35); }        .glitter-text {
+            background: linear-gradient(to right, #9D50BB, #FF69B4, #6E48AA, #9D50BB);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 300% auto;
+            animation: shine 4s linear infinite;
+            font-weight: 800;
+        }
+        @keyframes shine { to { background-position: 300% center; } }
+        .btn-glitter {
+            background: linear-gradient(45deg, #9D50BB, #6E48AA, #FF69B4, #764ba2);
+            background-size: 300% 300%;
+            animation: gradientMove 4s ease infinite;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(110, 72, 170, 0.4);
+        }
+        .btn-glitter:active { transform: scale(0.95); }
+        .btn-glitter:hover { filter: brightness(1.2); transform: translateY(-3px); box-shadow: 0 8px 25px rgba(110, 72, 170, 0.5); }
+        @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+        
+        .hidden-section { display: none !important; }
+        input, select, textarea {
+            background: rgba(255,255,255,0.9); border: 1px solid #cbd5e0; color: #2d3748;
+            border-radius: 8px; padding: 10px; width: 100%; margin-bottom: 8px; transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #9D50BB; box-shadow: 0 0 0 3px rgba(157, 80, 187, 0.2); }
+        input:disabled, select:disabled, textarea:disabled { background: #edf2f7; cursor: not-allowed; }
+        
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.58rem; font-weight: bold; text-transform: uppercase; white-space: nowrap; display: inline-block; }
+        .badge-public { background: #c6f6d5; color: #22543d; }
+        .badge-private { background: #e9d8fd; color: #553c9a; }
+        .badge-outstock { background: #cbd5e0; color: #4a5568; }
+        
+        .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #9D50BB; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
+        ::-webkit-scrollbar-thumb { background: #9D50BB; border-radius: 3px; }
+        
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        /* Toast Notifications */
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 10px; color: white; font-size: 0.85rem; z-index: 100; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast.success { background: var(--success-green); }        .toast.error { background: var(--error-red); }
+        .toast.warning { background: #dd6b20; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .glass-panel { border-radius: 16px; }
+            .btn-glitter { padding: 10px 16px; }
+        }
+        
+        /* Print friendly */
+        @media print {
+            .glass-panel { box-shadow: none; border: 1px solid #ccc; }
+            .btn-glitter { display: none; }
+        }
+        
+        /* Logo styling */
+        .nav-logo {
+            max-height: 50px;
+            width: auto;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+        .nav-logo:hover { transform: scale(1.05); }
+        
+        /* WhatsApp button */
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #25D366;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: 0 2px 6px rgba(37, 211, 102, 0.4);
+        }
+        .whatsapp-btn:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.6);
+        }
+        .whatsapp-btn img { width: 18px; height: 18px; }
+        
+        /* Progress steps */
+        .step-indicator {
+            display: flex;            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .step-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #cbd5e0;
+            transition: all 0.3s;
+        }
+        .step-dot.active { background: #9D50BB; transform: scale(1.2); }
+        .step-dot.completed { background: #38a169; }
+        
+        /* Image preview */
+        .preview-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+        }
+        .preview-item img {
+            width: 100%;
+            height: 80px;
+            object-fit: cover;
+        }
+        .preview-remove {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Success animation */        @keyframes confetti {
+            0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #9D50BB;
+            animation: confetti 3s ease-in-out forwards;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-6">
+
+    <!-- AUDIO EFFECTS -->
+    <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3" preload="auto"></audio>
+    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3" preload="auto"></audio>
+    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2"></div>
+
+    <!-- NAVBAR -->
+    <nav class="glass-panel sticky top-4 z-50 m-0 md:m-4 p-3 md:p-4 flex justify-between items-center flex-wrap gap-3 shadow-lg">
+        <a href="https://mfdstore.vercel.app" class="flex items-center gap-2 cursor-pointer group">
+            <img src="https://i.postimg.cc/G3Qjxkmt/20250410-212750-(1).png" 
+                 alt="MFD Store Logo" 
+                 class="nav-logo drop-shadow-md"
+                 onerror="this.src='https://via.placeholder.com/150x50?text=MFD+STORE'">
+            <span class="font-bold text-purple-700 hidden md:block">MFD Store</span>
+        </a>
+        <div class="flex items-center gap-3">
+            <a href="https://wa.me/60145400413" target="_blank" class="whatsapp-btn">
+                <img src="https://i.postimg.cc/Bvb6HRzm/whatsapp-logo-3d-render-free-png.png" alt="WA">
+                <span class="hidden sm:inline">Support</span>
+            </a>
+            <a href="https://mfdstore.vercel.app" class="px-4 py-2 bg-white/60 hover:bg-white text-purple-600 font-bold text-sm rounded-xl transition shadow-sm">
+                <i class="fas fa-home mr-1"></i>Home
+            </a>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="container mx-auto p-2 md:p-4 pb-20 fade-in max-w-4xl">
+        
+        <!-- Header Section -->
+        <div class="glass-panel p-6 md:p-8 mb-6 text-center bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 text-white shadow-xl rounded-2xl">            <h1 class="text-2xl md:text-3xl font-bold glitter-text mb-2">🚀 Upload Produk Percuma</h1>
+            <p class="text-white/90 text-sm md:text-base">Jual produk anda di MFD Store tanpa perlu daftar! Cepat & Mudah.</p>
+            <div class="mt-4 flex justify-center gap-2 flex-wrap">
+                <span class="badge badge-public">✅ Public Listing</span>
+                <span class="badge" style="background:#fef3c7;color:#92400e">📱 Mobile Friendly</span>
+                <span class="badge" style="background:#dbeafe;color:#1e40af">⚡ Instant Upload</span>
+            </div>
+        </div>
+
+        <!-- Upload Form Section -->
+        <div class="glass-panel p-4 md:p-6 mb-6">
+            <div class="step-indicator">
+                <div class="step-dot active" id="step-1"></div>
+                <div class="step-dot" id="step-2"></div>
+                <div class="step-dot" id="step-3"></div>
+            </div>
+            
+            <form id="product-form" class="space-y-4">
+                <!-- Step 1: Product Image -->
+                <div id="step-content-1">
+                    <h3 class="font-bold mb-4 text-purple-700 flex items-center gap-2">
+                        <span class="bg-purple-100 text-purple-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                        🖼️ Gambar Produk
+                    </h3>
+                    
+                    <div class="bg-white/30 p-4 rounded-xl space-y-3">
+                        <div class="flex gap-2 flex-wrap">
+                            <label class="flex-1 min-w-[200px]">
+                                <span class="block text-xs font-bold mb-1">Upload dari Device</span>
+                                <input type="file" id="prod-img-file" accept="image/*" multiple class="w-full text-xs py-2 m-0 cursor-pointer" title="Pilih gambar produk">
+                            </label>
+                            <label class="flex-1 min-w-[200px]">
+                                <span class="block text-xs font-bold mb-1">Atau Paste URL</span>
+                                <input type="url" id="prod-img-url" placeholder="https://..." class="w-full text-xs m-0" title="Paste URL gambar">
+                            </label>
+                        </div>
+                        
+                        <div id="prod-img-preview" class="preview-container hidden"></div>
+                        
+                        <p class="text-[10px] text-gray-500">*Max 5MB per image. Format: JPG, PNG, WebP. Disyorkan: 800x800px</p>
+                    </div>
+                </div>
+
+                <!-- Step 2: Product Details -->
+                <div id="step-content-2" class="hidden-section">
+                    <h3 class="font-bold mb-4 text-purple-700 flex items-center gap-2">
+                        <span class="bg-purple-100 text-purple-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                        📋 Maklumat Produk
+                    </h3>
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 bg-white/30 p-4 rounded-xl">
+                        <input type="text" id="prod-name" placeholder="Nama Produk *" required maxlength="100" class="md:col-span-2">
+                        <input type="number" id="prod-price-cost" placeholder="Harga Kos (RM) - Optional" min="0" step="0.01">
+                        <input type="number" id="prod-price-sell" placeholder="Harga Jualan (RM) *" required min="0.01" step="0.01">
+                        <input type="text" id="prod-variation" placeholder="Variasi (Size/Color/Type)" maxlength="50">
+                        <textarea id="prod-desc" placeholder="Deskripsi Produk (max 500 karakter)" class="md:col-span-2" maxlength="500" rows="3"></textarea>
+                        <input type="text" id="prod-country" placeholder="Negara Asal" maxlength="50">
+                        <input type="url" id="prod-link" placeholder="Pautan Tambahan (Website/Video)" maxlength="200">
+                        <input type="text" id="prod-label" placeholder="Label (e.g. Best Seller)" maxlength="30">
+                        <input type="text" id="prod-event" placeholder="Event (e.g. Ramadan Sale)" maxlength="30">
+                    </div>
+                </div>
+
+                <!-- Step 3: Settings & Submit -->
+                <div id="step-content-3" class="hidden-section">
+                    <h3 class="font-bold mb-4 text-purple-700 flex items-center gap-2">
+                        <span class="bg-purple-100 text-purple-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+                        ⚙️ Tetapan & Hantar
+                    </h3>
+                    
+                    <div class="bg-white/30 p-4 rounded-xl space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold mb-2">Status Produk</label>
+                            <select id="prod-status" class="m-0">
+                                <option value="Public">✅ Public - Boleh dilihat semua</option>
+                                <option value="Private">🔒 Private - Hanya dengan link</option>
+                                <option value="Out of Stock">❌ Out of Stock - Tunjuk tapi tak boleh beli</option>
+                            </select>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-4 text-xs">
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="prod-allow-review" checked class="w-4 h-4 accent-purple-500"> 
+                                <span>Allow Buyer Reviews</span>
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" id="prod-featured" class="w-4 h-4 accent-purple-500"> 
+                                <span>Featured Item ✨</span>
+                            </label>
+                        </div>
+                        
+                        <div class="p-3 bg-blue-50 rounded-lg border border-blue-200 text-xs text-blue-700">
+                            <i class="fas fa-info-circle mr-1"></i> 
+                            Produk anda akan diproses dalam masa 24 jam. Kod unik akan dijana automatik untuk tracking.
+                        </div>
+                        
+                        <!-- Unique Code Preview -->
+                        <div class="flex items-center gap-2 p-2 bg-gray-100 rounded">
+                            <span class="text-xs font-bold text-gray-600">Kod Unik:</span>
+                            <span id="prod-unique-code-preview" class="font-mono text-sm text-purple-600">ITEM-XXXXXX</span>                            <button type="button" onclick="generateUniqueCode()" class="text-xs text-purple-600 hover:underline ml-auto">
+                                <i class="fas fa-redo"></i> Generate Baru
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between pt-4 border-t border-gray-200">
+                    <button type="button" id="btn-prev" class="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg font-bold text-sm transition hidden-section" onclick="prevStep()">
+                        <i class="fas fa-arrow-left mr-1"></i> Kembali
+                    </button>
+                    <div class="flex gap-2 ml-auto">
+                        <button type="button" id="btn-next" class="px-6 py-2 btn-glitter rounded-lg font-bold text-sm shadow-lg" onclick="nextStep()">
+                            Seterusnya <i class="fas fa-arrow-right ml-1"></i>
+                        </button>
+                        <button type="submit" id="btn-submit" class="px-6 py-2 btn-glitter rounded-lg font-bold text-sm shadow-lg hidden-section">
+                            <i class="fas fa-rocket mr-2"></i>LANCAR PRODUK
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Guidelines Section -->
+        <div class="glass-panel p-4 md:p-6 mb-6">
+            <h3 class="font-bold mb-3 text-purple-700">📜 Panduan Upload</h3>
+            <ul class="text-xs space-y-2 text-gray-700">
+                <li class="flex items-start gap-2"><span class="text-green-500">✓</span> Gunakan gambar berkualiti tinggi (min. 800x800px)</li>
+                <li class="flex items-start gap-2"><span class="text-green-500">✓</span> Tulis deskripsi yang jelas dan menarik</li>
+                <li class="flex items-start gap-2"><span class="text-green-500">✓</span> Pastikan harga jualan lebih tinggi dari harga kos</li>
+                <li class="flex items-start gap-2"><span class="text-green-500">✓</span> Tambahkan variasi jika produk ada pilihan (size/warna)</li>
+                <li class="flex items-start gap-2"><span class="text-red-500">✗</span> Jangan upload produk haram/ilegal</li>
+                <li class="flex items-start gap-2"><span class="text-red-500">✗</span> Jangan guna gambar orang lain tanpa izin</li>
+            </ul>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="glass-panel p-4 md:p-6 mb-6">
+            <h3 class="font-bold mb-3 text-purple-700">❓ Soalan Lazim</h3>
+            <div class="space-y-3 text-sm">
+                <details class="bg-white/50 p-3 rounded-lg cursor-pointer">
+                    <summary class="font-bold text-purple-600">Adakah percuma untuk upload?</summary>
+                    <p class="mt-2 text-gray-600">Ya! Upload produk adalah 100% percuma. Tiada yuran tersembunyi.</p>
+                </details>
+                <details class="bg-white/50 p-3 rounded-lg cursor-pointer">
+                    <summary class="font-bold text-purple-600">Berapa lama produk akan diproses?</summary>
+                    <p class="mt-2 text-gray-600">Produk biasanya diproses dalam masa 24 jam. Anda akan dapat notifikasi melalui email jika disediakan.</p>
+                </details>
+                <details class="bg-white/50 p-3 rounded-lg cursor-pointer">                    <summary class="font-bold text-purple-600">Boleh edit produk selepas upload?</summary>
+                    <p class="mt-2 text-gray-600">Ya, hubungi support WhatsApp kami dengan kod unik produk untuk kemaskini.</p>
+                </details>
+            </div>
+        </div>
+
+        <!-- Google AdSense Banner -->
+        <div class="ads-container-320x50 text-center">
+            <div class="text-[10px] text-gray-400 mb-1">Advertisement</div>
+            <ins class="adsbygoogle"
+                 style="display:inline-block;width:320px;height:50px"
+                 data-ad-client="ca-pub-3180819938764995"
+                 data-ad-slot="4727343649"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+        </div>
+
+    </main>
+
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md p-6 text-center relative">
+            <button onclick="closeSuccessModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500 transition">&times;</button>
+            
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-check text-4xl text-green-500"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold text-purple-700 mb-2">🎉 Produk Berjaya Dihantar!</h3>
+            <p class="text-gray-600 text-sm mb-4">Produk anda sedang diproses. Simpan kod unik ini untuk rujukan:</p>
+            
+            <div class="bg-gray-100 p-3 rounded-lg font-mono text-lg text-purple-600 mb-4 select-all" id="success-unique-code">
+                ITEM-XXXXXX
+            </div>
+            
+            <div class="space-y-2 text-sm">
+                <a href="https://wa.me/60145400413?text=Hello,%20saya%20nak%20semak%20status%20produk%20dengan%20kod:%20" 
+                   target="_blank" 
+                   class="whatsapp-btn w-full justify-center">
+                    <img src="https://i.postimg.cc/Bvb6HRzm/whatsapp-logo-3d-render-free-png.png" alt="WA">
+                    Semak Status via WhatsApp
+                </a>
+                <button onclick="closeSuccessModal(); document.getElementById('product-form').reset(); resetForm();" 
+                        class="w-full py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg font-bold transition">
+                    Upload Produk Lain
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Firebase & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+
+        // Firebase Config - GANTI DENGAN CONFIG ANDA
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
+            authDomain: "mfd-store.firebaseapp.com",
+            projectId: "mfd-store",
+            storageBucket: "mfd-store.firebasestorage.app",
+            messagingSenderId: "1039564529069",
+            appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // Global state
+        let currentStep = 1;
+        const totalSteps = 3;
+        let uploadedImages = [];
+        let uniqueCode = '';
+
+        // ==================== UTILITY FUNCTIONS ====================
+        
+        function playSound(type) {
+            try {
+                const sounds = { 
+                    'click': document.getElementById('snd-click'), 
+                    'success': document.getElementById('snd-success'), 
+                    'error': document.getElementById('snd-error')
+                };
+                if(sounds[type]) { 
+                    sounds[type].currentTime = 0; 
+                    sounds[type].play().catch(() => {});
+                }
+            } catch(e) { console.warn('Sound error:', e); }
+        }
+
+        function showToast(message, type = 'success', duration = 3000) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>${message}`;
+            container.appendChild(toast);            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        function formatRM(amount) {
+            return 'RM ' + parseFloat(amount || 0).toFixed(2);
+        }
+
+        function generateUniqueCode() {
+            uniqueCode = "ITEM-" + Math.random().toString(36).substr(2, 6).toUpperCase();
+            document.getElementById('prod-unique-code-preview').textContent = uniqueCode;
+            return uniqueCode;
+        }
+
+        function createConfetti() {
+            const colors = ['#9D50BB', '#FF69B4', '#6E48AA', '#764ba2', '#f093fb'];
+            for(let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 5000);
+            }
+        }
+
+        // ==================== STEP NAVIGATION ====================
+        
+        window.nextStep = () => {
+            if(currentStep === 1 && !validateStep1()) return;
+            if(currentStep === 2 && !validateStep2()) return;
+            
+            playSound('click');
+            
+            // Update step indicators
+            document.getElementById(`step-${currentStep}`).classList.add('completed');
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            
+            currentStep++;
+            
+            if(currentStep <= totalSteps) {
+                document.getElementById(`step-${currentStep}`).classList.add('active');
+                document.getElementById(`step-content-${currentStep-1}`).classList.add('hidden-section');
+                document.getElementById(`step-content-${currentStep}`).classList.remove('hidden-section');                
+                // Update buttons
+                document.getElementById('btn-prev').classList.remove('hidden-section');
+                if(currentStep === totalSteps) {
+                    document.getElementById('btn-next').classList.add('hidden-section');
+                    document.getElementById('btn-submit').classList.remove('hidden-section');
+                }
+            }
+        };
+
+        window.prevStep = () => {
+            if(currentStep <= 1) return;
+            
+            playSound('click');
+            
+            document.getElementById(`step-${currentStep}`).classList.remove('active');
+            currentStep--;
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            document.getElementById(`step-${currentStep+1}`).classList.remove('completed');
+            
+            document.getElementById(`step-content-${currentStep+1}`).classList.add('hidden-section');
+            document.getElementById(`step-content-${currentStep}`).classList.remove('hidden-section');
+            
+            // Update buttons
+            if(currentStep === 1) {
+                document.getElementById('btn-prev').classList.add('hidden-section');
+            }
+            document.getElementById('btn-next').classList.remove('hidden-section');
+            document.getElementById('btn-submit').classList.add('hidden-section');
+        };
+
+        // ==================== VALIDATION ====================
+        
+        function validateStep1() {
+            const hasFile = document.getElementById('prod-img-file').files.length > 0;
+            const hasUrl = document.getElementById('prod-img-url').value.trim();
+            
+            if(!hasFile && !hasUrl) {
+                showToast('❌ Sila upload gambar atau paste URL', 'error');
+                return false;
+            }
+            
+            if(document.getElementById('prod-img-file').files.length > 0) {
+                const files = document.getElementById('prod-img-file').files;
+                for(let file of files) {
+                    if(file.size > 5 * 1024 * 1024) {
+                        showToast(`❌ ${file.name} terlalu besar (max 5MB)`, 'error');
+                        return false;
+                    }
+                    if(!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {                        showToast('❌ Format gambar tidak disokong', 'error');
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+
+        function validateStep2() {
+            const name = document.getElementById('prod-name').value.trim();
+            const priceSell = parseFloat(document.getElementById('prod-price-sell').value);
+            
+            if(!name) {
+                showToast('❌ Nama Produk diperlukan', 'error');
+                document.getElementById('prod-name').focus();
+                return false;
+            }
+            if(!priceSell || priceSell <= 0) {
+                showToast('❌ Harga Jualan tidak sah', 'error');
+                document.getElementById('prod-price-sell').focus();
+                return false;
+            }
+            
+            return true;
+        }
+
+        // ==================== IMAGE PREVIEW ====================
+        
+        document.getElementById('prod-img-file')?.addEventListener('change', function(e) {
+            const preview = document.getElementById('prod-img-preview');
+            preview.classList.remove('hidden');
+            preview.innerHTML = '';
+            uploadedImages = [];
+            
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const div = document.createElement('div');
+                    div.className = 'preview-item';
+                    div.innerHTML = `
+                        <img src="${event.target.result}" alt="Preview">
+                        <button type="button" class="preview-remove" onclick="removePreview(this)">&times;</button>
+                    `;
+                    preview.appendChild(div);
+                    uploadedImages.push({ file, preview: event.target.result });
+                };
+                reader.readAsDataURL(file);
+            });        });
+
+        document.getElementById('prod-img-url')?.addEventListener('input', function(e) {
+            const url = e.target.value.trim();
+            const preview = document.getElementById('prod-img-preview');
+            
+            if(url) {
+                preview.classList.remove('hidden');
+                preview.innerHTML = `
+                    <div class="preview-item">
+                        <img src="${url}" alt="URL Preview" onerror="this.parentElement.innerHTML='<p class=\'text-xs text-red-400 p-2\'>❌ URL tidak sah</p>'">
+                    </div>
+                `;
+                uploadedImages = [{ url }];
+            } else {
+                preview.classList.add('hidden');
+                preview.innerHTML = '';
+                uploadedImages = [];
+            }
+        });
+
+        window.removePreview = function(btn) {
+            btn.parentElement.remove();
+            const preview = document.getElementById('prod-img-preview');
+            if(preview.children.length === 0) {
+                preview.classList.add('hidden');
+            }
+        };
+
+        // ==================== FORM SUBMISSION ====================
+        
+        document.getElementById('product-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const btn = document.getElementById('btn-submit');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            
+            try {
+                // Generate unique code if not set
+                if(!uniqueCode) generateUniqueCode();
+                
+                // Handle image upload
+                let imageUrl = '';
+                const urlInput = document.getElementById('prod-img-url').value.trim();
+                
+                if(urlInput) {
+                    imageUrl = urlInput;
+                } else if(uploadedImages.length > 0 && uploadedImages[0].file) {
+                    const file = uploadedImages[0].file;                    const storageRef = ref(storage, `products/guest/${Date.now()}_${uniqueCode}_${file.name}`);
+                    await uploadBytes(storageRef, file);
+                    imageUrl = await getDownloadURL(storageRef);
+                }
+                
+                // Prepare product data
+                const productData = {
+                    name: document.getElementById('prod-name').value.trim(),
+                    price: parseFloat(document.getElementById('prod-price-cost').value) || 0,
+                    priceSell: parseFloat(document.getElementById('prod-price-sell').value),
+                    description: document.getElementById('prod-desc').value.trim() || '',
+                    imageUrl: imageUrl,
+                    status: document.getElementById('prod-status').value,
+                    country: document.getElementById('prod-country').value.trim() || '',
+                    event: document.getElementById('prod-event').value.trim() || '',
+                    label: document.getElementById('prod-label').value.trim() || '',
+                    variation: document.getElementById('prod-variation').value.trim() || '',
+                    uniqueCode: uniqueCode,
+                    link: document.getElementById('prod-link').value.trim() || '',
+                    totalSold: 0,
+                    rating: 5.0,
+                    revenue: 0,
+                    allowReviews: document.getElementById('prod-allow-review').checked,
+                    featured: document.getElementById('prod-featured').checked,
+                    reviews: [],
+                    submittedBy: 'guest',
+                    submittedAt: serverTimestamp(),
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                };
+                
+                // Save to Firestore
+                await addDoc(collection(db, "products"), productData);
+                
+                // Success!
+                playSound('success');
+                createConfetti();
+                document.getElementById('success-unique-code').textContent = uniqueCode;
+                document.getElementById('success-modal').classList.remove('hidden-section');
+                document.body.style.overflow = 'hidden';
+                
+            } catch(error) {
+                console.error('Upload error:', error);
+                showToast('❌ Gagal upload: ' + (error.message || 'Unknown error'), 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-rocket mr-2"></i>LANCAR PRODUK';
+            }
+        });
+        // ==================== MODAL FUNCTIONS ====================
+        
+        window.closeSuccessModal = function() {
+            document.getElementById('success-modal').classList.add('hidden-section');
+            document.body.style.overflow = '';
+        };
+
+        // Close modal when clicking outside
+        document.getElementById('success-modal')?.addEventListener('click', (e) => {
+            if(e.target.id === 'success-modal') closeSuccessModal();
+        });
+
+        // ==================== INITIALIZATION ====================
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Generate initial unique code
+            generateUniqueCode();
+            
+            // Auto-generate code when name changes
+            document.getElementById('prod-name')?.addEventListener('input', function() {
+                if(!uniqueCode || uniqueCode === 'ITEM-XXXXXX') {
+                    generateUniqueCode();
+                }
+            });
+            
+            // Preload sounds
+            document.querySelectorAll('audio').forEach(audio => audio.load());
+        });
+
+        // Reset form helper
+        window.resetForm = function() {
+            currentStep = 1;
+            uploadedImages = [];
+            uniqueCode = '';
+            
+            // Reset step indicators
+            document.querySelectorAll('.step-dot').forEach(dot => {
+                dot.classList.remove('active', 'completed');
+            });
+            document.getElementById('step-1').classList.add('active');
+            
+            // Reset content visibility
+            document.getElementById('step-content-1').classList.remove('hidden-section');
+            document.getElementById('step-content-2').classList.add('hidden-section');
+            document.getElementById('step-content-3').classList.add('hidden-section');
+            
+            // Reset buttons
+            document.getElementById('btn-prev').classList.add('hidden-section');
+            document.getElementById('btn-next').classList.remove('hidden-section');
+            document.getElementById('btn-submit').classList.add('hidden-section');            
+            // Reset image preview
+            document.getElementById('prod-img-preview').classList.add('hidden');
+            document.getElementById('prod-img-preview').innerHTML = '';
+            
+            // Generate new unique code
+            generateUniqueCode();
+        };
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if(e.key === 'Escape') {
+                const modal = document.getElementById('success-modal');
+                if(modal && !modal.classList.contains('hidden-section')) {
+                    closeSuccessModal();
+                }
+            }
+        });
+    </script>
+    
+    <!-- Fallback script for non-module browsers -->
+    <script>
+        // Ensure unique code is visible on load
+        document.addEventListener('DOMContentLoaded', () => {
+            if(typeof generateUniqueCode === 'function') {
+                generateUniqueCode();
+            }
+        });
+    </script>
+</body>
+</html>
