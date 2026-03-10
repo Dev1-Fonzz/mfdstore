@@ -1,44 +1,106 @@
 <?php
-// upload.php - HANYA CODE PHP, TIADA HTML
+// upload.php - SEMUA DALAM 1 FILE, TAK PERLU VENDOR/
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
 header('Content-Type: application/json');
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+function sendError($msg) {
+    echo json_encode(['success' => false, 'message' => $msg]);
+    exit;
+}
 
-require 'vendor/autoload.php';
+// Simple SMTP Mailer Class (Ganti PHPMailer)
+class SimpleSMTP {
+    private $smtp_host = 'smtp.gmail.com';
+    private $smtp_port = 587;
+    private $username;
+    private $password;
+    
+    public function __construct($username, $password) {
+        $this->username = $username;
+        $this->password = $password;
+    }
+    
+    public function send($to, $subject, $body, $attachment = null) {
+        $socket = fsockopen($this->smtp_host, $this->smtp_port, $errno, $errstr, 30);
+        if (!$socket) return false;
+        
+        $this->read($socket);
+        $this->send($socket, "EHLO " . gethostname() . "\r\n");
+        $this->read($socket);
+        $this->send($socket, "STARTTLS\r\n");
+        $this->read($socket);
+        stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+        $this->send($socket, "EHLO " . gethostname() . "\r\n");
+        $this->read($socket);
+        $this->send($socket, "AUTH LOGIN\r\n");
+        $this->read($socket);
+        $this->send($socket, base64_encode($this->username) . "\r\n");
+        $this->read($socket);
+        $this->send($socket, base64_encode($this->password) . "\r\n");
+        $this->read($socket);
+        $this->send($socket, "MAIL FROM:<" . $this->username . ">\r\n");
+        $this->read($socket);
+        $this->send($socket, "RCPT TO:<" . $to . ">\r\n");
+        $this->read($socket);
+        $this->send($socket, "DATA\r\n");
+        $this->read($socket);
+        
+        $boundary = '----=' . md5(uniqid(time()));
+        $headers = "From: <" . $this->username . ">\r\n";        $headers .= "To: <" . $to . ">\r\n";
+        $headers .= "Subject: " . $subject . "\r\n";
+        $headers .= "MIME-Version: 1.0\r\n";
+        $headers .= "Content-Type: multipart/mixed; boundary=\"" . $boundary . "\"\r\n\r\n";
+        
+        $message = "--" . $boundary . "\r\n";
+        $message .= "Content-Type: text/plain; charset=utf-8\r\n\r\n" . $body . "\r\n\r\n";
+        
+        if ($attachment) {
+            $fileContent = file_get_contents($attachment['tmp_name']);
+            $encoded = chunk_split(base64_encode($fileContent));
+            $message .= "--" . $boundary . "\r\n";
+            $message .= "Content-Type: application/octet-stream; name=\"" . $attachment['name'] . "\"\r\n";
+            $message .= "Content-Disposition: attachment; filename=\"" . $attachment['name'] . "\"\r\n";
+            $message .= "Content-Transfer-Encoding: base64\r\n\r\n" . $encoded . "\r\n\r\n";
+        }
+        
+        $message .= "--" . $boundary . "--\r\n.\r\n";
+        $this->send($socket, $message);
+        $this->read($socket);
+        $this->send($socket, "QUIT\r\n");
+        fclose($socket);
+        return true;
+    }
+    
+    private function send($socket, $data) {
+        fwrite($socket, $data);
+    }
+    
+    private function read($socket) {
+        return fgets($socket, 1024);
+    }
+}
 
+// Main Process
 $bloggerEmail = $_POST['bloggerEmail'] ?? '';
 $smtpEmail = $_POST['smtpEmail'] ?? '';
-$smtpPassword = $_POST['smtpPassword'] ?? ''; // ✅ BETUL: 'smtpPassword'
+$smtpPassword = $_POST['smtpPassword'] ?? '';
 $image = $_FILES['image'] ?? null;
 
 if (!$bloggerEmail || !$smtpEmail || !$smtpPassword || !$image) {
-    echo json_encode(['success' => false, 'message' => 'Data tidak lengkap']);
-    exit;
+    sendError('Data tidak lengkap');
 }
 
 $uniqueId = 'IMG_' . time() . '_' . rand(1000, 9999);
 
 // Step 1: Hantar email ke Blogger
-$mail = new PHPMailer(true);
-try {
-    $mail->isSMTP();
-    $mail->Host = 'smtp.gmail.com';
-    $mail->SMTPAuth = true;
-    $mail->Username = $smtpEmail;
-    $mail->Password = $smtpPassword;
-    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-    $mail->Port = 587;
-    
-    $mail->setFrom($smtpEmail);
-    $mail->addAddress($bloggerEmail);
-    $mail->Subject = $uniqueId;
-    $mail->Body = 'Auto upload';
-    $mail->addAttachment($image['tmp_name'], $image['name']);
-    $mail->send();
-} catch (Exception $e) {
-    echo json_encode(['success' => false, 'message' => 'Gagal hantar email: ' . $mail->ErrorInfo]);
-    exit;
+$mailer = new SimpleSMTP($smtpEmail, $smtpPassword);
+$sent = $mailer->send($bloggerEmail, $uniqueId, 'Auto upload', [
+    'tmp_name' => $image['tmp_name'],    'name' => $image['name']
+]);
+
+if (!$sent) {
+    sendError('Gagal hantar email. Check App Password & 2FA Gmail.');
 }
 
 // Step 2: Tunggu Blogger process
@@ -73,6 +135,6 @@ if (isset($data['items'])) {
 if ($imageUrl) {
     echo json_encode(['success' => true, 'image_url' => $imageUrl]);
 } else {
-    echo json_encode(['success' => false, 'message' => 'Gagal dapatkan link gambar']);
+    sendError('Gagal dapatkan link gambar. Check Access Token & Blogger setting.');
 }
 ?>
