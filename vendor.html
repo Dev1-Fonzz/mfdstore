@@ -3,2673 +3,753 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vendors Manager - MFD Store Showcase</title>
+    <title>Vendors Manager - MFD Store</title>
     
-    <!-- Firebase SDK (Modular) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            signInWithPopup, 
-            GoogleAuthProvider, 
-            GithubAuthProvider,
-            signOut, 
-            onAuthStateChanged,
-            updatePassword
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            collection, 
-            addDoc, 
-            getDocs, 
-            doc, 
-            setDoc, 
-            getDoc, 
-            updateDoc, 
-            deleteDoc, 
-            query, 
-            where, 
-            orderBy, 
-            limit, 
-            onSnapshot,
-            serverTimestamp,
-            arrayUnion,
-            increment
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { 
-            getStorage, 
-            ref as storageRef, 
-            uploadBytes, 
-            getDownloadURL 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-
-        // 🔥 FIREBASE CONFIGURATION
-        const firebaseConfig = {
-            apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",            authDomain: "mfd-store.firebaseapp.com",
-            projectId: "mfd-store",
-            storageBucket: "mfd-store.firebasestorage.app",
-            messagingSenderId: "1039564529069",
-            appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
-        const googleProvider = new GoogleAuthProvider();
-        const githubProvider = new GithubAuthProvider();
-        // GitHub Client ID Configuration
-        githubProvider.addScope('user:email');
-        githubProvider.setCustomParameters({
-            'client_id': 'Ov23liSDmvSXugVxojYP'
-        });
-
-        // 🎵 SOUND EFFECTS SYSTEM
-        const SoundFX = {
-            init: () => {
-                try {
-                    SoundFX.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                } catch(e) {
-                    console.log('Web Audio API not supported');
-                }
-            },
-            play: (frequency = 440, duration = 0.1, type = 'sine') => {
-                if(!SoundFX.audioContext) return;
-                const oscillator = SoundFX.audioContext.createOscillator();
-                const gainNode = SoundFX.audioContext.createGain();
-                oscillator.connect(gainNode);
-                gainNode.connect(SoundFX.audioContext.destination);
-                oscillator.frequency.value = frequency;
-                oscillator.type = type;
-                gainNode.gain.setValueAtTime(0.1, SoundFX.audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, SoundFX.audioContext.currentTime + duration);
-                oscillator.start();
-                oscillator.stop(SoundFX.audioContext.currentTime + duration);
-            },
-            click: () => SoundFX.play(523.25, 0.08),
-            success: () => { SoundFX.play(659.25, 0.1); setTimeout(()=>SoundFX.play(783.99, 0.15), 100); },
-            error: () => { SoundFX.play(200, 0.2, 'square'); setTimeout(()=>SoundFX.play(150, 0.2, 'square'), 100); },
-            notification: () => { SoundFX.play(880, 0.15); setTimeout(()=>SoundFX.play(1046.5, 0.2), 150); }
-        };
-
-        // 🎨 UI UTILITIES
-        const UI = {            showLoading: (el, show = true) => {
-                if(show) {
-                    el.classList.add('loading');
-                    el.innerHTML = '<div class="spinner"></div>';
-                } else {
-                    el.classList.remove('loading');
-                }
-            },
-            showToast: (message, type = 'info', duration = 3000) => {
-                const toast = document.createElement('div');
-                toast.className = `toast toast-${type}`;
-                toast.innerHTML = `<span>${message}</span>`;
-                document.body.appendChild(toast);
-                setTimeout(() => {
-                    toast.classList.add('toast-hide');
-                    setTimeout(() => toast.remove(), 300);
-                }, duration);
-                if(type === 'success') SoundFX.success();
-                else if(type === 'error') SoundFX.error();
-                else SoundFX.click();
-            },
-            formatCurrency: (amount) => {
-                return new Intl.NumberFormat('ms-MY', { 
-                    style: 'currency', 
-                    currency: 'MYR',
-                    minimumFractionDigits: 2 
-                }).format(amount || 0);
-            },
-            generateUAC: () => {
-                return 'UAC-' + Math.random().toString(36).substr(2, 6).toUpperCase() + 
-                       '-' + Date.now().toString(36).substr(-4).toUpperCase();
-            },
-            generateItemCode: () => {
-                return 'ITM-' + Math.random().toString(36).substr(2, 8).toUpperCase();
-            },
-            generateVenId: (base = 'VENFD') => {
-                return base + '-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-            }
-        };
-
-        // 👤 AUTHENTICATION MODULE
-        const Auth = {
-            currentUser: null,
-            userProfile: null,
-            
-            init: () => {
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        Auth.currentUser = user;
-                        await Auth.loadUserProfile(user.uid);                        Auth.showAuthenticatedUI();
-                    } else {
-                        Auth.currentUser = null;
-                        Auth.userProfile = null;
-                        Auth.showGuestUI();
-                    }
-                });
-            },
-            
-            loadUserProfile: async (uid) => {
-                try {
-                    const docRef = doc(db, 'vendors', uid);
-                    const docSnap = await getDoc(docRef);
-                    if (docSnap.exists()) {
-                        Auth.userProfile = { uid, ...docSnap.data() };
-                    } else {
-                        // Create new vendor profile
-                        const newProfile = {
-                            uid,
-                            email: auth.currentUser.email,
-                            sellerName: `Seller_${uid.substr(0,6)}`,
-                            venId: UI.generateVenId(),
-                            uac: UI.generateUAC(),
-                            businessName: '',
-                            businessDesc: '',
-                            phone: '',
-                            address: {},
-                            paymentInfo: {},
-                            accountStatus: 'ACTIVE',
-                            commissionRate: 1.00,
-                            createdAt: serverTimestamp(),
-                            lastLogin: serverTimestamp(),
-                            logCache: []
-                        };
-                        await setDoc(docRef, newProfile);
-                        Auth.userProfile = newProfile;
-                    }
-                } catch(error) {
-                    console.error('Profile load error:', error);
-                    UI.showToast('Gagal memuat profil', 'error');
-                }
-            },
-            
-            register: async (email, password, sellerName = '') => {
-                try {
-                    SoundFX.click();
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    UI.showToast('Akaun berjaya didaftar!', 'success');
-                    return userCredential.user;
-                } catch(error) {                    UI.showToast(error.message, 'error');
-                    throw error;
-                }
-            },
-            
-            login: async (email, password) => {
-                try {
-                    SoundFX.click();
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    UI.showToast('Selamat datang!', 'success');
-                    return userCredential.user;
-                } catch(error) {
-                    UI.showToast(error.message, 'error');
-                    throw error;
-                }
-            },
-            
-            loginWithGoogle: async () => {
-                try {
-                    SoundFX.click();
-                    const result = await signInWithPopup(auth, googleProvider);
-                    UI.showToast('Login Google berjaya!', 'success');
-                    return result.user;
-                } catch(error) {
-                    UI.showToast(error.message, 'error');
-                    throw error;
-                }
-            },
-            
-            loginWithGithub: async () => {
-                try {
-                    SoundFX.click();
-                    const result = await signInWithPopup(auth, githubProvider);
-                    UI.showToast('Login GitHub berjaya!', 'success');
-                    return result.user;
-                } catch(error) {
-                    UI.showToast(error.message, 'error');
-                    throw error;
-                }
-            },
-            
-            logout: async () => {
-                try {
-                    SoundFX.click();
-                    await signOut(auth);
-                    UI.showToast('Anda telah log keluar', 'info');
-                } catch(error) {
-                    UI.showToast(error.message, 'error');
-                }
-            },            
-            updatePassword: async (newPassword) => {
-                try {
-                    await updatePassword(auth.currentUser, newPassword);
-                    UI.showToast('Kata laluan dikemaskini!', 'success');
-                    return true;
-                } catch(error) {
-                    UI.showToast(error.message, 'error');
-                    return false;
-                }
-            },
-            
-            showAuthenticatedUI: () => {
-                document.getElementById('auth-section').classList.add('hidden');
-                document.getElementById('vendor-panel').classList.remove('hidden');
-                document.getElementById('user-email').textContent = Auth.currentUser.email;
-                document.getElementById('seller-name').textContent = Auth.userProfile?.sellerName || 'Loading...';
-                document.getElementById('ven-id-display').textContent = Auth.userProfile?.venId || '...';
-                document.getElementById('uac-display').textContent = Auth.userProfile?.uac || '...';
-                VendorPanel.loadDashboard();
-                ProductCatalog.loadRecommendations();
-                LiveAgent.init();
-            },
-            
-            showGuestUI: () => {
-                document.getElementById('auth-section').classList.remove('hidden');
-                document.getElementById('vendor-panel').classList.add('hidden');
-            },
-            
-            isAdmin: () => {
-                return Auth.userProfile?.role === 'admin' || Auth.userProfile?.isSuperAdmin === true;
-            }
-        };
-
-        // 📦 PRODUCT CATALOG MODULE
-        const ProductCatalog = {
-            currentProducts: [],
-            
-            init: () => {
-                ProductCatalog.bindEvents();
-                ProductCatalog.loadCatalog();
-            },
-            
-            bindEvents: () => {
-                document.getElementById('search-input').addEventListener('input', 
-                    ProductCatalog.handleSearch);
-                document.getElementById('search-btn').addEventListener('click', 
-                    () => { SoundFX.click(); ProductCatalog.handleSearch(); });
-            },
-                        handleSearch: async () => {
-                SoundFX.click();
-                const query = document.getElementById('search-input').value.toLowerCase();
-                if(!query) {
-                    ProductCatalog.loadCatalog();
-                    return;
-                }
-                const filtered = ProductCatalog.currentProducts.filter(p => 
-                    p.itemName?.toLowerCase().includes(query) ||
-                    p.description?.toLowerCase().includes(query) ||
-                    p.label?.toLowerCase().includes(query)
-                );
-                ProductCatalog.renderCatalog(filtered);
-            },
-            
-            loadCatalog: async () => {
-                try {
-                    const q = query(collection(db, 'products'), 
-                        where('status', '==', 'Public'),
-                        orderBy('createdAt', 'desc'),
-                        limit(50)
-                    );
-                    const snapshot = await getDocs(q);
-                    ProductCatalog.currentProducts = snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                    ProductCatalog.renderCatalog(ProductCatalog.currentProducts);
-                } catch(error) {
-                    console.error('Load catalog error:', error);
-                    UI.showToast('Gagal memuat katalog', 'error');
-                }
-            },
-            
-            loadRecommendations: async () => {
-                try {
-                    // Load highest purchased items
-                    const q = query(collection(db, 'products'), 
-                        where('status', '==', 'Public'),
-                        orderBy('totalSold', 'desc'),
-                        limit(10)
-                    );
-                    const snapshot = await getDocs(q);
-                    const recommendations = snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                    ProductCatalog.renderSection('recommendations-grid', recommendations, '🔥 Paling Laris');
-                } catch(error) {
-                    console.error('Load recommendations error:', error);                }
-            },
-            
-            renderCatalog: (products) => {
-                const container = document.getElementById('catalog-grid');
-                if(!products.length) {
-                    container.innerHTML = '<div class="empty-state">Tiada produk dijumpai</div>';
-                    return;
-                }
-                container.innerHTML = products.map(product => ProductCatalog.renderProductCard(product)).join('');
-                container.querySelectorAll('.product-card').forEach(card => {
-                    card.addEventListener('click', (e) => {
-                        if(!e.target.closest('.btn-add-cart')) {
-                            SoundFX.click();
-                            ProductCatalog.showProductDetail(card.dataset.productId);
-                        }
-                    });
-                });
-                container.querySelectorAll('.btn-add-cart').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        SoundFX.success();
-                        Cart.addToCart(btn.dataset.productId);
-                        UI.showToast('Ditambah ke troli!', 'success');
-                    });
-                });
-            },
-            
-            renderProductCard: (product) => {
-                const statusBadge = {
-                    'Public': '<span class="badge badge-success">Public</span>',
-                    'Private': '<span class="badge badge-warning">Private</span>',
-                    'Out of Stock': '<span class="badge badge-danger">Out of Stock</span>'
-                }[product.status] || '';
-                
-                return `
-                    <div class="product-card" data-product-id="${product.id}">
-                        <div class="product-image">
-                            <img src="${product.imageUrl || 'https://via.placeholder.com/200x200?text=No+Image'}" 
-                                 alt="${product.itemName}" 
-                                 onerror="this.src='https://via.placeholder.com/200x200?text=Image+Error'">
-                            ${product.eventItem ? `<span class="event-badge">🎁 ${product.eventItem}</span>` : ''}
-                        </div>
-                        <div class="product-info">
-                            <h4 class="product-name">${product.itemName || 'Tanpa Nama'}</h4>
-                            <div class="product-price">
-                                ${product.salePrice ? 
-                                    `<span class="price-sale">${UI.formatCurrency(product.salePrice)}</span>
-                                     ${product.price ? `<span class="price-original">${UI.formatCurrency(product.price)}</span>` : ''}` :
-                                    (product.price ? `<span class="price-sale">${UI.formatCurrency(product.price)}</span>` : '')                                }
-                            </div>
-                            <div class="product-meta">
-                                <span class="rating">⭐ ${product.rating || '0.0'}</span>
-                                <span class="sold">📦 ${product.totalSold || 0} dijual</span>
-                            </div>
-                            <div class="product-footer">
-                                ${statusBadge}
-                                <button class="btn-add-cart btn-sm" data-product-id="${product.id}">
-                                    🛒 Tambah
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            },
-            
-            renderSection: (containerId, products, title) => {
-                const container = document.getElementById(containerId);
-                if(!container) return;
-                container.innerHTML = `
-                    <h3 class="section-title">${title}</h3>
-                    <div class="products-grid">
-                        ${products.map(p => ProductCatalog.renderProductCard(p)).join('')}
-                    </div>
-                `;
-            },
-            
-            showProductDetail: async (productId) => {
-                // Modal implementation would go here
-                UI.showToast('Maklumat produk akan dipaparkan', 'info');
-            }
-        };
-
-        // 🛒 CART MODULE
-        const Cart = {
-            items: [],
-            
-            init: () => {
-                Cart.loadFromStorage();
-                Cart.updateBadge();
-            },
-            
-            loadFromStorage: () => {
-                if(Auth.currentUser) {
-                    // Load from Firestore for authenticated users
-                    // Implementation would fetch from user's cart collection
-                } else {
-                    // Fallback to localStorage for guests
-                    try {                        Cart.items = JSON.parse(localStorage.getItem('mfd_cart') || '[]');
-                    } catch(e) { Cart.items = []; }
-                }
-            },
-            
-            saveToStorage: () => {
-                if(!Auth.currentUser) {
-                    localStorage.setItem('mfd_cart', JSON.stringify(Cart.items));
-                }
-                Cart.updateBadge();
-            },
-            
-            addToCart: (productId, quantity = 1, variation = null) => {
-                const existing = Cart.items.find(i => i.productId === productId && 
-                    JSON.stringify(i.variation) === JSON.stringify(variation));
-                if(existing) {
-                    existing.quantity += quantity;
-                } else {
-                    Cart.items.push({
-                        productId,
-                        quantity,
-                        variation,
-                        addedAt: new Date().toISOString()
-                    });
-                }
-                Cart.saveToStorage();
-            },
-            
-            updateBadge: () => {
-                const badge = document.getElementById('cart-badge');
-                if(badge) {
-                    const total = Cart.items.reduce((sum, item) => sum + item.quantity, 0);
-                    badge.textContent = total;
-                    badge.style.display = total > 0 ? 'flex' : 'none';
-                }
-            },
-            
-            getItems: () => Cart.items,
-            
-            clear: () => {
-                Cart.items = [];
-                Cart.saveToStorage();
-            }
-        };
-
-        // 🏪 VENDOR PANEL MODULE
-        const VendorPanel = {
-            init: () => {
-                VendorPanel.bindEvents();
-            },            
-            bindEvents: () => {
-                // Navigation tabs
-                document.querySelectorAll('.nav-tab').forEach(tab => {
-                    tab.addEventListener('click', (e) => {
-                        SoundFX.click();
-                        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-                        e.currentTarget.classList.add('active');
-                        const target = e.currentTarget.dataset.target;
-                        document.querySelectorAll('.panel-section').forEach(s => s.classList.add('hidden'));
-                        document.getElementById(target)?.classList.remove('hidden');
-                    });
-                });
-                
-                // Profile update
-                document.getElementById('btn-update-profile')?.addEventListener('click', VendorPanel.updateProfile);
-                document.getElementById('btn-change-password')?.addEventListener('click', VendorPanel.changePassword);
-                
-                // Product management
-                document.getElementById('btn-add-product')?.addEventListener('click', VendorPanel.showAddProductForm);
-                document.getElementById('btn-save-product')?.addEventListener('click', VendorPanel.saveProduct);
-                
-                // Order management
-                document.getElementById('btn-refresh-orders')?.addEventListener('click', VendorPanel.loadOrders);
-                
-                // Account actions
-                document.getElementById('btn-logout')?.addEventListener('click', Auth.logout);
-                document.getElementById('btn-delete-account')?.addEventListener('click', VendorPanel.deleteAccount);
-            },
-            
-            loadDashboard: async () => {
-                if(!Auth.userProfile) return;
-                
-                // Update profile display
-                document.getElementById('profile-seller-name').value = Auth.userProfile.sellerName || '';
-                document.getElementById('profile-business-name').value = Auth.userProfile.businessName || '';
-                document.getElementById('profile-phone').value = Auth.userProfile.phone || '';
-                document.getElementById('profile-email').value = Auth.userProfile.email || '';
-                document.getElementById('profile-uac').value = Auth.userProfile.uac || '';
-                document.getElementById('profile-venid').value = Auth.userProfile.venId || '';
-                document.getElementById('profile-status').textContent = Auth.userProfile.accountStatus || 'ACTIVE';
-                
-                // Load real-time stats
-                VendorPanel.loadVendorStats();
-                VendorPanel.loadOrders();
-                VendorPanel.loadProducts();
-                
-                // Setup real-time listeners
-                VendorPanel.setupRealtimeListeners();
-            },            
-            loadVendorStats: async () => {
-                try {
-                    const uid = Auth.currentUser.uid;
-                    
-                    // Total sales query
-                    const ordersQuery = query(collection(db, 'orders'), 
-                        where('vendorId', '==', uid),
-                        where('orderCategory', '==', 'Completed Order')
-                    );
-                    const ordersSnap = await getDocs(ordersQuery);
-                    const totalSales = ordersSnap.docs.reduce((sum, doc) => {
-                        const data = doc.data();
-                        return sum + (data.totalPrice || 0);
-                    }, 0);
-                    
-                    // Active products count
-                    const productsQuery = query(collection(db, 'products'), 
-                        where('vendorId', '==', uid),
-                        where('status', '==', 'Public')
-                    );
-                    const productsSnap = await getDocs(productsQuery);
-                    
-                    // Update dashboard
-                    document.getElementById('stat-total-sales').textContent = UI.formatCurrency(totalSales);
-                    document.getElementById('stat-active-products').textContent = productsSnap.size;
-                    document.getElementById('stat-today-orders').textContent = '0'; // Would need date filter
-                    
-                    // Commission calculation
-                    const commissionRate = Auth.userProfile.commissionRate || 1.00;
-                    const commission = totalSales * (commissionRate / 100);
-                    document.getElementById('stat-commission').textContent = UI.formatCurrency(commission);
-                    
-                } catch(error) {
-                    console.error('Stats load error:', error);
-                }
-            },
-            
-            setupRealtimeListeners: () => {
-                // Real-time orders update
-                if(Auth.userProfile) {
-                    const ordersRef = collection(db, 'orders');
-                    const q = query(ordersRef, 
-                        where('vendorId', '==', Auth.currentUser.uid),
-                        orderBy('createdAt', 'desc'),
-                        limit(20)
-                    );
-                    
-                    onSnapshot(q, (snapshot) => {
-                        VendorPanel.renderOrders(snapshot.docs.map(d => ({id: d.id, ...d.data()})));                    });
-                }
-            },
-            
-            loadOrders: async () => {
-                try {
-                    const q = query(collection(db, 'orders'), 
-                        where('vendorId', '==', Auth.currentUser.uid),
-                        orderBy('createdAt', 'desc'),
-                        limit(50)
-                    );
-                    const snapshot = await getDocs(q);
-                    const orders = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                    VendorPanel.renderOrders(orders);
-                } catch(error) {
-                    console.error('Load orders error:', error);
-                }
-            },
-            
-            renderOrders: (orders) => {
-                const tbody = document.getElementById('orders-table-body');
-                if(!tbody) return;
-                
-                if(!orders.length) {
-                    tbody.innerHTML = '<tr><td colspan="12" class="empty-row">Tiada pesanan dijumpai</td></tr>';
-                    return;
-                }
-                
-                tbody.innerHTML = orders.map(order => `
-                    <tr>
-                        <td><small>${order.uac || '-'}</small></td>
-                        <td>${order.customerName || 'Pelanggan'}</td>
-                        <td>${order.itemName || 'Produk'}</td>
-                        <td><small>${order.itemCode || '-'}</small></td>
-                        <td><small>${order.destinationAddress?.substring(0,30) || '-'}...</small></td>
-                        <td>${order.quantity || 1}</td>
-                        <td>${UI.formatCurrency(order.totalPrice)}</td>
-                        <td>${order.paymentMethod || '-'}</td>
-                        <td>
-                            <span class="badge ${order.paymentVerified ? 'badge-success' : 'badge-warning'}">
-                                ${order.paymentVerified ? 'Verified' : 'Not Verified'}
-                            </span>
-                        </td>
-                        <td>${order.trackingNumber || '-'}</td>
-                        <td><small>${order.orderId || '-'}</small></td>
-                        <td>
-                            <span class="badge badge-${VendorPanel.getStatusColor(order.orderCategory)}">
-                                ${order.orderCategory || 'To Pay'}
-                            </span>
-                        </td>                    </tr>
-                `).join('');
-            },
-            
-            getStatusColor: (status) => {
-                const colors = {
-                    'To Pay': 'warning',
-                    'To Ship': 'info',
-                    'To Receive': 'primary',
-                    'Completed Order': 'success',
-                    'Return/Refund': 'danger',
-                    'Cancelled': 'secondary'
-                };
-                return colors[status] || 'secondary';
-            },
-            
-            loadProducts: async () => {
-                try {
-                    const q = query(collection(db, 'products'), 
-                        where('vendorId', '==', Auth.currentUser.uid),
-                        orderBy('createdAt', 'desc')
-                    );
-                    const snapshot = await getDocs(q);
-                    const products = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                    VendorPanel.renderProducts(products);
-                } catch(error) {
-                    console.error('Load products error:', error);
-                }
-            },
-            
-            renderProducts: (products) => {
-                const tbody = document.getElementById('products-table-body');
-                if(!tbody) return;
-                
-                if(!products.length) {
-                    tbody.innerHTML = '<tr><td colspan="9" class="empty-row">Tiada produk dilancarkan</td></tr>';
-                    return;
-                }
-                
-                tbody.innerHTML = products.map((product, index) => `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td><img src="${product.imageUrl || 'https://via.placeholder.com/40'}" 
-                                 class="thumb-img" alt="${product.itemName}"></td>
-                        <td>${product.itemName || 'Tanpa Nama'}</td>
-                        <td>${UI.formatCurrency(product.salePrice || product.price)}</td>
-                        <td>⭐ ${product.rating || '0.0'}</td>
-                        <td><span class="badge badge-${VendorPanel.getStatusColor(product.status)}">
-                            ${product.status}
-                        </span></td>                        <td>${product.totalSold || 0}</td>
-                        <td>
-                            <button class="btn-icon btn-edit" data-id="${product.id}" title="Edit">✏️</button>
-                            <button class="btn-icon btn-delete" data-id="${product.id}" title="Padam">🗑️</button>
-                        </td>
-                    </tr>
-                `).join('');
-                
-                // Bind edit/delete buttons
-                tbody.querySelectorAll('.btn-edit').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        SoundFX.click();
-                        VendorPanel.editProduct(btn.dataset.id);
-                    });
-                });
-                tbody.querySelectorAll('.btn-delete').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        SoundFX.click();
-                        if(confirm('Padam produk ini?')) {
-                            VendorPanel.deleteProduct(btn.dataset.id);
-                        }
-                    });
-                });
-            },
-            
-            showAddProductForm: () => {
-                SoundFX.click();
-                document.getElementById('product-form').reset();
-                document.getElementById('product-form-modal').classList.remove('hidden');
-                document.getElementById('form-product-id').value = UI.generateItemCode();
-            },
-            
-            saveProduct: async () => {
-                try {
-                    SoundFX.click();
-                    const formData = {
-                        vendorId: Auth.currentUser.uid,
-                        venId: Auth.userProfile.venId,
-                        uac: Auth.userProfile.uac,
-                        itemName: document.getElementById('form-item-name').value,
-                        price: parseFloat(document.getElementById('form-price').value) || null,
-                        salePrice: parseFloat(document.getElementById('form-sale-price').value) || null,
-                        description: document.getElementById('form-description').value,
-                        countryOrigin: document.getElementById('form-country').value,
-                        optionalLink: document.getElementById('form-link').value,
-                        status: document.getElementById('form-status').value,
-                        label: document.getElementById('form-label').value,
-                        eventItem: document.getElementById('form-event').value,
-                        itemCode: document.getElementById('form-product-id').value || UI.generateItemCode(),
-                        variations: [], // Would parse from form                        imageUrl: '', // Would handle image upload
-                        totalSold: 0,
-                        rating: 0,
-                        revenue: 0,
-                        createdAt: serverTimestamp(),
-                        updatedAt: serverTimestamp()
-                    };
-                    
-                    // Handle image upload if present
-                    const imageFile = document.getElementById('form-image').files[0];
-                    if(imageFile) {
-                        // Image upload logic would go here
-                        // For now, skip or use placeholder
-                    }
-                    
-                    const docRef = await addDoc(collection(db, 'products'), formData);
-                    UI.showToast('Produk berjaya ditambah!', 'success');
-                    document.getElementById('product-form-modal').classList.add('hidden');
-                    VendorPanel.loadProducts();
-                    
-                } catch(error) {
-                    console.error('Save product error:', error);
-                    UI.showToast('Gagal menyimpan produk', 'error');
-                }
-            },
-            
-            editProduct: async (productId) => {
-                try {
-                    const docRef = doc(db, 'products', productId);
-                    const docSnap = await getDoc(docRef);
-                    if(docSnap.exists()) {
-                        const product = docSnap.data();
-                        // Populate form fields
-                        document.getElementById('form-item-name').value = product.itemName || '';
-                        document.getElementById('form-price').value = product.price || '';
-                        document.getElementById('form-sale-price').value = product.salePrice || '';
-                        document.getElementById('form-description').value = product.description || '';
-                        document.getElementById('form-country').value = product.countryOrigin || '';
-                        document.getElementById('form-link').value = product.optionalLink || '';
-                        document.getElementById('form-status').value = product.status || 'Public';
-                        document.getElementById('form-label').value = product.label || '';
-                        document.getElementById('form-event').value = product.eventItem || '';
-                        document.getElementById('form-product-id').value = product.itemCode || UI.generateItemCode();
-                        document.getElementById('product-form-modal').classList.remove('hidden');
-                        // Store product ID for update
-                        document.getElementById('product-form').dataset.editId = productId;
-                    }
-                } catch(error) {
-                    UI.showToast('Gagal memuat produk', 'error');
-                }            },
-            
-            deleteProduct: async (productId) => {
-                try {
-                    await deleteDoc(doc(db, 'products', productId));
-                    UI.showToast('Produk dipadam', 'success');
-                    VendorPanel.loadProducts();
-                } catch(error) {
-                    UI.showToast('Gagal memadam produk', 'error');
-                }
-            },
-            
-            updateProfile: async () => {
-                try {
-                    SoundFX.click();
-                    const updates = {
-                        sellerName: document.getElementById('profile-seller-name').value,
-                        businessName: document.getElementById('profile-business-name').value,
-                        businessDesc: document.getElementById('profile-business-desc').value,
-                        phone: document.getElementById('profile-phone').value,
-                        email: document.getElementById('profile-email').value,
-                        address: {
-                            location: document.getElementById('profile-address').value,
-                            label: document.getElementById('profile-address-label').value
-                        },
-                        paymentInfo: {
-                            accountHolder: document.getElementById('payment-holder').value,
-                            bankName: document.getElementById('payment-bank').value,
-                            accountNumber: document.getElementById('payment-account').value,
-                            qrLink: document.getElementById('payment-qr').value
-                        },
-                        updatedAt: serverTimestamp()
-                    };
-                    
-                    // Add to log cache
-                    updates.logCache = arrayUnion({
-                        action: 'profile_update',
-                        timestamp: serverTimestamp(),
-                        fields: Object.keys(updates).filter(k => !['logCache','updatedAt'].includes(k))
-                    });
-                    
-                    await updateDoc(doc(db, 'vendors', Auth.currentUser.uid), updates);
-                    await Auth.loadUserProfile(Auth.currentUser.uid); // Refresh profile
-                    UI.showToast('Profil dikemaskini!', 'success');
-                } catch(error) {
-                    console.error('Update profile error:', error);
-                    UI.showToast('Gagal mengemaskini profil', 'error');
-                }
-            },
-                        changePassword: async () => {
-                const newPassword = document.getElementById('new-password').value;
-                if(newPassword.length < 6) {
-                    UI.showToast('Kata laluan minimum 6 aksara', 'error');
-                    return;
-                }
-                const success = await Auth.updatePassword(newPassword);
-                if(success) {
-                    document.getElementById('new-password').value = '';
-                }
-            },
-            
-            deleteAccount: async () => {
-                if(!confirm('PERHATIAN: Ini akan menyahaktifkan akaun anda secara kekal. Teruskan?')) {
-                    return;
-                }
-                try {
-                    SoundFX.click();
-                    await updateDoc(doc(db, 'vendors', Auth.currentUser.uid), {
-                        accountStatus: 'INACTIVE',
-                        deletedAt: serverTimestamp(),
-                        logCache: arrayUnion({
-                            action: 'account_deletion_requested',
-                            timestamp: serverTimestamp()
-                        })
-                    });
-                    UI.showToast('Akaun telah dinyahaktifkan', 'info');
-                    await Auth.logout();
-                } catch(error) {
-                    UI.showToast('Gagal memproses permintaan', 'error');
-                }
-            }
-        };
-
-        // 💬 LIVE AGENT CHAT MODULE
-        const LiveAgent = {
-            activeChat: null,
-            messageListener: null,
-            
-            init: () => {
-                LiveAgent.bindEvents();
-                LiveAgent.loadContacts();
-            },
-            
-            bindEvents: () => {
-                document.getElementById('btn-send-message')?.addEventListener('click', LiveAgent.sendMessage);
-                document.getElementById('btn-record-voice')?.addEventListener('click', LiveAgent.toggleRecording);
-                document.getElementById('btn-attach-location')?.addEventListener('click', LiveAgent.sendLocation);
-                document.getElementById('chat-status-toggle')?.addEventListener('change', LiveAgent.updateStatus);
-                                // Auto-resize textarea
-                const textarea = document.getElementById('message-input');
-                textarea?.addEventListener('input', function() {
-                    this.style.height = 'auto';
-                    this.style.height = (this.scrollHeight) + 'px';
-                });
-            },
-            
-            loadContacts: async () => {
-                try {
-                    // Load customer contacts for this vendor
-                    const q = query(collection(db, 'chats'), 
-                        where('vendorId', '==', Auth.currentUser.uid),
-                        orderBy('lastMessageAt', 'desc')
-                    );
-                    const snapshot = await getDocs(q);
-                    const contacts = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                    LiveAgent.renderContacts(contacts);
-                } catch(error) {
-                    console.error('Load contacts error:', error);
-                }
-            },
-            
-            renderContacts: (contacts) => {
-                const list = document.getElementById('contacts-list');
-                if(!list) return;
-                
-                if(!contacts.length) {
-                    list.innerHTML = '<div class="empty-state">Tiada perbualan aktif</div>';
-                    return;
-                }
-                
-                list.innerHTML = contacts.map(contact => `
-                    <div class="contact-item ${contact.unread ? 'unread' : ''}" 
-                         data-chat-id="${contact.id}"
-                         data-customer-id="${contact.customerId}">
-                        <div class="contact-avatar">${contact.customerName?.[0] || 'C'}</div>
-                        <div class="contact-info">
-                            <div class="contact-name">${contact.customerName || 'Pelanggan'}</div>
-                            <div class="contact-preview">${contact.lastMessage?.substring(0, 40) || 'Mesej baru...'}</div>
-                        </div>
-                        <div class="contact-meta">
-                            <span class="contact-time">${LiveAgent.formatTime(contact.lastMessageAt)}</span>
-                            ${contact.unread ? '<span class="badge-new">•</span>' : ''}
-                        </div>
-                    </div>
-                `).join('');
-                
-                // Bind click events
-                list.querySelectorAll('.contact-item').forEach(item => {                    item.addEventListener('click', () => {
-                        SoundFX.click();
-                        LiveAgent.openChat(item.dataset.chatId, item.dataset.customerId);
-                    });
-                });
-            },
-            
-            openChat: async (chatId, customerId) => {
-                LiveAgent.activeChat = { chatId, customerId };
-                document.getElementById('chat-header-name').textContent = 
-                    document.querySelector(`[data-chat-id="${chatId}"] .contact-name`)?.textContent || 'Pelanggan';
-                
-                // Load messages
-                await LiveAgent.loadMessages(chatId);
-                
-                // Setup real-time message listener
-                LiveAgent.setupMessageListener(chatId);
-                
-                // Mark as read
-                await updateDoc(doc(db, 'chats', chatId), {
-                    unread: false,
-                    lastReadAt: serverTimestamp()
-                });
-            },
-            
-            setupMessageListener: (chatId) => {
-                // Unsubscribe previous listener
-                if(LiveAgent.messageListener) {
-                    LiveAgent.messageListener();
-                }
-                
-                const messagesRef = collection(db, 'chats', chatId, 'messages');
-                const q = query(messagesRef, orderBy('timestamp', 'asc'));
-                
-                LiveAgent.messageListener = onSnapshot(q, (snapshot) => {
-                    const messages = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                    LiveAgent.renderMessages(messages);
-                    
-                    // Auto-scroll to bottom
-                    const container = document.getElementById('messages-container');
-                    if(container) {
-                        container.scrollTop = container.scrollHeight;
-                    }
-                    
-                    // Play notification for new messages
-                    if(snapshot.docChanges().some(change => change.type === 'added')) {
-                        const lastMsg = messages[messages.length - 1];
-                        if(lastMsg?.senderId !== Auth.currentUser.uid) {
-                            SoundFX.notification();
-                        }                    }
-                });
-            },
-            
-            loadMessages: async (chatId) => {
-                try {
-                    const q = query(collection(db, 'chats', chatId, 'messages'), 
-                        orderBy('timestamp', 'asc'), 
-                        limit(50));
-                    const snapshot = await getDocs(q);
-                    const messages = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                    LiveAgent.renderMessages(messages);
-                } catch(error) {
-                    console.error('Load messages error:', error);
-                }
-            },
-            
-            renderMessages: (messages) => {
-                const container = document.getElementById('messages-container');
-                if(!container) return;
-                
-                container.innerHTML = messages.map(msg => {
-                    const isOwn = msg.senderId === Auth.currentUser.uid;
-                    return `
-                        <div class="message ${isOwn ? 'message-own' : 'message-other'}">
-                            <div class="message-bubble">
-                                <div class="message-content">${msg.text || ''}</div>
-                                ${msg.imageUrl ? `<img src="${msg.imageUrl}" class="message-image">` : ''}
-                                ${msg.location ? `<div class="message-location">📍 ${msg.location}</div>` : ''}
-                                <div class="message-meta">
-                                    <span>${LiveAgent.formatTime(msg.timestamp)}</span>
-                                    ${isOwn ? `<span class="message-status">${msg.read ? '✓✓' : '✓'}</span>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            },
-            
-            sendMessage: async () => {
-                const input = document.getElementById('message-input');
-                const text = input.value.trim();
-                if(!text || !LiveAgent.activeChat) return;
-                
-                try {
-                    SoundFX.click();
-                    await addDoc(collection(db, 'chats', LiveAgent.activeChat.chatId, 'messages'), {
-                        senderId: Auth.currentUser.uid,
-                        senderName: Auth.userProfile?.sellerName || 'Vendor',
-                        text,                        timestamp: serverTimestamp(),
-                        read: false
-                    });
-                    
-                    // Update chat last message
-                    await updateDoc(doc(db, 'chats', LiveAgent.activeChat.chatId), {
-                        lastMessage: text,
-                        lastMessageAt: serverTimestamp(),
-                        unread: true
-                    });
-                    
-                    input.value = '';
-                    input.style.height = 'auto';
-                } catch(error) {
-                    UI.showToast('Gagal menghantar mesej', 'error');
-                }
-            },
-            
-            toggleRecording: () => {
-                SoundFX.click();
-                UI.showToast('Ciri rakaman suara akan ditambah', 'info');
-                // Web Audio API recording implementation would go here
-            },
-            
-            sendLocation: () => {
-                SoundFX.click();
-                if(navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(async (position) => {
-                        const { latitude, longitude } = position.coords;
-                        const locationText = `https://maps.google.com/?q=${latitude},${longitude}`;
-                        
-                        await addDoc(collection(db, 'chats', LiveAgent.activeChat.chatId, 'messages'), {
-                            senderId: Auth.currentUser.uid,
-                            senderName: Auth.userProfile?.sellerName || 'Vendor',
-                            location: locationText,
-                            timestamp: serverTimestamp(),
-                            read: false
-                        });
-                        UI.showToast('Lokasi dihantar', 'success');
-                    }, () => {
-                        UI.showToast('Gagal mendapatkan lokasi', 'error');
-                    });
-                } else {
-                    UI.showToast('Geolocation tidak disokong', 'error');
-                }
-            },
-            
-            updateStatus: async (e) => {
-                const status = e.target.value;
-                try {                    await updateDoc(doc(db, 'vendors', Auth.currentUser.uid), {
-                        liveAgentStatus: status,
-                        statusUpdatedAt: serverTimestamp()
-                    });
-                    UI.showToast(`Status: ${status}`, 'info');
-                } catch(error) {
-                    console.error('Update status error:', error);
-                }
-            },
-            
-            formatTime: (timestamp) => {
-                if(!timestamp) return '';
-                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-                return date.toLocaleTimeString('ms-MY', { 
-                    hour: '2-digit', 
-                    minute: '2-digit',
-                    hour12: false 
-                });
-            }
-        };
-
-        // 👑 ADMIN DASHBOARD MODULE (Role-based)
-        const AdminPanel = {
-            init: () => {
-                if(Auth.isAdmin()) {
-                    document.getElementById('admin-section')?.classList.remove('hidden');
-                    AdminPanel.loadAdminData();
-                }
-            },
-            
-            loadAdminData: async () => {
-                // Load all vendors for admin management
-                try {
-                    const snapshot = await getDocs(collection(db, 'vendors'));
-                    const vendors = snapshot.docs.map(doc => ({id: doc.id, ...doc.data()}));
-                    AdminPanel.renderVendorsTable(vendors);
-                } catch(error) {
-                    console.error('Admin load error:', error);
-                }
-            },
-            
-            renderVendorsTable: (vendors) => {
-                const tbody = document.getElementById('admin-vendors-body');
-                if(!tbody) return;
-                
-                tbody.innerHTML = vendors.map(vendor => `
-                    <tr>
-                        <td><small>${vendor.uac || '-'}</small></td>
-                        <td>${vendor.sellerName || '-'}</td>
-                        <td>${vendor.businessName || '-'}</td>                        <td>${vendor.phone || '-'}</td>
-                        <td><small>${vendor.address?.location?.substring(0,20) || '-'}</small></td>
-                        <td><span class="badge badge-${AdminPanel.getStatusColor(vendor.accountStatus)}">
-                            ${vendor.accountStatus || 'ACTIVE'}
-                        </span></td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>${UI.formatCurrency((vendor.totalSales || 0) * ((vendor.commissionRate || 1)/100))}</td>
-                        <td>-</td>
-                        <td>
-                            <button class="btn-sm" onclick="AdminPanel.messageVendor('${vendor.uid}')">
-                                ✉️ Mesej
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-            },
-            
-            getStatusColor: (status) => {
-                const colors = {
-                    'ACTIVE': 'success',
-                    'INACTIVE': 'secondary',
-                    'BLOCKED': 'danger'
-                };
-                return colors[status] || 'secondary';
-            },
-            
-            messageVendor: (vendorId) => {
-                SoundFX.click();
-                UI.showToast('Ciri mesej admin akan ditambah', 'info');
-            },
-            
-            updateCommission: async () => {
-                const rate = parseFloat(document.getElementById('admin-commission-rate').value);
-                if(rate < 0.01 || rate > 5) {
-                    UI.showToast('Kadar komisen: 0.01 - 5.00 MYR', 'error');
-                    return;
-                }
-                try {
-                    await updateDoc(doc(db, 'vendors', Auth.currentUser.uid), {
-                        commissionRate: rate,
-                        updatedAt: serverTimestamp()
-                    });
-                    UI.showToast('Kadar komisen dikemaskini!', 'success');
-                } catch(error) {
-                    UI.showToast('Gagal mengemaskini', 'error');
-                }
-            }
-        };
-        // 🔄 AUTO-UPDATE & REALTIME SYNC
-        const AutoUpdate = {
-            init: () => {
-                // Setup global realtime listeners
-                setInterval(() => {
-                    if(Auth.currentUser) {
-                        // Refresh critical data every 30 seconds
-                        VendorPanel.loadVendorStats();
-                        Cart.updateBadge();
-                    }
-                }, 30000);
-                
-                // Listen for tab visibility changes to refresh
-                document.addEventListener('visibilitychange', () => {
-                    if(!document.hidden && Auth.currentUser) {
-                        VendorPanel.loadOrders();
-                        LiveAgent.loadContacts();
-                    }
-                });
-            }
-        };
-
-        // 🚀 APP INITIALIZATION
-        const App = {
-            init: async () => {
-                // Initialize sound system on first user interaction
-                document.addEventListener('click', () => SoundFX.init(), { once: true });
-                
-                // Initialize modules
-                Auth.init();
-                ProductCatalog.init();
-                Cart.init();
-                VendorPanel.init();
-                AdminPanel.init();
-                AutoUpdate.init();
-                
-                // Setup global event listeners
-                document.getElementById('btn-login')?.addEventListener('click', () => {
-                    SoundFX.click();
-                    const email = document.getElementById('login-email').value;
-                    const password = document.getElementById('login-password').value;
-                    Auth.login(email, password);
-                });
-                
-                document.getElementById('btn-register')?.addEventListener('click', () => {
-                    SoundFX.click();
-                    const email = document.getElementById('register-email').value;
-                    const password = document.getElementById('register-password').value;
-                    const sellerName = document.getElementById('register-name').value;
-                    Auth.register(email, password, sellerName);                });
-                
-                document.getElementById('btn-google-login')?.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    Auth.loginWithGoogle();
-                });
-                
-                document.getElementById('btn-github-login')?.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    Auth.loginWithGithub();
-                });
-                
-                // Close modals
-                document.querySelectorAll('.modal-close, .modal-overlay').forEach(el => {
-                    el.addEventListener('click', (e) => {
-                        if(e.target === el || el.classList.contains('modal-close')) {
-                            SoundFX.click();
-                            document.querySelectorAll('.modal').forEach(m => m.classList.add('hidden'));
-                        }
-                    });
-                });
-                
-                console.log('✅ MFD Store Vendor Panel Initialized');
-                UI.showToast('Sistem siap! Sila login untuk meneruskan.', 'info', 5000);
-            }
-        };
-
-        // Start the app when DOM is ready
-        if(document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', App.init);
-        } else {
-            App.init();
-        }
-
-        // Export for global access (debugging)
-        window.MFD = { Auth, ProductCatalog, VendorPanel, LiveAgent, AdminPanel, UI, SoundFX };
-    </script>
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
-        /* 🎨 YELLOW GRADIENT THEME + GLITTER EFFECTS */
         :root {
             --primary: #FFD700;
             --primary-dark: #FFA500;
             --primary-light: #FFF9E6;
             --secondary: #FF6B6B;
             --success: #4CAF50;
-            --warning: #FF9800;
             --danger: #F44336;
-            --info: #2196F3;
-            --dark: #2C3E50;            --light: #F8F9FA;
-            --gray: #6C757D;
-            --glitter: rgba(255, 215, 0, 0.1);
-            --shadow: 0 4px 20px rgba(0,0,0,0.15);
-            --radius: 16px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --dark: #2C3E50;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.6);
         }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #FFF9E6 0%, #FFECB3 50%, #FFE082 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             color: var(--dark);
-            line-height: 1.6;
             min-height: 100vh;
             overflow-x: hidden;
         }
-        
-        /* ✨ GLITTER ANIMATION */
-        @keyframes glitter {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.05); }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .glitter-bg {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: 
-                radial-gradient(circle at 20% 35%, var(--glitter) 0%, transparent 20%),
-                radial-gradient(circle at 80% 15%, var(--glitter) 0%, transparent 20%),
-                radial-gradient(circle at 40% 75%, var(--glitter) 0%, transparent 20%),
-                radial-gradient(circle at 90% 60%, var(--glitter) 0%, transparent 20%);
-            animation: glitter 3s ease-in-out infinite;
-            pointer-events: none;
-            z-index: -1;
-        }
-        
-        /* 🧭 LAYOUT */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-                /* 🎯 HEADER */
-        header {
-            background: linear-gradient(120deg, var(--primary), var(--primary-dark));
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+
+        .glitter-text {
+            background: linear-gradient(to right, #FFD700, #FF6B6B, #FF8C00, #FFD700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            background-size: 300% auto;
+            animation: shine 4s linear infinite;
             font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--dark);
-            text-decoration: none;
         }
-        
-        .logo-icon {
-            font-size: 1.8rem;
-            animation: glitter 2s ease-in-out infinite;
-        }
-        
-        /* 🔍 SEARCH BAR */
-        .search-bar {
-            flex: 1;
-            max-width: 500px;
-            margin: 0 2rem;
-            position: relative;
-        }
-        
-        .search-bar input {
-            width: 100%;
-            padding: 0.8rem 1rem 0.8rem 3rem;
-            border: none;
-            border-radius: 50px;
-            background: white;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-        
-        .search-bar input:focus {
-            outline: none;            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.4);
-            transform: scale(1.02);
-        }
-        
-        .search-bar i {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray);
-        }
-        
-        /* 👤 USER ACTIONS */
-        .user-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .btn {
-            padding: 0.6rem 1.5rem;
-            border: none;
-            border-radius: 50px;
-            background: var(--dark);
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            text-decoration: none;
-            font-size: 0.95rem;
-        }
-        
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.25);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--dark);
-        }
-        
-        .btn-success { background: var(--success); }
-        .btn-warning { background: var(--warning); color: var(--dark); }
-        .btn-danger { background: var(--danger); }
-        .btn-sm { padding: 0.4rem 1rem; font-size: 0.85rem; }
-        .btn-icon {             background: none; 
-            border: none; 
-            font-size: 1.2rem; 
-            cursor: pointer;
-            padding: 0.3rem;
-            border-radius: 8px;
-            transition: var(--transition);
-        }
-        .btn-icon:hover { background: rgba(0,0,0,0.1); transform: scale(1.1); }
-        
-        .cart-icon {
-            position: relative;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 50%;
-            transition: var(--transition);
-        }
-        .cart-icon:hover { background: rgba(0,0,0,0.1); }
-        #cart-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--danger);
-            color: white;
-            font-size: 0.75rem;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-        }
-        
-        /* 🔐 AUTH SECTION */
-        #auth-section {
-            max-width: 450px;
-            margin: 3rem auto;
-            background: white;
-            border-radius: var(--radius);
-            padding: 2.5rem;
-            box-shadow: var(--shadow);
-            animation: float 5s ease-in-out infinite;
-        }
-        
-        .auth-tabs {
-            display: flex;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid var(--primary-light);        }
-        
-        .auth-tab {
-            flex: 1;
-            padding: 1rem;
-            text-align: center;
-            cursor: pointer;
-            font-weight: 600;
-            color: var(--gray);
-            transition: var(--transition);
-            border-bottom: 3px solid transparent;
-        }
-        
-        .auth-tab.active {
-            color: var(--primary-dark);
-            border-bottom-color: var(--primary);
-        }
-        
-        .auth-form { display: none; }
-        .auth-form.active { display: block; animation: fadeIn 0.3s ease; }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--dark);
-        }
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 0.9rem;
-            border: 2px solid var(--primary-light);
-            border-radius: 12px;
-            font-size: 1rem;
-            transition: var(--transition);
-            background: var(--light);
-        }
-        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 4px var(--glitter);
-        }
-        
-        .social-login {
-            display: flex;
-            gap: 1rem;
-            margin: 1.5rem 0;        }
-        .social-btn {
-            flex: 1;
-            padding: 0.8rem;
-            border: 2px solid var(--primary-light);
-            border-radius: 12px;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            transition: var(--transition);
-            font-weight: 600;
-            text-decoration: none;
-            color: var(--dark);
-        }
-        .social-btn:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-        .social-btn.google { color: #DB4437; }
-        .social-btn.github { color: #333; }
-        
-        /* 🏪 VENDOR PANEL */
-        #vendor-panel { display: none; }
-        #vendor-panel:not(.hidden) { display: block; }
-        
-        .panel-header {
-            background: white;
-            border-radius: var(--radius);
-            padding: 1.5rem 2rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .avatar {
-            width: 50px;
-            height: 50px;            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: var(--dark);
-            font-size: 1.2rem;
-        }
-        
-        /* 🧭 NAVIGATION TABS */
-        .nav-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-            background: white;
-            padding: 0.5rem;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-        }
-        .nav-tab {
-            padding: 0.8rem 1.5rem;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: var(--transition);
-            color: var(--gray);
-        }
-        .nav-tab:hover, .nav-tab.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--dark);
-            transform: translateY(-2px);
-        }
-        
-        /* 📊 DASHBOARD CARDS */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-        .stat-card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            text-align: center;
-            transition: var(--transition);
-            border: 2px solid transparent;        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
-        }
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--primary-dark);
-            margin: 0.5rem 0;
-        }
-        .stat-label { color: var(--gray); font-size: 0.9rem; }
-        
-        /* 📦 PRODUCT CATALOG */
-        .catalog-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-        
-        .product-card {
-            background: white;
-            border-radius: var(--radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-        }
-        .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-        }
-        
-        .product-image {
-            position: relative;
-            height: 200px;
-            background: var(--primary-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;        }
-        .product-card:hover .product-image img { transform: scale(1.05); }
-        
-        .event-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: linear-gradient(135deg, var(--secondary), #FF5252);
-            color: white;
-            padding: 0.3rem 0.8rem;
+        @keyframes shine { to { background-position: 300% center; } }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
             border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            animation: glitter 2s ease-in-out infinite;
+            box-shadow: 0 8px 32px 0 rgba(255, 215, 0, 0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        
-        .product-info { padding: 1.2rem; flex: 1; display: flex; flex-direction: column; }
-        .product-name {
-            font-weight: 700;
-            margin-bottom: 0.5rem;
+
+        .glass-panel:hover { transform: translateY(-2px); box-shadow: 0 12px 40px 0 rgba(255, 215, 0, 0.35); }
+
+        .btn-glitter {
+            background: linear-gradient(45deg, #FFD700, #FF8C00, #FF6B6B, #FFA500);
+            background-size: 300% 300%;
+            animation: gradientMove 4s ease infinite;
             color: var(--dark);
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        .product-price {
-            margin: 0.5rem 0;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .price-sale {
-            font-weight: 800;
-            font-size: 1.3rem;
-            color: var(--primary-dark);
-        }
-        .price-original {
-            text-decoration: line-through;
-            color: var(--gray);
-            font-size: 0.95rem;
-        }
-        .product-meta {
-            display: flex;
-            justify-content: space-between;
-            margin: 0.8rem 0;
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-        .product-footer {            margin-top: auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 0.8rem;
-            border-top: 1px solid var(--primary-light);
-        }
-        .badge {
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        .badge-success { background: #E8F5E9; color: #2E7D32; }
-        .badge-warning { background: #FFF3E0; color: #EF6C00; }
-        .badge-danger { background: #FFEBEE; color: #C62828; }
-        .badge-info { background: #E3F2FD; color: #1565C0; }
-        .badge-primary { background: #E8EAF6; color: #283593; }
-        .badge-secondary { background: #ECEFF1; color: #455A64; }
-        
-        /* 📋 TABLES */
-        .table-container {
-            background: white;
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            box-shadow: var(--shadow);
-            overflow-x: auto;
-            margin: 1.5rem 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px;
-        }
-        th, td {
-            padding: 1rem;
-            text-align: left;
-            border-bottom: 1px solid var(--primary-light);
-        }
-        th {
-            background: var(--primary-light);
-            font-weight: 700;
-            color: var(--dark);
-            position: sticky;
-            top: 0;
-        }
-        tr:hover { background: var(--glitter); }
-        .thumb-img {
-            width: 40px;
-            height: 40px;            border-radius: 8px;
-            object-fit: cover;
-            background: var(--primary-light);
-        }
-        .empty-row { text-align: center; color: var(--gray); padding: 2rem !important; }
-        
-        /* 💬 LIVE CHAT */
-        .chat-container {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 1.5rem;
-            height: calc(100vh - 250px);
-            min-height: 500px;
-        }
-        
-        .contacts-panel {
-            background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .contacts-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--primary-light);
-            font-weight: 700;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .contacts-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0.5rem;
-        }
-        .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            padding: 0.8rem;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            margin-bottom: 0.3rem;
-        }
-        .contact-item:hover, .contact-item.active {
-            background: var(--primary-light);
-        }
-        .contact-item.unread {            background: linear-gradient(135deg, var(--primary-light), #FFF3E0);
-            border-left: 3px solid var(--primary);
-        }
-        .contact-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-weight: bold;
-            color: var(--dark);
-            flex-shrink: 0;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 165, 0, 0.4);
         }
-        .contact-info { flex: 1; min-width: 0; }
-        .contact-name { font-weight: 600; margin-bottom: 0.2rem; }
-        .contact-preview {
-            color: var(--gray);
-            font-size: 0.9rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .contact-meta {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 0.3rem;
-            font-size: 0.8rem;
-            color: var(--gray);
-        }
-        .badge-new {
-            background: var(--danger);
-            color: white;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            animation: glitter 1.5s ease-in-out infinite;
-        }
-        
-        .chat-panel {
-            background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        .chat-header {            padding: 1rem 1.5rem;
-            border-bottom: 1px solid var(--primary-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--primary-light);
-        }
-        .chat-status {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-        }
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--success);
-            animation: glitter 2s ease-in-out infinite;
-        }
-        .status-dot.offline { background: var(--gray); }
-        
-        .messages-container {
-            flex: 1;
-            padding: 1.5rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            background: var(--light);
-        }
-        .message { display: flex; margin-bottom: 0.5rem; }
-        .message-own { justify-content: flex-end; }
-        .message-bubble {
-            max-width: 70%;
-            padding: 0.8rem 1.2rem;
-            border-radius: 18px;
-            background: white;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            position: relative;
-        }
-        .message-own .message-bubble {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--dark);
-            border-bottom-right-radius: 4px;
-        }
-        .message-other .message-bubble {
-            border-bottom-left-radius: 4px;
-        }
-        .message-content { margin-bottom: 0.3rem; word-wrap: break-word; }        .message-image {
-            max-width: 100%;
-            border-radius: 12px;
-            margin: 0.5rem 0;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .message-location {
-            background: var(--primary-light);
-            padding: 0.5rem;
-            border-radius: 8px;
-            margin: 0.5rem 0;
-            font-size: 0.9rem;
-        }
-        .message-meta {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.5rem;
-            font-size: 0.75rem;
-            color: var(--gray);
-            margin-top: 0.3rem;
-        }
-        .message-own .message-meta { color: rgba(0,0,0,0.7); }
-        .message-status { font-weight: bold; }
-        
-        .chat-input {
-            padding: 1rem;
-            border-top: 1px solid var(--primary-light);
-            background: white;
-            display: flex;
-            gap: 0.8rem;
-            align-items: flex-end;
-        }
-        .chat-input textarea {
-            flex: 1;
-            padding: 0.8rem 1.2rem;
-            border: 2px solid var(--primary-light);
-            border-radius: 24px;
-            resize: none;
-            min-height: 44px;
-            max-height: 120px;
-            font-family: inherit;
-            transition: var(--transition);
-        }
-        .chat-input textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px var(--glitter);
-        }
-        .chat-actions {
-            display: flex;            gap: 0.5rem;
-            align-items: center;
-        }
-        .chat-action-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            background: var(--primary-light);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 1.1rem;
-        }
-        .chat-action-btn:hover {
-            background: var(--primary);
-            transform: scale(1.1);
-        }
-        #btn-send-message {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--dark);
-            font-weight: 600;
-            width: auto;
-            border-radius: 24px;
-            padding: 0 1.5rem;
-        }
-        
-        /* 🗂️ MODALS */
-        .modal {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 1rem;
-            animation: fadeIn 0.2s ease;
-        }
-        .modal.hidden { display: none; }
-        .modal-content {
-            background: white;
-            border-radius: var(--radius);
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);            animation: float 0.4s ease-out;
-        }
-        .modal-header {
-            padding: 1.5rem 2rem;
-            border-bottom: 1px solid var(--primary-light);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 1;
-        }
-        .modal-title { font-weight: 700; font-size: 1.3rem; }
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        .modal-close:hover { background: var(--primary-light); }
-        .modal-body { padding: 2rem; }
-        .modal-footer {
-            padding: 1.5rem 2rem;
-            border-top: 1px solid var(--primary-light);
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-            position: sticky;
-            bottom: 0;
-            background: white;
-        }
-        
-        /* 🍞 TOAST NOTIFICATIONS */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.25);            z-index: 2000;
-            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            max-width: 350px;
-        }
-        .toast-success { background: linear-gradient(135deg, var(--success), #43A047); }
-        .toast-error { background: linear-gradient(135deg, var(--danger), #E53935); }
-        .toast-info { background: linear-gradient(135deg, var(--info), #1E88E5); }
-        .toast-warning { background: linear-gradient(135deg, var(--warning), #FB8C00); color: var(--dark); }
-        .toast-hide { animation: slideOut 0.3s ease forwards; }
-        
-        @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { to { transform: translateX(100px); opacity: 0; } }
-        @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
-        
-        /* ⏳ LOADING SPINNER */
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--primary-light);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 2rem auto;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading { opacity: 0.7; pointer-events: none; }
-        
-        /* 📱 RESPONSIVE DESIGN */
-        @media (max-width: 1024px) {
-            .chat-container { grid-template-columns: 1fr; }
-            .contacts-panel { max-height: 300px; }
-            .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
-        }
-        
-        @media (max-width: 768px) {
-            header { flex-direction: column; gap: 1rem; padding: 1rem; }
-            .search-bar { margin: 0; width: 100%; max-width: none; }
-            .user-actions { width: 100%; justify-content: center; }
-            .nav-tabs { overflow-x: auto; padding-bottom: 0.5rem; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .panel-header { flex-direction: column; text-align: center; }
-            .chat-container { height: auto; min-height: 400px; }
-            .messages-container { max-height: 400px; }
-        }
-        
-        @media (max-width: 480px) {
-            .stats-grid { grid-template-columns: 1fr; }            .product-card { min-width: 100%; }
-            .social-login { flex-direction: column; }
-            .auth-form { padding: 0 1rem; }
-            table { font-size: 0.85rem; }
-            th, td { padding: 0.7rem 0.5rem; }
-        }
-        
-        /* 🎨 UTILITY CLASSES */
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .text-right { text-align: right; }
-        .mt-1 { margin-top: 0.5rem; }
-        .mt-2 { margin-top: 1rem; }
-        .mb-1 { margin-bottom: 0.5rem; }
-        .mb-2 { margin-bottom: 1rem; }
-        .flex { display: flex; }
-        .flex-wrap { flex-wrap: wrap; }
-        .items-center { align-items: center; }
-        .justify-between { justify-content: space-between; }
-        .gap-1 { gap: 0.5rem; }
-        .gap-2 { gap: 1rem; }
-        .w-full { width: 100%; }
-        .empty-state {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: var(--gray);
-            font-style: italic;
-        }
-        
-        /* ✨ FINAL TOUCHES */
-        ::selection { background: var(--primary); color: var(--dark); }
+
+        .btn-glitter:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-glitter:active { transform: scale(0.98); }
+
+        @keyframes gradientMove { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }
+
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--primary-light); border-radius: 10px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.3); }
         ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary-dark); }
-        
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
+
+        /* Utilities */
+        .hidden-section { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Table Styles */
+        .table-container { overflow-x: auto; border-radius: 15px; box-shadow: 0 4px 6px rgba(255, 215, 0, 0.1); background: rgba(255,255,255,0.6); }
+        .custom-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1000px; font-size: 0.85rem; }
+        .custom-table th { background: linear-gradient(135deg, #FFD700, #FFA500); padding: 12px; text-align: left; font-weight: 700; color: var(--dark); position: sticky; top: 0; }
+        .custom-table td { padding: 10px; border-bottom: 1px solid #edf2f7; background: rgba(255,255,255,0.5); }
+        .custom-table tr:hover td { background: rgba(255, 249, 230, 0.9); }
+
+        /* Badges */
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
+        .badge-success { background: #c6f6d5; color: #22543d; }        .badge-warning { background: #feebc8; color: #744210; }
+        .badge-danger { background: #fed7d7; color: #822727; }
+        .badge-info { background: #bee3f8; color: #2a4365; }
+
+        /* Chat */
+        .chat-container { display: grid; grid-template-columns: 300px 1fr; gap: 1rem; height: 70vh; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .msg-bubble { max-width: 80%; padding: 10px 15px; border-radius: 15px; position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .msg-me { align-self: flex-end; background: linear-gradient(135deg, #FFD700, #FFA500); color: var(--dark); border-bottom-right-radius: 2px; }
+        .msg-other { align-self: flex-start; background: white; color: var(--dark); border-bottom-left-radius: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        /* Toast */
+        .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; border-radius: 10px; color: white; font-weight: 600; z-index: 9999; animation: slideIn 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .toast.success { background: var(--success); }
+        .toast.error { background: var(--danger); }
+        .toast.info { background: #2196F3; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Loader */
+        .loader { border: 4px solid rgba(255,255,255,0.3); border-left-color: #FFD700; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        @media (max-width: 768px) {
+            .chat-container { grid-template-columns: 1fr; }
+            .contacts-panel { display: none; }
+            .contacts-panel.active { display: block; position: absolute; inset: 0; z-index: 10; background: white; }
         }
     </style>
 </head>
-<body>
-    <!-- ✨ GLITTER BACKGROUND -->
-    <div class="glitter-bg"></div>
-    
-    <!-- 🧭 HEADER -->    <header>
-        <a href="#" class="logo">
-            <span class="logo-icon">✨</span>
-            MFD Store Vendor
-        </a>
-        
-        <div class="search-bar">
-            <span>🔍</span>
-            <input type="text" id="search-input" placeholder="Cari produk, vendor, atau kategori...">
-        </div>
-        
-        <div class="user-actions">
-            <div class="cart-icon">
-                🛒
-                <span id="cart-badge">0</span>
-            </div>
-            <button id="btn-logout" class="btn btn-sm" style="display:none;">🚪 Log Keluar</button>
-            <span id="user-email" style="font-weight:600;display:none;"></span>
-        </div>
-    </header>
-    
-    <div class="container">
-        <!-- 🔐 AUTHENTICATION SECTION -->
-        <section id="auth-section">
-            <div class="auth-tabs">
-                <div class="auth-tab active" data-target="login-form">Login Account</div>
-                <div class="auth-tab" data-target="register-form">Register Account</div>
-            </div>
-            
-            <!-- Login Form -->
-            <form id="login-form" class="auth-form active">
-                <div class="form-group">
-                    <label for="login-email">📧 Email Address</label>
-                    <input type="email" id="login-email" required placeholder="nama@email.com">
-                </div>
-                <div class="form-group">
-                    <label for="login-password">🔑 Password</label>
-                    <input type="password" id="login-password" required placeholder="••••••••">
-                </div>
-                <button type="button" id="btn-login" class="btn btn-primary w-full">
-                    🔐 Login Account
-                </button>
-                
-                <div class="social-login">
-                    <a href="#" id="btn-google-login" class="social-btn google">
-                        <span>G</span> Google
-                    </a>
-                    <a href="#" id="btn-github-login" class="social-btn github">
-                        <span>⌘</span> GitHub
-                    </a>                </div>
-                
-                <p style="text-align:center;color:var(--gray);font-size:0.9rem;">
-                    Dengan login, anda bersetuju dengan <a href="#" style="color:var(--primary-dark)">Terma & Syarat</a> MFD Store
-                </p>
-            </form>
-            
-            <!-- Register Form -->
-            <form id="register-form" class="auth-form">
-                <div class="form-group">
-                    <label for="register-name">👤 Seller Name (Optional)</label>
-                    <input type="text" id="register-name" placeholder="Nama kedai anda">
-                </div>
-                <div class="form-group">
-                    <label for="register-email">📧 Email Address</label>
-                    <input type="email" id="register-email" required placeholder="nama@email.com">
-                </div>
-                <div class="form-group">
-                    <label for="register-password">🔑 Password (Min 6 aksara)</label>
-                    <input type="password" id="register-password" required minlength="6" placeholder="••••••••">
-                </div>
-                <button type="button" id="btn-register" class="btn btn-primary w-full">
-                    ✨ Register Account
-                </button>
-                
-                <p style="text-align:center;color:var(--gray);font-size:0.9rem;margin-top:1rem;">
-                    Sudah ada akaun? <a href="#" onclick="document.querySelector('.auth-tab:first-child').click();return false;" style="color:var(--primary-dark);font-weight:600;">Login disini</a>
-                </p>
-            </form>
-        </section>
-        
-        <!-- 🏪 VENDOR PANEL (Hidden until login) -->
-        <section id="vendor-panel" class="hidden">
-            <!-- Panel Header -->
-            <div class="panel-header">
-                <div class="user-info">
-                    <div class="avatar" id="avatar-initial">V</div>
-                    <div>
-                        <div style="font-weight:700;font-size:1.2rem;" id="seller-name">Loading...</div>
-                        <div style="color:var(--gray);font-size:0.9rem;">
-                            VEN ID: <span id="ven-id-display">...</span> | 
-                            UAC: <span id="uac-display">...</span>
-                        </div>
-                    </div>
-                </div>
-                <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
-                    <span class="badge badge-success" id="profile-status">ACTIVE</span>
-                    <button class="btn btn-sm" onclick="document.getElementById('product-form-modal').classList.remove('hidden')">
-                        ➕ Tambah Produk
-                    </button>                    <button class="btn btn-sm btn-warning" onclick="LiveAgent.loadContacts()">
-                        💬 Live Agent
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Navigation Tabs -->
-            <div class="nav-tabs">
-                <div class="nav-tab active" data-target="dashboard-section">📊 Dashboard</div>
-                <div class="nav-tab" data-target="products-section">📦 Produk Saya</div>
-                <div class="nav-tab" data-target="orders-section">📋 Pesanan</div>
-                <div class="nav-tab" data-target="profile-section">⚙️ Profil & Tetapan</div>
-                <div class="nav-tab" data-target="chat-section" id="chat-tab">💬 Live Chat</div>
-                <div class="nav-tab" data-target="admin-section" id="admin-tab" style="display:none;">👑 Admin Panel</div>
-            </div>
-            
-            <!-- Dashboard Section -->
-            <section id="dashboard-section" class="panel-section">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">💰 Jualan Hari Ini</div>
-                        <div class="stat-value" id="stat-today-orders">RM 0.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">📈 Total Jualan</div>
-                        <div class="stat-value" id="stat-total-sales">RM 0.00</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">🎯 Produk Aktif</div>
-                        <div class="stat-value" id="stat-active-products">0</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">💸 Komisen MFD</div>
-                        <div class="stat-value" id="stat-commission">RM 0.00</div>
-                    </div>
-                </div>
-                
-                <h3 style="margin:2rem 0 1rem;">🔥 Produk Paling Laris</h3>
-                <div id="recommendations-grid" class="catalog-grid">
-                    <!-- Dynamic content loaded via JS -->
-                </div>
-            </section>
-            
-            <!-- Products Management Section -->
-            <section id="products-section" class="panel-section hidden">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-                    <h3>📋 Senarai Produk Dilancarkan</h3>
-                    <button class="btn btn-primary btn-sm" onclick="VendorPanel.showAddProductForm()">
-                        ➕ Tambah Produk Baharu
-                    </button>                </div>
-                
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>BIL</th>
-                                <th>GAMBAR</th>
-                                <th>NAMA ITEM</th>
-                                <th>HARGA JUALAN</th>
-                                <th>RATING</th>
-                                <th>STATUS</th>
-                                <th>TOTAL SOLD</th>
-                                <th>ACTION</th>
-                            </tr>
-                        </thead>
-                        <tbody id="products-table-body">
-                            <tr><td colspan="8" class="empty-row">Memuatkan data produk...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-            
-            <!-- Orders Management Section -->
-            <section id="orders-section" class="panel-section hidden">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-                    <h3>📋 Pesanan Pelanggan</h3>
-                    <button class="btn btn-sm" id="btn-refresh-orders">🔄 Refresh</button>
-                </div>
-                
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>UAC</th>
-                                <th>PELANGGAN</th>
-                                <th>ITEM</th>
-                                <th>KODE</th>
-                                <th>ALAMAT</th>
-                                <th>QTY</th>
-                                <th>TOTAL</th>
-                                <th>PAYMENT</th>
-                                <th>STATUS BAYARAN</th>
-                                <th>TRACKING</th>
-                                <th>ID PESANAN</th>
-                                <th>KATEGORI</th>
-                            </tr>
-                        </thead>
-                        <tbody id="orders-table-body">
-                            <tr><td colspan="12" class="empty-row">Memuatkan pesanan...</td></tr>                        </tbody>
-                    </table>
-                </div>
-            </section>
-            
-            <!-- Profile & Settings Section -->
-            <section id="profile-section" class="panel-section hidden">
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2rem;">
-                    <!-- Seller Information -->
-                    <div class="table-container">
-                        <h4 style="margin-bottom:1.5rem;">👤 Maklumat Penjual</h4>
-                        <div class="form-group">
-                            <label>Seller Name (Auto: VENFD format)</label>
-                            <input type="text" id="profile-seller-name" placeholder="Nama penjual">
-                        </div>
-                        <div class="form-group">
-                            <label>Business Name</label>
-                            <input type="text" id="profile-business-name" placeholder="Nama perniagaan">
-                        </div>
-                        <div class="form-group">
-                            <label>Deskripsi Business</label>
-                            <textarea id="profile-business-desc" rows="3" placeholder="Ceritakan tentang perniagaan anda"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>📱 Phone Number</label>
-                            <input type="tel" id="profile-phone" placeholder="+60123456789">
-                        </div>
-                        <div class="form-group">
-                            <label>📧 Email Address (Optional)</label>
-                            <input type="email" id="profile-email" placeholder="email@bisnes.com">
-                        </div>
-                        <div class="form-group">
-                            <label>🔑 Unique Account Code (UAC)</label>
-                            <input type="text" id="profile-uac" readonly style="background:var(--primary-light);font-weight:600;">
-                        </div>
-                        <div class="form-group">
-                            <label>🆔 Vendor ID</label>
-                            <input type="text" id="profile-venid" readonly style="background:var(--primary-light);font-weight:600;">
-                        </div>
-                        <button class="btn btn-primary" id="btn-update-profile">💾 Simpan Perubahan</button>
-                    </div>
-                    
-                    <!-- Address & Payment -->
-                    <div class="table-container">
-                        <h4 style="margin-bottom:1.5rem;">📍 Alamat & Pembayaran</h4>
-                        <div class="form-group">
-                            <label>Shop Address</label>
-                            <textarea id="profile-address" rows="2" placeholder="No. Rumah, Jalan, Poskod, Negeri"></textarea>
-                        </div>
-                        <div class="form-group">                            <label>Label Alamat</label>
-                            <select id="profile-address-label">
-                                <option value="Home">🏠 Home</option>
-                                <option value="Work">💼 Work</option>
-                                <option value="Warehouse">📦 Warehouse</option>
-                            </select>
-                        </div>
-                        <hr style="margin:1.5rem 0;border-color:var(--primary-light);">
-                        <h5 style="margin-bottom:1rem;">💳 Maklumat Pembayaran</h5>
-                        <div class="form-group">
-                            <label>Account Holder Name</label>
-                            <input type="text" id="payment-holder" placeholder="Nama pemegang akaun">
-                        </div>
-                        <div class="form-group">
-                            <label>Bank / E-Wallet</label>
-                            <select id="payment-bank">
-                                <option value="">Pilih bank/e-wallet</option>
-                                <option value="Maybank">Maybank</option>
-                                <option value="CIMB">CIMB</option>
-                                <option value="Public Bank">Public Bank</option>
-                                <option value="Touch 'n Go eWallet">Touch 'n Go eWallet</option>
-                                <option value="DuitNow QR">DuitNow QR</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Account Number / QR Link</label>
-                            <input type="text" id="payment-account" placeholder="Nombor akaun atau paste link QR">
-                        </div>
-                        <div class="form-group">
-                            <label>QR Code Image (Optional)</label>
-                            <input type="url" id="payment-qr" placeholder="https://.../qr-code.png">
-                        </div>
-                    </div>
-                    
-                    <!-- Security & Account -->
-                    <div class="table-container" style="grid-column:1/-1;">
-                        <h4 style="margin-bottom:1.5rem;">🔒 Keselamatan & Akaun</h4>
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1.5rem;">
-                            <div>
-                                <label>🔄 Tukar Password</label>
-                                <div style="display:flex;gap:0.5rem;margin-top:0.5rem;">
-                                    <input type="password" id="new-password" placeholder="Password baru" style="flex:1;">
-                                    <button class="btn btn-sm" id="btn-change-password">Tukar</button>
-                                </div>
-                            </div>
-                            <div>
-                                <label>Status Akaun</label>
-                                <div style="margin-top:0.5rem;padding:0.8rem;background:var(--primary-light);border-radius:12px;font-weight:600;">
-                                    <span id="profile-status-display">ACTIVE</span>
-                                </div>                            </div>
-                            <div>
-                                <label>🗓️ Log Cache</label>
-                                <div style="margin-top:0.5rem;font-size:0.9rem;color:var(--gray);">
-                                    Dikemaskini: <span id="last-updated">-</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-top:2rem;padding-top:1.5rem;border-top:2px dashed var(--primary-light);">
-                            <h5 style="color:var(--danger);margin-bottom:0.5rem;">⚠️ Zon Bahaya</h5>
-                            <p style="color:var(--gray);margin-bottom:1rem;font-size:0.95rem;">
-                                Tindakan ini akan menyahaktifkan akaun anda secara kekal. Semua data akan diarkibkan.
-                            </p>
-                            <button class="btn btn-danger" id="btn-delete-account">🗑️ Padam Akaun Secara Kekal</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Live Chat Section -->
-            <section id="chat-section" class="panel-section hidden">
-                <div class="chat-container">
-                    <!-- Contacts Panel -->
-                    <div class="contacts-panel">
-                        <div class="contacts-header">
-                            <span>👥 Pelanggan</span>
-                            <select id="chat-status-toggle" style="padding:0.4rem 0.8rem;border-radius:8px;border:1px solid var(--primary-light);">
-                                <option value="Online">🟢 Online</option>
-                                <option value="Away">🟡 Away</option>
-                                <option value="Busy">🔴 Busy</option>
-                                <option value="Offline">⚫ Offline</option>
-                            </select>
-                        </div>
-                        <div class="contacts-list" id="contacts-list">
-                            <div class="empty-state">Tiada perbualan aktif</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Chat Panel -->
-                    <div class="chat-panel">
-                        <div class="chat-header">
-                            <div>
-                                <strong id="chat-header-name">Pilih pelanggan untuk mula berborak</strong>
-                                <div class="chat-status">
-                                    <span class="status-dot" id="agent-status-dot"></span>
-                                    <span id="agent-status-text">Online</span>
-                                </div>
-                            </div>
-                            <div style="display:flex;gap:0.5rem;">                                <button class="btn-icon" title="Padam Mesej">🗑️</button>
-                                <button class="btn-icon" title="Tetapkan Mesej">📌</button>
-                                <button class="btn-icon" title="Tetapkan Blok">🚫</button>
-                            </div>
-                        </div>
-                        
-                        <div class="messages-container" id="messages-container">
-                            <div class="empty-state" style="margin:auto;">
-                                👋 Pilih pelanggan dari senarai untuk mula perbualan<br>
-                                <small style="color:var(--gray);">Mesej akan diselaraskan secara real-time</small>
-                            </div>
-                        </div>
-                        
-                        <div class="chat-input">
-                            <textarea id="message-input" placeholder="Taip mesej... (Shift+Enter untuk baris baru)"></textarea>
-                            <div class="chat-actions">
-                                <button class="chat-action-btn" id="btn-attach-location" title="Hantar Lokasi">📍</button>
-                                <button class="chat-action-btn" id="btn-record-voice" title="Rakam Suara">🎤</button>
-                                <button class="chat-action-btn" title="Muatnaik Foto">🖼️</button>
-                                <button class="btn btn-primary btn-sm" id="btn-send-message">Hantar</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Admin Panel Section (Role-based) -->
-            <section id="admin-section" class="panel-section hidden">
-                <div style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:1.5rem;border-radius:var(--radius);margin-bottom:2rem;">
-                    <h3 style="margin-bottom:0.5rem;">👑 Dashboard Admin MFD Store</h3>
-                    <p style="opacity:0.9;">Urus vendor, komisen, dan data sistem secara berpusat</p>
-                </div>
-                
-                <div class="table-container">
-                    <h4 style="margin-bottom:1rem;">📊 Database Vendor</h4>
-                    <div style="margin-bottom:1rem;display:flex;gap:1rem;flex-wrap:wrap;">
-                        <div style="flex:1;min-width:200px;">
-                            <label style="font-size:0.9rem;">Kadar Komisen (MYR)</label>
-                            <div style="display:flex;gap:0.5rem;">
-                                <input type="number" id="admin-commission-rate" min="0.01" max="5" step="0.01" value="1.00" 
-                                       style="flex:1;padding:0.6rem;border-radius:8px;border:2px solid var(--primary-light);">
-                                <button class="btn btn-sm" onclick="AdminPanel.updateCommission()">💾 Tetapkan</button>
-                            </div>
-                            <small style="color:var(--gray);">0.01 - 5.00 MYR dipotong setiap jualan</small>
-                        </div>
-                    </div>
-                    
-                    <div style="overflow-x:auto;">
-                        <table>
-                            <thead>                                <tr>
-                                    <th>UAC</th>
-                                    <th>SELLER</th>
-                                    <th>BISNES</th>
-                                    <th>PHONE</th>
-                                    <th>ALAMAT</th>
-                                    <th>STATUS</th>
-                                    <th>ORDER HARI INI</th>
-                                    <th>TOTAL JUALAN</th>
-                                    <th>KOMISEN MFD</th>
-                                    <th>PRODUK AKTIF</th>
-                                    <th>ACTION</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-vendors-body">
-                                <tr><td colspan="11" class="empty-row">Memuatkan data vendor...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-        </section>
-    </div>
-    
-    <!-- ➕ ADD/EDIT PRODUCT MODAL -->
-    <div id="product-form-modal" class="modal hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">📦 Tambah / Edit Produk</div>
-                <button class="modal-close">&times;</button>
-            </div>
-            <form id="product-form" class="modal-body">
-                <input type="hidden" id="form-product-id">
-                
-                <div class="form-group">
-                    <label>🖼️ Gambar Produk</label>
-                    <input type="file" id="form-image" accept="image/*">
-                    <small style="color:var(--gray);">Muatnaik dari galeri peranti</small>
-                </div>
-                
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                    <div class="form-group">
-                        <label>🏷️ Nama Item *</label>
-                        <input type="text" id="form-item-name" required placeholder="Nama produk">
-                    </div>
-                    <div class="form-group">
-                        <label>🌍 Negara Asal</label>
-                        <input type="text" id="form-country" placeholder="Malaysia, China, dll">
-                    </div>
-                </div>                
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                    <div class="form-group">
-                        <label>💰 Harga Asal (Opsyenal)</label>
-                        <input type="number" id="form-price" step="0.01" placeholder="0.00">
-                    </div>
-                    <div class="form-group">
-                        <label>💸 Harga Jualan (Opsyenal)</label>
-                        <input type="number" id="form-sale-price" step="0.01" placeholder="0.00">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>📝 Deskripsi Item</label>
-                    <textarea id="form-description" rows="4" placeholder="Terangkan produk dengan jelas..."></textarea>
-                </div>
-                
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-                    <div class="form-group">
-                        <label>🏷️ Label Item</label>
-                        <input type="text" id="form-label" placeholder="Best Seller, New Arrival, dll">
-                    </div>
-                    <div class="form-group">
-                        <label>🎁 Event Item (Opsyenal)</label>
-                        <input type="text" id="form-event" placeholder="Ramadan Sale, 11.11, dll">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>🔗 Pautan Opsyenal</label>
-                    <input type="url" id="form-link" placeholder="https://...">
-                </div>
-                
-                <div class="form-group">
-                    <label>✅ Status Item</label>
-                    <select id="form-status">
-                        <option value="Public">🟢 Public - Boleh dilihat semua</option>
-                        <option value="Private">🟡 Private - Hanya pelanggan tertentu</option>
-                        <option value="Out of Stock">🔴 Out of Stock - Tiada stok</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>🔄 Variasi Item (Nama & Harga)</label>
-                    <textarea id="form-variations" rows="3" placeholder="Contoh:&#10;Merah:RM25.00&#10;Biru:RM28.00&#10;XL:+RM5.00"></textarea>
-                </div>
-            </form>
-            <div class="modal-footer">
-                <button class="btn" onclick="document.getElementById('product-form-modal').classList.add('hidden')">Batal</button>
-                <button class="btn btn-primary" id="btn-save-product">💾 Simpan Produk</button>            </div>
-        </div>
-    </div>
-    
-    <!-- 🍞 TOAST CONTAINER -->
+<body class="p-0 md:p-4">
+
+    <!-- Audio Effects -->
+    <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3"></audio>
+    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3"></audio>
+    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+
+    <!-- Toast Container -->
     <div id="toast-container"></div>
-    
-    <!-- 🎵 AUDIO CONTEXT INIT TRIGGER -->
-    <div style="position:fixed;bottom:1rem;left:1rem;z-index:9999;">
-        <button onclick="SoundFX.init();this.remove();UI.showToast('🔊 Efek suara diaktifkan!','info');" 
-                style="background:var(--primary);border:none;padding:0.6rem 1.2rem;border-radius:50px;cursor:pointer;font-weight:600;box-shadow:var(--shadow);">
-            🔊 Aktifkan Suara
-        </button>
+
+    <!-- Navbar -->
+    <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 md:p-4 flex justify-between items-center flex-wrap gap-3 shadow-lg">
+        <a href="#" class="flex items-center gap-2 cursor-pointer group">
+            <i class="fas fa-store text-2xl text-yellow-600"></i>
+            <span class="text-xl font-bold glitter-text">Vendors Manager</span>
+        </a>
+        <div class="flex items-center gap-2 md:gap-4">
+            <button onclick="toggleCart()" class="relative p-2 hover:bg-white/40 rounded-full transition">
+                <i class="fas fa-shopping-cart text-yellow-600 text-lg"></i>
+                <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>            </button>
+            <div id="auth-nav">
+                <button onclick="navTo('login')" class="px-3 py-2 rounded-xl bg-white/60 hover:bg-white text-yellow-600 font-bold text-sm transition">Login</button>
+                <button onclick="navTo('register')" class="px-3 py-2 rounded-xl btn-glitter ml-2 shadow-lg text-sm">Register</button>
+            </div>
+            <div id="user-nav" class="hidden-section flex items-center gap-2">
+                <div class="text-right hidden md:block">
+                    <div id="nav-name" class="font-bold text-xs text-gray-700"></div>
+                    <div id="nav-uac" class="text-[10px] text-yellow-600 font-mono"></div>
+                </div>
+                <button onclick="navTo('dashboard')" class="px-3 py-2 bg-yellow-500 text-white rounded-xl shadow hover:bg-yellow-600 transition text-sm"><i class="fas fa-user"></i></button>
+                <button onclick="doLogout()" class="px-3 py-2 bg-red-500 text-white rounded-xl shadow hover:bg-red-600 transition text-sm"><i class="fas fa-sign-out-alt"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-2 md:p-4 pb-20 fade-in">
+        
+        <!-- AUTH SECTION -->
+        <section id="view-login" class="max-w-md mx-auto mt-10 hidden-section">
+            <div class="glass-panel p-8">
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Vendor Login</h2>
+                <input type="email" id="login-email" placeholder="Email Address" class="w-full mb-3 p-3 rounded-lg border border-gray-200">
+                <input type="password" id="login-pass" placeholder="Password" class="w-full mb-3 p-3 rounded-lg border border-gray-200">
+                <button onclick="doLogin()" class="btn-glitter w-full py-3 rounded-xl font-bold shadow-lg">LOGIN NOW</button>
+                <div class="relative my-5"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-300"></div></div><div class="relative flex justify-center text-xs"><span class="px-2 bg-transparent text-gray-500">ATAU</span></div></div>
+                <button onclick="doGoogleSignIn()" class="w-full py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 bg-white hover:bg-gray-50 border border-gray-300 mb-2">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> Continue with Google
+                </button>
+                <button onclick="doGithubSignIn()" class="w-full py-3 rounded-xl font-bold shadow-lg flex items-center justify-center gap-2 bg-gray-800 text-white hover:bg-gray-700">
+                    <i class="fab fa-github"></i> Continue with GitHub
+                </button>
+                <p class="text-center mt-4 text-sm">New here? <span class="text-yellow-600 font-bold cursor-pointer underline" onclick="navTo('register')">Register Account</span></p>
+            </div>
+        </section>
+
+        <section id="view-register" class="max-w-md mx-auto mt-10 hidden-section">
+            <div class="glass-panel p-8">
+                <h2 class="text-3xl font-bold text-center mb-6 glitter-text">Register Vendor</h2>
+                <input type="text" id="reg-business" placeholder="Business Name *" class="w-full mb-3 p-3 rounded-lg border">
+                <input type="tel" id="reg-phone" placeholder="Phone Number *" class="w-full mb-3 p-3 rounded-lg border">
+                <input type="email" id="reg-email" placeholder="Email Address *" class="w-full mb-3 p-3 rounded-lg border">
+                <input type="password" id="reg-pass" placeholder="Password (Min 6)" class="w-full mb-3 p-3 rounded-lg border">
+                <button onclick="doRegister()" class="btn-glitter w-full py-3 rounded-xl font-bold shadow-lg">REGISTER FREE</button>
+                <p class="text-center mt-4 text-sm">Have account? <span class="text-yellow-600 font-bold cursor-pointer underline" onclick="navTo('login')">Login Here</span></p>
+            </div>
+        </section>
+
+        <!-- DASHBOARD SECTION -->
+        <section id="view-dashboard" class="hidden-section">            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="glass-panel p-4 text-center">
+                    <div class="text-2xl font-bold text-yellow-600" id="stat-sales">RM 0.00</div>
+                    <div class="text-xs text-gray-600">Total Sales</div>
+                </div>
+                <div class="glass-panel p-4 text-center">
+                    <div class="text-2xl font-bold text-green-600" id="stat-orders">0</div>
+                    <div class="text-xs text-gray-600">Active Orders</div>
+                </div>
+                <div class="glass-panel p-4 text-center">
+                    <div class="text-2xl font-bold text-purple-600" id="stat-products">0</div>
+                    <div class="text-xs text-gray-600">Products</div>
+                </div>
+                <div class="glass-panel p-4 text-center">
+                    <div class="text-2xl font-bold text-red-600" id="stat-commission">RM 0.00</div>
+                    <div class="text-xs text-gray-600">Commission Fee</div>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                <button onclick="switchTab('tab-products')" class="px-4 py-2 bg-white rounded-xl text-yellow-600 font-bold text-sm whitespace-nowrap shadow-sm active-tab">📦 Produk</button>
+                <button onclick="switchTab('tab-orders')" class="px-4 py-2 bg-white rounded-xl text-yellow-600 font-bold text-sm whitespace-nowrap shadow-sm">📋 Pesanan</button>
+                <button onclick="switchTab('tab-profile')" class="px-4 py-2 bg-white rounded-xl text-yellow-600 font-bold text-sm whitespace-nowrap shadow-sm">⚙️ Profil</button>
+                <button onclick="switchTab('tab-chat')" class="px-4 py-2 bg-white rounded-xl text-pink-600 font-bold text-sm whitespace-nowrap shadow-sm">💬 Live Agent</button>
+                <button onclick="switchTab('tab-admin')" id="btn-admin-tab" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-bold text-sm whitespace-nowrap shadow-sm hidden-section">👑 Admin</button>
+            </div>
+
+            <!-- Tab Contents -->
+            <div id="tab-products" class="tab-content glass-panel p-4 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg">Katalog Produk</h3>
+                    <button onclick="openProductModal()" class="btn-glitter px-4 py-2 rounded-lg text-sm shadow">➕ Tambah Produk</button>
+                </div>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead><tr><th>Gambar</th><th>Nama Item</th><th>Harga</th><th>Status</th><th>Sold</th><th>Aksi</th></tr></thead>
+                        <tbody id="product-list-body"><tr><td colspan="6" class="text-center py-4">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-orders" class="tab-content hidden-section glass-panel p-4 mb-6">
+                <h3 class="font-bold text-lg mb-4">Senarai Pesanan Pelanggan</h3>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th><th>Pelanggan</th><th>Item</th><th>Total</th><th>Status Bayaran</th><th>Kategori</th><th>Aksi</th>                            </tr>
+                        </thead>
+                        <tbody id="order-list-body"><tr><td colspan="7" class="text-center py-4">Loading...</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-profile" class="tab-content hidden-section glass-panel p-4 mb-6">
+                <h3 class="font-bold text-lg mb-4">Maklumat Penjual</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" id="prof-seller" placeholder="Seller Name" class="p-2 border rounded">
+                    <input type="text" id="prof-business" placeholder="Business Name" class="p-2 border rounded">
+                    <input type="tel" id="prof-phone" placeholder="Phone" class="p-2 border rounded">
+                    <input type="email" id="prof-email" placeholder="Email" class="p-2 border rounded" disabled>
+                    <textarea id="prof-address" placeholder="Full Address" class="p-2 border rounded md:col-span-2"></textarea>
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-bold">Payment Info (Bank/QR)</label>
+                        <textarea id="prof-payment" placeholder="Account No / QR Link" class="w-full p-2 border rounded"></textarea>
+                    </div>
+                </div>
+                <div class="mt-4 flex gap-2">
+                    <button onclick="saveProfile()" class="btn-glitter px-6 py-2 rounded-lg shadow">💾 Simpan</button>
+                    <button onclick="changePassword()" class="bg-gray-200 px-6 py-2 rounded-lg shadow">🔑 Tukar Password</button>
+                    <button onclick="deleteAccount()" class="bg-red-100 text-red-600 px-6 py-2 rounded-lg shadow ml-auto">🗑️ Delete Account</button>
+                </div>
+            </div>
+
+            <div id="tab-chat" class="tab-content hidden-section glass-panel p-4 mb-6 h-auto">
+                <div class="chat-container">
+                    <div class="contacts-panel glass-panel p-2 overflow-y-auto" id="chat-contacts">
+                        <!-- Contacts loaded here -->
+                    </div>
+                    <div class="chat-panel glass-panel flex flex-col">
+                        <div class="p-3 border-b flex justify-between items-center bg-yellow-50">
+                            <span id="chat-header-name" class="font-bold">Select Customer</span>
+                            <div class="flex gap-2">
+                                <select id="agent-status" onchange="updateAgentStatus()" class="text-xs border rounded p-1">
+                                    <option value="Online">🟢 Online</option>
+                                    <option value="Busy">🔴 Busy</option>
+                                    <option value="Offline">⚫ Offline</option>
+                                </select>
+                                <button onclick="closeChat()" class="md:hidden text-red-500"><i class="fas fa-times"></i></button>
+                            </div>
+                        </div>
+                        <div id="chat-messages" class="chat-messages bg-white/50 flex-1"></div>
+                        <div class="p-3 border-t bg-white flex gap-2 items-end">
+                            <button onclick="document.getElementById('chat-file').click()" class="p-2 hover:bg-gray-100 rounded-full"><i class="fas fa-image text-gray-500"></i></button>
+                            <input type="file" id="chat-file" class="hidden" accept="image/*" onchange="sendImage(this)">
+                            <textarea id="chat-input" rows="1" class="flex-1 border rounded-lg p-2 resize-none focus:outline-none focus:border-yellow-400" placeholder="Type message..."></textarea>
+                            <button onclick="sendMessage()" class="p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"><i class="fas fa-paper-plane"></i></button>                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-admin" class="tab-content hidden-section glass-panel p-4 mb-6">
+                <h3 class="font-bold text-lg mb-4 text-purple-700">👑 Admin Management</h3>
+                <div class="mb-4 p-4 bg-purple-50 rounded-lg">
+                    <label class="text-sm font-bold">Set Commission Rate (RM 0.01 - 5.00)</label>
+                    <div class="flex gap-2 mt-2">
+                        <input type="number" id="admin-comm-rate" step="0.01" min="0.01" max="5" class="border p-2 rounded w-32">
+                        <button onclick="updateCommission()" class="btn-glitter px-4 py-2 rounded text-sm">Update</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="custom-table">
+                        <thead><tr><th>UAC</th><th>Seller</th><th>Sales</th><th>Commission</th><th>Status</th><th>Action</th></tr></thead>
+                        <tbody id="admin-vendor-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="fixed inset-0 bg-black/50 z-50 hidden-section flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeProductModal()" class="absolute top-4 right-4 text-2xl">&times;</button>
+            <h3 class="text-xl font-bold mb-4 glitter-text">Add/Edit Product</h3>
+            
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold">Gambar Produk (Upload)</label>
+                    <input type="file" id="prod-img" accept="image/*" class="w-full text-sm mt-1" onchange="previewImage(this)">
+                    <img id="prod-preview" class="w-20 h-20 object-cover rounded mt-2 hidden border">
+                </div>
+                <input type="text" id="prod-name" placeholder="Nama Item *" class="w-full p-2 border rounded">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="prod-price" placeholder="Harga Asal" class="p-2 border rounded">
+                    <input type="number" id="prod-sale" placeholder="Harga Jualan *" class="p-2 border rounded">
+                </div>
+                <textarea id="prod-desc" placeholder="Deskripsi" class="w-full p-2 border rounded"></textarea>
+                <select id="prod-status" class="w-full p-2 border rounded">
+                    <option value="Public">Public</option>
+                    <option value="Private">Private</option>
+                    <option value="Out of Stock">Out of Stock</option>
+                </select>
+                <input type="text" id="prod-label" placeholder="Label (e.g. Best Seller)" class="w-full p-2 border rounded">
+                <input type="text" id="prod-event" placeholder="Event (e.g. Raya Sale)" class="w-full p-2 border rounded">                
+                <button onclick="saveProduct()" class="btn-glitter w-full py-3 rounded-lg font-bold shadow-lg mt-4">💾 Save Product</button>
+            </div>
+        </div>
     </div>
 
-    <script>
-        // Fallback for non-module browsers (graceful degradation)
-        if(typeof firebase === 'undefined') {
-            document.getElementById('auth-section').innerHTML = `
-                <div style="text-align:center;padding:2rem;">
-                    <h3>⚠️ Browser Tidak Disokong</h3>
-                    <p>Sila gunakan browser terkini (Chrome, Firefox, Edge) untuk pengalaman terbaik.</p>
-                    <p style="color:var(--gray);margin-top:1rem;">MFD Store memerlukan JavaScript Modules dan Firebase SDK</p>
-                </div>
-            `;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, GithubAuthProvider, updatePassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, arrayUnion } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
+            authDomain: "mfd-store.firebaseapp.com",
+            projectId: "mfd-store",
+            storageBucket: "mfd-store.firebasestorage.app",
+            messagingSenderId: "1039564529069",
+            appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+        const githubProvider = new GithubAuthProvider();
+        // GitHub Client ID handled in Firebase Console -> Authorized Domains
+
+        // STATE
+        let currentUser = null;
+        let userProfile = null;
+        let currentChatId = null;
+        let unsubscribeChat = null;
+        let editProductId = null;
+
+        // UTILS
+        window.playSound = (type) => {
+            const sounds = { 'click': document.getElementById('snd-click'), 'success': document.getElementById('snd-success'), 'error': document.getElementById('snd-error') };
+            if(sounds[type]) { sounds[type].currentTime = 0; sounds[type].play().catch(()=>{}); }
+        };
+
+        window.showToast = (msg, type='info') => {
+            const t = document.createElement('div');
+            t.className = `toast ${type}`;
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+            playSound(type === 'error' ? 'error' : 'success');
+        };
+        window.navTo = (view) => {
+            playSound('click');
+            document.querySelectorAll('section').forEach(el => el.classList.add('hidden-section'));
+            document.getElementById(`view-${view}`).classList.remove('hidden-section');
+            if(view === 'dashboard') loadDashboardData();
+        };
+
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden-section'));
+            document.getElementById(tabId).classList.remove('hidden-section');
+            if(tabId === 'tab-chat') loadChatContacts();
+        };
+
+        // AUTH
+        window.doRegister = async () => {
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            const business = document.getElementById('reg-business').value;
+            const phone = document.getElementById('reg-phone').value;
+
+            if(!email || !pass || !business) return showToast('Isi semua medan wajib', 'error');
+
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, pass);
+                const uac = "VEN-" + Math.random().toString(36).substr(2,6).toUpperCase();
+                const venId = "VENFD-" + Date.now().toString(36).toUpperCase();
+                
+                await setDoc(doc(db, "vendors", cred.user.uid), {
+                    uid: cred.user.uid,
+                    email, phone, businessName: business,
+                    sellerName: business,
+                    uac, venId,
+                    status: 'ACTIVE',
+                    commissionRate: 1.00,
+                    createdAt: serverTimestamp()
+                });
+                showToast('Registration Success!', 'success');
+                navTo('login');
+            } catch(e) { showToast(e.message, 'error'); }
+        };
+
+        window.doLogin = async () => {
+            try {
+                await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value);
+                showToast('Welcome Back!', 'success');
+            } catch(e) { showToast('Login Failed: ' + e.message, 'error'); }
+        };
+
+        window.doGoogleSignIn = async () => {
+            try { await signInWithPopup(auth, googleProvider); showToast('Google Login Success', 'success'); }             catch(e) { showToast(e.message, 'error'); }
+        };
+
+        window.doGithubSignIn = async () => {
+            try { await signInWithPopup(auth, githubProvider); showToast('GitHub Login Success', 'success'); } 
+            catch(e) { showToast(e.message, 'error'); }
+        };
+
+        window.doLogout = () => { signOut(auth); navTo('login'); };
+
+        onAuthStateChanged(auth, async (user) => {
+            currentUser = user;
+            if(user) {
+                document.getElementById('auth-nav').classList.add('hidden-section');
+                document.getElementById('user-nav').classList.remove('hidden-section');
+                const snap = await getDoc(doc(db, "vendors", user.uid));
+                if(snap.exists()) {
+                    userProfile = snap.data();
+                    document.getElementById('nav-name').innerText = userProfile.sellerName;
+                    document.getElementById('nav-uac').innerText = userProfile.uac;
+                    if(userProfile.role === 'admin') document.getElementById('btn-admin-tab').classList.remove('hidden-section');
+                    navTo('dashboard');
+                }
+            } else {
+                document.getElementById('auth-nav').classList.remove('hidden-section');
+                document.getElementById('user-nav').classList.add('hidden-section');
+                navTo('login');
+            }
+        });
+
+        // PRODUCT MANAGEMENT (Base64 Image Logic)
+        let currentImageBase64 = null;
+
+        window.previewImage = (input) => {
+            const file = input.files[0];
+            if(file) {
+                if(file.size > 800000) return showToast('Gambar terlalu besar! Max 800KB', 'error'); // Critical fix for Firestore limit
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentImageBase64 = e.target.result;
+                    const img = document.getElementById('prod-preview');
+                    img.src = currentImageBase64;
+                    img.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.openProductModal = () => {
+            editProductId = null;            currentImageBase64 = null;
+            document.getElementById('product-modal').classList.remove('hidden-section');
+            document.getElementById('prod-preview').classList.add('hidden');
+            document.querySelectorAll('#product-modal input, #product-modal textarea').forEach(i => i.value = '');
+        };
+
+        window.closeProductModal = () => document.getElementById('product-modal').classList.add('hidden-section');
+
+        window.saveProduct = async () => {
+            const name = document.getElementById('prod-name').value;
+            const sale = document.getElementById('prod-sale').value;
+            if(!name || !sale) return showToast('Nama dan Harga Jualan wajib diisi', 'error');
+
+            const data = {
+                vendorId: currentUser.uid,
+                name,
+                price: parseFloat(document.getElementById('prod-price').value) || 0,
+                salePrice: parseFloat(sale),
+                description: document.getElementById('prod-desc').value,
+                status: document.getElementById('prod-status').value,
+                label: document.getElementById('prod-label').value,
+                event: document.getElementById('prod-event').value,
+                imageUrl: currentImageBase64, // Stored directly in Firestore
+                totalSold: 0,
+                rating: 0,
+                updatedAt: serverTimestamp()
+            };
+
+            try {
+                if(editProductId) {
+                    await updateDoc(doc(db, "products", editProductId), data);
+                    showToast('Product Updated', 'success');
+                } else {
+                    data.createdAt = serverTimestamp();
+                    await addDoc(collection(db, "products"), data);
+                    showToast('Product Added', 'success');
+                }
+                closeProductModal();
+                loadDashboardData();
+            } catch(e) {
+                console.error(e);
+                showToast('Gagal simpan: ' + e.message, 'error');
+            }
+        };
+
+        // DASHBOARD DATA LOADING
+        async function loadDashboardData() {
+            if(!currentUser) return;
+            
+            // Load Products            const qProd = query(collection(db, "products"), where("vendorId", "==", currentUser.uid));
+            onSnapshot(qProd, (snap) => {
+                const tbody = document.getElementById('product-list-body');
+                let html = '';
+                let totalSales = 0;
+                snap.forEach(d => {
+                    const p = d.data();
+                    totalSales += (p.salePrice * (p.totalSold||0));
+                    html += `<tr>
+                        <td><img src="${p.imageUrl || 'https://via.placeholder.com/40'}" class="w-10 h-10 rounded object-cover"></td>
+                        <td>${p.name}</td>
+                        <td>RM ${p.salePrice}</td>
+                        <td><span class="badge badge-${p.status==='Public'?'success':'warning'}">${p.status}</span></td>
+                        <td>${p.totalSold||0}</td>
+                        <td>
+                            <button onclick="editProd('${d.id}')" class="text-blue-500 mr-2"><i class="fas fa-edit"></i></button>
+                            <button onclick="delProd('${d.id}')" class="text-red-500"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>`;
+                });
+                tbody.innerHTML = html || '<tr><td colspan="6" class="text-center">Tiada produk</td></tr>';
+                document.getElementById('stat-products').innerText = snap.size;
+                document.getElementById('stat-sales').innerText = 'RM ' + totalSales.toFixed(2);
+            });
+
+            // Load Orders
+            const qOrd = query(collection(db, "orders"), where("vendorId", "==", currentUser.uid), orderBy("createdAt", "desc"));
+            onSnapshot(qOrd, (snap) => {
+                const tbody = document.getElementById('order-list-body');
+                let html = '';
+                let activeCount = 0;
+                snap.forEach(d => {
+                    const o = d.data();
+                    if(o.status !== 'Completed' && o.status !== 'Cancelled') activeCount++;
+                    html += `<tr>
+                        <td class="font-mono text-xs">${o.orderId || 'N/A'}</td>
+                        <td>${o.username || 'Customer'}</td>
+                        <td>${o.items?.map(i=>i.name).join(', ') || '-'}</td>
+                        <td>RM ${o.total}</td>
+                        <td><span class="badge badge-${o.paymentStatus==='Verified'?'success':'warning'}">${o.paymentStatus}</span></td>
+                        <td>${o.status}</td>
+                        <td><button onclick="msgCustomer('${o.userId}')" class="text-yellow-600"><i class="fas fa-comment"></i></button></td>
+                    </tr>`;
+                });
+                tbody.innerHTML = html || '<tr><td colspan="7" class="text-center">Tiada pesanan</td></tr>';
+                document.getElementById('stat-orders').innerText = activeCount;
+            });
+
+            // Load Profile Inputs
+            if(userProfile) {                document.getElementById('prof-seller').value = userProfile.sellerName || '';
+                document.getElementById('prof-business').value = userProfile.businessName || '';
+                document.getElementById('prof-phone').value = userProfile.phone || '';
+                document.getElementById('prof-email').value = userProfile.email || '';
+                document.getElementById('prof-address').value = userProfile.address || '';
+                document.getElementById('prof-payment').value = userProfile.paymentInfo || '';
+            }
         }
+
+        window.editProd = async (id) => {
+            const d = await getDoc(doc(db, "products", id));
+            if(d.exists()) {
+                const p = d.data();
+                editProductId = id;
+                currentImageBase64 = p.imageUrl;
+                document.getElementById('prod-name').value = p.name;
+                document.getElementById('prod-price').value = p.price;
+                document.getElementById('prod-sale').value = p.salePrice;
+                document.getElementById('prod-desc').value = p.description;
+                document.getElementById('prod-status').value = p.status;
+                document.getElementById('product-modal').classList.remove('hidden-section');
+                if(p.imageUrl) {
+                    const img = document.getElementById('prod-preview');
+                    img.src = p.imageUrl;
+                    img.classList.remove('hidden');
+                }
+            }
+        };
+
+        window.delProd = async (id) => {
+            if(confirm('Padam produk ini?')) {
+                await deleteDoc(doc(db, "products", id));
+                showToast('Produk dipadam', 'success');
+            }
+        };
+
+        window.saveProfile = async () => {
+            await updateDoc(doc(db, "vendors", currentUser.uid), {
+                sellerName: document.getElementById('prof-seller').value,
+                businessName: document.getElementById('prof-business').value,
+                phone: document.getElementById('prof-phone').value,
+                address: document.getElementById('prof-address').value,
+                paymentInfo: document.getElementById('prof-payment').value,
+                logCache: serverTimestamp()
+            });
+            showToast('Profil dikemaskini', 'success');
+        };
+
+        window.changePassword = async () => {
+            const newPass = prompt("Masukkan password baru:");            if(newPass && newPass.length >= 6) {
+                await updatePassword(currentUser, newPass);
+                showToast('Password ditukar', 'success');
+            } else {
+                showToast('Password terlalu pendek', 'error');
+            }
+        };
+
+        window.deleteAccount = async () => {
+            if(confirm('PERHATIAN: Akaun akan dinyahaktifkan kekal. Teruskan?')) {
+                await updateDoc(doc(db, "vendors", currentUser.uid), { status: 'INACTIVE', deletedAt: serverTimestamp() });
+                signOut(auth);
+                showToast('Akaun dinyahaktifkan', 'info');
+            }
+        };
+
+        // CHAT SYSTEM
+        window.loadChatContacts = () => {
+            const q = query(collection(db, "chats"), where("participants", "array-contains", currentUser.uid));
+            onSnapshot(q, (snap) => {
+                const div = document.getElementById('chat-contacts');
+                let html = '';
+                snap.forEach(d => {
+                    const c = d.data();
+                    const otherId = c.participants.find(id => id !== currentUser.uid);
+                    // Get other user name (simplified)
+                    html += `<div onclick="openChat('${d.id}', '${otherId}')" class="p-3 border-b hover:bg-yellow-50 cursor-pointer">
+                        <div class="font-bold text-sm">Customer ${otherId.substr(0,5)}...</div>
+                        <div class="text-xs text-gray-500 truncate">${c.lastMessage || 'No messages'}</div>
+                    </div>`;
+                });
+                div.innerHTML = html || '<div class="p-4 text-center text-gray-500">Tiada chat</div>';
+            });
+        };
+
+        window.openChat = (chatId, partnerId) => {
+            currentChatId = chatId;
+            document.getElementById('chat-header-name').innerText = "Customer Service";
+            if(window.innerWidth < 768) {
+                document.querySelector('.contacts-panel').classList.add('hidden-section'); // Mobile logic
+                document.querySelector('.contacts-panel').classList.remove('active');
+            }
+            
+            if(unsubscribeChat) unsubscribeChat();
+            const q = query(collection(db, `chats/${chatId}/messages`), orderBy("timestamp", "asc"));
+            unsubscribeChat = onSnapshot(q, (snap) => {
+                const div = document.getElementById('chat-messages');
+                let html = '';
+                snap.forEach(d => {
+                    const m = d.data();                    const isMe = m.senderId === currentUser.uid;
+                    html += `<div class="msg-bubble ${isMe ? 'msg-me' : 'msg-other'}">
+                        ${m.text || ''}
+                        ${m.imageUrl ? `<img src="${m.imageUrl}" class="max-w-full rounded mt-1">` : ''}
+                        <div class="text-[10px] opacity-70 mt-1 text-right">${m.timestamp ? m.timestamp.toDate().toLocaleTimeString() : ''}</div>
+                    </div>`;
+                });
+                div.innerHTML = html;
+                div.scrollTop = div.scrollHeight;
+            });
+        };
+
+        window.sendMessage = async () => {
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if(!text || !currentChatId) return;
+            
+            await addDoc(collection(db, `chats/${currentChatId}/messages`), {
+                senderId: currentUser.uid,
+                text,
+                timestamp: serverTimestamp()
+            });
+            await updateDoc(doc(db, "chats", currentChatId), {
+                lastMessage: text,
+                lastTime: serverTimestamp()
+            });
+            input.value = '';
+        };
+
+        window.sendImage = async (input) => {
+            const file = input.files[0];
+            if(!file || !currentChatId) return;
+            if(file.size > 800000) return showToast('Gambar terlalu besar (Max 800KB)', 'error');
+
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                await addDoc(collection(db, `chats/${currentChatId}/messages`), {
+                    senderId: currentUser.uid,
+                    imageUrl: e.target.result,
+                    timestamp: serverTimestamp()
+                });
+                showToast('Gambar dihantar', 'success');
+            };
+            reader.readAsDataURL(file);
+            input.value = '';
+        };
+
+        window.updateAgentStatus = () => {
+            const status = document.getElementById('agent-status').value;
+            updateDoc(doc(db, "vendors", currentUser.uid), { agentStatus: status });        };
+
+        window.closeChat = () => {
+            document.querySelector('.contacts-panel').classList.remove('hidden-section');
+            document.querySelector('.contacts-panel').classList.add('active');
+        };
+
+        // ADMIN FUNCTIONS
+        window.updateCommission = async () => {
+            const rate = parseFloat(document.getElementById('admin-comm-rate').value);
+            if(rate < 0.01 || rate > 5) return showToast('Kadar mesti 0.01 - 5.00', 'error');
+            await updateDoc(doc(db, "vendors", currentUser.uid), { commissionRate: rate });
+            showToast('Kadar komisen dikemaskini', 'success');
+        };
+
+        // Init
+        console.log("Vendor Panel Initialized");
     </script>
 </body>
 </html>
