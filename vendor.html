@@ -2,16 +2,363 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🏪 Vendor Manager - MFD Store</title>
     
-    <!-- Firebase SDK (Modular) -->
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #FFD700; --primary-dark: #FFA500;
+            --secondary: #00CED1; --secondary-dark: #008B8B;
+            --glass-bg: rgba(255, 255, 255, 0.92);
+            --glass-border: rgba(255, 215, 0, 0.4);
+            --dark: #1a1a2e;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #FFF9E6 0%, #E0FFFF 35%, #FFECB3 100%);
+            background-size: 400% 400%;
+            animation: gradientBG 20s ease infinite;
+            color: var(--dark);
+            min-height: 100vh;
+        }
+        @keyframes gradientBG { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+        
+        .glitter-text {
+            background: linear-gradient(90deg, #FFD700, #00CED1, #FF6B6B, #FFD700);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            background-size: 400% auto; animation: shine 5s linear infinite; font-weight: 700;
+        }
+        @keyframes shine { 0%{background-position:0%} 100%{background-position:400%} }
+        
+        .glass-panel {
+            background: var(--glass-bg); backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border); border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(255,215,0,0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .glass-panel:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(255,215,0,0.3); }
+        
+        .btn-glitter {
+            background: linear-gradient(45deg, #FFD700, #FF8C00, #00CED1);            background-size: 300% 300%; animation: gradientMove 4s ease infinite;
+            color: var(--dark); font-weight: 600; transition: all 0.2s;
+        }
+        .btn-glitter:hover { filter: brightness(1.05); transform: translateY(-1px); }
+        @keyframes gradientMove { 0%,100%{background-position:0%} 50%{background-position:100%} }
+        
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        
+        .badge { padding: 3px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        
+        .input-glass {
+            background: rgba(255,255,255,0.8); border: 1px solid var(--glass-border);
+            border-radius: 10px; padding: 10px 14px; width: 100%;
+            transition: border-color 0.2s;
+        }
+        .input-glass:focus { outline: none; border-color: var(--secondary); }
+        
+        .product-card {
+            background: white; border-radius: 14px; overflow: hidden;
+            border: 1px solid rgba(255,215,0,0.2); transition: transform 0.2s;
+        }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .product-img { height: 140px; background: #fff9e6; display: flex; align-items: center; justify-content: center; }
+        .product-img img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .chat-container { display: grid; grid-template-columns: 260px 1fr; gap: 1rem; height: 65vh; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+        .msg-bubble { max-width: 80%; padding: 10px 14px; border-radius: 16px; animation: popIn 0.2s; }
+        .msg-me { align-self: flex-end; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: var(--dark); }
+        .msg-other { align-self: flex-start; background: white; border-left: 3px solid var(--secondary); }
+        @keyframes popIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
+        
+        .toast {
+            position: fixed; bottom: 20px; right: 20px; padding: 12px 20px;
+            border-radius: 12px; color: white; font-weight: 500; z-index: 9999;
+            animation: slideIn 0.3s, fadeOut 0.3s 2.7s forwards;
+        }
+        .toast.success { background: #22c55e; } .toast.error { background: #ef4444; }
+        @keyframes slideIn { from{transform:translateX(100%);opacity:0} to{transform:translateX(0);opacity:1} }
+        @keyframes fadeOut { to{opacity:0;transform:translateY(-10px)} }
+        
+        .loader { border: 3px solid rgba(0,0,0,0.1); border-left-color: var(--primary);
+            border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 100%{transform:rotate(360deg)} }
+                @media(max-width:768px) {
+            .chat-container { grid-template-columns: 1fr; }
+            .contacts-panel { position: absolute; inset: 0; z-index: 10; background: white; border-radius: 20px; }
+            .contacts-panel.hidden { display: none; }
+            .product-grid { grid-template-columns: repeat(2,1fr); }
+        }
+    </style>
+</head>
+<body class="p-2 md:p-4">
+
+    <!-- Audio -->
+    <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3"></audio>
+    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3"></audio>
+    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Navbar -->
+    <nav class="glass-panel sticky top-2 md:top-4 z-40 p-3 flex justify-between items-center gap-2">
+        <a href="#" class="flex items-center gap-2" onclick="playSound('click')">
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-yellow-400 to-cyan-400 flex items-center justify-center text-white">
+                <i class="fas fa-store"></i>
+            </div>
+            <span class="font-bold glitter-text">Vendors Manager</span>
+        </a>
+        <div class="flex items-center gap-2">
+            <div id="auth-nav" class="flex gap-2">
+                <button onclick="navTo('login')" class="px-3 py-1.5 rounded-lg bg-white/80 text-sm font-medium">Login</button>
+                <button onclick="navTo('register')" class="px-3 py-1.5 rounded-lg btn-glitter text-sm">Register</button>
+            </div>
+            <div id="user-nav" class="hidden flex items-center gap-2">
+                <span id="nav-uac" class="text-xs font-mono bg-cyan-100 px-2 py-0.5 rounded"></span>
+                <button onclick="navTo('dashboard')" class="w-8 h-8 rounded-lg bg-yellow-400 text-white"><i class="fas fa-user"></i></button>
+                <button onclick="doLogout()" class="w-8 h-8 rounded-lg bg-red-400 text-white"><i class="fas fa-sign-out"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <main class="container mx-auto pb-20 fade-in">
+        
+        <!-- Login -->
+        <section id="view-login" class="max-w-sm mx-auto mt-12 hidden">
+            <div class="glass-panel p-6">
+                <h2 class="text-2xl font-bold glitter-text text-center mb-4">Vendor Login</h2>
+                <form onsubmit="doLogin(event)" class="space-y-3">
+                    <input type="email" id="login-email" required placeholder="Email" class="input-glass">
+                    <input type="password" id="login-pass" required placeholder="Password" class="input-glass">
+                    <button type="submit" class="btn-glitter w-full py-2.5 rounded-lg font-medium">Login</button>                </form>
+                <div class="my-4 text-center text-sm text-gray-500">ATAU</div>
+                <div class="space-y-2">
+                    <button onclick="doGoogleSignIn()" class="w-full py-2 rounded-lg border flex items-center justify-center gap-2 text-sm">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4 h-4"> Google
+                    </button>
+                    <button onclick="doGithubSignIn()" class="w-full py-2 rounded-lg bg-gray-900 text-white flex items-center justify-center gap-2 text-sm">
+                        <i class="fab fa-github"></i> GitHub
+                    </button>
+                </div>
+                <p class="text-center mt-4 text-sm">Belum ada akaun? <span class="text-yellow-600 font-medium cursor-pointer" onclick="navTo('register')">Daftar</span></p>
+            </div>
+        </section>
+
+        <!-- Register -->
+        <section id="view-register" class="max-w-sm mx-auto mt-12 hidden">
+            <div class="glass-panel p-6">
+                <h2 class="text-2xl font-bold glitter-text text-center mb-4">Register Vendor</h2>
+                <form onsubmit="doRegister(event)" class="space-y-3">
+                    <input type="text" id="reg-business" required placeholder="Business Name *" class="input-glass">
+                    <input type="tel" id="reg-phone" required placeholder="Phone *" class="input-glass">
+                    <input type="email" id="reg-email" required placeholder="Email *" class="input-glass">
+                    <input type="password" id="reg-pass" required minlength="6" placeholder="Password (min 6) *" class="input-glass">
+                    <button type="submit" class="btn-glitter w-full py-2.5 rounded-lg font-medium">Register</button>
+                </form>
+                <p class="text-center mt-4 text-sm">Sudah ada akaun? <span class="text-cyan-600 font-medium cursor-pointer" onclick="navTo('login')">Login</span></p>
+            </div>
+        </section>
+
+        <!-- Dashboard -->
+        <section id="view-dashboard" class="hidden">
+            <!-- Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                <div class="glass-panel p-3 text-center">
+                    <div class="text-xl font-bold text-yellow-600" id="stat-sales">RM 0</div>
+                    <div class="text-xs text-gray-500">Total Sales</div>
+                </div>
+                <div class="glass-panel p-3 text-center">
+                    <div class="text-xl font-bold text-green-600" id="stat-orders">0</div>
+                    <div class="text-xs text-gray-500">Active Orders</div>
+                </div>
+                <div class="glass-panel p-3 text-center">
+                    <div class="text-xl font-bold text-purple-600" id="stat-products">0</div>
+                    <div class="text-xs text-gray-500">Products</div>
+                </div>
+                <div class="glass-panel p-3 text-center">
+                    <div class="text-xl font-bold text-red-600" id="stat-commission">RM 0</div>
+                    <div class="text-xs text-gray-500">Commission</div>
+                </div>
+            </div>
+            <!-- Tabs -->
+            <div class="flex gap-2 mb-4 overflow-x-auto pb-1">
+                <button onclick="switchTab('products')" id="tab-products" class="px-4 py-1.5 rounded-lg bg-white/80 text-sm font-medium whitespace-nowrap active">Produk</button>
+                <button onclick="switchTab('orders')" id="tab-orders" class="px-4 py-1.5 rounded-lg bg-white/80 text-sm font-medium whitespace-nowrap">Pesanan</button>
+                <button onclick="switchTab('profile')" id="tab-profile" class="px-4 py-1.5 rounded-lg bg-white/80 text-sm font-medium whitespace-nowrap">Profil</button>
+                <button onclick="switchTab('chat')" id="tab-chat" class="px-4 py-1.5 rounded-lg bg-white/80 text-sm font-medium whitespace-nowrap">💬 Chat</button>
+                <button onclick="switchTab('admin')" id="tab-admin" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium whitespace-nowrap hidden">👑 Admin</button>
+            </div>
+
+            <!-- Products Tab -->
+            <div id="content-products" class="glass-panel p-4 mb-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="font-semibold">📦 Katalog Produk</h3>
+                    <button onclick="openProductModal()" class="btn-glitter px-3 py-1.5 rounded-lg text-sm">+ Tambah</button>
+                </div>
+                <input type="text" id="product-search" placeholder="Cari produk..." class="input-glass mb-3 text-sm" oninput="filterProducts(this.value)">
+                <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <div class="col-span-full text-center py-6 text-gray-500">
+                        <div class="loader mx-auto mb-2"></div>
+                        Memuatkan...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="content-orders" class="glass-panel p-4 mb-4 hidden">
+                <h3 class="font-semibold mb-3">📋 Pesanan Pelanggan</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gradient-to-r from-yellow-400 to-cyan-400 text-left">
+                                <th class="p-2 rounded-l-lg">ID</th><th>Pelanggan</th><th>Item</th><th>Total</th><th>Status</th><th class="rounded-r-lg">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="order-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="content-profile" class="glass-panel p-4 mb-4 hidden">
+                <h3 class="font-semibold mb-4">⚙️ Maklumat Penjual</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="text" id="prof-seller" placeholder="Seller Name" class="input-glass">
+                    <input type="text" id="prof-business" placeholder="Business Name" class="input-glass">
+                    <input type="tel" id="prof-phone" placeholder="Phone" class="input-glass">
+                    <input type="email" id="prof-email" placeholder="Email" class="input-glass" disabled>
+                    <textarea id="prof-address" placeholder="Address" class="input-glass md:col-span-2" rows="2"></textarea>
+                    <textarea id="prof-payment" placeholder="Payment Info (Bank/QR)" class="input-glass md:col-span-2" rows="2"></textarea>                </div>
+                <div class="mt-4 p-3 bg-yellow-50 rounded-lg text-sm">
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>UAC: <span id="disp-uac" class="font-mono font-medium">-</span></div>
+                        <div>Status: <span id="disp-status" class="font-medium text-green-600">ACTIVE</span></div>
+                    </div>
+                </div>
+                <div class="mt-4 flex gap-2">
+                    <button onclick="saveProfile()" class="btn-glitter px-4 py-2 rounded-lg text-sm">💾 Simpan</button>
+                    <button onclick="changePassword()" class="px-4 py-2 rounded-lg bg-gray-200 text-sm">🔑 Password</button>
+                    <button onclick="deleteAccount()" class="px-4 py-2 rounded-lg bg-red-100 text-red-600 text-sm ml-auto">🗑️ Delete</button>
+                </div>
+            </div>
+
+            <!-- Chat Tab -->
+            <div id="content-chat" class="glass-panel p-0 mb-4 hidden overflow-hidden">
+                <div class="chat-container">
+                    <div class="contacts-panel glass-panel p-2 overflow-y-auto" id="chat-contacts">
+                        <div class="text-center py-6 text-gray-500 text-sm">Tiada perbualan</div>
+                    </div>
+                    <div class="flex flex-col">
+                        <div class="p-3 border-b flex justify-between items-center bg-yellow-50">
+                            <span id="chat-name" class="font-medium">Pilih Pelanggan</span>
+                            <select id="agent-status" onchange="updateAgentStatus()" class="text-xs border rounded px-2 py-1">
+                                <option>🟢 Online</option><option>🔴 Busy</option><option>⚫ Offline</option>
+                            </select>
+                        </div>
+                        <div id="chat-msgs" class="chat-messages bg-white/40 flex-1"></div>
+                        <div class="p-2 border-t flex gap-2">
+                            <input type="file" id="chat-file" class="hidden" accept="image/*" onchange="sendImage(this)">
+                            <button onclick="document.getElementById('chat-file').click()" class="p-2 hover:bg-gray-100 rounded"><i class="fas fa-image"></i></button>
+                            <textarea id="chat-input" rows="1" placeholder="Taip mesej..." class="flex-1 input-glass resize-none" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
+                            <button onclick="sendMessage()" class="p-2 bg-yellow-400 text-white rounded"><i class="fas fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Tab -->
+            <div id="content-admin" class="glass-panel p-4 mb-4 hidden">
+                <h3 class="font-semibold mb-3 text-purple-700">👑 Admin Panel</h3>
+                <div class="p-3 bg-purple-50 rounded-lg mb-4">
+                    <label class="text-sm font-medium">Kadar Komisen (RM 0.01-5.00)</label>
+                    <div class="flex gap-2 mt-2">
+                        <input type="number" id="admin-rate" step="0.01" min="0.01" max="5" class="input-glass w-24 text-sm">
+                        <button onclick="updateCommission()" class="btn-glitter px-3 py-1.5 rounded text-sm">Update</button>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">                        <thead>
+                            <tr class="bg-gradient-to-r from-purple-400 to-pink-400 text-left">
+                                <th class="p-2 rounded-l-lg">UAC</th><th>Seller</th><th>Sales</th><th>Commission</th><th>Status</th><th class="rounded-r-lg">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-list"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Public Catalogue -->
+        <section id="view-catalogue" class="hidden">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold glitter-text">✨ Showcase MFD Store</h2>
+            </div>
+            <div class="flex gap-2 mb-4 overflow-x-auto justify-center">
+                <button onclick="loadCatalogue('all')" class="px-3 py-1.5 rounded-lg bg-white/80 text-sm">Semua</button>
+                <button onclick="loadCatalogue('highest')" class="px-3 py-1.5 rounded-lg bg-white/80 text-sm">🔥 Popular</button>
+                <button onclick="loadCatalogue('event')" class="px-3 py-1.5 rounded-lg bg-white/80 text-sm">🎉 Event</button>
+            </div>
+            <div id="catalogue-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"></div>
+        </section>
+
+    </main>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg p-4 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeProductModal()" class="absolute top-3 right-3 text-xl">&times;</button>
+            <h3 class="font-bold glitter-text mb-4" id="modal-title">➕ Tambah Produk</h3>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-medium">Gambar (Max 500KB)</label>
+                    <input type="file" id="prod-img" accept="image/*" class="input-glass text-sm py-1.5" onchange="previewImage(this)">
+                    <img id="prod-preview" class="w-16 h-16 object-cover rounded mt-2 hidden border">
+                </div>
+                <input type="text" id="prod-name" placeholder="Nama Item *" class="input-glass">
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" id="prod-price" placeholder="Harga Asal" class="input-glass" step="0.01">
+                    <input type="number" id="prod-sale" placeholder="Harga Jualan *" class="input-glass" step="0.01" required>
+                </div>
+                <textarea id="prod-desc" placeholder="Deskripsi" class="input-glass" rows="2"></textarea>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="prod-country" placeholder="Negara Asal" class="input-glass">
+                    <input type="text" id="prod-label" placeholder="Label/Tag" class="input-glass">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="text" id="prod-event" placeholder="Event" class="input-glass">
+                    <select id="prod-status" class="input-glass">                        <option value="Public">🟢 Public</option>
+                        <option value="Private">🔒 Private</option>
+                        <option value="Out of Stock">❌ Out of Stock</option>
+                    </select>
+                </div>
+                <input type="hidden" id="prod-id">
+                <button onclick="saveProduct()" class="btn-glitter w-full py-2.5 rounded-lg font-medium mt-2">💾 Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase & App Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, GithubAuthProvider, updatePassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, arrayUnion, arrayRemove, limit, startAfter } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-        
-        // ✅ CONFIGURATION FIREBASE
+        import { getFirestore, collection, addDoc, doc, setDoc, updateDoc, getDoc, query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
             authDomain: "mfd-store.firebaseapp.com",
@@ -21,2274 +368,376 @@
             appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
         const githubProvider = new GithubAuthProvider();
-        
-        // ✅ EXPORT TO WINDOW FOR GLOBAL ACCESS
-        window.firebase = { auth, db, googleProvider, githubProvider };
-        console.log("🔥 Firebase Initialized | Project: mfd-store");
-    </script>
-    
-    <!-- Libraries -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            /* 🎨 Primary Theme - Yellow Gradient + Cyan Accent */
-            --primary: #FFD700;
-            --primary-dark: #FFA500;
-            --primary-light: #FFF9E6;
-            --secondary: #00CED1; /* Cyan */
-            --secondary-dark: #008B8B;
-            --secondary-light: #E0FFFF;
-            --accent: #FF6B6B;            --success: #4CAF50;
-            --danger: #F44336;
-            --warning: #FF9800;
-            --dark: #1a1a2e;
-            --darker: #0f0f1a;
-            --glass-bg: rgba(255, 255, 255, 0.92);
-            --glass-border: rgba(255, 215, 0, 0.4);
-            --glass-shadow: rgba(255, 215, 0, 0.25);
-            --cyan-glow: rgba(0, 206, 209, 0.3);
-        }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        // State
+        let user = null, profile = null, chatId = null, chatUnsub = null, editPid = null, imgBase64 = null, products = [];
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #FFF9E6 0%, #E0FFFF 35%, #FFECB3 70%, #FFF9E6 100%);
-            background-size: 400% 400%;
-            animation: gradientBG 20s ease infinite;
-            color: var(--dark);
-            min-height: 100vh;
-            overflow-x: hidden;
-            line-height: 1.5;
-        }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* ✨ Glitter Text Effect */
-        .glitter-text {
-            background: linear-gradient(90deg, #FFD700, #00CED1, #FF6B6B, #FFA500, #FFD700);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            background-size: 400% auto;
-            animation: shine 5s linear infinite;
-            font-weight: 800;
-            text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
-        }
-        @keyframes shine { 
-            0% { background-position: 0% center; }
-            100% { background-position: 400% center; } 
-        }
-
-        /* 🪟 Glassmorphism Panel */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(24px);            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 
-                0 8px 32px 0 var(--glass-shadow),
-                0 0 0 1px rgba(255,255,255,0.5) inset;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .glass-panel::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 3px;
-            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
-            opacity: 0.8;
-        }
-
-        .glass-panel:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 
-                0 15px 45px 0 var(--glass-shadow),
-                0 0 25px var(--cyan-glow),
-                0 0 0 1px rgba(255,255,255,0.7) inset;
-        }
-
-        /* 🔘 Glitter Button */
-        .btn-glitter {
-            background: linear-gradient(45deg, #FFD700, #FF8C00, #FF6B6B, #00CED1, #FFD700);
-            background-size: 400% 400%;
-            animation: gradientMove 6s ease infinite;
-            color: var(--dark);
-            font-weight: 700;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 20px rgba(255, 165, 0, 0.5);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-glitter::after {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-                .btn-glitter:hover::after { opacity: 1; }
-        .btn-glitter:hover { 
-            filter: brightness(1.08); 
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 30px rgba(0, 206, 209, 0.6);
-        }
-        .btn-glitter:active { transform: scale(0.98); }
-
-        @keyframes gradientMove { 
-            0% { background-position: 0% 50%; } 
-            50% { background-position: 100% 50%; } 
-            100% { background-position: 0% 50%; } 
-        }
-
-        /* 🔄 Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { 
-            background: rgba(255,255,255,0.4); 
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb { 
-            background: linear-gradient(180deg, var(--primary), var(--secondary)); 
-            border-radius: 10px;
-            border: 2px solid rgba(255,255,255,0.3);
-        }
-        ::-webkit-scrollbar-thumb:hover { 
-            background: linear-gradient(180deg, var(--primary-dark), var(--secondary-dark)); 
-        }
-
-        /* 🎭 Utilities */
-        .hidden-section { display: none !important; }
-        .fade-in { animation: fadeIn 0.4s ease-out; }
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(10px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
-
-        .pulse { animation: pulse 2s infinite; }
-        @keyframes pulse { 
-            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(255, 215, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
-        }
-
-        /* 📊 Table Styles */
-        .table-container { 
-            overflow-x: auto; 
-            border-radius: 16px; 
-            background: rgba(255,255,255,0.7);
-            border: 1px solid var(--glass-border);        }
-        
-        .custom-table { 
-            width: 100%; 
-            border-collapse: separate; 
-            border-spacing: 0; 
-            min-width: 900px; 
-            font-size: 0.875rem; 
-        }
-        
-        .custom-table th { 
-            background: linear-gradient(135deg, var(--primary), var(--secondary)); 
-            padding: 14px 12px; 
-            text-align: left; 
-            font-weight: 700; 
-            color: var(--dark); 
-            position: sticky; 
-            top: 0;
-            z-index: 5;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-        }
-        
-        .custom-table td { 
-            padding: 12px; 
-            border-bottom: 1px solid rgba(0,0,0,0.06); 
-            background: rgba(255,255,255,0.6);
-            transition: background 0.2s;
-        }
-        
-        .custom-table tr:hover td { 
-            background: linear-gradient(90deg, rgba(255,249,230,0.9), rgba(224,255,255,0.7)); 
-        }
-        
-        .custom-table tr:last-child td { border-bottom: none; }
-
-        /* 🏷️ Badges */
-        .badge { 
-            padding: 4px 10px; 
-            border-radius: 20px; 
-            font-size: 0.7rem; 
-            font-weight: 700; 
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .badge-success { background: linear-gradient(135deg, #c6f6d5, #68d391); color: #1a5d3a; }        .badge-warning { background: linear-gradient(135deg, #feebc8, #f6ad55); color: #744210; }
-        .badge-danger { background: linear-gradient(135deg, #fed7d7, #fc8181); color: #822727; }
-        .badge-info { background: linear-gradient(135deg, #bee3f8, #63b3ed); color: #2a4365; }
-        .badge-purple { background: linear-gradient(135deg, #e9d8fd, #b794f4); color: #553c9a; }
-
-        /* 💬 Chat System */
-        .chat-container { 
-            display: grid; 
-            grid-template-columns: 280px 1fr; 
-            gap: 1rem; 
-            height: 72vh;
-            min-height: 500px;
-        }
-        
-        .chat-messages { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 1rem; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 0.75rem;
-            background: rgba(255,255,255,0.4);
-            border-radius: 16px;
-        }
-        
-        .msg-bubble { 
-            max-width: 85%; 
-            padding: 12px 16px; 
-            border-radius: 18px; 
-            position: relative; 
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-        }
-        
-        .msg-me { 
-            align-self: flex-end; 
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
-            color: var(--dark); 
-            border-bottom-right-radius: 4px;
-            font-weight: 500;
-        }
-        
-        .msg-other { 
-            align-self: flex-start; 
-            background: white; 
-            color: var(--dark); 
-            border-bottom-left-radius: 4px;
-            border-left: 3px solid var(--secondary);
-        }
-                .msg-image { 
-            max-width: 100%; 
-            border-radius: 12px; 
-            margin-top: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
-        @keyframes popIn { 
-            from { opacity: 0; transform: scale(0.9) translateY(15px); } 
-            to { opacity: 1; transform: scale(1) translateY(0); } 
-        }
-
-        /* 🍞 Toast Notifications */
-        .toast { 
-            position: fixed; 
-            bottom: 24px; 
-            right: 24px; 
-            padding: 14px 22px; 
-            border-radius: 14px; 
-            color: white; 
-            font-weight: 600; 
-            z-index: 9999; 
-            animation: slideIn 0.35s ease, fadeOut 0.3s 2.7s ease forwards;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            max-width: 320px;
-        }
-        
-        .toast.success { 
-            background: linear-gradient(135deg, var(--success), #43a047);
-            border-left: 4px solid #2e7d32;
-        }
-        .toast.error { 
-            background: linear-gradient(135deg, var(--danger), #e53935);
-            border-left: 4px solid #c62828;
-        }
-        .toast.info { 
-            background: linear-gradient(135deg, #2196F3, #1976D2);
-            border-left: 4px solid #0d47a1;
-        }
-        .toast.warning { 
-            background: linear-gradient(135deg, var(--warning), #f57c00);
-            border-left: 4px solid #ef6c00;
-        }
-        
-        @keyframes slideIn { 
-            from { transform: translateX(120%); opacity: 0; } 
-            to { transform: translateX(0); opacity: 1; }         }
-        @keyframes fadeOut { 
-            to { opacity: 0; transform: translateX(20px); } 
-        }
-
-        /* ⏳ Loader */
-        .loader { 
-            border: 4px solid rgba(255,255,255,0.3); 
-            border-left-color: var(--primary); 
-            border-radius: 50%; 
-            width: 32px; 
-            height: 32px; 
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-
-        /* 🖼️ Product Card */
-        .product-card {
-            background: rgba(255,255,255,0.85);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.3s;
-            border: 1px solid rgba(255,215,0,0.2);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(255,215,0,0.3);
-            border-color: var(--secondary);
-        }
-        
-        .product-img {
-            height: 160px;
-            object-fit: cover;
-            width: 100%;
-            background: linear-gradient(135deg, #fff9e6, #e0ffff);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary-dark);
-            font-size: 3rem;
-        }
-        
-        .product-info { padding: 14px; flex: 1; display: flex; flex-direction: column; }
-        .product-title { font-weight: 600; margin-bottom: 6px; font-size: 0.95rem; }
-        .product-price { color: var(--primary-dark); font-weight: 700; font-size: 1.1rem; }
-        .product-sale { color: var(--danger); font-weight: 700; text-decoration: line-through; opacity: 0.7; font-size: 0.9rem; }
-        /* 📱 Responsive */
-        @media (max-width: 1024px) {
-            .chat-container { grid-template-columns: 1fr; }
-            .contacts-panel { 
-                display: none; 
-                position: absolute; 
-                inset: 0; 
-                z-index: 20; 
-                background: var(--glass-bg);
-                border-radius: 24px;
-                margin: 1rem;
-            }
-            .contacts-panel.active { display: block; }
-            .custom-table { min-width: 700px; font-size: 0.8rem; }
-            .custom-table th, .custom-table td { padding: 10px 8px; }
-        }
-        
-        @media (max-width: 768px) {
-            .grid-cols-2 { grid-template-columns: 1fr; }
-            .grid-cols-4 { grid-template-columns: repeat(2, 1fr); }
-            .product-grid { grid-template-columns: repeat(2, 1fr); }
-            .btn-group { flex-wrap: wrap; }
-            .nav-buttons { gap: 8px; }
-        }
-        
-        @media (max-width: 480px) {
-            .product-grid { grid-template-columns: 1fr; }
-            .custom-table { min-width: 500px; font-size: 0.75rem; }
-            .msg-bubble { max-width: 95%; }
-            .toast { right: 12px; left: 12px; max-width: none; }
-        }
-
-        /* 🎨 Additional Utilities */
-        .text-gradient {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-weight: 700;
-        }
-        
-        .input-glass {
-            background: rgba(255,255,255,0.7);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 12px 16px;
-            transition: all 0.2s;
-            width: 100%;
-        }        
-        .input-glass:focus {
-            outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px var(--cyan-glow);
-            background: white;
-        }
-        
-        .tab-btn {
-            padding: 10px 18px;
-            border-radius: 14px;
-            font-weight: 600;
-            transition: all 0.2s;
-            background: rgba(255,255,255,0.7);
-            border: 1px solid var(--glass-border);
-        }
-        
-        .tab-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0,206,209,0.4);
-        }
-        
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-        }
-        .status-online { background: var(--success); box-shadow: 0 0 8px var(--success); }
-        .status-busy { background: var(--danger); }
-        .status-offline { background: #999; }
-    </style>
-</head>
-<body class="p-0 md:p-4">
-
-    <!-- 🔊 Audio Effects -->
-    <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3" preload="auto"></audio>
-    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3" preload="auto"></audio>
-    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
-    <audio id="snd-chat" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-click-2345.mp3" preload="auto"></audio>
-
-    <!-- 🍞 Toast Container -->
-    <div id="toast-container" class="fixed bottom-0 right-0 p-4 z-[10000]"></div>
-
-    <!-- 🧭 Navbar -->
-    <nav class="glass-panel sticky top-0 z-50 m-0 md:m-4 p-3 md:p-4 flex justify-between items-center flex-wrap gap-3 shadow-xl">
-        <a href="#" class="flex items-center gap-3 cursor-pointer group" onclick="playSound('click')">            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-cyan-400 flex items-center justify-center text-white text-lg shadow-lg">
-                <i class="fas fa-store"></i>
-            </div>
-            <span class="text-xl font-bold glitter-text tracking-tight">Vendors Manager</span>
-        </a>
-        
-        <div class="flex items-center gap-2 md:gap-4 nav-buttons">
-            <!-- Search Product -->
-            <div class="relative hidden md:block">
-                <input type="text" id="global-search" placeholder="🔍 Cari produk..." 
-                    class="input-glass pl-10 pr-4 py-2 w-64 text-sm"
-                    onkeyup="searchProducts(this.value)">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
-            </div>
-            
-            <!-- Cart -->
-            <button onclick="toggleCart(); playSound('click')" class="relative p-2.5 hover:bg-white/50 rounded-xl transition group">
-                <i class="fas fa-shopping-cart text-lg text-yellow-600 group-hover:scale-110 transition"></i>
-                <span id="cart-badge" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] w-5 h-5 flex items-center justify-center rounded-full font-bold hidden pulse">0</span>
-            </button>
-            
-            <!-- Auth -->
-            <div id="auth-nav" class="flex items-center gap-2">
-                <button onclick="navTo('login'); playSound('click')" class="px-4 py-2 rounded-xl bg-white/70 hover:bg-white text-yellow-700 font-semibold text-sm transition border border-yellow-200">
-                    <i class="fas fa-sign-in-alt mr-1"></i> Login
-                </button>
-                <button onclick="navTo('register'); playSound('click')" class="px-4 py-2 rounded-xl btn-glitter shadow-lg text-sm">
-                    <i class="fas fa-user-plus mr-1"></i> Register
-                </button>
-            </div>
-            
-            <!-- User Menu -->
-            <div id="user-nav" class="hidden-section flex items-center gap-2">
-                <div class="text-right hidden md:block mr-2">
-                    <div id="nav-name" class="font-bold text-sm text-gray-800"></div>
-                    <div id="nav-uac" class="text-[10px] text-cyan-700 font-mono bg-cyan-100 px-2 py-0.5 rounded-full"></div>
-                </div>
-                <button onclick="navTo('dashboard'); playSound('click')" class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 text-white shadow-lg hover:scale-105 transition flex items-center justify-center">
-                    <i class="fas fa-user"></i>
-                </button>
-                <button onclick="doLogout(); playSound('click')" class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-400 to-pink-500 text-white shadow-lg hover:scale-105 transition flex items-center justify-center">
-                    <i class="fas fa-sign-out-alt"></i>
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- 🎯 Main Content -->
-    <main class="container mx-auto p-2 md:p-4 pb-24 fade-in">
-                <!-- 🔐 AUTH SECTION -->
-        <section id="view-login" class="max-w-md mx-auto mt-8 md:mt-16 hidden-section">
-            <div class="glass-panel p-6 md:p-8">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-yellow-400 to-cyan-400 flex items-center justify-center text-white text-2xl mb-3 shadow-lg">
-                        <i class="fas fa-store"></i>
-                    </div>
-                    <h2 class="text-2xl md:text-3xl font-bold glitter-text">Vendor Login</h2>
-                    <p class="text-gray-600 text-sm mt-1">Akses panel pengurusan anda</p>
-                </div>
-                
-                <form onsubmit="doLogin(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Email Address</label>
-                        <input type="email" id="login-email" required placeholder="you@example.com" 
-                            class="input-glass" autocomplete="email">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Password</label>
-                        <input type="password" id="login-pass" required placeholder="••••••••" 
-                            class="input-glass" autocomplete="current-password">
-                    </div>
-                    
-                    <button type="submit" class="btn-glitter w-full py-3 rounded-xl font-bold shadow-lg mt-2">
-                        <i class="fas fa-sign-in-alt mr-2"></i> LOGIN NOW
-                    </button>
-                </form>
-                
-                <div class="relative my-6">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div class="relative flex justify-center text-xs">
-                        <span class="px-3 bg-transparent text-gray-500 font-medium">ATAU</span>
-                    </div>
-                </div>
-                
-                <div class="space-y-3">
-                    <button onclick="doGoogleSignIn(); playSound('click')" 
-                        class="w-full py-3 rounded-xl font-semibold shadow flex items-center justify-center gap-3 bg-white hover:bg-gray-50 border border-gray-200 transition">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5"> 
-                        Continue with Google
-                    </button>
-                    <button onclick="doGithubSignIn(); playSound('click')" 
-                        class="w-full py-3 rounded-xl font-semibold shadow flex items-center justify-center gap-3 bg-gray-900 text-white hover:bg-gray-800 transition">
-                        <i class="fab fa-github text-lg"></i> Continue with GitHub
-                    </button>
-                </div>
-                
-                <p class="text-center mt-6 text-sm text-gray-600">                    New vendor? 
-                    <span class="text-yellow-600 font-bold cursor-pointer hover:underline" onclick="navTo('register'); playSound('click')">
-                        Register Account →
-                    </span>
-                </p>
-            </div>
-        </section>
-
-        <section id="view-register" class="max-w-md mx-auto mt-8 md:mt-16 hidden-section">
-            <div class="glass-panel p-6 md:p-8">
-                <div class="text-center mb-6">
-                    <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-br from-cyan-400 to-yellow-400 flex items-center justify-center text-white text-2xl mb-3 shadow-lg">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <h2 class="text-2xl md:text-3xl font-bold glitter-text">Register Vendor</h2>
-                    <p class="text-gray-600 text-sm mt-1">Mula jualan dengan MFD Store</p>
-                </div>
-                
-                <form onsubmit="doRegister(event)" class="space-y-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 mb-1">Business Name *</label>
-                            <input type="text" id="reg-business" required placeholder="My Awesome Shop" 
-                                class="input-glass">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-700 mb-1">Phone Number *</label>
-                            <input type="tel" id="reg-phone" required placeholder="+60123456789" 
-                                class="input-glass" pattern="[\+]?[0-9\s\-]{10,}">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Email Address *</label>
-                        <input type="email" id="reg-email" required placeholder="vendor@business.com" 
-                            class="input-glass" autocomplete="email">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Password (Min 6 characters) *</label>
-                        <input type="password" id="reg-pass" required placeholder="••••••••" minlength="6"
-                            class="input-glass" autocomplete="new-password">
-                    </div>
-                    
-                    <button type="submit" class="btn-glitter w-full py-3 rounded-xl font-bold shadow-lg mt-2">
-                        <i class="fas fa-user-plus mr-2"></i> REGISTER FREE
-                    </button>
-                </form>
-                
-                <p class="text-center mt-6 text-sm text-gray-600">                    Already have account? 
-                    <span class="text-cyan-600 font-bold cursor-pointer hover:underline" onclick="navTo('login'); playSound('click')">
-                        Login Here →
-                    </span>
-                </p>
-            </div>
-        </section>
-
-        <!-- 📊 DASHBOARD SECTION -->
-        <section id="view-dashboard" class="hidden-section">
-            
-            <!-- 📈 Stats Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="glass-panel p-4 text-center hover:scale-[1.02] transition">
-                    <div class="text-2xl font-bold text-gradient" id="stat-sales">RM 0.00</div>
-                    <div class="text-xs text-gray-600 mt-1">💰 Total Sales</div>
-                </div>
-                <div class="glass-panel p-4 text-center hover:scale-[1.02] transition">
-                    <div class="text-2xl font-bold text-green-600" id="stat-orders">0</div>
-                    <div class="text-xs text-gray-600 mt-1">📦 Active Orders</div>
-                </div>
-                <div class="glass-panel p-4 text-center hover:scale-[1.02] transition">
-                    <div class="text-2xl font-bold text-purple-600" id="stat-products">0</div>
-                    <div class="text-xs text-gray-600 mt-1">🛍️ Products</div>
-                </div>
-                <div class="glass-panel p-4 text-center hover:scale-[1.02] transition">
-                    <div class="text-2xl font-bold text-red-600" id="stat-commission">RM 0.00</div>
-                    <div class="text-xs text-gray-600 mt-1">💸 Commission Fee</div>
-                </div>
-            </div>
-
-            <!-- 🔀 Navigation Tabs -->
-            <div class="flex gap-2 mb-5 overflow-x-auto pb-2 scrollbar-hide">
-                <button onclick="switchTab('tab-products')" id="tab-btn-products" class="tab-btn active whitespace-nowrap">
-                    <i class="fas fa-box-open mr-1"></i> Produk
-                </button>
-                <button onclick="switchTab('tab-orders')" id="tab-btn-orders" class="tab-btn whitespace-nowrap">
-                    <i class="fas fa-clipboard-list mr-1"></i> Pesanan
-                </button>
-                <button onclick="switchTab('tab-profile')" id="tab-btn-profile" class="tab-btn whitespace-nowrap">
-                    <i class="fas fa-user-cog mr-1"></i> Profil
-                </button>
-                <button onclick="switchTab('tab-chat')" id="tab-btn-chat" class="tab-btn whitespace-nowrap text-pink-600">
-                    <i class="fas fa-comments mr-1"></i> Live Agent
-                </button>
-                <button onclick="switchTab('tab-admin')" id="btn-admin-tab" class="tab-btn whitespace-nowrap bg-gradient-to-r from-purple-600 to-pink-600 text-white hidden-section">
-                    <i class="fas fa-crown mr-1"></i> Admin
-                </button>
-            </div>
-            <!-- 📦 PRODUCT TAB -->
-            <div id="tab-products" class="tab-content glass-panel p-4 md:p-5 mb-6">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 gap-3">
-                    <h3 class="font-bold text-lg text-gradient">📦 Katalog Produk</h3>
-                    <div class="flex gap-2 w-full md:w-auto">
-                        <input type="text" id="product-search" placeholder="Cari produk..." 
-                            class="input-glass py-2 text-sm flex-1 md:flex-initial"
-                            onkeyup="filterProducts(this.value)">
-                        <button onclick="openProductModal()" class="btn-glitter px-4 py-2 rounded-xl text-sm shadow whitespace-nowrap">
-                            <i class="fas fa-plus mr-1"></i> Tambah
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Product Grid -->
-                <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <!-- Products loaded dynamically -->
-                    <div class="col-span-full text-center py-8 text-gray-500">
-                        <div class="loader"></div>
-                        <p class="mt-3">Memuatkan produk...</p>
-                    </div>
-                </div>
-                
-                <!-- Fallback Table View -->
-                <div class="table-container mt-6 hidden" id="product-table-view">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>Gambar</th><th>Nama Item</th><th>Harga</th><th>Status</th><th>Sold</th><th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="product-list-body">
-                            <tr><td colspan="6" class="text-center py-4">Loading...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- 📋 ORDERS TAB -->
-            <div id="tab-orders" class="tab-content hidden-section glass-panel p-4 md:p-5 mb-6">
-                <div class="flex justify-between items-center mb-5">
-                    <h3 class="font-bold text-lg text-gradient">📋 Senarai Pesanan Pelanggan</h3>
-                    <select id="order-filter" onchange="filterOrders(this.value)" class="input-glass py-2 text-sm w-40">
-                        <option value="all">Semua Status</option>
-                        <option value="To Pay">To Pay</option>
-                        <option value="To Ship">To Ship</option>
-                        <option value="To Receive">To Receive</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>                </div>
-                
-                <div class="table-container">
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>ID Pesanan</th>
-                                <th>Pelanggan</th>
-                                <th>Item</th>
-                                <th>Total</th>
-                                <th>Bayaran</th>
-                                <th>Status</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="order-list-body">
-                            <tr><td colspan="7" class="text-center py-4">
-                                <div class="loader"></div>
-                                <p class="mt-2 text-gray-500">Memuatkan pesanan...</p>
-                            </td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ⚙️ PROFILE TAB -->
-            <div id="tab-profile" class="tab-content hidden-section glass-panel p-4 md:p-5 mb-6">
-                <h3 class="font-bold text-lg text-gradient mb-5">⚙️ Maklumat Penjual</h3>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Seller Name</label>
-                        <input type="text" id="prof-seller" placeholder="Nama Penjual" class="input-glass">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Business Name</label>
-                        <input type="text" id="prof-business" placeholder="Nama Perniagaan" class="input-glass">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Phone Number</label>
-                        <input type="tel" id="prof-phone" placeholder="+60123456789" class="input-glass">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Email Address</label>
-                        <input type="email" id="prof-email" placeholder="email@domain.com" class="input-glass" disabled>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Full Address</label>
-                        <textarea id="prof-address" placeholder="No. Rumah, Jalan, Taman, Poskod, Negeri" 
-                            class="input-glass min-h-[80px] resize-y"></textarea>                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">
-                            💳 Payment Information (Bank / QR Code Link)
-                        </label>
-                        <textarea id="prof-payment" placeholder="Nama Pemegang Akaun, Bank, No. Akaun / Link QR DuitNow" 
-                            class="input-glass min-h-[80px] resize-y"></textarea>
-                    </div>
-                </div>
-                
-                <!-- Account Info Display -->
-                <div class="mt-6 p-4 bg-gradient-to-r from-yellow-50 to-cyan-50 rounded-xl border border-yellow-200">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                        <div>
-                            <span class="text-gray-500 block text-xs">UAC</span>
-                            <span id="display-uac" class="font-mono font-bold text-cyan-700">-</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-500 block text-xs">VenID</span>
-                            <span id="display-venid" class="font-mono font-bold">-</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-500 block text-xs">Status</span>
-                            <span id="display-status" class="font-bold text-green-600">ACTIVE</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-500 block text-xs">Log Cache</span>
-                            <span id="display-logcache" class="text-xs">-</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Action Buttons -->
-                <div class="mt-6 flex flex-wrap gap-3">
-                    <button onclick="saveProfile(); playSound('click')" class="btn-glitter px-6 py-2.5 rounded-xl shadow">
-                        <i class="fas fa-save mr-2"></i> Simpan Perubahan
-                    </button>
-                    <button onclick="changePassword(); playSound('click')" class="px-6 py-2.5 rounded-xl bg-gray-200 hover:bg-gray-300 transition font-medium">
-                        <i class="fas fa-key mr-2"></i> Tukar Password
-                    </button>
-                    <button onclick="deleteAccount(); playSound('click')" class="px-6 py-2.5 rounded-xl bg-red-100 text-red-700 hover:bg-red-200 transition font-medium ml-auto">
-                        <i class="fas fa-trash-alt mr-2"></i> Delete Account
-                    </button>
-                </div>
-            </div>
-
-            <!-- 💬 CHAT TAB -->
-            <div id="tab-chat" class="tab-content hidden-section glass-panel p-0 mb-6 overflow-hidden">
-                <div class="chat-container">
-                    <!-- Contacts Panel -->                    <div class="contacts-panel glass-panel p-3 overflow-y-auto border-r border-gray-200" id="chat-contacts">
-                        <div class="flex justify-between items-center mb-3 pb-2 border-b">
-                            <h4 class="font-bold text-sm">👥 Pelanggan</h4>
-                            <button onclick="toggleMobileContacts()" class="md:hidden text-gray-500">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div id="contacts-list" class="space-y-2">
-                            <!-- Contacts loaded dynamically -->
-                            <div class="text-center py-8 text-gray-500 text-sm">
-                                <i class="fas fa-inbox text-2xl mb-2 opacity-50"></i>
-                                <p>Tiada perbualan</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Chat Panel -->
-                    <div class="chat-panel flex flex-col">
-                        <!-- Chat Header -->
-                        <div class="p-3 md:p-4 border-b flex justify-between items-center bg-gradient-to-r from-yellow-50 to-cyan-50">
-                            <div class="flex items-center gap-3">
-                                <button onclick="toggleMobileContacts()" class="md:hidden p-2 hover:bg-white/50 rounded-lg">
-                                    <i class="fas fa-list text-gray-600"></i>
-                                </button>
-                                <div>
-                                    <div id="chat-header-name" class="font-bold text-gray-800">Pilih Pelanggan</div>
-                                    <div id="chat-header-status" class="text-xs text-gray-500">
-                                        <span class="status-dot status-offline"></span> Offline
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <select id="agent-status" onchange="updateAgentStatus()" 
-                                    class="text-xs border rounded-lg p-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-cyan-400">
-                                    <option value="Online">🟢 Online</option>
-                                    <option value="Busy">🔴 Busy</option>
-                                    <option value="Offline">⚫ Offline</option>
-                                </select>
-                                <button onclick="closeChatMobile()" class="md:hidden p-2 hover:bg-red-100 rounded-lg text-red-500">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Messages Area -->
-                        <div id="chat-messages" class="chat-messages bg-white/40 flex-1">
-                            <div class="h-full flex items-center justify-center text-gray-400">
-                                <div class="text-center">
-                                    <i class="fas fa-comments text-4xl mb-3 opacity-30"></i>
-                                    <p class="text-sm">Pilih pelanggan untuk mula berborak</p>                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Message Input -->
-                        <div class="p-3 md:p-4 border-t bg-white/80">
-                            <div class="flex items-end gap-2">
-                                <button onclick="document.getElementById('chat-file').click()" 
-                                    class="p-2.5 hover:bg-gray-100 rounded-xl transition" title="Hantar Gambar">
-                                    <i class="fas fa-image text-gray-500"></i>
-                                </button>
-                                <input type="file" id="chat-file" class="hidden" accept="image/*" onchange="sendImage(this)">
-                                
-                                <button class="p-2.5 hover:bg-gray-100 rounded-xl transition hidden" title="Rakam Suara">
-                                    <i class="fas fa-microphone text-gray-500"></i>
-                                </button>
-                                
-                                <textarea id="chat-input" rows="1" 
-                                    class="flex-1 border rounded-xl p-3 resize-none focus:outline-none focus:ring-2 focus:ring-cyan-400 bg-white/70" 
-                                    placeholder="Taip mesej..."
-                                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
-                                
-                                <button onclick="sendMessage(); playSound('chat')" 
-                                    class="p-3 bg-gradient-to-br from-yellow-400 to-cyan-400 text-white rounded-xl hover:scale-105 transition shadow-lg">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </div>
-                            <div class="text-[10px] text-gray-400 mt-1 text-center">
-                                Tekan Enter untuk hantar • Shift+Enter untuk baris baru
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 👑 ADMIN TAB (Admin Only) -->
-            <div id="tab-admin" class="tab-content hidden-section glass-panel p-4 md:p-5 mb-6">
-                <h3 class="font-bold text-lg text-gradient mb-4 flex items-center gap-2">
-                    <i class="fas fa-crown text-purple-600"></i> 👑 Admin Management
-                </h3>
-                
-                <!-- Commission Settings -->
-                <div class="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200">
-                    <label class="text-sm font-bold text-gray-700 block mb-2">
-                        ⚙️ Tetapan Kadar Komisen (RM 0.01 - 5.00)
-                    </label>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <input type="number" id="admin-comm-rate" step="0.01" min="0.01" max="5" 
-                            placeholder="1.00" class="input-glass w-32">
-                        <button onclick="updateCommission(); playSound('click')"                             class="btn-glitter px-5 py-2.5 rounded-xl text-sm whitespace-nowrap">
-                            <i class="fas fa-sync-alt mr-1"></i> Update Rate
-                        </button>
-                        <div class="text-xs text-gray-500 self-center">
-                            Semasa: <span id="current-comm-rate" class="font-bold text-purple-600">RM 1.00</span> / jualan
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Vendor Management Table -->
-                <div class="mb-6">
-                    <h4 class="font-bold text-gray-700 mb-3">📊 Pengurusan Vendor</h4>
-                    <div class="table-container">
-                        <table class="custom-table">
-                            <thead>
-                                <tr>
-                                    <th>UAC</th><th>Seller</th><th>Sales</th><th>Commission</th><th>Status</th><th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-vendor-list">
-                                <tr><td colspan="6" class="text-center py-4">
-                                    <div class="loader"></div>
-                                </td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Salary Management -->
-                <div>
-                    <h4 class="font-bold text-gray-700 mb-3">💰 Pengurusan Gaji Penjual</h4>
-                    <div class="table-container">
-                        <table class="custom-table">
-                            <thead>
-                                <tr>
-                                    <th>UAC</th><th>Business</th><th>Total Sales</th><th>Commission</th><th>Payment Status</th><th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-salary-list">
-                                <tr><td colspan="6" class="text-center py-4 text-gray-500">
-                                    Tiada data gaji
-                                </td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 🛍️ PUBLIC CATALOGUE (Showcase) -->        <section id="view-catalogue" class="hidden-section">
-            <div class="text-center mb-6">
-                <h2 class="text-2xl md:text-3xl font-bold glitter-text mb-2">✨ Showcase MFD Store</h2>
-                <p class="text-gray-600">Produk pilihan untuk anda</p>
-            </div>
-            
-            <!-- Filter Tabs -->
-            <div class="flex gap-2 mb-6 overflow-x-auto pb-2 justify-center">
-                <button onclick="filterCatalogue('all')" class="tab-btn active">Semua</button>
-                <button onclick="filterCatalogue('recommendations')" class="tab-btn">🌟 Disyorkan</button>
-                <button onclick="filterCatalogue('highest')" class="tab-btn">🔥 Paling Laku</button>
-                <button onclick="filterCatalogue('event')" class="tab-btn">🎉 Event</button>
-            </div>
-            
-            <!-- Product Grid -->
-            <div id="catalogue-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                <!-- Products loaded dynamically -->
-            </div>
-        </section>
-
-    </main>
-
-    <!-- 🎁 Product Modal -->
-    <div id="product-modal" class="fixed inset-0 bg-black/60 z-[1000] hidden-section flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-2xl p-5 md:p-6 relative max-h-[95vh] overflow-y-auto">
-            <button onclick="closeProductModal(); playSound('click')" 
-                class="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/80 hover:bg-red-100 text-gray-600 hover:text-red-500 flex items-center justify-center text-xl transition">
-                &times;
-            </button>
-            
-            <h3 class="text-xl font-bold glitter-text mb-5" id="modal-title">➕ Tambah Produk Baharu</h3>
-            
-            <div class="space-y-4">
-                <!-- Image Upload -->
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-2">🖼️ Gambar Produk (Max 800KB)</label>
-                    <div class="flex items-center gap-4">
-                        <input type="file" id="prod-img" accept="image/*" 
-                            class="input-glass text-sm py-2" onchange="previewImage(this)">
-                        <img id="prod-preview" class="w-20 h-20 object-cover rounded-xl border-2 border-dashed border-gray-300 hidden">
-                    </div>
-                    <p class="text-[10px] text-gray-500 mt-1">Gambar disimpan dalam Firestore sebagai base64</p>
-                </div>
-                
-                <!-- Basic Info -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nama Item *</label>
-                        <input type="text" id="prod-name" placeholder="Contoh: Baju Kurung Premium" class="input-glass">
-                    </div>                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Kod Item Unik</label>
-                        <input type="text" id="prod-code" placeholder="Auto-generated" class="input-glass" readonly>
-                    </div>
-                </div>
-                
-                <!-- Pricing -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Harga Asal (Opsyenal)</label>
-                        <input type="number" id="prod-price" placeholder="0.00" step="0.01" class="input-glass">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Harga Jualan *</label>
-                        <input type="number" id="prod-sale" placeholder="0.00" step="0.01" class="input-glass" required>
-                    </div>
-                </div>
-                
-                <!-- Details -->
-                <div>
-                    <label class="block text-xs font-semibold text-gray-700 mb-1">Deskripsi Item</label>
-                    <textarea id="prod-desc" placeholder="Terangkan produk anda..." class="input-glass min-h-[80px]"></textarea>
-                </div>
-                
-                <!-- Variations & Metadata -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Negara Asal</label>
-                        <input type="text" id="prod-country" placeholder="Contoh: Malaysia" class="input-glass">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Label / Tag</label>
-                        <input type="text" id="prod-label" placeholder="Contoh: Best Seller, New Arrival" class="input-glass">
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Event (Opsyenal)</label>
-                        <input type="text" id="prod-event" placeholder="Contoh: Raya Sale 2024" class="input-glass">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Pautan Tambahan</label>
-                        <input type="url" id="prod-link" placeholder="https://..." class="input-glass">
-                    </div>
-                </div>
-                
-                <!-- Status & Advanced -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>                        <label class="block text-xs font-semibold text-gray-700 mb-1">Status Item</label>
-                        <select id="prod-status" class="input-glass">
-                            <option value="Public">🟢 Public</option>
-                            <option value="Private">🔒 Private</option>
-                            <option value="Out of Stock">❌ Out of Stock</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-700 mb-1">Variasi Item</label>
-                        <input type="text" id="prod-variation" placeholder="Contoh: S/M/L/XL, Merah/Biru" class="input-glass">
-                    </div>
-                </div>
-                
-                <!-- Hidden Fields -->
-                <input type="hidden" id="prod-id">
-                <input type="hidden" id="prod-revenue" value="0">
-                <input type="hidden" id="prod-sold" value="0">
-                <input type="hidden" id="prod-rating" value="0">
-                
-                <!-- Action Button -->
-                <button onclick="saveProduct(); playSound('click')" 
-                    class="btn-glitter w-full py-3.5 rounded-xl font-bold shadow-lg mt-2">
-                    <i class="fas fa-save mr-2"></i> 💾 Simpan Produk
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 🛒 Cart Modal (Simplified) -->
-    <div id="cart-modal" class="fixed inset-0 bg-black/60 z-[1000] hidden-section flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-lg glitter-text">🛒 Shopping Cart</h3>
-                <button onclick="toggleCart()" class="text-2xl">&times;</button>
-            </div>
-            <div id="cart-items" class="space-y-3 max-h-60 overflow-y-auto mb-4">
-                <p class="text-center text-gray-500 py-4">Cart kosong</p>
-            </div>
-            <div class="flex justify-between font-bold mb-4">
-                <span>Total:</span>
-                <span id="cart-total" class="text-yellow-600">RM 0.00</span>
-            </div>
-            <button class="btn-glitter w-full py-3 rounded-xl font-bold">Proceed to Checkout</button>
-        </div>
-    </div>
-
-    <!-- 🧠 Core JavaScript Logic -->
-    <script type="module">
-        // ✅ Import Firebase (already initialized in head)
-        const { auth, db, googleProvider, githubProvider } = window.firebase;        const { 
-            createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, 
-            onAuthStateChanged, signInWithPopup, updatePassword 
-        } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js");
-        
-        const { 
-            collection, addDoc, getDocs, doc, setDoc, updateDoc, getDoc, 
-            query, where, orderBy, serverTimestamp, deleteDoc, onSnapshot, 
-            arrayUnion, arrayRemove, limit, startAfter 
-        } = await import("https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js");
-
-        // 🧠 GLOBAL STATE
-        let currentUser = null;
-        let userProfile = null;
-        let currentChatId = null;
-        let unsubscribeChat = null;
-        let editProductId = null;
-        let currentImageBase64 = null;
-        let productsCache = [];
-        let ordersCache = [];
-
-        // 🔊 SOUND UTILS
-        window.playSound = (type) => {
-            const sounds = { 
-                'click': document.getElementById('snd-click'), 
-                'success': document.getElementById('snd-success'), 
-                'error': document.getElementById('snd-error'),
-                'chat': document.getElementById('snd-chat')
-            };
-            if(sounds[type]) { 
-                sounds[type].currentTime = 0; 
-                sounds[type].play().catch(e => console.log('Audio play error:', e)); 
-            }
+        // Utils
+        window.playSound = t => { const s = document.getElementById(`snd-${t}`); if(s){ s.currentTime=0; s.play().catch(()=>{}); } };
+        window.showToast = (m,t='info') => {
+            const el = document.getElementById('toast');
+            el.textContent = m; el.className = `toast ${t}`; el.classList.remove('hidden');
+            setTimeout(()=>el.classList.add('hidden'),3000); playSound(t==='error'?'error':'success');
         };
-
-        // 🍞 TOAST NOTIFICATIONS
-        window.showToast = (msg, type='info') => {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            const icons = {
-                success: '✅',
-                error: '❌', 
-                info: 'ℹ️',
-                warning: '⚠️'
-            };
-            
-            toast.innerHTML = `<span>${icons[type] || '🔔'}</span> <span>${msg}</span>`;
-            container.appendChild(toast);            
-            // Auto remove
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(20px)';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-            
-            playSound(type === 'error' ? 'error' : 'success');
-        };
-
-        // 🧭 NAVIGATION
-        window.navTo = (view) => {
+        window.navTo = v => {
             playSound('click');
-            // Hide all sections
-            document.querySelectorAll('section[id^="view-"]').forEach(el => {
-                el.classList.add('hidden-section');
-            });
-            // Show target
-            const target = document.getElementById(`view-${view}`);
-            if(target) {
-                target.classList.remove('hidden-section');
-                target.classList.add('fade-in');
-            }
-            // Load data if dashboard
-            if(view === 'dashboard' && currentUser) {
-                loadDashboardData();
-            }
-            // Update URL hash for deep linking
-            history.pushState(null, null, `#${view}`);
-        };
-
-        // 🔄 TAB SWITCHING
-        window.switchTab = (tabId) => {
+            document.querySelectorAll('section[id^="view-"]').forEach(e=>e.classList.add('hidden'));
+            document.getElementById(`view-${v}`).classList.remove('hidden');
+            if(v==='dashboard' && user) loadDashboard();
+            history.replaceState(null,null,`#${v}`);
+        };        window.switchTab = t => {
             playSound('click');
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(el => {
-                el.classList.add('hidden-section');
-            });
-            // Remove active class from buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            // Show target tab
-            document.getElementById(tabId).classList.remove('hidden-section');
-            // Add active class to button
-            const btnId = tabId.replace('tab-', 'tab-btn-');
-            const btn = document.getElementById(btnId);
-            if(btn) btn.classList.add('active');
-                        // Load specific data
-            if(tabId === 'tab-chat') loadChatContacts();
-            if(tabId === 'tab-admin' && userProfile?.role === 'admin') loadAdminData();
+            document.querySelectorAll('[id^="content-"]').forEach(e=>e.classList.add('hidden'));
+            document.getElementById(`content-${t}`).classList.remove('hidden');
+            document.querySelectorAll('.flex.gap-2 button').forEach(b=>b.classList.remove('active'));
+            document.getElementById(`tab-${t}`).classList.add('active');
+            if(t==='chat') loadChats();
+            if(t==='admin' && profile?.role==='admin') loadAdmin();
         };
 
-        // 🔐 AUTHENTICATION
-        window.doRegister = async (e) => {
+        // Auth
+        window.doRegister = async e => {
             e?.preventDefault();
             const email = document.getElementById('reg-email').value.trim();
             const pass = document.getElementById('reg-pass').value;
             const business = document.getElementById('reg-business').value.trim();
             const phone = document.getElementById('reg-phone').value.trim();
-
-            if(!email || !pass || !business || !phone) {
-                return showToast('Sila isi semua medan wajib *', 'error');
-            }
-            if(pass.length < 6) {
-                return showToast('Password minimum 6 karakter', 'error');
-            }
-
+            if(!email||!pass||!business||!phone) return showToast('Isi semua medan *','error');
+            if(pass.length<6) return showToast('Password min 6 karakter','error');
             try {
-                showToast('Mendaftar akaun...', 'info');
-                
-                // Create Firebase Auth user
-                const cred = await createUserWithEmailAndPassword(auth, email, pass);
-                
-                // Generate unique IDs
-                const uac = "VEN-" + Math.random().toString(36).substr(2,6).toUpperCase();
-                const venId = "VENFD-" + Date.now().toString(36).toUpperCase();
-                
-                // Save vendor profile to Firestore
-                await setDoc(doc(db, "vendors", cred.user.uid), {
-                    uid: cred.user.uid,
-                    email, 
-                    phone, 
-                    businessName: business,
-                    sellerName: business, // Default to business name
-                    description: "",
-                    uac, 
-                    venId,
-                    status: 'ACTIVE',
-                    role: 'vendor', // Default role
-                    commissionRate: 1.00, // Default RM1.00 commission
-                    paymentInfo: "",
-                    address: "",
-                    agentStatus: 'Online',
-                    createdAt: serverTimestamp(),
-                    logCache: serverTimestamp()
+                showToast('Mendaftar...','info');
+                const cred = await createUserWithEmailAndPassword(auth,email,pass);
+                const uac = "VEN-"+Math.random().toString(36).slice(2,8).toUpperCase();
+                const venId = "VENFD-"+Date.now().toString(36).toUpperCase();
+                await setDoc(doc(db,"vendors",cred.user.uid),{
+                    uid:cred.user.uid,email,phone,businessName:business,sellerName:business,
+                    uac,venId,status:'ACTIVE',role:'vendor',commissionRate:1,
+                    paymentInfo:'',address:'',agentStatus:'Online',
+                    createdAt:serverTimestamp(),logCache:serverTimestamp()
                 });
-                                showToast('✅ Pendaftaran berjaya! Sila login.', 'success');
-                navTo('login');
-                
-            } catch(error) {
-                console.error('Registration error:', error);
-                let msg = error.message;
-                if(msg.includes('email-already-in-use')) msg = 'Email sudah digunakan';
-                if(msg.includes('weak-password')) msg = 'Password terlalu lemah';
-                showToast(`❌ ${msg}`, 'error');
-            }
+                showToast('✅ Daftar berjaya! Login.','success'); navTo('login');
+            } catch(err){ showToast(`❌ ${err.message.replace('Firebase: ','')}`,'error'); }
         };
-
-        window.doLogin = async (e) => {
+        window.doLogin = async e => {
             e?.preventDefault();
-            const email = document.getElementById('login-email').value.trim();
-            const pass = document.getElementById('login-pass').value;
-
             try {
-                showToast('Logging in...', 'info');
-                await signInWithEmailAndPassword(auth, email, pass);
-                // Auth state change will handle redirect
-            } catch(error) {
-                console.error('Login error:', error);
-                let msg = error.message;
-                if(msg.includes('user-not-found') || msg.includes('wrong-password')) {
-                    msg = 'Email atau password tidak sah';
-                }
-                showToast(`❌ ${msg}`, 'error');
-            }
+                showToast('Logging in...','info');
+                await signInWithEmailAndPassword(auth,document.getElementById('login-email').value.trim(),document.getElementById('login-pass').value);
+            } catch(err){ showToast(`❌ ${err.message.includes('user')?'Email/password salah':err.message}`,'error'); }
         };
+        window.doGoogleSignIn = async () => { try{ await signInWithPopup(auth,googleProvider); } catch(err){ showToast(`❌ ${err.message}`,'error'); } };
+        window.doGithubSignIn = async () => { try{ await signInWithPopup(auth,githubProvider); } catch(err){ showToast(`❌ ${err.message}`,'error'); } };
+        window.doLogout = async () => { await signOut(auth); showToast('✅ Logout','success'); navTo('login'); };
 
-        window.doGoogleSignIn = async () => {
-            try {
-                showToast('Connecting to Google...', 'info');
-                await signInWithPopup(auth, googleProvider);
-            } catch(error) {
-                console.error('Google sign-in error:', error);
-                showToast(`❌ ${error.message}`, 'error');
-            }
-        };
-
-        window.doGithubSignIn = async () => {
-            try {
-                showToast('Connecting to GitHub...', 'info');
-                // GitHub provider configured in Firebase Console
-                await signInWithPopup(auth, githubProvider);
-            } catch(error) {
-                console.error('GitHub sign-in error:', error);
-                showToast(`❌ ${error.message}`, 'error');
-            }        };
-
-        window.doLogout = async () => {
-            try {
-                await signOut(auth);
-                showToast('✅ Logout berjaya', 'success');
-                navTo('login');
-            } catch(error) {
-                showToast(`❌ ${error.message}`, 'error');
-            }
-        };
-
-        // 👤 AUTH STATE LISTENER
-        onAuthStateChanged(auth, async (user) => {
-            currentUser = user;
-            
-            if(user) {
-                // User signed in
-                document.getElementById('auth-nav').classList.add('hidden-section');
-                document.getElementById('user-nav').classList.remove('hidden-section');
-                
-                // Load vendor profile
-                try {
-                    const snap = await getDoc(doc(db, "vendors", user.uid));
-                    if(snap.exists()) {
-                        userProfile = snap.data();
-                        
-                        // Update nav display
-                        document.getElementById('nav-name').innerText = userProfile.sellerName || 'Vendor';
-                        document.getElementById('nav-uac').innerText = userProfile.uac || '';
-                        
-                        // Update profile display
-                        document.getElementById('display-uac').innerText = userProfile.uac || '-';
-                        document.getElementById('display-venid').innerText = userProfile.venId || '-';
-                        document.getElementById('display-status').innerText = userProfile.status || 'ACTIVE';
-                        document.getElementById('display-status').className = 
-                            `font-bold ${userProfile.status === 'ACTIVE' ? 'text-green-600' : 'text-red-600'}`;
-                        
-                        if(userProfile.logCache?.toDate) {
-                            document.getElementById('display-logcache').innerText = 
-                                userProfile.logCache.toDate().toLocaleString('ms-MY');
-                        }
-                        
-                        // Show admin tab if admin
-                        if(userProfile.role === 'admin') {
-                            document.getElementById('btn-admin-tab').classList.remove('hidden-section');
-                        }
-                        
-                        // Auto navigate to dashboard
-                        navTo('dashboard');                    } else {
-                        // Profile not found - create basic one
-                        await initializeVendorProfile(user);
+        onAuthStateChanged(auth, async u => {
+            user = u;
+            if(u){
+                document.getElementById('auth-nav').classList.add('hidden');
+                document.getElementById('user-nav').classList.remove('hidden');
+                try{                    const snap = await getDoc(doc(db,"vendors",u.uid));
+                    if(snap.exists()){
+                        profile = snap.data();
+                        document.getElementById('nav-uac').textContent = profile.uac||'';
+                        document.getElementById('disp-uac').textContent = profile.uac||'-';
+                        document.getElementById('disp-status').textContent = profile.status||'ACTIVE';
+                        if(profile.role==='admin') document.getElementById('tab-admin').classList.remove('hidden');
+                        navTo('dashboard');
                     }
-                } catch(error) {
-                    console.error('Profile load error:', error);
-                    showToast('Gagal muat profil', 'error');
-                }
-            } else {
-                // User signed out
-                userProfile = null;
-                document.getElementById('auth-nav').classList.remove('hidden-section');
-                document.getElementById('user-nav').classList.add('hidden-section');
-                
-                // Check URL hash for public pages
-                const hash = window.location.hash.replace('#', '');
-                if(hash === 'catalogue') {
-                    navTo('catalogue');
-                    loadPublicCatalogue();
-                } else {
-                    navTo('login');
-                }
+                }catch(err){ console.error(err); showToast('Gagal load profil','error'); }
+            }else{
+                profile = null;
+                document.getElementById('auth-nav').classList.remove('hidden');
+                document.getElementById('user-nav').classList.add('hidden');
+                const hash = location.hash.slice(1);
+                navTo(hash==='catalogue'?'catalogue':'login');
+                if(hash==='catalogue') loadCatalogue();
             }
         });
 
-        // 🆕 Initialize vendor profile if not exists
-        async function initializeVendorProfile(user) {
-            const uac = "VEN-" + Math.random().toString(36).substr(2,6).toUpperCase();
-            const venId = "VENFD-" + Date.now().toString(36).toUpperCase();
-            
-            await setDoc(doc(db, "vendors", user.uid), {
-                uid: user.uid,
-                email: user.email,
-                sellerName: user.displayName || `Vendor-${venId.slice(-6)}`,
-                businessName: user.displayName || 'My Business',
-                phone: user.phoneNumber || '',
-                uac,
-                venId,
-                status: 'ACTIVE',
-                role: 'vendor',
-                commissionRate: 1.00,
-                createdAt: serverTimestamp(),
-                logCache: serverTimestamp()
-            });
-            
-            userProfile = { uac, venId, status: 'ACTIVE' };
-            showToast('✅ Profil vendor dicipta', 'success');
-        }
-
-        // 🖼️ IMAGE HANDLING (Base64 for Firestore)        window.previewImage = (input) => {
-            const file = input.files[0];
-            if(!file) return;
-            
-            // Validate file size (800KB limit for Firestore)
-            if(file.size > 800 * 1024) {
-                showToast('❌ Gambar terlalu besar! Max 800KB', 'error');
-                input.value = '';
-                return;
-            }
-            
-            // Validate file type
-            if(!file.type.startsWith('image/')) {
-                showToast('❌ Hanya fail gambar dibenarkan', 'error');
-                input.value = '';
-                return;
-            }
-            
+        // Products
+        window.previewImage = input => {
+            const file = input.files[0]; if(!file) return;
+            if(file.size>500*1024) return showToast('❌ Gambar >500KB','error');
+            if(!file.type.startsWith('image/')) return showToast('❌ Hanya gambar','error');
             const reader = new FileReader();
-            reader.onload = (e) => {
-                currentImageBase64 = e.target.result;
-                const img = document.getElementById('prod-preview');
-                img.src = currentImageBase64;
-                img.classList.remove('hidden');
-                showToast('✅ Gambar dimuatnaik', 'success');
-            };
-            reader.onerror = () => {
-                showToast('❌ Gagal baca gambar', 'error');
-            };
+            reader.onload = e => { imgBase64 = e.target.result; const img = document.getElementById('prod-preview'); img.src = imgBase64; img.classList.remove('hidden'); };
             reader.readAsDataURL(file);
         };
-
-        // 🎁 PRODUCT MODAL
-        window.openProductModal = (productId = null) => {
-            playSound('click');
-            editProductId = productId;
-            currentImageBase64 = null;
-            
-            // Reset form
-            document.querySelectorAll('#product-modal input:not([readonly]), #product-modal textarea, #product-modal select').forEach(i => {
-                if(i.id !== 'prod-code') i.value = '';
-            });
+        window.openProductModal = pid => {
+            playSound('click'); editPid = pid; imgBase64 = null;
+            document.querySelectorAll('#product-modal input,#product-modal textarea,#product-modal select').forEach(i=>{ if(i.id!=='prod-code') i.value=''; });
             document.getElementById('prod-preview').classList.add('hidden');
-            document.getElementById('modal-title').innerText = productId ? '✏️ Edit Produk' : '➕ Tambah Produk Baharu';
-            
-            // Generate unique code for new product
-            if(!productId) {
-                const code = "ITEM-" + Date.now().toString(36).toUpperCase().slice(-8);
-                document.getElementById('prod-code').value = code;
-            }            
-            document.getElementById('product-modal').classList.remove('hidden-section');
-            
-            // Load existing data if editing
-            if(productId) {
-                loadProductForEdit(productId);
-            }
+            document.getElementById('modal-title').textContent = pid?'✏️ Edit Produk':'➕ Tambah Produk';
+            if(!pid) document.getElementById('prod-code').value = "ITEM-"+Date.now().toString(36).slice(-8).toUpperCase();
+            document.getElementById('product-modal').classList.remove('hidden');
+            if(pid) loadProductEdit(pid);
         };
-
-        window.closeProductModal = () => {
-            playSound('click');
-            document.getElementById('product-modal').classList.add('hidden-section');
-            editProductId = null;
-            currentImageBase64 = null;
-        };
-
-        async function loadProductForEdit(productId) {
-            try {
-                const snap = await getDoc(doc(db, "products", productId));
-                if(snap.exists()) {
+        window.closeProductModal = () => { playSound('click'); document.getElementById('product-modal').classList.add('hidden'); editPid=null; imgBase64=null; };
+        async function loadProductEdit(id){
+            try{
+                const snap = await getDoc(doc(db,"products",id));
+                if(snap.exists()){
                     const p = snap.data();
-                    document.getElementById('prod-id').value = productId;
-                    document.getElementById('prod-name').value = p.name || '';
-                    document.getElementById('prod-code').value = p.itemCode || '';
-                    document.getElementById('prod-price').value = p.price || '';
-                    document.getElementById('prod-sale').value = p.salePrice || '';
-                    document.getElementById('prod-desc').value = p.description || '';
-                    document.getElementById('prod-country').value = p.country || '';
-                    document.getElementById('prod-label').value = p.label || '';
-                    document.getElementById('prod-event').value = p.event || '';
-                    document.getElementById('prod-link').value = p.link || '';
-                    document.getElementById('prod-status').value = p.status || 'Public';
-                    document.getElementById('prod-variation').value = p.variation || '';
-                    document.getElementById('prod-revenue').value = p.revenue || 0;
-                    document.getElementById('prod-sold').value = p.totalSold || 0;
-                    document.getElementById('prod-rating').value = p.rating || 0;
-                    
-                    // Load image preview
-                    if(p.imageUrl) {
-                        currentImageBase64 = p.imageUrl;
-                        const img = document.getElementById('prod-preview');
-                        img.src = currentImageBase64;
-                        img.classList.remove('hidden');
-                    }
+                    document.getElementById('prod-id').value = id;
+                    document.getElementById('prod-name').value = p.name||'';
+                    document.getElementById('prod-price').value = p.price||'';
+                    document.getElementById('prod-sale').value = p.salePrice||'';
+                    document.getElementById('prod-desc').value = p.description||'';
+                    document.getElementById('prod-country').value = p.country||'';                    document.getElementById('prod-label').value = p.label||'';
+                    document.getElementById('prod-event').value = p.event||'';
+                    document.getElementById('prod-status').value = p.status||'Public';
+                    if(p.imageUrl){ imgBase64 = p.imageUrl; const img = document.getElementById('prod-preview'); img.src = imgBase64; img.classList.remove('hidden'); }
                 }
-            } catch(error) {
-                console.error('Load product error:', error);
-                showToast('Gagal muat data produk', 'error');
-            }
+            }catch(err){ showToast('Gagal load produk','error'); }
         }
         window.saveProduct = async () => {
             const name = document.getElementById('prod-name').value.trim();
             const sale = document.getElementById('prod-sale').value;
-            
-            if(!name || !sale) {
-                return showToast('❌ Nama dan Harga Jualan wajib diisi', 'error');
-            }
-            
-            const salePrice = parseFloat(sale);
-            if(isNaN(salePrice) || salePrice <= 0) {
-                return showToast('❌ Harga jualan tidak sah', 'error');
-            }
-
-            const productData = {
-                vendorId: currentUser.uid,
-                vendorUAC: userProfile?.uac,
-                name,
-                itemCode: document.getElementById('prod-code').value || `ITEM-${Date.now().toString(36).toUpperCase().slice(-8)}`,
-                price: parseFloat(document.getElementById('prod-price').value) || 0,
-                salePrice,
-                description: document.getElementById('prod-desc').value,
-                country: document.getElementById('prod-country').value,
-                label: document.getElementById('prod-label').value,
-                event: document.getElementById('prod-event').value,
-                link: document.getElementById('prod-link').value,
-                status: document.getElementById('prod-status').value,
-                variation: document.getElementById('prod-variation').value,
-                imageUrl: currentImageBase64, // Stored as base64 in Firestore
-                totalSold: parseInt(document.getElementById('prod-sold').value) || 0,
-                rating: parseFloat(document.getElementById('prod-rating').value) || 0,
-                revenue: parseFloat(document.getElementById('prod-revenue').value) || 0,
-                updatedAt: serverTimestamp()
+            if(!name||!sale) return showToast('❌ Nama & Harga Jualan wajib','error');
+            const salePrice = parseFloat(sale); if(isNaN(salePrice)||salePrice<=0) return showToast('❌ Harga tidak sah','error');
+            const data = {
+                vendorId:user.uid, vendorUAC:profile?.uac, name,
+                itemCode: document.getElementById('prod-code').value || `ITEM-${Date.now().toString(36).slice(-8).toUpperCase()}`,
+                price: parseFloat(document.getElementById('prod-price').value)||0, salePrice,
+                description: document.getElementById('prod-desc').value, country: document.getElementById('prod-country').value,
+                label: document.getElementById('prod-label').value, event: document.getElementById('prod-event').value,
+                status: document.getElementById('prod-status').value, imageUrl: imgBase64,
+                totalSold:0, rating:0, revenue:0, updatedAt:serverTimestamp()
             };
-
-            try {
-                showToast('Menyimpan produk...', 'info');
-                
-                if(editProductId) {
-                    // Update existing
-                    await updateDoc(doc(db, "products", editProductId), productData);
-                    showToast('✅ Produk dikemaskini', 'success');
-                } else {
-                    // Create new
-                    productData.createdAt = serverTimestamp();
-                    productData.reviews = []; // Initialize reviews array
-                    await addDoc(collection(db, "products"), productData);
-                    showToast('✅ Produk ditambah', 'success');
-                }
-                                closeProductModal();
-                loadDashboardData(); // Refresh product list
-                
-            } catch(error) {
-                console.error('Save product error:', error);
-                let msg = error.message;
-                if(msg.includes('quota')) {
-                    msg = 'Had simpanan Firestore dicapai. Kurangkan saiz gambar.';
-                }
-                showToast(`❌ Gagal simpan: ${msg}`, 'error');
-            }
+            try{
+                showToast('Menyimpan...','info');
+                if(editPid) await updateDoc(doc(db,"products",editPid),data);
+                else { data.createdAt=serverTimestamp(); data.reviews=[]; await addDoc(collection(db,"products"),data); }
+                showToast('✅ Produk disimpan','success'); closeProductModal(); loadDashboard();
+            }catch(err){ showToast(`❌ ${err.message.includes('quota')?'Gambar terlalu besar':err.message}`,'error'); }
+        };
+        window.deleteProduct = async id => {
+            if(!confirm('Padam produk ini?')) return;
+            try{ await deleteDoc(doc(db,"products",id)); showToast('✅ Dipadam','success'); loadDashboard(); }
+            catch(err){ showToast(`❌ ${err.message}`,'error'); }
         };
 
-        // 📊 DASHBOARD DATA LOADING
-        async function loadDashboardData() {
-            if(!currentUser || !userProfile) return;
-            
-            // 📦 Load Products with real-time sync
-            const qProd = query(
-                collection(db, "products"), 
-                where("vendorId", "==", currentUser.uid),
-                orderBy("createdAt", "desc")
-            );
-            
-            onSnapshot(qProd, (snapshot) => {
-                productsCache = [];
-                const grid = document.getElementById('product-grid');
-                const tbody = document.getElementById('product-list-body');
-                let htmlGrid = '';
-                let htmlTable = '';
-                let totalSales = 0;
-                
-                if(snapshot.empty) {
-                    grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">
-                        <i class="fas fa-box-open text-4xl mb-3 opacity-30"></i>
-                        <p>Tiada produk lagi</p>
-                        <button onclick="openProductModal()" class="btn-glitter mt-4 px-4 py-2 rounded-lg text-sm">
-                            <i class="fas fa-plus mr-1"></i> Tambah Produk Pertama
-                        </button>
-                    </div>`;
-                    tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4">Tiada produk</td></tr>';
-                    document.getElementById('stat-products').innerText = '0';
-                    return;
-                }
-                
-                snapshot.forEach(docSnap => {
-                    const p = docSnap.data();
-                    productsCache.push({ id: docSnap.id, ...p });
-                    
-                    // Calculate sales                    const sold = p.totalSold || 0;
-                    const revenue = (p.salePrice || 0) * sold;
-                    totalSales += revenue;
-                    
-                    // Grid card
-                    htmlGrid += `
-                    <div class="product-card">
-                        <div class="product-img">
-                            ${p.imageUrl ? `<img src="${p.imageUrl}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\' class=\\'text-3xl\\'></i>'">` : '<i class="fas fa-image text-3xl"></i>'}
-                        </div>
-                        <div class="product-info">
-                            <div class="product-title">${p.name}</div>
-                            <div class="flex items-baseline gap-2 mb-2">
-                                ${p.price > 0 ? `<span class="product-sale">RM${p.price}</span>` : ''}
-                                <span class="product-price">RM${p.salePrice}</span>
-                            </div>
-                            <div class="flex justify-between items-center text-xs text-gray-600 mb-3">
-                                <span>📦 ${sold} sold</span>
-                                <span class="badge badge-${p.status==='Public'?'success':p.status==='Private'?'warning':'danger'}">${p.status}</span>
-                            </div>
-                            <div class="flex gap-1 mt-auto">
-                                <button onclick="openProductModal('${docSnap.id}')" class="flex-1 py-1.5 text-xs bg-yellow-100 hover:bg-yellow-200 rounded-lg transition">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="deleteProduct('${docSnap.id}')" class="flex-1 py-1.5 text-xs bg-red-100 hover:bg-red-200 text-red-600 rounded-lg transition">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
+        // Dashboard
+        async function loadDashboard(){
+            if(!user||!profile) return;
+            // Products
+            const qP = query(collection(db,"products"),where("vendorId","==",user.uid),orderBy("createdAt","desc"));
+            onSnapshot(qP, snap => {
+                products = []; const grid = document.getElementById('product-grid'); let html='', total=0;
+                if(snap.empty){ grid.innerHTML = `<div class="col-span-full text-center py-6 text-gray-500"><i class="fas fa-box-open text-2xl mb-2 opacity-30"></i><p>Tiada produk</p><button onclick="openProductModal()" class="btn-glitter mt-3 px-3 py-1.5 rounded text-sm">+ Tambah</button></div>`; document.getElementById('stat-products').textContent='0'; return; }
+                snap.forEach(d => {
+                    const p = d.data(); products.push({id:d.id,...p});
+                    const sold = p.totalSold||0; total += (p.salePrice||0)*sold;
+                    html += `<div class="product-card">
+                        <div class="product-img">${p.imageUrl?`<img src="${p.imageUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\\\' class=\\'text-2xl\\\\'>'">`:'<i class="fas fa-image text-2xl"></i>'}</div>
+                        <div class="p-3">
+                            <div class="font-medium text-sm truncate">${p.name}</div>
+                            <div class="flex items-baseline gap-1 my-1">${p.price>0?`<span class="text-xs text-gray-400 line-through">RM${p.price}</span>`:''}<span class="font-bold text-yellow-600">RM${p.salePrice}</span></div>                            <div class="flex justify-between items-center text-xs text-gray-500"><span>📦 ${sold}</span><span class="badge badge-${p.status==='Public'?'success':'warning'}">${p.status}</span></div>
+                            <div class="flex gap-1 mt-2"><button onclick="openProductModal('${d.id}')" class="flex-1 py-1 text-xs bg-yellow-100 rounded">✏️</button><button onclick="deleteProduct('${d.id}')" class="flex-1 py-1 text-xs bg-red-100 text-red-600 rounded">🗑️</button></div>
                         </div>
                     </div>`;
-                    
-                    // Table row
-                    htmlTable += `
-                    <tr>
-                        <td><img src="${p.imageUrl || 'https://via.placeholder.com/40/FFD700/FFFFFF?text=🖼️'}" class="w-10 h-10 rounded object-cover border"></td>
-                        <td class="font-medium">${p.name}</td>
-                        <td class="font-bold text-yellow-600">RM${p.salePrice}</td>
-                        <td><span class="badge badge-${p.status==='Public'?'success':p.status==='Private'?'warning':'danger'}">${p.status}</span></td>
-                        <td class="font-bold">${sold}</td>
-                        <td class="flex gap-2">
-                            <button onclick="openProductModal('${docSnap.id}')" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteProduct('${docSnap.id}')" class="text-red-500 hover:text-red-700" title="Delete"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>`;
                 });
-                
-                grid.innerHTML = htmlGrid;
-                tbody.innerHTML = htmlTable;
-                document.getElementById('stat-products').innerText = snapshot.size;
-                document.getElementById('stat-sales').innerText = 'RM ' + totalSales.toFixed(2);                
-                // Update commission stat
-                const commissionRate = userProfile.commissionRate || 1.00;
-                const totalCommission = totalSales * (commissionRate / 100);
-                document.getElementById('stat-commission').innerText = 'RM ' + totalCommission.toFixed(2);
-            }, (error) => {
-                console.error('Products snapshot error:', error);
-                document.getElementById('product-grid').innerHTML = 
-                    `<div class="col-span-full text-center py-8 text-red-500">
-                        ❌ Gagal muat produk: ${error.message}
-                    </div>`;
+                grid.innerHTML = html; document.getElementById('stat-products').textContent = snap.size;
+                document.getElementById('stat-sales').textContent = `RM ${total.toFixed(2)}`;
+                document.getElementById('stat-commission').textContent = `RM ${(total*(profile.commissionRate||1)/100).toFixed(2)}`;
             });
-            
-            // 📋 Load Orders with real-time sync
-            const qOrd = query(
-                collection(db, "orders"), 
-                where("vendorId", "==", currentUser.uid),
-                orderBy("createdAt", "desc")
-            );
-            
-            onSnapshot(qOrd, (snapshot) => {
-                ordersCache = [];
-                const tbody = document.getElementById('order-list-body');
-                let html = '';
-                let activeCount = 0;
-                
-                snapshot.forEach(docSnap => {
-                    const o = docSnap.data();
-                    ordersCache.push({ id: docSnap.id, ...o });
-                    
-                    // Count active orders
-                    if(!['Completed', 'Cancelled'].includes(o.status)) {
-                        activeCount++;
-                    }
-                    
-                    const items = o.items?.map(i => i.name).join(', ') || '-';
-                    const paymentBadge = o.paymentStatus === 'Verified' ? 'success' : 'warning';
-                    
-                    html += `
-                    <tr>
-                        <td class="font-mono text-xs bg-gray-50">${o.orderId || 'N/A'}</td>
-                        <td>${o.username || 'Customer'}</td>
-                        <td class="max-w-[150px] truncate" title="${items}">${items}</td>
-                        <td class="font-bold text-yellow-600">RM${o.total?.toFixed(2) || '0.00'}</td>
-                        <td><span class="badge badge-${paymentBadge}">${o.paymentStatus || 'Pending'}</span></td>
-                        <td><span class="badge badge-${o.status==='Completed'?'success':o.status==='Cancelled'?'danger':'info'}">${o.status || 'New'}</span></td>
-                        <td class="flex gap-2">
-                            <button onclick="messageCustomer('${o.userId}', '${o.orderId}')" class="text-cyan-600 hover:text-cyan-800" title="Message">
-                                <i class="fas fa-comment"></i>
-                            </button>                            <button onclick="updateOrderStatus('${docSnap.id}')" class="text-purple-600 hover:text-purple-800" title="Update">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                        </td>
-                    </tr>`;
+            // Orders
+            const qO = query(collection(db,"orders"),where("vendorId","==",user.uid),orderBy("createdAt","desc"));
+            onSnapshot(qO, snap => {
+                const tbody = document.getElementById('order-list'); let html='', active=0;
+                snap.forEach(d => {
+                    const o = d.data(); if(!['Completed','Cancelled'].includes(o.status)) active++;
+                    const items = o.items?.map(i=>i.name).join(', ')||'-';
+                    html += `<tr class="border-b"><td class="p-2 font-mono text-xs">${o.orderId||'N/A'}</td><td>${o.username||'-'}</td><td class="truncate max-w-[100px]">${items}</td><td class="font-bold text-yellow-600">RM${o.total?.toFixed(2)||'0'}</td><td><span class="badge badge-${o.status==='Completed'?'success':o.status==='Cancelled'?'danger':'warning'}">${o.status||'New'}</span></td><td><button onclick="msgCustomer('${o.userId}')" class="text-cyan-600"><i class="fas fa-comment"></i></button></td></tr>`;
                 });
-                
-                tbody.innerHTML = html || '<tr><td colspan="7" class="text-center py-4 text-gray-500">Tiada pesanan</td></tr>';
-                document.getElementById('stat-orders').innerText = activeCount;
+                tbody.innerHTML = html||'<tr><td colspan="6" class="text-center py-4 text-gray-500">Tiada pesanan</td></tr>';
+                document.getElementById('stat-orders').textContent = active;
             });
-            
-            // 👤 Load Profile Form Data
-            if(userProfile) {
-                document.getElementById('prof-seller').value = userProfile.sellerName || '';
-                document.getElementById('prof-business').value = userProfile.businessName || '';
-                document.getElementById('prof-phone').value = userProfile.phone || '';
-                document.getElementById('prof-email').value = userProfile.email || '';
-                document.getElementById('prof-address').value = userProfile.address || '';
-                document.getElementById('prof-payment').value = userProfile.paymentInfo || '';
-                document.getElementById('agent-status').value = userProfile.agentStatus || 'Online';
+            // Profile form
+            if(profile){
+                document.getElementById('prof-seller').value = profile.sellerName||'';
+                document.getElementById('prof-business').value = profile.businessName||'';
+                document.getElementById('prof-phone').value = profile.phone||'';
+                document.getElementById('prof-email').value = profile.email||'';
+                document.getElementById('prof-address').value = profile.address||'';
+                document.getElementById('prof-payment').value = profile.paymentInfo||'';
+                document.getElementById('agent-status').value = profile.agentStatus||'Online';
             }
         }
 
-        // 🗑️ Delete Product
-        window.deleteProduct = async (productId) => {
-            if(!confirm('❓ Adakah anda pasti mahu memadam produk ini?\n\nTindakan ini tidak boleh diubah.')) {
-                return;
-            }
-            
-            try {
-                showToast('Memadam produk...', 'info');
-                await deleteDoc(doc(db, "products", productId));
-                showToast('✅ Produk dipadam', 'success');
-            } catch(error) {
-                console.error('Delete error:', error);
-                showToast(`❌ Gagal: ${error.message}`, 'error');
-            }
-        };
-
-        // 💾 Save Profile
+        // Profile
         window.saveProfile = async () => {
-            try {
-                showToast('Mengemaskini profil...', 'info');
-                
-                await updateDoc(doc(db, "vendors", currentUser.uid), {
-                    sellerName: document.getElementById('prof-seller').value.trim(),
-                    businessName: document.getElementById('prof-business').value.trim(),
-                    phone: document.getElementById('prof-phone').value.trim(),
-                    address: document.getElementById('prof-address').value.trim(),
-                    paymentInfo: document.getElementById('prof-payment').value.trim(),                    logCache: serverTimestamp() // Update log cache
+            try{
+                showToast('Mengemaskini...','info');
+                await updateDoc(doc(db,"vendors",user.uid),{
+                    sellerName:document.getElementById('prof-seller').value.trim(),
+                    businessName:document.getElementById('prof-business').value.trim(),
+                    phone:document.getElementById('prof-phone').value.trim(),
+                    address:document.getElementById('prof-address').value.trim(),
+                    paymentInfo:document.getElementById('prof-payment').value.trim(),
+                    logCache:serverTimestamp()
                 });
-                
-                // Refresh local profile
-                const snap = await getDoc(doc(db, "vendors", currentUser.uid));
-                if(snap.exists()) {
-                    userProfile = snap.data();
-                    document.getElementById('display-logcache').innerText = 
-                        userProfile.logCache?.toDate?.().toLocaleString('ms-MY') || '-';
-                }
-                
-                showToast('✅ Profil dikemaskini', 'success');
-            } catch(error) {
-                console.error('Profile update error:', error);
-                showToast(`❌ Gagal: ${error.message}`, 'error');
-            }
+                showToast('✅ Profil dikemaskini','success');
+            }catch(err){ showToast(`❌ ${err.message}`,'error'); }
         };
-
-        // 🔑 Change Password
         window.changePassword = async () => {
-            const newPass = prompt("🔐 Masukkan password baru (min 6 karakter):");
-            if(!newPass) return;
-            if(newPass.length < 6) {
-                return showToast('❌ Password terlalu pendek', 'error');
-            }
-            
-            try {
-                await updatePassword(currentUser, newPass);
-                showToast('✅ Password berjaya ditukar', 'success');
-            } catch(error) {
-                console.error('Password change error:', error);
-                let msg = error.message;
-                if(msg.includes('requires-recent-login')) {
-                    msg = 'Sila login semula untuk tukar password';
-                }
-                showToast(`❌ ${msg}`, 'error');
-            }
+            const p = prompt("Password baru (min 6):"); if(!p||p.length<6) return showToast('❌ Password terlalu pendek','error');            try{ await updatePassword(user,p); showToast('✅ Password ditukar','success'); }
+            catch(err){ showToast(`❌ ${err.message.includes('recent')?'Login semula untuk tukar password':err.message}`,'error'); }
         };
-
-        // 🗑️ Delete Account (Soft Delete)
         window.deleteAccount = async () => {
-            if(!confirm('⚠️ PERHATIAN: Akaun akan dinyahaktifkan kekal.\n\nSemua data akan diarkibkan tetapi tidak boleh diakses.\n\nTeruskan?')) {
-                return;
-            }
-            
-            try {
-                showToast('Menyahaktifkan akaun...', 'info');
-                
-                await updateDoc(doc(db, "vendors", currentUser.uid), { 
-                    status: 'INACTIVE',                     deletedAt: serverTimestamp(),
-                    logCache: serverTimestamp()
-                });
-                
-                await signOut(auth);
-                showToast('✅ Akaun dinyahaktifkan. Terima kasih!', 'success');
-                navTo('login');
-                
-            } catch(error) {
-                console.error('Delete account error:', error);
-                showToast(`❌ Gagal: ${error.message}`, 'error');
-            }
+            if(!confirm('⚠️ Akaun akan dinyahaktifkan kekal. Teruskan?')) return;
+            try{
+                await updateDoc(doc(db,"vendors",user.uid),{status:'INACTIVE',deletedAt:serverTimestamp()});
+                await signOut(auth); showToast('✅ Akaun dinyahaktifkan','success'); navTo('login');
+            }catch(err){ showToast(`❌ ${err.message}`,'error'); }
         };
 
-        // 💬 CHAT SYSTEM
-        window.loadChatContacts = () => {
-            if(!currentUser) return;
-            
-            const q = query(
-                collection(db, "chats"), 
-                where("participants", "array-contains", currentUser.uid),
-                orderBy("lastTime", "desc")
-            );
-            
-            onSnapshot(q, (snapshot) => {
-                const container = document.getElementById('contacts-list');
-                
-                if(snapshot.empty) {
-                    container.innerHTML = `
-                    <div class="text-center py-8 text-gray-500 text-sm">
-                        <i class="fas fa-inbox text-2xl mb-2 opacity-30"></i>
-                        <p>Tiada perbualan</p>
-                        <p class="text-xs mt-1">Mesej akan muncul apabila pelanggan menghubungi</p>
-                    </div>`;
-                    return;
-                }
-                
+        // Chat
+        window.loadChats = () => {
+            if(!user) return;
+            const q = query(collection(db,"chats"),where("participants","array-contains",user.uid),orderBy("lastTime","desc"));
+            onSnapshot(q, snap => {
+                const el = document.getElementById('chat-contacts');
+                if(snap.empty){ el.innerHTML = '<div class="text-center py-6 text-gray-500 text-sm">Tiada perbualan</div>'; return; }
                 let html = '';
-                snapshot.forEach(docSnap => {
-                    const chat = docSnap.data();
-                    const otherId = chat.participants.find(id => id !== currentUser.uid);
-                    
-                    // Get other user name (simplified - in production, fetch from users collection)
-                    const otherName = chat.otherUserName || `Customer ${otherId?.slice(0,6) || '???'}...`;
-                    const lastMsg = chat.lastMessage || 'No messages';
-                    const lastTime = chat.lastTime?.toDate?.().toLocaleTimeString('ms-MY', {hour:'2-digit',minute:'2-digit'}) || '';
-                    const status = chat.otherStatus || 'Offline';
-                    const statusClass = status === 'Online' ? 'status-online' : status === 'Busy' ? 'status-busy' : 'status-offline';
-                    
-                    html += `                    <div onclick="openChat('${docSnap.id}', '${otherId}')" 
-                        class="p-3 border border-gray-100 rounded-xl hover:bg-yellow-50 cursor-pointer transition group">
-                        <div class="flex justify-between items-start">
-                            <div class="flex items-center gap-2">
-                                <span class="status-dot ${statusClass}"></span>
-                                <div>
-                                    <div class="font-semibold text-sm group-hover:text-yellow-700">${otherName}</div>
-                                    <div class="text-xs text-gray-500 truncate max-w-[180px]">${lastMsg}</div>
-                                </div>
-                            </div>
-                            <div class="text-[10px] text-gray-400">${lastTime}</div>
-                        </div>
+                snap.forEach(d => {
+                    const c = d.data(); const other = c.participants.find(id=>id!==user.uid);
+                    const name = c.otherUserName||`Customer ${other?.slice(0,6)}...`;
+                    html += `<div onclick="openChat('${d.id}','${other}')" class="p-2 border-b hover:bg-yellow-50 cursor-pointer">
+                        <div class="font-medium text-sm">${name}</div><div class="text-xs text-gray-500 truncate">${c.lastMessage||'No messages'}</div>
                     </div>`;
                 });
-                
-                container.innerHTML = html;
+                el.innerHTML = html;
             });
         };
-
-        window.openChat = (chatId, partnerId) => {
-            currentChatId = chatId;
-            playSound('chat');
-            
-            // Update header
-            document.getElementById('chat-header-name').innerText = "💬 Customer Service";
-            document.getElementById('chat-header-status').innerHTML = 
-                `<span class="status-dot status-online"></span> Online`;
-            
-            // Mobile: hide contacts, show chat
-            if(window.innerWidth < 768) {
-                document.querySelector('.contacts-panel')?.classList.add('hidden-section');
-            }
-            
-            // Unsubscribe previous chat
-            if(unsubscribeChat) unsubscribeChat();
-            
-            // Subscribe to messages
-            const q = query(
-                collection(db, `chats/${chatId}/messages`), 
-                orderBy("timestamp", "asc")
-            );
-            
-            unsubscribeChat = onSnapshot(q, (snapshot) => {
-                const container = document.getElementById('chat-messages');
-                
-                if(snapshot.empty) {
-                    container.innerHTML = `
-                    <div class="h-full flex items-center justify-center text-gray-400">
-                        <div class="text-center">
-                            <i class="fas fa-comments text-3xl mb-2 opacity-30"></i>                            <p class="text-sm">Mula perbualan dengan pelanggan</p>
-                        </div>
-                    </div>`;
-                    return;
-                }
-                
+        window.openChat = (cid, pid) => {
+            chatId = cid; playSound('click');
+            document.getElementById('chat-name').textContent = "💬 Customer";
+            if(window.innerWidth<768) document.querySelector('.contacts-panel')?.classList.add('hidden');
+            if(chatUnsub) chatUnsub();
+            const q = query(collection(db,`chats/${cid}/messages`),orderBy("timestamp","asc"));
+            chatUnsub = onSnapshot(q, snap => {
+                const el = document.getElementById('chat-msgs');
+                if(snap.empty){ el.innerHTML = '<div class="text-center text-gray-400 py-4">Mula perbualan...</div>'; return; }
                 let html = '';
-                snapshot.forEach(docSnap => {
-                    const msg = docSnap.data();
-                    const isMe = msg.senderId === currentUser.uid;
-                    const time = msg.timestamp?.toDate?.().toLocaleTimeString('ms-MY', {hour:'2-digit',minute:'2-digit'}) || '';
-                    
-                    html += `
-                    <div class="msg-bubble ${isMe ? 'msg-me' : 'msg-other'}">
-                        ${msg.text ? `<div>${msg.text}</div>` : ''}
-                        ${msg.imageUrl ? `<img src="${msg.imageUrl}" class="msg-image" onerror="this.style.display='none'">` : ''}
-                        <div class="text-[10px] opacity-70 mt-1 text-right">${time}</div>
-                    </div>`;
+                snap.forEach(d => {
+                    const m = d.data(); const me = m.senderId===user.uid;
+                    html += `<div class="msg-bubble ${me?'msg-me':'msg-other'}">${m.text||''}${m.imageUrl?`<img src="${m.imageUrl}" class="max-w-full rounded mt-1">`:''}<div class="text-[10px] opacity-60 mt-0.5 text-right">${m.timestamp?.toDate?.().toLocaleTimeString('ms-MY',{hour:'2-digit',minute:'2-digit'})||''}</div></div>`;
                 });
-                
-                container.innerHTML = html;
-                container.scrollTop = container.scrollHeight; // Auto scroll to bottom
+                el.innerHTML = html; el.scrollTop = el.scrollHeight;
             });
         };
-
         window.sendMessage = async () => {
-            const input = document.getElementById('chat-input');
-            const text = input.value.trim();
-            
-            if(!text || !currentChatId) {
-                if(!currentChatId) showToast('❌ Pilih pelanggan dahulu', 'warning');
-                return;
-            }
-            
-            try {
-                await addDoc(collection(db, `chats/${currentChatId}/messages`), {
-                    senderId: currentUser.uid,
-                    senderName: userProfile?.sellerName || 'Vendor',
-                    text,
-                    timestamp: serverTimestamp()
-                });
-                
-                // Update chat last message
-                await updateDoc(doc(db, "chats", currentChatId), {
-                    lastMessage: text,
-                    lastTime: serverTimestamp()
-                });
-                
-                input.value = '';
-                playSound('chat');                
-            } catch(error) {
-                console.error('Send message error:', error);
-                showToast(`❌ Gagal hantar: ${error.message}`, 'error');
-            }
+            const txt = document.getElementById('chat-input').value.trim();
+            if(!txt||!chatId) return;
+            try{                await addDoc(collection(db,`chats/${chatId}/messages`),{senderId:user.uid,senderName:profile?.sellerName||'Vendor',text:txt,timestamp:serverTimestamp()});
+                await updateDoc(doc(db,"chats",chatId),{lastMessage:txt,lastTime:serverTimestamp()});
+                document.getElementById('chat-input').value = ''; playSound('chat');
+            }catch(err){ showToast(`❌ ${err.message}`,'error'); }
         };
-
-        window.sendImage = async (input) => {
-            const file = input.files[0];
-            if(!file || !currentChatId) return;
-            
-            // Validate
-            if(file.size > 800 * 1024) {
-                return showToast('❌ Gambar terlalu besar (Max 800KB)', 'error');
-            }
-            if(!file.type.startsWith('image/')) {
-                return showToast('❌ Hanya gambar dibenarkan', 'error');
-            }
-            
+        window.sendImage = async input => {
+            const file = input.files[0]; if(!file||!chatId) return;
+            if(file.size>500*1024) return showToast('❌ Gambar >500KB','error');
+            if(!file.type.startsWith('image/')) return showToast('❌ Hanya gambar','error');
             const reader = new FileReader();
-            reader.onload = async (e) => {
-                try {
-                    showToast('Menghantar gambar...', 'info');
-                    
-                    await addDoc(collection(db, `chats/${currentChatId}/messages`), {
-                        senderId: currentUser.uid,
-                        senderName: userProfile?.sellerName || 'Vendor',
-                        imageUrl: e.target.result, // Base64 in Firestore
-                        timestamp: serverTimestamp()
-                    });
-                    
-                    // Update chat last message
-                    await updateDoc(doc(db, "chats", currentChatId), {
-                        lastMessage: '[Image]',
-                        lastTime: serverTimestamp()
-                    });
-                    
-                    showToast('✅ Gambar dihantar', 'success');
-                    
-                } catch(error) {
-                    console.error('Send image error:', error);
-                    showToast(`❌ Gagal: ${error.message}`, 'error');
-                }
+            reader.onload = async e => {
+                try{
+                    await addDoc(collection(db,`chats/${chatId}/messages`),{senderId:user.uid,senderName:profile?.sellerName||'Vendor',imageUrl:e.target.result,timestamp:serverTimestamp()});
+                    await updateDoc(doc(db,"chats",chatId),{lastMessage:'[Image]',lastTime:serverTimestamp()});
+                    showToast('✅ Gambar dihantar','success');
+                }catch(err){ showToast(`❌ ${err.message}`,'error'); }
             };
-            reader.readAsDataURL(file);
-            input.value = ''; // Reset input
+            reader.readAsDataURL(file); input.value = '';
         };
-
         window.updateAgentStatus = () => {
-            const status = document.getElementById('agent-status').value;            updateDoc(doc(db, "vendors", currentUser.uid), { 
-                agentStatus: status,
-                logCache: serverTimestamp()
-            });
-            showToast(`✅ Status: ${status}`, 'success');
+            const s = document.getElementById('agent-status').value;
+            updateDoc(doc(db,"vendors",user.uid),{agentStatus:s,logCache:serverTimestamp()});
+            showToast(`✅ Status: ${s}`,'success');
         };
 
-        window.toggleMobileContacts = () => {
-            const panel = document.querySelector('.contacts-panel');
-            panel?.classList.toggle('hidden-section');
-            panel?.classList.toggle('active');
-        };
-
-        window.closeChatMobile = () => {
-            document.querySelector('.contacts-panel')?.classList.remove('hidden-section');
-            document.querySelector('.chat-panel')?.classList.add('hidden-section');
-        };
-
-        // 👑 ADMIN FUNCTIONS
-        async function loadAdminData() {
-            if(userProfile?.role !== 'admin') return;
-            
-            // Load current commission rate
-            document.getElementById('current-comm-rate').innerText = 
-                `RM ${(userProfile.commissionRate || 1.00).toFixed(2)}`;
-            
-            // Load all vendors
-            const q = query(collection(db, "vendors"), orderBy("createdAt", "desc"));
-            onSnapshot(q, (snapshot) => {
-                const tbody = document.getElementById('admin-vendor-list');
-                let html = '';
-                
-                snapshot.forEach(docSnap => {
-                    const v = docSnap.data();
-                    if(v.uid === currentUser.uid) return; // Skip self
-                    
-                    const totalSales = v.totalSales || 0;
-                    const commission = totalSales * ((v.commissionRate || 1.00) / 100);
-                    
-                    html += `
-                    <tr>
-                        <td class="font-mono text-xs">${v.uac}</td>
-                        <td>${v.sellerName}</td>
-                        <td class="font-bold text-yellow-600">RM${totalSales.toFixed(2)}</td>
-                        <td class="text-purple-600">RM${commission.toFixed(2)}</td>
-                        <td><span class="badge badge-${v.status==='ACTIVE'?'success':'danger'}">${v.status}</span></td>
-                        <td>
-                            <button class="text-blue-500 hover:text-blue-700 mr-2" title="Edit"><i class="fas fa-edit"></i></button>
-                            <button class="text-red-500 hover:text-red-700" title="Deactivate"><i class="fas fa-ban"></i></button>
-                        </td>                    </tr>`;
+        // Admin
+        async function loadAdmin(){
+            if(profile?.role!=='admin') return;
+            document.getElementById('admin-rate').value = profile.commissionRate||1;
+            const q = query(collection(db,"vendors"),orderBy("createdAt","desc"));
+            onSnapshot(q, snap => {
+                const tbody = document.getElementById('admin-list'); let html='';
+                snap.forEach(d => {
+                    const v = d.data(); if(v.uid===user.uid) return;
+                    const sales = v.totalSales||0, comm = sales*((v.commissionRate||1)/100);
+                    html += `<tr class="border-b"><td class="p-2 font-mono text-xs">${v.uac}</td><td>${v.sellerName}</td><td class="font-bold text-yellow-600">RM${sales.toFixed(2)}</td><td class="text-purple-600">RM${comm.toFixed(2)}</td><td><span class="badge badge-${v.status==='ACTIVE'?'success':'danger'}">${v.status}</span></td><td><button class="text-blue-500">✏️</button></td></tr>`;
                 });
-                
-                tbody.innerHTML = html || '<tr><td colspan="6" class="text-center py-4">Tiada vendor</td></tr>';
+                tbody.innerHTML = html||'<tr><td colspan="6" class="text-center py-4 text-gray-500">Tiada vendor</td></tr>';
             });
         }
-
         window.updateCommission = async () => {
-            const rate = parseFloat(document.getElementById('admin-comm-rate').value);
-            if(isNaN(rate) || rate < 0.01 || rate > 5) {
-                return showToast('❌ Kadar mesti antara RM 0.01 - 5.00', 'error');
-            }
-            
-            try {
-                await updateDoc(doc(db, "vendors", currentUser.uid), { 
-                    commissionRate: rate,
-                    logCache: serverTimestamp()
-                });
-                document.getElementById('current-comm-rate').innerText = `RM ${rate.toFixed(2)}`;
-                showToast('✅ Kadar komisen dikemaskini', 'success');
-            } catch(error) {
-                showToast(`❌ Gagal: ${error.message}`, 'error');
-            }
+            const r = parseFloat(document.getElementById('admin-rate').value);
+            if(isNaN(r)||r<0.01||r>5) return showToast('❌ Kadar RM 0.01-5.00','error');
+            try{
+                await updateDoc(doc(db,"vendors",user.uid),{commissionRate:r,logCache:serverTimestamp()});
+                showToast('✅ Komisen dikemaskini','success');
+            }catch(err){ showToast(`❌ ${err.message}`,'error'); }
         };
 
-        // 🔍 PRODUCT SEARCH & FILTER
-        window.filterProducts = (keyword) => {
+        // Search & Catalogue        window.filterProducts = kw => {
             const grid = document.getElementById('product-grid');
-            if(!keyword) {
-                // Reload all
-                loadDashboardData();
-                return;
-            }
-            
-            const filtered = productsCache.filter(p => 
-                p.name?.toLowerCase().includes(keyword.toLowerCase()) ||
-                p.itemCode?.toLowerCase().includes(keyword.toLowerCase()) ||
-                p.label?.toLowerCase().includes(keyword.toLowerCase())
-            );
-            
-            renderProductGrid(filtered, grid);
-        };
-
-        window.searchProducts = (keyword) => {
-            // Global search - filter all products
-            if(!keyword) {
-                loadDashboardData();
-                return;
-            }
-            filterProducts(keyword);        };
-
-        function renderProductGrid(products, container) {
-            if(products.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500">
-                    🔍 Tiada produk dijumpai untuk "${keyword}"
-                </div>`;
-                return;
-            }
-            
+            if(!kw){ loadDashboard(); return; }
+            const f = products.filter(p => p.name?.toLowerCase().includes(kw.toLowerCase())||p.itemCode?.toLowerCase().includes(kw.toLowerCase()));
+            if(!f.length){ grid.innerHTML = '<div class="col-span-full text-center py-4 text-gray-500">🔍 Tiada hasil</div>'; return; }
             let html = '';
-            products.forEach(p => {
-                const sold = p.totalSold || 0;
-                html += `
-                <div class="product-card">
-                    <div class="product-img">
-                        ${p.imageUrl ? `<img src="${p.imageUrl}" class="w-full h-full object-cover">` : '<i class="fas fa-image text-3xl"></i>'}
-                    </div>
-                    <div class="product-info">
-                        <div class="product-title">${p.name}</div>
-                        <div class="flex items-baseline gap-2 mb-2">
-                            ${p.price > 0 ? `<span class="product-sale">RM${p.price}</span>` : ''}
-                            <span class="product-price">RM${p.salePrice}</span>
-                        </div>
-                        <div class="flex justify-between items-center text-xs text-gray-600 mb-3">
-                            <span>📦 ${sold} sold</span>
-                            <span class="badge badge-${p.status==='Public'?'success':'warning'}">${p.status}</span>
-                        </div>
-                        <button onclick="openProductModal('${p.id}')" class="w-full py-1.5 text-xs bg-yellow-100 hover:bg-yellow-200 rounded-lg transition">
-                            <i class="fas fa-edit mr-1"></i> Edit
-                        </button>
+            f.forEach(p => {
+                html += `<div class="product-card">
+                    <div class="product-img">${p.imageUrl?`<img src="${p.imageUrl}">`:'<i class="fas fa-image text-2xl"></i>'}</div>
+                    <div class="p-3">
+                        <div class="font-medium text-sm truncate">${p.name}</div>
+                        <div class="font-bold text-yellow-600">RM${p.salePrice}</div>
+                        <button onclick="openProductModal('${p.id}')" class="w-full mt-2 py-1 text-xs bg-yellow-100 rounded">✏️ Edit</button>
                     </div>
                 </div>`;
             });
-            container.innerHTML = html;
-        }
-
-        // 🛍️ PUBLIC CATALOGUE
-        async function loadPublicCatalogue(filter = 'all') {
+            grid.innerHTML = html;
+        };
+        window.loadCatalogue = async filter => {
             const grid = document.getElementById('catalogue-grid');
-            grid.innerHTML = `<div class="col-span-full text-center py-8"><div class="loader"></div></div>`;
-            
-            try {
+            grid.innerHTML = '<div class="col-span-full text-center py-6"><div class="loader mx-auto"></div></div>';
+            try{
                 let q;
-                if(filter === 'highest') {
-                    q = query(collection(db, "products"), where("status", "==", "Public"), orderBy("totalSold", "desc"), limit(20));
-                } else if(filter === 'event') {
-                    q = query(collection(db, "products"), where("status", "==", "Public"), where("event", "!=", ""), orderBy("createdAt", "desc"), limit(20));
-                } else {
-                    q = query(collection(db, "products"), where("status", "==", "Public"), orderBy("createdAt", "desc"), limit(20));                }
-                
-                const snapshot = await getDocs(q);
-                
-                if(snapshot.empty) {
-                    grid.innerHTML = `<div class="col-span-full text-center py-12 text-gray-500">
-                        <i class="fas fa-shopping-bag text-4xl mb-3 opacity-30"></i>
-                        <p>Tiada produk tersedia</p>
-                    </div>`;
-                    return;
-                }
-                
+                if(filter==='highest') q = query(collection(db,"products"),where("status","==","Public"),orderBy("totalSold","desc"));
+                else if(filter==='event') q = query(collection(db,"products"),where("status","==","Public"),where("event","!=",""),orderBy("createdAt","desc"));
+                else q = query(collection(db,"products"),where("status","==","Public"),orderBy("createdAt","desc"));
+                const snap = await getDocs(q);
+                if(snap.empty){ grid.innerHTML = '<div class="col-span-full text-center py-6 text-gray-500">Tiada produk</div>'; return; }
                 let html = '';
-                snapshot.forEach(docSnap => {
-                    const p = docSnap.data();
-                    html += `
-                    <div class="product-card cursor-pointer" onclick="viewProductDetail('${docSnap.id}')">
-                        <div class="product-img">
-                            ${p.imageUrl ? `<img src="${p.imageUrl}" class="w-full h-full object-cover">` : '<i class="fas fa-image text-3xl"></i>'}
-                        </div>
-                        <div class="product-info">
-                            <div class="product-title">${p.name}</div>
-                            <div class="flex items-baseline gap-2 mb-2">
-                                ${p.price > 0 ? `<span class="product-sale">RM${p.price}</span>` : ''}
-                                <span class="product-price">RM${p.salePrice}</span>
-                            </div>
-                            <div class="flex justify-between items-center text-xs text-gray-600">
-                                <span>⭐ ${p.rating?.toFixed(1) || '0.0'} (${p.totalSold||0})</span>
-                                ${p.label ? `<span class="badge badge-info">${p.label}</span>` : ''}
-                            </div>
+                snap.forEach(d => {
+                    const p = d.data();
+                    html += `<div class="product-card">
+                        <div class="product-img">${p.imageUrl?`<img src="${p.imageUrl}">`:'<i class="fas fa-image text-2xl"></i>'}</div>
+                        <div class="p-3">
+                            <div class="font-medium text-sm truncate">${p.name}</div>
+                            <div class="flex items-baseline gap-1">${p.price>0?`<span class="text-xs text-gray-400 line-through">RM${p.price}</span>`:''}<span class="font-bold text-yellow-600">RM${p.salePrice}</span></div>
+                            <div class="text-xs text-gray-500">⭐ ${p.rating?.toFixed(1)||0} • 📦 ${p.totalSold||0}</div>
+                            ${p.label?`<span class="badge badge-info mt-1">${p.label}</span>`:''}
                         </div>
                     </div>`;
                 });
-                
                 grid.innerHTML = html;
-                
-            } catch(error) {
-                console.error('Catalogue load error:', error);
-                grid.innerHTML = `<div class="col-span-full text-center py-8 text-red-500">
-                    ❌ Gagal muat katalog
-                </div>`;
-            }
-        }
-
-        window.filterCatalogue = (filter) => {
-            // Update active tab
-            document.querySelectorAll('#view-catalogue .tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            loadPublicCatalogue(filter);        };
-
-        window.viewProductDetail = (productId) => {
-            showToast('🔜 Fitur detail produk akan datang!', 'info');
-            // In production: open modal with full product info, reviews, add to cart
+            }catch(err){ grid.innerHTML = `<div class="col-span-full text-center py-6 text-red-500">❌ Gagal: ${err.message}</div>`; }
         };
 
-        // 🛒 CART FUNCTIONS (Simplified)
-        window.toggleCart = () => {
-            const modal = document.getElementById('cart-modal');
-            modal.classList.toggle('hidden-section');
-            playSound('click');
-        };
+        // Helpers
+        window.msgCustomer = uid => { showToast(`💬 Chat dengan ${uid}`,'info'); switchTab('chat'); };
 
-        // 📱 MOBILE OPTIMIZATION
-        window.addEventListener('resize', () => {
-            if(window.innerWidth >= 768) {
-                // Desktop: ensure panels visible
-                document.querySelector('.contacts-panel')?.classList.remove('hidden-section');
-                document.querySelector('.chat-panel')?.classList.remove('hidden-section');
-            }
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {            const h = location.hash.slice(1);
+            if(h&&['login','register','dashboard','catalogue'].includes(h)) setTimeout(()=>navTo(h),100);
+            console.log("✅ Vendor Manager Loaded | MFD Store");
         });
-
-        // 🚀 INITIALIZATION
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check URL hash for deep linking
-            const hash = window.location.hash.replace('#', '');
-            if(hash && ['login', 'register', 'dashboard', 'catalogue'].includes(hash)) {
-                // Wait for auth state
-                const checkAuth = setInterval(() => {
-                    if(currentUser !== undefined) {
-                        clearInterval(checkAuth);
-                        if(hash === 'catalogue') {
-                            navTo('catalogue');
-                            loadPublicCatalogue();
-                        } else if(currentUser) {
-                            navTo('dashboard');
-                        } else {
-                            navTo(hash);
-                        }
-                    }
-                }, 100);
-            }
-            
-            // Auto-focus search on desktop
-            if(window.innerWidth >= 768) {
-                document.getElementById('global-search')?.focus();
-            }
-            
-            console.log("✨ Vendor Manager Initialized | MFD Store");            console.log("🔗 Firestore: mfd-store | Theme: Yellow-Cyan Glitter");
-        });
-
-        // 🌐 Handle browser back/forward
-        window.addEventListener('popstate', () => {
-            const hash = window.location.hash.replace('#', '') || 'login';
-            if(currentUser && hash !== 'catalogue') {
-                navTo('dashboard');
-            } else {
-                navTo(hash);
-            }
-        });
-    </script>
-    
-    <!-- 🧩 Additional Utilities -->
-    <script>
-        // Non-module helper functions
-        window.filterOrders = (status) => {
-            // Client-side filter for orders (in production, use Firestore query)
-            showToast(`Menapis: ${status === 'all' ? 'Semua' : status}`, 'info');
-            // Reload with filter logic here
-        };
-        
-        window.messageCustomer = (userId, orderId) => {
-            showToast(`💬 Membuka chat dengan pelanggan...`, 'info');
-            // In production: open/create chat with customer
-            switchTab('tab-chat');
-            // Would load specific chat here
-        };
-        
-        window.updateOrderStatus = (orderId) => {
-            const newStatus = prompt("Update status pesanan:\n(To Pay, To Ship, To Receive, Completed, Cancelled)", "To Ship");
-            if(newStatus) {
-                showToast(`✅ Status dikemaskini kepada: ${newStatus}`, 'success');
-                // In production: update Firestore
-            }
-        };
+        window.addEventListener('popstate', () => { const h=location.hash.slice(1)||'login'; navTo(user&&h!=='catalogue'?'dashboard':h); });
     </script>
 </body>
 </html>
