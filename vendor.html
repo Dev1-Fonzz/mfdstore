@@ -5,17 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>🏪 Vendor Manager - MFD Store</title>
     
-    <!-- Tailwind CSS -->
+    <!-- Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --primary: #FFD700; --primary-dark: #FFA500; --primary-light: #FFF9E6;
-            --secondary: #00CED1; --secondary-dark: #008B8B; --secondary-light: #E0FFFF;
+            --secondary: #00CED1; --secondary-dark: #008B8B;
             --accent: #FF6B6B; --success: #22c55e; --danger: #ef4444; --warning: #f59e0b;
             --dark: #1a1a2e; --glass-bg: rgba(255,255,255,0.92); --glass-border: rgba(255,215,0,0.4);
         }
@@ -47,8 +45,9 @@
             background: linear-gradient(45deg, #FFD700, #FF8C00, #FF6B6B, #00CED1);
             background-size: 400% 400%; animation: gradientMove 6s ease infinite;
             color: var(--dark); font-weight: 600; transition: all 0.2s;
-            box-shadow: 0 4px 15px rgba(255,165,0,0.4);        }
-        .btn-glitter:hover { filter: brightness(1.05); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,206,209,0.5); }
+            box-shadow: 0 4px 15px rgba(255,165,0,0.4);
+        }
+        .btn-glitter:hover { filter: brightness(1.05); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,206,209,0.5); }        .btn-glitter:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; }
         @keyframes gradientMove { 0%,100%{background-position:0%} 50%{background-position:100%} }
         
         .hidden { display: none !important; }
@@ -96,8 +95,8 @@
             position: fixed; bottom: 20px; right: 20px; padding: 12px 20px;
             border-radius: 12px; color: white; font-weight: 500; z-index: 9999;
             animation: slideIn 0.3s ease, fadeOut 0.3s 2.7s ease forwards;
-            display: flex; align-items: center; gap: 8px; max-width: 320px;            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
+            display: flex; align-items: center; gap: 8px; max-width: 320px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);        }
         .toast.success { background: linear-gradient(135deg, var(--success), #16a34a); }
         .toast.error { background: linear-gradient(135deg, var(--danger), #dc2626); }
         .toast.info { background: linear-gradient(135deg, #3b82f6, #2563eb); }
@@ -133,7 +132,6 @@
         @media(max-width: 768px) {
             .product-grid { grid-template-columns: repeat(2,1fr); }
             .grid-cols-4 { grid-template-columns: repeat(2,1fr); }
-            .nav-buttons { gap: 6px; }
         }
         @media(max-width: 480px) {
             .product-grid { grid-template-columns: 1fr; }
@@ -145,9 +143,9 @@
 
     <!-- 🔊 Audio Effects -->
     <audio id="snd-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3" preload="auto"></audio>
-    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3" preload="auto"></audio>    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
+    <audio id="snd-success" src="https://assets.mixkit.co/sfx/preview/mixkit-positive-notification-951.mp3" preload="auto"></audio>
+    <audio id="snd-error" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3" preload="auto"></audio>
     <audio id="snd-chat" src="https://assets.mixkit.co/sfx/preview/mixkit-software-interface-click-2345.mp3" preload="auto"></audio>
-
     <!-- 🍞 Toast -->
     <div id="toast" class="toast hidden"></div>
 
@@ -159,27 +157,11 @@
             </div>
             <span class="font-bold glitter-text text-sm md:text-base">Vendors Manager</span>
         </a>
-        
-        <div class="flex items-center gap-2 nav-buttons">
-            <!-- Search -->
-            <div class="relative hidden md:block">
-                <input type="text" id="global-search" placeholder="🔍 Cari produk..." class="input-glass pl-9 pr-3 py-1.5 text-sm w-48" oninput="globalSearch(this.value)">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-            </div>
-            
-            <!-- Cart -->
-            <button onclick="toggleCart(); playSound('click')" class="relative p-2 hover:bg-white/50 rounded-lg transition">
-                <i class="fas fa-shopping-cart text-yellow-600"></i>
-                <span id="cart-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full hidden">0</span>
-            </button>
-            
-            <!-- Auth -->
+        <div class="flex items-center gap-2">
             <div id="auth-nav" class="flex gap-1.5">
                 <button onclick="navTo('login'); playSound('click')" class="px-3 py-1.5 rounded-lg bg-white/80 text-xs md:text-sm font-medium border border-yellow-200">Login</button>
                 <button onclick="navTo('register'); playSound('click')" class="px-3 py-1.5 rounded-lg btn-glitter text-xs md:text-sm">Register</button>
             </div>
-            
-            <!-- User -->
             <div id="user-nav" class="hidden flex items-center gap-1.5">
                 <span id="nav-uac" class="text-[10px] md:text-xs font-mono bg-cyan-100 px-1.5 py-0.5 rounded hidden sm:inline"></span>
                 <button onclick="navTo('dashboard'); playSound('click')" class="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-400 to-orange-500 text-white shadow flex items-center justify-center">
@@ -194,7 +176,8 @@
 
     <!-- 🎯 Main Content -->
     <main class="container mx-auto pb-24 fade-in">
-                <!-- 🔐 Login Section -->
+        
+        <!-- 🔐 Login Section -->
         <section id="view-login" class="max-w-sm mx-auto mt-8 md:mt-16">
             <div class="glass-panel p-6">
                 <div class="text-center mb-5">
@@ -204,7 +187,6 @@
                     <h2 class="text-xl md:text-2xl font-bold glitter-text">Vendor Login</h2>
                     <p class="text-gray-600 text-xs mt-1">Akses panel pengurusan anda</p>
                 </div>
-                
                 <form onsubmit="doLogin(event)" class="space-y-3">
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
@@ -212,17 +194,12 @@
                     </div>
                     <div>
                         <label class="block text-xs font-medium text-gray-700 mb-1">Password</label>
-                        <input type="password" id="login-pass" required placeholder="••••••••" class="input-glass" autocomplete="current-password">
-                    </div>
-                    <button type="submit" class="btn-glitter w-full py-2.5 rounded-lg font-medium shadow">
+                        <input type="password" id="login-pass" required placeholder="••••••••" class="input-glass" autocomplete="current-password">                    </div>
+                    <button type="submit" class="btn-glitter w-full py-2.5 rounded-lg font-medium shadow" id="login-btn">
                         <i class="fas fa-sign-in-alt mr-2"></i> Login
                     </button>
                 </form>
-                
-                <div class="my-4 text-center text-xs text-gray-500 relative">
-                    <span class="px-3 bg-white">ATAU</span>
-                </div>
-                
+                <div class="my-4 text-center text-xs text-gray-500 relative"><span class="px-3 bg-white">ATAU</span></div>
                 <div class="space-y-2">
                     <button onclick="doGoogleSignIn(); playSound('click')" class="w-full py-2 rounded-lg border flex items-center justify-center gap-2 text-xs md:text-sm hover:bg-gray-50 transition">
                         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-4 h-4"> Google
@@ -231,7 +208,6 @@
                         <i class="fab fa-github"></i> GitHub
                     </button>
                 </div>
-                
                 <p class="text-center mt-5 text-xs text-gray-600">
                     Belum ada akaun? <span class="text-yellow-600 font-medium cursor-pointer hover:underline" onclick="navTo('register'); playSound('click')">Daftar Sekarang →</span>
                 </p>
@@ -243,11 +219,11 @@
             <div class="glass-panel p-6">
                 <div class="text-center mb-5">
                     <div class="w-14 h-14 mx-auto rounded-xl bg-gradient-to-br from-cyan-400 to-yellow-400 flex items-center justify-center text-white text-xl mb-3 shadow">
-                        <i class="fas fa-user-plus"></i>                    </div>
+                        <i class="fas fa-user-plus"></i>
+                    </div>
                     <h2 class="text-xl md:text-2xl font-bold glitter-text">Register Vendor</h2>
                     <p class="text-gray-600 text-xs mt-1">Mula jualan dengan MFD Store</p>
                 </div>
-                
                 <form onsubmit="doRegister(event)" class="space-y-3">
                     <div class="grid grid-cols-2 gap-2">
                         <div>
@@ -267,11 +243,9 @@
                         <label class="block text-xs font-medium text-gray-700 mb-1">Password (min 6) *</label>
                         <input type="password" id="reg-pass" required minlength="6" placeholder="••••••••" class="input-glass text-sm" autocomplete="new-password">
                     </div>
-                    <button type="submit" class="btn-glitter w-full py-2.5 rounded-lg font-medium shadow mt-1">
-                        <i class="fas fa-user-plus mr-2"></i> Register Free
+                    <button type="submit" class="btn-glitter w-full py-2.5 rounded-lg font-medium shadow mt-1" id="register-btn">                        <i class="fas fa-user-plus mr-2"></i> Register Free
                     </button>
                 </form>
-                
                 <p class="text-center mt-5 text-xs text-gray-600">
                     Sudah ada akaun? <span class="text-cyan-600 font-medium cursor-pointer hover:underline" onclick="navTo('login'); playSound('click')">Login →</span>
                 </p>
@@ -280,7 +254,6 @@
 
         <!-- 📊 Dashboard Section -->
         <section id="view-dashboard" class="hidden">
-            
             <!-- 📈 Stats -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                 <div class="glass-panel p-3 text-center hover:scale-[1.02] transition">
@@ -292,7 +265,8 @@
                     <div class="text-[10px] md:text-xs text-gray-600 mt-1">📦 Active Orders</div>
                 </div>
                 <div class="glass-panel p-3 text-center hover:scale-[1.02] transition">
-                    <div class="text-lg md:text-xl font-bold text-purple-600" id="stat-products">0</div>                    <div class="text-[10px] md:text-xs text-gray-600 mt-1">🛍️ Products</div>
+                    <div class="text-lg md:text-xl font-bold text-purple-600" id="stat-products">0</div>
+                    <div class="text-[10px] md:text-xs text-gray-600 mt-1">🛍️ Products</div>
                 </div>
                 <div class="glass-panel p-3 text-center hover:scale-[1.02] transition">
                     <div class="text-lg md:text-xl font-bold text-red-600" id="stat-commission">RM 0.00</div>
@@ -318,8 +292,7 @@
                         <button onclick="openProductModal()" class="btn-glitter px-3 py-1.5 rounded-lg text-xs sm:text-sm whitespace-nowrap">+ Tambah</button>
                     </div>
                 </div>
-                <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    <div class="col-span-full text-center py-8 text-gray-500">
+                <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">                    <div class="col-span-full text-center py-8 text-gray-500">
                         <div class="loader mx-auto mb-2"></div>
                         <p class="text-xs">Memuatkan produk...</p>
                     </div>
@@ -341,7 +314,8 @@
                 </div>
                 <div class="table-container">
                     <table class="custom-table">
-                        <thead>                            <tr>
+                        <thead>
+                            <tr>
                                 <th>ID</th><th>Pelanggan</th><th>Item</th><th>Total</th><th>Bayaran</th><th>Status</th><th>Aksi</th>
                             </tr>
                         </thead>
@@ -358,44 +332,22 @@
             <div id="content-profile" class="glass-panel p-4 mb-4 hidden">
                 <h3 class="font-semibold mb-4 text-sm md:text-base">⚙️ Maklumat Penjual</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Seller Name</label>
-                        <input type="text" id="prof-seller" placeholder="Nama Penjual" class="input-glass text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Business Name</label>
-                        <input type="text" id="prof-business" placeholder="Nama Perniagaan" class="input-glass text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Phone</label>
-                        <input type="tel" id="prof-phone" placeholder="+60123456789" class="input-glass text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
-                        <input type="email" id="prof-email" placeholder="email@domain.com" class="input-glass text-sm" disabled>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Full Address</label>
-                        <textarea id="prof-address" placeholder="No. Rumah, Jalan, Taman, Poskod, Negeri" class="input-glass text-sm min-h-[70px] resize-y"></textarea>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">💳 Payment Info (Bank/QR)</label>
-                        <textarea id="prof-payment" placeholder="Nama Pemegang, Bank, No. Akaun / Link QR DuitNow" class="input-glass text-sm min-h-[70px] resize-y"></textarea>
-                    </div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Seller Name</label><input type="text" id="prof-seller" placeholder="Nama Penjual" class="input-glass text-sm"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Business Name</label><input type="text" id="prof-business" placeholder="Nama Perniagaan" class="input-glass text-sm"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Phone</label><input type="tel" id="prof-phone" placeholder="+60123456789" class="input-glass text-sm"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Email</label><input type="email" id="prof-email" placeholder="email@domain.com" class="input-glass text-sm" disabled></div>
+                    <div class="md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">Full Address</label><textarea id="prof-address" placeholder="No. Rumah, Jalan, Taman, Poskod, Negeri" class="input-glass text-sm min-h-[70px] resize-y"></textarea></div>
+                    <div class="md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">💳 Payment Info (Bank/QR)</label><textarea id="prof-payment" placeholder="Nama Pemegang, Bank, No. Akaun / Link QR DuitNow" class="input-glass text-sm min-h-[70px] resize-y"></textarea></div>
                 </div>
-                
-                <!-- Account Info -->
                 <div class="mt-5 p-3 bg-gradient-to-r from-yellow-50 to-cyan-50 rounded-xl border border-yellow-200">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                        <div><span class="text-gray-500 block">UAC</span><span id="disp-uac" class="font-mono font-medium text-cyan-700">-</span></div>
-                        <div><span class="text-gray-500 block">VenID</span><span id="disp-venid" class="font-mono font-medium">-</span></div>
+                        <div><span class="text-gray-500 block">UAC</span><span id="disp-uac" class="font-mono font-medium text-cyan-700">-</span></div>                        <div><span class="text-gray-500 block">VenID</span><span id="disp-venid" class="font-mono font-medium">-</span></div>
                         <div><span class="text-gray-500 block">Status</span><span id="disp-status" class="font-medium text-green-600">ACTIVE</span></div>
-                        <div><span class="text-gray-500 block">Log Cache</span><span id="disp-logcache" class="text-[10px]">-</span></div>                    </div>
+                        <div><span class="text-gray-500 block">Log Cache</span><span id="disp-logcache" class="text-[10px]">-</span></div>
+                    </div>
                 </div>
-                
-                <!-- Actions -->
                 <div class="mt-5 flex flex-wrap gap-2">
-                    <button onclick="saveProfile(); playSound('click')" class="btn-glitter px-4 py-2 rounded-lg text-xs md:text-sm shadow">💾 Simpan</button>
+                    <button onclick="saveProfile(); playSound('click')" class="btn-glitter px-4 py-2 rounded-lg text-xs md:text-sm shadow" id="save-profile-btn">💾 Simpan</button>
                     <button onclick="changePassword(); playSound('click')" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition text-xs md:text-sm">🔑 Password</button>
                     <button onclick="deleteAccount(); playSound('click')" class="px-4 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition text-xs md:text-sm ml-auto">🗑️ Delete</button>
                 </div>
@@ -404,7 +356,6 @@
             <!-- 💬 Chat Tab -->
             <div id="content-chat" class="glass-panel p-0 mb-4 hidden overflow-hidden">
                 <div class="chat-container">
-                    <!-- Contacts -->
                     <div class="contacts-panel glass-panel p-2 overflow-y-auto border-r border-gray-200" id="chat-contacts">
                         <div class="flex justify-between items-center mb-2 pb-2 border-b">
                             <h4 class="font-medium text-xs">👥 Pelanggan</h4>
@@ -414,10 +365,7 @@
                             <div class="text-center py-6 text-gray-500 text-xs">Tiada perbualan</div>
                         </div>
                     </div>
-                    
-                    <!-- Chat Panel -->
                     <div class="flex flex-col">
-                        <!-- Header -->
                         <div class="p-3 border-b flex justify-between items-center bg-gradient-to-r from-yellow-50 to-cyan-50">
                             <div class="flex items-center gap-2">
                                 <button onclick="toggleMobileContacts()" class="md:hidden p-1.5 hover:bg-white/50 rounded"><i class="fas fa-list text-gray-600"></i></button>
@@ -432,24 +380,17 @@
                                 <option value="Offline">⚫ Offline</option>
                             </select>
                         </div>
-                        
-                        <!-- Messages -->
                         <div id="chat-msgs" class="chat-messages bg-white/40 flex-1">
                             <div class="h-full flex items-center justify-center text-gray-400">
-                                <div class="text-center">
-                                    <i class="fas fa-comments text-2xl mb-2 opacity-30"></i>
-                                    <p class="text-xs">Pilih pelanggan untuk mula berborak</p>
-                                </div>                            </div>
+                                <div class="text-center"><i class="fas fa-comments text-2xl mb-2 opacity-30"></i><p class="text-xs">Pilih pelanggan untuk mula berborak</p></div>
+                            </div>
                         </div>
-                        
-                        <!-- Input -->
                         <div class="p-2 border-t bg-white/80">
                             <div class="flex items-end gap-1.5">
                                 <input type="file" id="chat-file" class="hidden" accept="image/*" onchange="sendImage(this)">
                                 <button onclick="document.getElementById('chat-file').click()" class="p-2 hover:bg-gray-100 rounded-lg transition" title="Hantar Gambar"><i class="fas fa-image text-gray-500 text-sm"></i></button>
                                 <textarea id="chat-input" rows="1" placeholder="Taip mesej..." class="flex-1 input-glass text-sm resize-none" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"></textarea>
-                                <button onclick="sendMessage(); playSound('chat')" class="p-2 bg-gradient-to-br from-yellow-400 to-cyan-400 text-white rounded-lg hover:scale-105 transition shadow"><i class="fas fa-paper-plane text-sm"></i></button>
-                            </div>
+                                <button onclick="sendMessage(); playSound('chat')" class="p-2 bg-gradient-to-br from-yellow-400 to-cyan-400 text-white rounded-lg hover:scale-105 transition shadow"><i class="fas fa-paper-plane text-sm"></i></button>                            </div>
                             <div class="text-[9px] text-gray-400 mt-1 text-center">Enter=hantar • Shift+Enter=baris baru</div>
                         </div>
                     </div>
@@ -458,11 +399,7 @@
 
             <!-- 👑 Admin Tab -->
             <div id="content-admin" class="glass-panel p-4 mb-4 hidden">
-                <h3 class="font-semibold mb-4 text-sm md:text-base text-purple-700 flex items-center gap-2">
-                    <i class="fas fa-crown"></i> 👑 Admin Management
-                </h3>
-                
-                <!-- Commission -->
+                <h3 class="font-semibold mb-4 text-sm md:text-base text-purple-700 flex items-center gap-2"><i class="fas fa-crown"></i> 👑 Admin Management</h3>
                 <div class="p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200 mb-4">
                     <label class="text-xs font-medium text-gray-700 block mb-2">⚙️ Kadar Komisen (RM 0.01 - 5.00)</label>
                     <div class="flex flex-col sm:flex-row gap-2">
@@ -471,24 +408,12 @@
                         <div class="text-[10px] text-gray-500 self-center sm:self-auto">Semasa: <span id="curr-rate" class="font-medium text-purple-600">RM 1.00</span> / jualan</div>
                     </div>
                 </div>
-                
-                <!-- Vendors Table -->
                 <div class="mb-5">
                     <h4 class="font-medium text-gray-700 mb-2 text-sm">📊 Pengurusan Vendor</h4>
                     <div class="table-container">
                         <table class="custom-table">
                             <thead><tr><th>UAC</th><th>Seller</th><th>Sales</th><th>Commission</th><th>Status</th><th>Aksi</th></tr></thead>
                             <tbody id="admin-vendors"><tr><td colspan="6" class="text-center py-4"><div class="loader mx-auto"></div></td></tr></tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Salary Table -->
-                <div>
-                    <h4 class="font-medium text-gray-700 mb-2 text-sm">💰 Pengurusan Gaji</h4>
-                    <div class="table-container">
-                        <table class="custom-table">
-                            <thead><tr><th>UAC</th><th>Business</th><th>Sales</th><th>Commission</th><th>Payment</th><th>Aksi</th></tr></thead>                            <tbody id="admin-salary"><tr><td colspan="6" class="text-center py-4 text-gray-500 text-xs">Tiada data</td></tr></tbody>
                         </table>
                     </div>
                 </div>
@@ -501,141 +426,61 @@
                 <h2 class="text-xl md:text-2xl font-bold glitter-text mb-2">✨ Showcase MFD Store</h2>
                 <p class="text-gray-600 text-sm">Produk pilihan untuk anda</p>
             </div>
-            
-            <!-- Filters -->
             <div class="flex gap-2 mb-5 overflow-x-auto pb-1 justify-center">
                 <button onclick="loadCatalogue('all')" id="cat-all" class="tab-btn active text-xs">Semua</button>
                 <button onclick="loadCatalogue('recommendations')" id="cat-rec" class="tab-btn text-xs">🌟 Disyorkan</button>
                 <button onclick="loadCatalogue('highest')" id="cat-high" class="tab-btn text-xs">🔥 Paling Laku</button>
                 <button onclick="loadCatalogue('event')" id="cat-event" class="tab-btn text-xs">🎉 Event</button>
             </div>
-            
-            <!-- Grid -->
             <div id="catalogue-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                <div class="col-span-full text-center py-8">
-                    <div class="loader mx-auto mb-2"></div>
-                    <p class="text-gray-500 text-xs">Memuatkan katalog...</p>
-                </div>
+                <div class="col-span-full text-center py-8"><div class="loader mx-auto mb-2"></div><p class="text-gray-500 text-xs">Memuatkan katalog...</p></div>
             </div>
         </section>
-
     </main>
 
     <!-- 🎁 Product Modal -->
-    <div id="product-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-lg p-4 relative max-h-[90vh] overflow-y-auto">
+    <div id="product-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">        <div class="glass-panel w-full max-w-lg p-4 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeProductModal(); playSound('click')" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 hover:bg-red-100 text-gray-600 hover:text-red-500 flex items-center justify-center text-lg transition">&times;</button>
-            
             <h3 class="font-bold glitter-text mb-4 text-base" id="modal-title">➕ Tambah Produk Baharu</h3>
-            
             <div class="space-y-3">
-                <!-- Image -->
                 <div>
                     <label class="block text-xs font-medium text-gray-700 mb-1">🖼️ Gambar (Max 500KB)</label>
                     <input type="file" id="prod-img" accept="image/*" class="input-glass text-xs py-1.5" onchange="previewImage(this)">
                     <img id="prod-preview" class="w-16 h-16 object-cover rounded-lg border mt-2 hidden">
                 </div>
-                
-                <!-- Basic Info -->
-                <div class="grid grid-cols-2 gap-2">                    <div class="col-span-2">
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Nama Item *</label>
-                        <input type="text" id="prod-name" placeholder="Contoh: Baju Kurung Premium" class="input-glass text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Kod Item</label>
-                        <input type="text" id="prod-code" placeholder="Auto" class="input-glass text-sm" readonly>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Negara Asal</label>
-                        <input type="text" id="prod-country" placeholder="Malaysia" class="input-glass text-sm">
-                    </div>
-                </div>
-                
-                <!-- Pricing -->
                 <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Harga Asal</label>
-                        <input type="number" id="prod-price" placeholder="0.00" step="0.01" class="input-glass text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Harga Jualan *</label>
-                        <input type="number" id="prod-sale" placeholder="0.00" step="0.01" class="input-glass text-sm" required>
-                    </div>
+                    <div class="col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">Nama Item *</label><input type="text" id="prod-name" placeholder="Contoh: Baju Kurung Premium" class="input-glass text-sm"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Kod Item</label><input type="text" id="prod-code" placeholder="Auto" class="input-glass text-sm" readonly></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Negara Asal</label><input type="text" id="prod-country" placeholder="Malaysia" class="input-glass text-sm"></div>
                 </div>
-                
-                <!-- Details -->
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Deskripsi</label>
-                    <textarea id="prod-desc" placeholder="Terangkan produk..." class="input-glass text-sm min-h-[60px]" rows="2"></textarea>
-                </div>
-                
-                <!-- Meta -->
                 <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Label/Tag</label>
-                        <input type="text" id="prod-label" placeholder="Best Seller, New" class="input-glass text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Event</label>
-                        <input type="text" id="prod-event" placeholder="Raya Sale 2024" class="input-glass text-sm">
-                    </div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Harga Asal</label><input type="number" id="prod-price" placeholder="0.00" step="0.01" class="input-glass text-sm"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Harga Jualan *</label><input type="number" id="prod-sale" placeholder="0.00" step="0.01" class="input-glass text-sm" required></div>
                 </div>
-                
+                <div><label class="block text-xs font-medium text-gray-700 mb-1">Deskripsi</label><textarea id="prod-desc" placeholder="Terangkan produk..." class="input-glass text-sm min-h-[60px]" rows="2"></textarea></div>
                 <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Status</label>
-                        <select id="prod-status" class="input-glass text-sm">
-                            <option value="Public">🟢 Public</option>
-                            <option value="Private">🔒 Private</option>                            <option value="Out of Stock">❌ Out of Stock</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Variasi</label>
-                        <input type="text" id="prod-variation" placeholder="S/M/L, Merah/Biru" class="input-glass text-sm">
-                    </div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Label/Tag</label><input type="text" id="prod-label" placeholder="Best Seller, New" class="input-glass text-sm"></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Event</label><input type="text" id="prod-event" placeholder="Raya Sale 2024" class="input-glass text-sm"></div>
                 </div>
-                
-                <div>
-                    <label class="block text-xs font-medium text-gray-700 mb-1">Pautan Tambahan</label>
-                    <input type="url" id="prod-link" placeholder="https://..." class="input-glass text-sm">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Status</label><select id="prod-status" class="input-glass text-sm"><option value="Public">🟢 Public</option><option value="Private">🔒 Private</option><option value="Out of Stock">❌ Out of Stock</option></select></div>
+                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Variasi</label><input type="text" id="prod-variation" placeholder="S/M/L, Merah/Biru" class="input-glass text-sm"></div>
                 </div>
-                
-                <!-- Hidden -->
-                <input type="hidden" id="prod-id">
-                <input type="hidden" id="prod-sold" value="0">
-                <input type="hidden" id="prod-rating" value="0">
-                <input type="hidden" id="prod-revenue" value="0">
-                
-                <!-- Save -->
-                <button onclick="saveProduct(); playSound('click')" class="btn-glitter w-full py-2.5 rounded-lg font-medium shadow mt-2">
-                    <i class="fas fa-save mr-2"></i> 💾 Simpan Produk
-                </button>
+                <div><label class="block text-xs font-medium text-gray-700 mb-1">Pautan Tambahan</label><input type="url" id="prod-link" placeholder="https://..." class="input-glass text-sm"></div>
+                <input type="hidden" id="prod-id"><input type="hidden" id="prod-sold" value="0"><input type="hidden" id="prod-rating" value="0"><input type="hidden" id="prod-revenue" value="0">
+                <button onclick="saveProduct(); playSound('click')" class="btn-glitter w-full py-2.5 rounded-lg font-medium shadow mt-2" id="save-prod-btn"><i class="fas fa-save mr-2"></i> 💾 Simpan Produk</button>
             </div>
         </div>
     </div>
 
-    <!-- 🛒 Cart Modal -->
-    <div id="cart-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-sm p-4">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="font-bold glitter-text text-sm">🛒 Cart</h3>
-                <button onclick="toggleCart()" class="text-lg">&times;</button>
-            </div>
-            <div id="cart-items" class="space-y-2 max-h-48 overflow-y-auto mb-3 text-xs"></div>
-            <div class="flex justify-between font-medium text-sm mb-3">
-                <span>Total:</span><span id="cart-total" class="text-yellow-600">RM 0.00</span>
-            </div>
-            <button class="btn-glitter w-full py-2 rounded-lg text-sm font-medium">Checkout</button>
-        </div>
-    </div>
-
-    <!-- 🧠 Firebase & App Logic -->
+    <!-- 🧠 Firebase & App Logic (COMPAT SDK for stability) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     
     <script>
-        // Firebase Config        const firebaseConfig = {
+        // Firebase Config
+        const firebaseConfig = {
             apiKey: "AIzaSyDMrexlgTwauuqmZ2kZECwqqEYmwtj7Zrs",
             authDomain: "mfd-store.firebaseapp.com",
             projectId: "mfd-store",
@@ -643,30 +488,37 @@
             messagingSenderId: "1039564529069",
             appId: "1:1039564529069:web:bc7c752f3618e6cb879524"
         };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+        firebase.initializeApp(firebaseConfig);        const auth = firebase.auth();
         const db = firebase.firestore();
 
         // State
-        let user = null, profile = null, chatId = null, chatUnsub = null, editPid = null, imgBase64 = null, products = [], orders = [], cart = [];
+        let user = null, profile = null, chatId = null, chatUnsub = null, editPid = null, imgBase64 = null, products = [], orders = [];
 
-        // Utils
-        function playSound(t) { const s = document.getElementById(`snd-${t}`); if(s){ s.currentTime=0; s.play().catch(()=>{}); } }
+        // ===== UTILITIES (same patterns as index.html) =====
+        function playSound(t) { 
+            const s = document.getElementById(`snd-${t}`); 
+            if(s) { s.currentTime = 0; s.play().catch(()=>{}); } 
+        }
+        
         function showToast(m, t='info') {
             const el = document.getElementById('toast');
-            el.innerHTML = `<span>${t==='success'?'✅':t==='error'?'❌':t==='warning'?'⚠️':'🔔'}</span><span>${m}</span>`;
+            const icon = t==='success'?'✅':t==='error'?'❌':t==='warning'?'⚠️':'🔔';
+            el.innerHTML = `<span>${icon}</span><span>${m}</span>`;
             el.className = `toast ${t}`; el.classList.remove('hidden');
             setTimeout(()=>el.classList.add('hidden'), 3000);
             playSound(t==='error'?'error':'success');
         }
+        
         function navTo(v) {
             playSound('click');
             document.querySelectorAll('section[id^="view-"]').forEach(e=>e.classList.add('hidden'));
-            document.getElementById(`view-${v}`).classList.remove('hidden');
+            const target = document.getElementById(`view-${v}`);
+            if(target) { target.classList.remove('hidden'); target.classList.add('fade-in'); }
             if(v==='dashboard' && user) loadDashboard();
             if(v==='catalogue') loadCatalogue();
             history.replaceState(null, null, `#${v}`);
         }
+        
         function switchTab(t) {
             playSound('click');
             document.querySelectorAll('[id^="content-"]').forEach(e=>e.classList.add('hidden'));
@@ -676,18 +528,29 @@
             if(t==='chat') loadChats();
             if(t==='admin' && profile?.role==='admin') loadAdmin();
         }
+        
         function formatRM(n) { return 'RM ' + (parseFloat(n)||0).toFixed(2); }
         function formatTime(ts) { return ts?.toDate ? ts.toDate().toLocaleTimeString('ms-MY',{hour:'2-digit',minute:'2-digit'}) : ''; }
+        
+        // Validation helpers
+        function isValidEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+        function isValidPhone(p) { return /^[\+]?[0-9\s\-\(\)]{10,}$/.test(p.replace(/[\s\-\(\)]/g,'')); }
 
-        // Auth
-        function doRegister(e) {
-            e?.preventDefault();
+        // ===== AUTHENTICATION =====
+        function doRegister(e) {            e?.preventDefault();
             const email = document.getElementById('reg-email').value.trim();
             const pass = document.getElementById('reg-pass').value;
-            const business = document.getElementById('reg-business').value.trim();            const phone = document.getElementById('reg-phone').value.trim();
+            const business = document.getElementById('reg-business').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
+            const btn = document.getElementById('register-btn');
+            
             if(!email||!pass||!business||!phone) return showToast('Isi semua medan *', 'error');
             if(pass.length<6) return showToast('Password min 6 karakter', 'error');
-            showToast('Mendaftar...','info');
+            if(!isValidEmail(email)) return showToast('Format email tidak sah', 'error');
+            if(!isValidPhone(phone)) return showToast('Nombor telefon tidak sah', 'error');
+            
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+            
             auth.createUserWithEmailAndPassword(email, pass).then(cred => {
                 const uac = "VEN-"+Math.random().toString(36).slice(2,8).toUpperCase();
                 const venId = "VENFD-"+Date.now().toString(36).toUpperCase();
@@ -697,26 +560,50 @@
                     agentStatus: 'Online', createdAt: firebase.firestore.FieldValue.serverTimestamp(), logCache: firebase.firestore.FieldValue.serverTimestamp()
                 });
             }).then(()=>{ showToast('✅ Daftar berjaya! Sila login.','success'); navTo('login'); })
-            .catch(err=> showToast(`❌ ${err.message.replace('Firebase: ','')}`,'error'));
+            .catch(err=> { 
+                let msg = err.message.replace('Firebase: ','');
+                if(msg.includes('email-already')) msg = 'Email sudah digunakan';
+                if(msg.includes('weak-password')) msg = 'Password terlalu lemah';
+                showToast('❌ '+msg,'error'); 
+            })
+            .finally(()=>{ btn.disabled=false; btn.innerHTML='<i class="fas fa-user-plus mr-2"></i> Register Free'; });
         }
+        
         function doLogin(e) {
             e?.preventDefault();
-            showToast('Logging in...','info');
-            auth.signInWithEmailAndPassword(document.getElementById('login-email').value.trim(), document.getElementById('login-pass').value)
-            .catch(err=> showToast(`❌ ${err.message.includes('user')?'Email/password salah':err.message}`,'error'));
-        }
+            const email = document.getElementById('login-email').value.trim();
+            const pass = document.getElementById('login-pass').value;
+            const btn = document.getElementById('login-btn');
+            
+            if(!email||!pass) return showToast('Sila masukkan email dan password', 'error');
+            
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
+            
+            auth.signInWithEmailAndPassword(email, pass)
+            .catch(err=> {
+                let msg = err.message;
+                if(msg.includes('user-not-found')||msg.includes('wrong-password')) msg = 'Email atau password salah';
+                showToast('❌ '+msg,'error');
+            })
+            .finally(()=>{ btn.disabled=false; btn.innerHTML='<i class="fas fa-sign-in-alt mr-2"></i> Login'; });
+        }        
         function doGoogleSignIn() {
             showToast('Connecting to Google...','info');
-            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(err=> showToast(`❌ ${err.message}`,'error'));
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(err=> showToast('❌ '+err.message,'error'));
         }
+        
         function doGithubSignIn() {
             showToast('Connecting to GitHub...','info');
-            auth.signInWithPopup(new firebase.auth.GithubAuthProvider()).catch(err=> showToast(`❌ ${err.message}`,'error'));
+            const provider = new firebase.auth.GithubAuthProvider();
+            auth.signInWithPopup(provider).catch(err=> showToast('❌ '+err.message,'error'));
         }
+        
         function doLogout() {
             auth.signOut().then(()=>{ showToast('✅ Logout','success'); navTo('login'); });
         }
 
+        // Auth state listener
         auth.onAuthStateChanged(async u => {
             user = u;
             if(u) {
@@ -726,6 +613,9 @@
                     const snap = await db.collection('vendors').doc(u.uid).get();
                     if(snap.exists) {
                         profile = snap.data();
+                        // Security check
+                        if(profile.status === 'BLOCKED') { showToast('❌ Akaun diblokir','error'); auth.signOut(); return; }
+                        
                         document.getElementById('nav-uac').textContent = profile.uac||'';
                         document.getElementById('disp-uac').textContent = profile.uac||'-';
                         document.getElementById('disp-venid').textContent = profile.venId||'-';
@@ -733,7 +623,9 @@
                         document.getElementById('disp-status').className = `font-medium ${profile.status==='ACTIVE'?'text-green-600':'text-red-600'}`;
                         if(profile.logCache?.toDate) document.getElementById('disp-logcache').textContent = profile.logCache.toDate().toLocaleString('ms-MY');
                         if(profile.role==='admin') document.getElementById('tab-admin').classList.remove('hidden');
-                        document.getElementById('prof-seller').value = profile.sellerName||'';                        document.getElementById('prof-business').value = profile.businessName||'';
+                        
+                        document.getElementById('prof-seller').value = profile.sellerName||'';
+                        document.getElementById('prof-business').value = profile.businessName||'';
                         document.getElementById('prof-phone').value = profile.phone||'';
                         document.getElementById('prof-email').value = profile.email||'';
                         document.getElementById('prof-address').value = profile.address||'';
@@ -743,8 +635,7 @@
                     }
                     navTo('dashboard');
                 } catch(err) { console.error(err); showToast('Gagal load profil','error'); }
-            } else {
-                profile = null;
+            } else {                profile = null;
                 document.getElementById('auth-nav').classList.remove('hidden');
                 document.getElementById('user-nav').classList.add('hidden');
                 const hash = location.hash.slice(1);
@@ -752,15 +643,21 @@
             }
         });
 
-        // Products
+        // ===== PRODUCTS =====
         function previewImage(input) {
             const file = input.files[0]; if(!file) return;
             if(file.size > 500*1024) return showToast('❌ Gambar >500KB','error');
             if(!file.type.startsWith('image/')) return showToast('❌ Hanya gambar','error');
             const reader = new FileReader();
-            reader.onload = e => { imgBase64 = e.target.result; const img = document.getElementById('prod-preview'); img.src = imgBase64; img.classList.remove('hidden'); showToast('✅ Gambar dimuatnaik','success'); };
+            reader.onload = e => { 
+                imgBase64 = e.target.result; 
+                const img = document.getElementById('prod-preview'); 
+                img.src = imgBase64; img.classList.remove('hidden'); 
+                showToast('✅ Gambar dimuatnaik','success'); 
+            };
             reader.readAsDataURL(file);
         }
+        
         function openProductModal(pid=null) {
             playSound('click'); editPid = pid; imgBase64 = null;
             document.querySelectorAll('#product-modal input:not([readonly]),#product-modal textarea,#product-modal select').forEach(i=>i.value='');
@@ -770,7 +667,13 @@
             document.getElementById('product-modal').classList.remove('hidden');
             if(pid) loadProductEdit(pid);
         }
-        function closeProductModal() { playSound('click'); document.getElementById('product-modal').classList.add('hidden'); editPid=null; imgBase64=null; }
+        
+        function closeProductModal() { 
+            playSound('click'); 
+            document.getElementById('product-modal').classList.add('hidden'); 
+            editPid=null; imgBase64=null; 
+        }
+        
         async function loadProductEdit(id) {
             try {
                 const snap = await db.collection('products').doc(id).get();
@@ -781,8 +684,8 @@
                     document.getElementById('prod-code').value = p.itemCode||'';
                     document.getElementById('prod-price').value = p.price||'';
                     document.getElementById('prod-sale').value = p.salePrice||'';
-                    document.getElementById('prod-desc').value = p.description||'';
-                    document.getElementById('prod-country').value = p.country||'';                    document.getElementById('prod-label').value = p.label||'';
+                    document.getElementById('prod-desc').value = p.description||'';                    document.getElementById('prod-country').value = p.country||'';
+                    document.getElementById('prod-label').value = p.label||'';
                     document.getElementById('prod-event').value = p.event||'';
                     document.getElementById('prod-link').value = p.link||'';
                     document.getElementById('prod-status').value = p.status||'Public';
@@ -794,11 +697,15 @@
                 }
             } catch(err) { showToast('Gagal load produk','error'); }
         }
+        
         async function saveProduct() {
             const name = document.getElementById('prod-name').value.trim();
             const sale = document.getElementById('prod-sale').value;
+            const btn = document.getElementById('save-prod-btn');
+            
             if(!name||!sale) return showToast('❌ Nama & Harga Jualan wajib','error');
             const salePrice = parseFloat(sale); if(isNaN(salePrice)||salePrice<=0) return showToast('❌ Harga tidak sah','error');
+            
             const data = {
                 vendorId: user.uid, vendorUAC: profile?.uac, name,
                 itemCode: document.getElementById('prod-code').value || `ITEM-${Date.now().toString(36).slice(-8).toUpperCase()}`,
@@ -812,26 +719,41 @@
                 revenue: parseFloat(document.getElementById('prod-revenue').value)||0,
                 reviews: [], updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
+            
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Menyimpan...';
+            
             try {
-                showToast('Menyimpan...','info');
                 if(editPid) await db.collection('products').doc(editPid).update(data);
                 else { data.createdAt = firebase.firestore.FieldValue.serverTimestamp(); await db.collection('products').add(data); }
                 showToast('✅ Produk disimpan','success'); closeProductModal(); loadDashboard();
-            } catch(err) { showToast(`❌ ${err.message.includes('quota')?'Gambar terlalu besar':err.message}`,'error'); }
-        }
+            } catch(err) { 
+                let msg = err.message;
+                if(msg.includes('quota')) msg = 'Gambar terlalu besar';
+                showToast('❌ '+msg,'error'); 
+            } finally {
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-save mr-2"></i> 💾 Simpan Produk';
+            }
+        }        
         async function deleteProduct(id) {
             if(!confirm('Padam produk ini?')) return;
-            try { await db.collection('products').doc(id).delete(); showToast('✅ Dipadam','success'); loadDashboard(); }
-            catch(err) { showToast(`❌ ${err.message}`,'error'); }
+            try { 
+                await db.collection('products').doc(id).delete(); 
+                showToast('✅ Dipadam','success'); loadDashboard(); 
+            } catch(err) { showToast('❌ '+err.message,'error'); }
         }
 
-        // Dashboard
+        // ===== DASHBOARD =====
         function loadDashboard() {
             if(!user||!profile) return;
-            // Products
+            
+            // Products with real-time sync
             db.collection('products').where('vendorId','==',user.uid).orderBy('createdAt','desc')
             .onSnapshot(snap => {
-                products = []; const grid = document.getElementById('product-grid'); let html='', total=0;                if(snap.empty) { grid.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500"><i class="fas fa-box-open text-2xl mb-2 opacity-30"></i><p class="text-xs">Tiada produk</p><button onclick="openProductModal()" class="btn-glitter mt-3 px-3 py-1.5 rounded text-xs">+ Tambah</button></div>`; document.getElementById('stat-products').textContent='0'; return; }
+                products = []; const grid = document.getElementById('product-grid'); let html='', total=0;
+                if(snap.empty) { 
+                    grid.innerHTML = `<div class="col-span-full text-center py-8 text-gray-500"><i class="fas fa-box-open text-2xl mb-2 opacity-30"></i><p class="text-xs">Tiada produk</p><button onclick="openProductModal()" class="btn-glitter mt-3 px-3 py-1.5 rounded text-xs">+ Tambah</button></div>`; 
+                    document.getElementById('stat-products').textContent='0'; return; 
+                }
                 snap.forEach(d => {
                     const p = d.data(); products.push({id:d.id,...p});
                     const sold = p.totalSold||0; total += (p.salePrice||0)*sold;
@@ -849,7 +771,8 @@
                 document.getElementById('stat-sales').textContent = formatRM(total);
                 document.getElementById('stat-commission').textContent = formatRM(total * (profile.commissionRate||1) / 100);
             });
-            // Orders
+            
+            // Orders with real-time sync
             db.collection('orders').where('vendorId','==',user.uid).orderBy('createdAt','desc')
             .onSnapshot(snap => {
                 orders = []; const tbody = document.getElementById('order-list'); let html='', active=0;
@@ -859,15 +782,16 @@
                     const items = o.items?.map(i=>i.name).join(', ')||'-';
                     html += `<tr><td class="font-mono text-[10px]">${o.orderId||'N/A'}</td><td>${o.username||'-'}</td><td class="truncate max-w-[120px]">${items}</td><td class="font-bold text-yellow-600">${formatRM(o.total)}</td><td><span class="badge badge-${o.paymentStatus==='Verified'?'success':'warning'}">${o.paymentStatus||'Pending'}</span></td><td><span class="badge badge-${o.status==='Completed'?'success':o.status==='Cancelled'?'danger':'info'}">${o.status||'New'}</span></td><td><button onclick="msgCustomer('${o.userId}','${o.orderId}')" class="text-cyan-600"><i class="fas fa-comment"></i></button></td></tr>`;
                 });
-                tbody.innerHTML = html||'<tr><td colspan="7" class="text-center py-4 text-gray-500 text-xs">Tiada pesanan</td></tr>';
-                document.getElementById('stat-orders').textContent = active;
+                tbody.innerHTML = html||'<tr><td colspan="7" class="text-center py-4 text-gray-500 text-xs">Tiada pesanan</td></tr>';                document.getElementById('stat-orders').textContent = active;
             });
         }
 
-        // Profile
+        // ===== PROFILE =====
         function saveProfile() {
             if(!user) return;
-            showToast('Mengemaskini...','info');
+            const btn = document.getElementById('save-profile-btn');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
             db.collection('vendors').doc(user.uid).update({
                 sellerName: document.getElementById('prof-seller').value.trim(),
                 businessName: document.getElementById('prof-business').value.trim(),
@@ -875,28 +799,39 @@
                 address: document.getElementById('prof-address').value.trim(),
                 paymentInfo: document.getElementById('prof-payment').value.trim(),
                 logCache: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(()=>{ showToast('✅ Profil dikemaskini','success'); if(profile) profile.logCache = firebase.firestore.Timestamp.now(); })
-            .catch(err=> showToast(`❌ ${err.message}`,'error'));
+            }).then(()=>{ 
+                showToast('✅ Profil dikemaskini','success'); 
+                if(profile) profile.logCache = firebase.firestore.Timestamp.now(); 
+            })
+            .catch(err=> showToast('❌ '+err.message,'error'))
+            .finally(()=>{ btn.disabled=false; btn.innerHTML='💾 Simpan'; });
         }
+        
         function changePassword() {
-            const p = prompt("🔐 Password baru (min 6):"); if(!p||p.length<6) return showToast('❌ Password terlalu pendek','error');
-            user.updatePassword(p).then(()=> showToast('✅ Password ditukar','success'))            .catch(err=> showToast(`❌ ${err.message.includes('recent')?'Login semula untuk tukar password':err.message}`,'error'));
+            const p = prompt("🔐 Password baru (min 6):"); 
+            if(!p||p.length<6) return showToast('❌ Password terlalu pendek','error');
+            user.updatePassword(p).then(()=> showToast('✅ Password ditukar','success'))
+            .catch(err=> {
+                let msg = err.message;
+                if(msg.includes('recent')) msg = 'Login semula untuk tukar password';
+                showToast('❌ '+msg,'error');
+            });
         }
+        
         function deleteAccount() {
             if(!confirm('⚠️ Akaun akan dinyahaktifkan kekal. Teruskan?')) return;
             showToast('Menyahaktifkan...','info');
             db.collection('vendors').doc(user.uid).update({status:'INACTIVE',deletedAt:firebase.firestore.FieldValue.serverTimestamp()})
             .then(()=>{ auth.signOut(); showToast('✅ Akaun dinyahaktifkan','success'); navTo('login'); })
-            .catch(err=> showToast(`❌ ${err.message}`,'error'));
+            .catch(err=> showToast('❌ '+err.message,'error'));
         }
 
-        // Chat
+        // ===== CHAT =====
         function loadChats() {
             if(!user) return;
             db.collection('chats').where('participants','array-contains',user.uid).orderBy('lastTime','desc')
             .onSnapshot(snap => {
-                const el = document.getElementById('contacts-list');
-                if(snap.empty) { el.innerHTML = '<div class="text-center py-6 text-gray-500 text-xs"><i class="fas fa-inbox text-lg mb-1 opacity-30"></i><p>Tiada perbualan</p></div>'; return; }
+                const el = document.getElementById('contacts-list');                if(snap.empty) { el.innerHTML = '<div class="text-center py-6 text-gray-500 text-xs"><i class="fas fa-inbox text-lg mb-1 opacity-30"></i><p>Tiada perbualan</p></div>'; return; }
                 let html = '';
                 snap.forEach(d => {
                     const c = d.data(); const other = c.participants.find(id=>id!==user.uid);
@@ -916,6 +851,7 @@
                 el.innerHTML = html;
             });
         }
+        
         function openChat(cid, pid) {
             chatId = cid; playSound('chat');
             document.getElementById('chat-name').textContent = "💬 Customer Service";
@@ -929,22 +865,24 @@
                 snap.forEach(d => {
                     const m = d.data(); const me = m.senderId===user.uid;
                     html += `<div class="msg-bubble ${me?'msg-me':'msg-other'}">
-                        ${m.text?`<div class="text-xs">${m.text}</div>`:''}                        ${m.imageUrl?`<img src="${m.imageUrl}" class="msg-image" onerror="this.style.display='none'">`:''}
+                        ${m.text?`<div class="text-xs">${m.text}</div>`:''}
+                        ${m.imageUrl?`<img src="${m.imageUrl}" class="msg-image" onerror="this.style.display='none'">`:''}
                         <div class="msg-time">${formatTime(m.timestamp)}</div>
                     </div>`;
                 });
                 el.innerHTML = html; el.scrollTop = el.scrollHeight;
             });
         }
+        
         async function sendMessage() {
             const input = document.getElementById('chat-input'); const txt = input.value.trim();
             if(!txt||!chatId) { if(!chatId) showToast('❌ Pilih pelanggan dahulu','warning'); return; }
             try {
                 await db.collection(`chats/${chatId}/messages`).add({senderId:user.uid,senderName:profile?.sellerName||'Vendor',text:txt,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
                 await db.collection('chats').doc(chatId).update({lastMessage:txt,lastTime:firebase.firestore.FieldValue.serverTimestamp()});
-                input.value = ''; playSound('chat');
-            } catch(err) { showToast(`❌ ${err.message}`,'error'); }
+                input.value = ''; playSound('chat');            } catch(err) { showToast('❌ '+err.message,'error'); }
         }
+        
         async function sendImage(input) {
             const file = input.files[0]; if(!file||!chatId) return;
             if(file.size>500*1024) return showToast('❌ Gambar >500KB','error');
@@ -956,18 +894,20 @@
                     await db.collection(`chats/${chatId}/messages`).add({senderId:user.uid,senderName:profile?.sellerName||'Vendor',imageUrl:e.target.result,timestamp:firebase.firestore.FieldValue.serverTimestamp()});
                     await db.collection('chats').doc(chatId).update({lastMessage:'[Image]',lastTime:firebase.firestore.FieldValue.serverTimestamp()});
                     showToast('✅ Gambar dihantar','success');
-                } catch(err) { showToast(`❌ ${err.message}`,'error'); }
+                } catch(err) { showToast('❌ '+err.message,'error'); }
             };
             reader.readAsDataURL(file); input.value = '';
         }
+        
         function updateAgentStatus() {
             const s = document.getElementById('agent-status').value;
             db.collection('vendors').doc(user.uid).update({agentStatus:s,logCache:firebase.firestore.FieldValue.serverTimestamp()});
             showToast(`✅ Status: ${s}`,'success');
         }
+        
         function toggleMobileContacts() { document.querySelector('.contacts-panel')?.classList.toggle('hidden'); }
 
-        // Admin
+        // ===== ADMIN =====
         function loadAdmin() {
             if(profile?.role!=='admin') return;
             document.getElementById('admin-rate').value = profile.commissionRate||1;
@@ -978,17 +918,18 @@
                     const sales = v.totalSales||0, comm = sales * ((v.commissionRate||1)/100);
                     html += `<tr><td class="font-mono text-[10px]">${v.uac}</td><td>${v.sellerName}</td><td class="font-bold text-yellow-600">${formatRM(sales)}</td><td class="text-purple-600">${formatRM(comm)}</td><td><span class="badge badge-${v.status==='ACTIVE'?'success':'danger'}">${v.status}</span></td><td><button class="text-blue-500 text-xs">✏️</button></td></tr>`;
                 });
-                tbody.innerHTML = html||'<tr><td colspan="6" class="text-center py-4 text-gray-500 text-xs">Tiada vendor</td></tr>';            });
+                tbody.innerHTML = html||'<tr><td colspan="6" class="text-center py-4 text-gray-500 text-xs">Tiada vendor</td></tr>';
+            });
         }
+        
         function updateCommission() {
             const r = parseFloat(document.getElementById('admin-rate').value);
             if(isNaN(r)||r<0.01||r>5) return showToast('❌ Kadar RM 0.01-5.00','error');
             db.collection('vendors').doc(user.uid).update({commissionRate:r,logCache:firebase.firestore.FieldValue.serverTimestamp()})
             .then(()=>{ document.getElementById('curr-rate').textContent = formatRM(r); showToast('✅ Komisen dikemaskini','success'); })
-            .catch(err=> showToast(`❌ ${err.message}`,'error'));
+            .catch(err=> showToast('❌ '+err.message,'error'));
         }
-
-        // Search & Catalogue
+        // ===== SEARCH & CATALOGUE =====
         function filterProducts(kw) {
             const grid = document.getElementById('product-grid');
             if(!kw) { loadDashboard(); return; }
@@ -1007,11 +948,10 @@
             });
             grid.innerHTML = html;
         }
-        function globalSearch(kw) { if(location.hash.includes('catalogue')) loadCatalogue('all', kw); }
-        async function loadCatalogue(filter='all', kw='') {
+        
+        async function loadCatalogue(filter='all') {
             const grid = document.getElementById('catalogue-grid');
             grid.innerHTML = '<div class="col-span-full text-center py-8"><div class="loader mx-auto mb-2"></div><p class="text-gray-500 text-xs">Memuatkan...</p></div>';
-            // Update active tab
             document.querySelectorAll('#view-catalogue .tab-btn').forEach(b=>b.classList.remove('active'));
             document.getElementById(`cat-${filter==='all'?'all':filter==='highest'?'high':filter==='event'?'event':'rec'}`)?.classList.add('active');
             try {
@@ -1025,9 +965,9 @@
                 let html = '';
                 snap.forEach(d => {
                     const p = d.data();
-                    if(kw && !p.name?.toLowerCase().includes(kw.toLowerCase())) return;
                     html += `<div class="product-card">
-                        <div class="product-img">${p.imageUrl?`<img src="${p.imageUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\\\' class=\\'text-xl\\\\'>'">`:'<i class="fas fa-image text-xl"></i>'}</div>                        <div class="product-info">
+                        <div class="product-img">${p.imageUrl?`<img src="${p.imageUrl}" onerror="this.parentElement.innerHTML='<i class=\\'fas fa-image\\\\' class=\\'text-xl\\\\'>'">`:'<i class="fas fa-image text-xl"></i>'}</div>
+                        <div class="product-info">
                             <div class="product-title truncate">${p.name}</div>
                             <div class="flex items-baseline gap-1 mb-1">${p.price>0?`<span class="product-sale text-[10px]">RM${p.price}</span>`:''}<span class="product-price text-sm">RM${p.salePrice}</span></div>
                             <div class="flex justify-between items-center text-[10px] text-gray-500"><span>⭐ ${p.rating?.toFixed(1)||0}</span><span>📦 ${p.totalSold||0}</span></div>
@@ -1038,23 +978,7 @@
                 grid.innerHTML = html || '<div class="col-span-full text-center py-8 text-gray-500 text-xs">🔍 Tiada hasil</div>';
             } catch(err) { grid.innerHTML = `<div class="col-span-full text-center py-8 text-red-500 text-xs">❌ Gagal: ${err.message}</div>`; }
         }
-
-        // Cart (Simplified)
-        function toggleCart() {
-            const modal = document.getElementById('cart-modal');
-            modal.classList.toggle('hidden');
-            playSound('click');
-            if(!modal.classList.contains('hidden')) renderCart();
-        }
-        function renderCart() {
-            const el = document.getElementById('cart-items');
-            if(!cart.length) { el.innerHTML = '<p class="text-center text-gray-500 py-4 text-xs">Cart kosong</p>'; document.getElementById('cart-total').textContent = 'RM 0.00'; return; }
-            let html = '', total = 0;
-            cart.forEach((item,i) => { total += item.price * item.qty; html += `<div class="flex justify-between items-center text-xs"><span>${item.name} x${item.qty}</span><span class="font-medium text-yellow-600">${formatRM(item.price*item.qty)}</span></div>`; });
-            el.innerHTML = html; document.getElementById('cart-total').textContent = formatRM(total);
-        }
-
-        // Helpers
+        // ===== HELPERS =====
         function msgCustomer(uid, oid) { showToast(`💬 Chat: ${uid}`,'info'); switchTab('chat'); }
         function filterOrders(status) {
             const tbody = document.getElementById('order-list');
@@ -1068,7 +992,7 @@
             tbody.innerHTML = html;
         }
 
-        // Init
+        // ===== INIT =====
         document.addEventListener('DOMContentLoaded', () => {
             const h = location.hash.slice(1);
             if(h && ['login','register','dashboard','catalogue'].includes(h)) setTimeout(()=>navTo(h), 100);
@@ -1076,5 +1000,6 @@
         });
         window.addEventListener('hashchange', () => { const h=location.hash.slice(1)||'login'; navTo(user&&h!=='catalogue'?'dashboard':h); });
         window.addEventListener('resize', () => { if(window.innerWidth>=768) document.querySelector('.contacts-panel')?.classList.remove('hidden'); });
-    </script></body>
+    </script>
+</body>
 </html>
