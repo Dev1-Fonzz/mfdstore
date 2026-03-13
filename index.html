@@ -759,6 +759,19 @@
         <div id="active-chat-view" class="hidden-section flex-1 flex flex-col h-full">
             <!-- Chat Header -->
             <div class="flex items-center justify-between border-b pb-2 mb-2">
+                <!-- 🔽===== PASTE START: CHAT CONTEXT BANNER =====🔽 -->
+<div id="chat-ctx" class="hidden bg-cyan-50 border border-cyan-200 rounded-lg p-2 mb-2">
+    <div class="flex items-start gap-2">
+        <i class="fas fa-info-circle text-cyan-600 mt-0.5 text-xs"></i>
+        <div class="text-xs">
+            <div class="font-bold text-cyan-800">💬 Mengenai Produk</div>
+            <div id="ctx-prod" class="text-gray-600">-</div>
+            <div id="ctx-vendor" class="text-[10px] text-gray-400">Penjual: -</div>
+        </div>
+        <button onclick="clearChatCtx()" class="ml-auto text-gray-400 hover:text-red-500" title="Tutup"><i class="fas fa-times text-xs"></i></button>
+    </div>
+</div>
+<!-- 🔼===== PASTE END: CHAT CONTEXT BANNER =====🔼 -->
                 <div class="flex items-center gap-2">
                     <button onclick="closeActiveChat()" class="text-gray-500"><i class="fas fa-arrow-left"></i></button>
                     <div>
@@ -1156,23 +1169,54 @@
                 </p>
                 
                 <!-- QR CODE (BLUR BY DEFAULT, CLICK TO REVEAL) -->
-                <div class="text-center mb-4">
-                    <p class="text-sm text-gray-600 mb-2">🔐 Klik QR untuk lihat & scan:</p>                    <img src="https://i.postimg.cc/DzHmmZqQ/IMG-20260227-134328-052.jpg" 
-                         alt="QR Code Touch 'n Go" 
-                         id="qr-payment"
-                         onclick="toggleQRBlur()"
-                         class="w-40 h-40 mx-auto object-contain border-2 border-purple-200 rounded-xl shadow-sm bg-white cursor-pointer transition-all duration-300 blur-md hover:blur-sm select-none"
-                         loading="lazy">
-                    <p id="qr-hint" class="text-xs text-purple-600 mt-2 font-medium">👆 Klik untuk jelas</p>
-                </div>
-                
-                <ol class="list-decimal pl-5 text-sm space-y-2 text-gray-700">
-                    <li>Online: <a href="https://sociabuzz.com/fareezonzz_019/give" target="_blank" rel="noopener" class="text-blue-500 underline font-bold">Sociabuzz</a></li>
-                    <li>TNG: <strong class="font-mono bg-white px-2 py-0.5 rounded border">161489981218</strong></li>
-                    <li class="text-red-500 font-semibold text-xs bg-red-50 p-2 rounded mt-2">
-                        <i class="fas fa-exclamation-triangle"></i> Hantar bukti ke WhatsApp <strong>+60145400413</strong>
-                    </li>
-                </ol>
+               <!-- 🔽===== PASTE START: DYNAMIC VENDOR PAYMENT SECTION (GANTI QR ADMIN) =====🔽 -->
+<div class="text-center mb-4">
+    <p class="text-sm text-gray-600 mb-2">🔐 Pembayaran Langsung ke Penjual</p>
+    
+    <!-- Loading -->
+    <div id="pay-load" class="flex items-center justify-center py-4">
+        <div class="loader mr-2"></div><span class="text-xs text-gray-500">Memuatkan pembayaran...</span>
+    </div>
+    
+    <!-- Content (hidden until loaded) -->
+    <div id="pay-content" class="hidden">
+        <!-- QR Vendor -->
+        <img id="v-qr" src="" alt="QR Vendor" 
+             onclick="if(this.classList.contains('blur-md')){this.classList.replace('blur-md','blur-none');document.getElementById('qr-hint').innerHTML='✅ Scan & hantar bukti';this.classList.add('ring-2','ring-green-400');}else{this.classList.replace('blur-none','blur-md');document.getElementById('qr-hint').innerHTML='👆 Klik untuk jelas';this.classList.remove('ring-2','ring-green-400');}"
+             class="w-40 h-40 mx-auto object-contain border-2 border-yellow-300 rounded-xl shadow bg-white cursor-pointer transition blur-md select-none"
+             onerror="this.parentElement.innerHTML='<p class=\\'text-xs text-red-500\\'>❌ QR tidak valid</p>'">
+        <p id="qr-hint" class="text-xs text-yellow-600 mt-2">👆 Klik untuk jelas</p>
+        
+        <!-- Bank Details -->
+        <div class="mt-3 p-2 bg-yellow-50 rounded border border-yellow-200 text-xs">
+            <div class="font-bold text-gray-700 mb-1">🏦 Akaun Penjual</div>
+            <div class="grid grid-cols-2 gap-1 text-gray-600">
+                <span>Bank:</span><span id="v-bank" class="font-medium">-</span>
+                <span>No:</span><span id="v-acc" class="font-mono">-</span>
+                <span class="col-span-2">Nama:</span><span id="v-name" class="col-span-2 font-medium">-</span>
+            </div>
+        </div>
+        
+        <!-- WhatsApp Button -->
+        <a id="v-wa-btn" href="#" target="_blank" rel="noopener" 
+           class="hidden mt-2 inline-flex items-center gap-1 text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200">
+            <i class="fab fa-whatsapp"></i> Chat Penjual
+        </a>
+    </div>
+    
+    <!-- Error -->
+    <div id="pay-err" class="hidden text-center text-red-500 text-xs py-2">❌ Gagal load pembayaran</div>
+</div>
+
+<!-- Instructions -->
+<ol class="list-decimal pl-5 text-sm space-y-2 text-gray-700">
+    <li>Scan QR atau transfer ke akaun penjual di atas</li>
+    <li class="text-red-500 font-semibold text-xs bg-red-50 p-2 rounded">
+        ⚠️ <strong>WAJIB:</strong> Hantar bukti pembayaran dalam chat atau WhatsApp penjual
+    </li>
+    <li>Penjual akan sahkan & proses pesanan dalam 24 jam</li>
+</ol>
+<!-- 🔼===== PASTE END: DYNAMIC VENDOR PAYMENT SECTION =====🔼 -->
             </div>
             
             <button onclick="submitOrder()" class="btn-glitter w-full py-4 rounded-xl font-bold mt-6 shadow-xl text-lg disabled:opacity-50" id="checkout-btn">
@@ -1616,16 +1660,15 @@ window.doGoogleSignIn = async (e) => {
         </button>` : ''}
 
         <!-- 🛒 ADD TO CART BUTTON (only if Public & In Stock) -->
-        ${p.status === 'Public' ? `
-        <button onclick="addToCart('${p.id}')" 
-                class="btn-glitter w-full py-1.5 rounded-lg text-xs mt-auto shadow disabled:opacity-50"
-                ${p.status === 'Out of Stock' ? 'disabled' : ''}>
-            ${p.totalSold < 1 ? '🔥 New!' : '🛒 Add to Cart'}
-        </button>` : 
-        `<button disabled class="w-full py-1.5 rounded-lg text-xs mt-auto bg-gray-200 text-gray-400 cursor-not-allowed">
-            ${p.status === 'Out of Stock' ? '❌ Out of Stock' : '🔒 Private'}
-        </button>`}
-
+${p.status === 'Public' ? `
+<div class="flex gap-1 mt-2">
+    <button onclick="addToCart('${p.id}')" class="btn-glitter flex-1 py-1.5 rounded-lg text-xs shadow disabled:opacity-50" ${p.status==='Out of Stock'?'disabled':''}>
+        ${p.totalSold<1?'🔥 New!':'🛒 Cart'}
+    </button>
+    <button onclick="event.stopPropagation();openVendorChat('${p.vendorId||''}','${p.vendorUAC||''}','${(p.name||'Product').replace(/'/g,"\\'")}" class="flex-1 py-1.5 rounded-lg text-xs bg-cyan-100 text-cyan-700 hover:bg-cyan-200 transition flex items-center justify-center gap-1" title="Chat penjual">
+        <i class="fas fa-comment"></i><span class="hidden sm:inline">Seller</span>
+    </button>
+</div>` : `<button disabled class="w-full py-1.5 rounded-lg text-xs bg-gray-200 text-gray-400 cursor-not-allowed">${p.status==='Out of Stock'?'❌ Out of Stock':'🔒 Private'}</button>`}
     </div>`;
 }).join('');
         };
@@ -1914,6 +1957,72 @@ if (avatarEl && userData.photoURL) {
                 showToast('🛒 Item ditambah ke cart!', 'success'); 
             } 
         };
+// 🔽===== PASTE START: VENDOR PAYMENT & DIRECT CHAT FUNCTIONS =====🔽
+
+// Load vendor payment info for cart items
+async function loadVendorPayment() {
+    const [load, content, err] = ['pay-load','pay-content','pay-err'].map(id=>document.getElementById(id));
+    if(!load||!content||!err) return;
+    load.classList.remove('hidden'); content.classList.add('hidden'); err.classList.add('hidden');
+    try {
+        const prod = cart[0]; if(!prod?.vendorId) throw new Error('Vendor ID missing');
+        const snap = await getDoc(doc(db,"products",prod.id));
+        if(!snap.exists()) throw new Error('Product not found');
+        const p = snap.data(), pay = p?.paymentInfo;
+        if(!pay?.qrUrl) throw new Error('Payment info incomplete');
+        document.getElementById('v-qr').src = pay.qrUrl;
+        ['bank','account','holder'].forEach((f,i)=>{
+            const el = document.getElementById(`v-${f==='holder'?'name':f}`);
+            if(el) el.textContent = pay[f] || '-';
+        });
+        const wa = document.getElementById('v-wa-btn');
+        if(pay.whatsapp) { wa.href = `https://wa.me/${pay.whatsapp.replace(/\D/g,'')}`; wa.classList.remove('hidden'); }
+        else wa.classList.add('hidden');
+        load.classList.add('hidden'); content.classList.remove('hidden');
+    } catch(e) { console.error('Payment load error:',e); load.classList.add('hidden'); err.classList.remove('hidden'); err.textContent = `❌ ${e.message}`; }
+}
+
+// Override cart modal to load vendor payment
+const _origCart = window.toggleCartModal;
+window.toggleCartModal = function() {
+    _origCart?.();
+    const modal = document.getElementById('modal-cart');
+    if(modal && !modal.classList.contains('hidden-section') && cart.length>0) setTimeout(loadVendorPayment,300);
+};
+
+// Open direct chat with product vendor
+window.openVendorChat = async (vid,vac,pname) => {
+    if(!currentUser) { showToast('❌ Login untuk chat penjual','error'); return navTo('login'); }
+    playSound('click'); showToast('🔍 Mencari penjual...','info');
+    try {
+        const vsnap = await getDoc(doc(db,"vendors",vid));
+        if(!vsnap.exists()) throw new Error('Vendor not found');
+        const v = vsnap.data(), cid = [currentUser.uid,vid].sort().join('_');
+        const cref = doc(db,"chats",cid);
+        if(!(await getDoc(cref)).exists()) await setDoc(cref,{
+            participants:[currentUser.uid,vid], productContext:pname,
+            createdAt:serverTimestamp(), lastTime:serverTimestamp(),
+            lastMessage:`Customer bertanya: ${pname}`
+        });
+        localStorage.setItem('mfd_chat_id',cid);
+        localStorage.setItem('mfd_chat_partner',vid);
+        localStorage.setItem('mfd_chat_ctx',JSON.stringify({vendor:v.sellerName||v.businessName||'Seller',uac:vac,product:pname}));
+        navTo('chat-list'); showToast('✅ Chat dibuka dengan penjual','success');
+    } catch(e) { console.error('Vendor chat error:',e); showToast(`❌ ${e.message}`,'error'); }
+};
+
+// Load chat context banner
+function loadChatCtx() {
+    const ctx = localStorage.getItem('mfd_chat_ctx'), ban = document.getElementById('chat-ctx');
+    if(!ctx||!ban) return;
+    try { const c = JSON.parse(ctx);
+        document.getElementById('ctx-prod').textContent = c.product||'-';
+        document.getElementById('ctx-vendor').textContent = `Penjual: ${c.vendor||'-'}`;
+        ban.classList.remove('hidden');
+    } catch(e){}
+}
+function clearChatCtx() { localStorage.removeItem('mfd_chat_ctx'); const b=document.getElementById('chat-ctx'); if(b)b.classList.add('hidden'); }
+// 🔼===== PASTE END: VENDOR PAYMENT & DIRECT CHAT FUNCTIONS =====🔼
 
         // ==================== ADMIN FUNCTIONS - PRODUCTION READY ====================
         
@@ -2571,6 +2680,7 @@ function loadMessages() {
     const q = query(collection(db, `chats/${chatId}/messages`), orderBy('timestamp', 'asc'), limit(100));
     msgListener = onSnapshot(q, (snap) => {
         container.innerHTML = '';
+loadChatCtx();
         document.getElementById('last-update').textContent = 'Updated: ' + new Date().toLocaleTimeString('ms-MY');
         if(snap.empty) { container.innerHTML = '<div class="text-center text-gray-400 mt-10"><i class="fas fa-comments text-3xl mb-2 opacity-50"></i><br>Mula perbualan...</div>'; return; }
         snap.forEach(doc => {
