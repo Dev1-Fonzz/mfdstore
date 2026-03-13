@@ -295,6 +295,36 @@
                     <div><label class="block text-xs font-medium text-gray-700 mb-1">Label/Tag</label><input type="text" id="prod-label" placeholder="Best Seller, New" class="input-glass text-sm"></div>                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Event</label><input type="text" id="prod-event" placeholder="Raya Sale 2024" class="input-glass text-sm"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
+                    <!-- 🔽===== PASTE START: VENDOR PAYMENT INFO FIELDS =====🔽 -->
+<div class="mt-3 pt-3 border-t border-yellow-200">
+    <h4 class="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1">
+        <i class="fas fa-credit-card"></i> 💳 Maklumat Pembayaran (Wajib)
+    </h4>
+    <div class="grid grid-cols-2 gap-2">
+        <div class="col-span-2">
+            <label class="block text-[10px] font-medium text-gray-600 mb-1">🖼️ QR Code URL</label>
+            <input type="url" id="prod-qr-url" placeholder="https://i.postimg.cc/xxx/qr.jpg" class="input-glass text-xs" required>
+            <p class="text-[9px] text-gray-400 mt-1">* Upload QR ke postimg.cc → Copy URL → Paste di sini</p>
+        </div>
+        <div>
+            <label class="block text-[10px] font-medium text-gray-600 mb-1">🏦 Bank</label>
+            <input type="text" id="prod-bank" placeholder="Maybank" class="input-glass text-xs">
+        </div>
+        <div>
+            <label class="block text-[10px] font-medium text-gray-600 mb-1">🔢 Akaun</label>
+            <input type="text" id="prod-account" placeholder="1234567890" class="input-glass text-xs font-mono">
+        </div>
+        <div class="col-span-2">
+            <label class="block text-[10px] font-medium text-gray-600 mb-1">👤 Nama Pemegang</label>
+            <input type="text" id="prod-holder" placeholder="AHMAD BIN ABDULLAH" class="input-glass text-xs">
+        </div>
+        <div class="col-span-2">
+            <label class="block text-[10px] font-medium text-gray-600 mb-1">📱 WhatsApp (Optional)</label>
+            <input type="tel" id="prod-wa" placeholder="60123456789" class="input-glass text-xs">
+        </div>
+    </div>
+</div>
+<!-- 🔼===== PASTE END: VENDOR PAYMENT INFO FIELDS =====🔼 -->
                     <div><label class="block text-xs font-medium text-gray-700 mb-1">Status</label><select id="prod-status" class="input-glass text-sm"><option value="Public">🟢 Public</option><option value="Private">🔒 Private</option><option value="Out of Stock">❌ Out of Stock</option></select></div>
                     <div><label class="block text-xs font-medium text-gray-700 mb-1">Variasi</label><input type="text" id="prod-variation" placeholder="S/M/L, Merah/Biru" class="input-glass text-sm"></div>
                 </div>
@@ -589,6 +619,13 @@
                     safeSet('prod-event', p?.event);                    safeSet('prod-link', p?.link);
                     safeSet('prod-status', p?.status, 'Public');
                     safeSet('prod-variation', p?.variation);
+                    // 🔽===== PASTE START: LOAD PAYMENT INFO UNTUK EDIT =====🔽
+safeSet('prod-qr-url', p?.paymentInfo?.qrUrl);
+safeSet('prod-bank', p?.paymentInfo?.bank);
+safeSet('prod-account', p?.paymentInfo?.account);
+safeSet('prod-holder', p?.paymentInfo?.holder);
+safeSet('prod-wa', p?.paymentInfo?.whatsapp);
+// 🔼===== PASTE END: LOAD PAYMENT INFO UNTUK EDIT =====🔼
                     safeSet('prod-sold', p?.totalSold, 0);
                     safeSet('prod-rating', p?.rating, 0);
                     safeSet('prod-revenue', p?.revenue, 0);
@@ -629,6 +666,15 @@
                 link: (document.getElementById('prod-link')?.value||'').trim(), 
                 status: document.getElementById('prod-status')?.value||'Public',
                 variation: (document.getElementById('prod-variation')?.value||'').trim(), 
+                // 🔽===== PASTE START: PAYMENT INFO DALAM SAVE PRODUCT =====🔽
+paymentInfo: {
+    qrUrl: (document.getElementById('prod-qr-url')?.value || '').trim(),
+    bank: (document.getElementById('prod-bank')?.value || '').trim(),
+    account: (document.getElementById('prod-account')?.value || '').trim(),
+    holder: (document.getElementById('prod-holder')?.value || '').trim(),
+    whatsapp: (document.getElementById('prod-wa')?.value || '').trim()
+},
+// 🔼===== PASTE END: PAYMENT INFO DALAM SAVE PRODUCT =====🔼
                 imageUrl: imgBase64,
                 totalSold: parseInt(document.getElementById('prod-sold')?.value)||0,
                 rating: parseFloat(document.getElementById('prod-rating')?.value)||0,
