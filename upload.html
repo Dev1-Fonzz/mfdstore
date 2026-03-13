@@ -21,20 +21,16 @@
         #result img{max-width:100%;border-radius:5px;margin:10px 0}
         #result a{color:#1a73e8;text-decoration:none}
         .hint{font-size:12px;color:#666;margin-top:4px;font-style:italic}
-        .api-key-box{background:#fff3cd;padding:10px;border-radius:5px;border:1px solid #ffc107;margin:10px 0}
         footer{text-align:center;margin-top:25px;color:#888;font-size:13px}
+        .btn-copy{background:#28a745;margin-top:5px}
+        .btn-html{background:#17a2b8;margin-top:5px}
+        .btn-bb{background:#6f42c1;margin-top:5px}
     </style>
 </head>
 <body>
     <div class="card">
         <h2>🛍️ Upload Produk MFD Store</h2>
         
-        <div class="api-key-box">
-            <strong>🔑 API Key ImgBB:</strong>
-            <input type="text" id="apiKey" placeholder="6f23d9c5feaa6a9378364a98831d034d" value="">
-            <div class="hint">Dapat free: <a href="https://api.imgbb.com/" target="_blank">api.imgbb.com</a> → Sign Up → Copy API Key</div>
-        </div>
-
         <label>📛 Nama Produk</label>
         <input type="text" id="productName" placeholder="Contoh: Baju Melayu Cotton Premium">
 
@@ -43,35 +39,34 @@
 
         <label>🖼️ Gambar Produk</label>
         <input type="file" id="imageFile" accept="image/*" required>
-        <div class="hint">Format: JPG/PNG/WebP • Max: 32MB</div>
+        <div class="hint">Format: JPG/PNG/WebP • Max: 32MB • Gambar kekal selamanya ✓</div>
 
         <button onclick="uploadProduk()" id="btn">🚀 Upload Produk</button>
 
-        <div class="status" id="status"></div>        <div class="status" id="result"></div>
+        <div class="status" id="status"></div>
+        <div class="status" id="result"></div>
     </div>
 
-    <footer>
-        🔒 Gambar disimpan di ImgBB (FREE, kekal, tiada expired)<br>
-        💡 Copy link gambar untuk letak di blog/website
+    <footer>        🔒 Gambar disimpan di ImgBB (FREE, kekal, tiada expired)<br>
+        💡 Copy link untuk letak di blog/WhatsApp/Facebook
     </footer>
 
     <script>
-        // 🔧 Fungsi upload ke ImgBB API
+        // 🔧 CONFIG - API KEY ANDA
+        const API_KEY = 'b06f5cb40051c6b16bbb2b6994c1bed3'; // ⚠️ Ganti dengan key baru selepas regenerate!
+        const API_URL = 'https://api.imgbb.com/1/upload';
+
+        // 🔧 Fungsi utama upload
         async function uploadProduk() {
             const btn = document.getElementById('btn');
             const status = document.getElementById('status');
             const result = document.getElementById('result');
             
-            const apiKey = document.getElementById('apiKey').value.trim();
             const productName = document.getElementById('productName').value.trim();
             const productDesc = document.getElementById('productDesc').value.trim();
             const imageFile = document.getElementById('imageFile').files[0];
 
-            // Validasi
-            if (!apiKey) {
-                showAlert('❌ Sila masukkan API Key ImgBB dahulu!', 'error');
-                return;
-            }
+            // Validasi input
             if (!productName) {
                 showAlert('❌ Sila masukkan nama produk!', 'error');
                 return;
@@ -85,50 +80,60 @@
                 return;
             }
 
+            // UI update
             btn.disabled = true;
             btn.textContent = '⏳ Uploading...';
-            showAlert('📤 Mengupload gambar ke ImgBB...', 'info');
+            showAlert('📤 Mengupload ke ImgBB...', 'info');
 
             try {
-                // Step 1: Upload gambar ke ImgBB API
+                // Step 1: Prepare FormData
                 const formData = new FormData();
-                formData.append('key', apiKey);
+                formData.append('key', API_KEY);
                 formData.append('image', imageFile);
                 formData.append('name', productName.replace(/[^a-z0-9]/gi, '_').toLowerCase());
+                // ✅ expiration=0 = gambar KEKAL SELAMANYA (tiada auto-delete)
+                formData.append('expiration', '0');
 
-                const res = await fetch('https://api.imgbb.com/1/upload', {                    method: 'POST',
-                    body: formData
+                // Step 2: POST ke ImgBB API
+                const res = await fetch(API_URL, {
+                    method: 'POST',                    body: formData
                 });
 
                 const json = await res.json();
 
+                // Step 3: Handle response
                 if (!json.success) {
                     throw new Error(json.error?.message || 'Upload gagal');
                 }
 
-                // Step 2: Prepare result
-                const imageUrl = json.data.url;           // https://ibb.co/xxx
-                const directUrl = json.data.image.url;    // https://i.ibb.co/xxx.jpg
-                const thumbUrl = json.data.thumb.url;
+                // ✅ Extract URLs dari response
+                const { url, image, thumb, delete_url } = json.data;
+                const directUrl = image.url; // https://i.ibb.co/xxx.jpg
 
+                // Step 4: Show success
                 showAlert('✅ Upload berjaya!', 'success');
                 
                 result.innerHTML = `
-                    <strong>📦 ${productName}</strong><br><br>
-                    ${productDesc ? `<em>${productDesc}</em><br><br>` : ''}
-                    <img src="${directUrl}" alt="${productName}" style="max-height:200px"><br>
-                    <strong>🔗 Link Gambar (Direct):</strong><br>
+                    <strong>📦 ${escapeHtml(productName)}</strong><br><br>
+                    ${productDesc ? `<em>${escapeHtml(productDesc)}</em><br><br>` : ''}
+                    <img src="${directUrl}" alt="${escapeHtml(productName)}" style="max-height:200px;border-radius:5px"><br>
+                    
+                    <strong>🔗 Direct Image URL (untuk embed):</strong><br>
                     <a href="${directUrl}" target="_blank">${directUrl}</a><br><br>
-                    <strong>🔗 Link Page ImgBB:</strong><br>
-                    <a href="${imageUrl}" target="_blank">${imageUrl}</a><br><br>
-                    <button onclick="navigator.clipboard.writeText('${directUrl}')">📋 Copy Direct Link</button>
-                    <button onclick="navigator.clipboard.writeText('[img]${directUrl}[/img]')" style="margin-top:5px;background:#28a745">📋 Copy BBCode</button>
-                    <button onclick="navigator.clipboard.writeText('<img src="${directUrl}" alt="${productName}">')" style="margin-top:5px;background:#17a2b8">📋 Copy HTML</button>
+                    
+                    <strong>🔗 ImgBB Page:</strong><br>
+                    <a href="${url}" target="_blank">${url}</a><br><br>
+                    
+                    <button onclick="copyToClipboard('${directUrl}')">📋 Copy Direct URL</button>
+                    <button class="btn-html" onclick="copyToClipboard('<img src="${directUrl}" alt="${escapeHtml(productName)}">')">📋 Copy HTML</button>
+                    <button class="btn-bb" onclick="copyToClipboard('[img]${directUrl}[/img]')">📋 Copy BBCode</button>
+                    
+                    <details style="margin-top:15px;font-size:13px">
+                        <summary>🗑️ Link Delete (simpan untuk hapus gambar)</summary>
+                        <a href="${delete_url}" target="_blank" style="word-break:break-all">${delete_url}</a>
+                    </details>
                 `;
                 result.style.display = 'block';
-
-                // Optional: Auto-copy direct link
-                // navigator.clipboard.writeText(directUrl);
 
             } catch (e) {
                 showAlert('❌ ' + e.message, 'error');
@@ -139,23 +144,42 @@
             }
         }
 
-        function showAlert(msg, type) {
-            const status = document.getElementById('status');
+        // 🔧 Helper: Show status message
+        function showAlert(msg, type) {            const status = document.getElementById('status');
             status.className = `status ${type}`;
             status.textContent = msg;
             status.style.display = 'block';
-            // Auto-hide after 5 seconds for non-error
-            if (type !== 'error') {                setTimeout(() => { status.style.display = 'none'; }, 5000);
+            if (type !== 'error') {
+                setTimeout(() => { status.style.display = 'none'; }, 5000);
             }
         }
 
-        // 🔧 Auto-save API Key to localStorage (convenience)
-        const apiKeyInput = document.getElementById('apiKey');
-        if (localStorage.getItem('imgbb_key')) {
-            apiKeyInput.value = localStorage.getItem('imgbb_key');
+        // 🔧 Helper: Copy to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('✅ Disalin ke clipboard!');
+            }).catch(() => {
+                // Fallback untuk browser lama
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                alert('✅ Disalin!');
+            });
         }
-        apiKeyInput.addEventListener('change', () => {
-            localStorage.setItem('imgbb_key', apiKeyInput.value.trim());
+
+        // 🔧 Helper: Escape HTML untuk elak XSS
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        // 🔧 Auto-focus nama produk bila page load
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('productName').focus();
         });
     </script>
 </body>
