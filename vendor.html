@@ -165,45 +165,126 @@
             </div>
 
             <!-- Orders -->
-            <div id="content-orders" class="glass-panel p-4 mb-4 hidden">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-semibold text-sm md:text-base">📋 Senarai Pesanan</h3>
-                    <select id="order-filter" onchange="filterOrders(this.value)" class="input-glass py-1.5 text-xs">
-                        <option value="all">Semua</option><option value="To Pay">To Pay</option><option value="To Ship">To Ship</option><option value="To Receive">To Receive</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
-                    </select>
-                </div>
-                <div class="table-container">
-                    <table class="custom-table">
-                        <thead><tr><th>ID</th><th>Pelanggan</th><th>Item</th><th>Total</th><th>Bayaran</th><th>Status</th><th>Aksi</th></tr></thead>
-                        <tbody id="order-list"><tr><td colspan="7" class="text-center py-4 text-gray-500"><div class="loader mx-auto mb-2"></div>Memuatkan...</td></tr></tbody>
-                    </table>
-                </div>
-            </div>
+            <!-- 🔽===== PASTE START: VENDOR ORDER MANAGEMENT TABLE (MACAM ADMIN) =====🔽 -->
+<div id="content-orders" class="glass-panel p-4 mb-4 hidden">
+    <!-- Header + Filter -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+        <h3 class="font-semibold text-sm md:text-base">📋 Pesanan Masuk</h3>
+        <div class="flex gap-2 w-full sm:w-auto">
+            <select id="order-filter" onchange="filterVendorOrders(this.value)" class="input-glass py-1.5 text-xs sm:text-sm">
+                <option value="all">Semua Status</option>
+                <option value="To Pay">⏳ To Pay</option>
+                <option value="To Ship">🚚 To Ship</option>
+                <option value="To Receive">📦 To Receive</option>
+                <option value="Completed">✅ Completed</option>
+                <option value="Cancelled">❌ Cancelled</option>
+            </select>
+            <input type="text" id="order-search" placeholder="Cari order..." class="input-glass py-1.5 text-xs sm:text-sm w-32" onkeyup="filterVendorOrders(document.getElementById('order-filter').value)">
+        </div>
+    </div>
 
-            <!-- Profile -->
-            <div id="content-profile" class="glass-panel p-4 mb-4 hidden">
-                <h3 class="font-semibold mb-4 text-sm md:text-base">⚙️ Maklumat Penjual</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Seller Name</label><input type="text" id="prof-seller" placeholder="Nama Penjual" class="input-glass text-sm"></div>
-                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Business Name</label><input type="text" id="prof-business" placeholder="Nama Perniagaan" class="input-glass text-sm"></div>
-                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Phone</label><input type="tel" id="prof-phone" placeholder="+60123456789" class="input-glass text-sm"></div>
-                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Email</label><input type="email" id="prof-email" placeholder="email@domain.com" class="input-glass text-sm" disabled></div>
-                    <div class="md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">Full Address</label><textarea id="prof-address" placeholder="No. Rumah, Jalan, Taman, Poskod, Negeri" class="input-glass text-sm min-h-[70px] resize-y"></textarea></div>
-                    <div class="md:col-span-2"><label class="block text-xs font-medium text-gray-700 mb-1">💳 Payment Info (Bank/QR)</label><textarea id="prof-payment" placeholder="Nama Pemegang, Bank, No. Akaun / Link QR DuitNow" class="input-glass text-sm min-h-[70px] resize-y"></textarea></div>
-                </div>
-                <div class="mt-5 p-3 bg-gradient-to-r from-yellow-50 to-cyan-50 rounded-xl border border-yellow-200">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                        <div><span class="text-gray-500 block">UAC</span><span id="disp-uac" class="font-mono font-medium text-cyan-700">-</span></div>
-                        <div><span class="text-gray-500 block">VenID</span><span id="disp-venid" class="font-mono font-medium">-</span></div>                        <div><span class="text-gray-500 block">Status</span><span id="disp-status" class="font-medium text-green-600">ACTIVE</span></div>
-                        <div><span class="text-gray-500 block">Log Cache</span><span id="disp-logcache" class="text-[10px]">-</span></div>
-                    </div>
-                </div>
-                <div class="mt-5 flex flex-wrap gap-2">
-                    <button onclick="saveProfile(); playSound('click')" class="btn-glitter px-4 py-2 rounded-lg text-xs md:text-sm shadow" id="save-profile-btn">💾 Simpan</button>
-                    <button onclick="changePassword(); playSound('click')" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition text-xs md:text-sm">🔑 Password</button>
-                    <button onclick="deleteAccount(); playSound('click')" class="px-4 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition text-xs md:text-sm ml-auto">🗑️ Delete</button>
-                </div>
+    <!-- Order Table -->
+    <div class="table-container">
+        <table class="custom-table">
+            <thead>
+                <tr>
+                    <th>Order ID</th>
+                    <th>Pelanggan</th>
+                    <th>Item</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                    <th>Payment</th>
+                    <th>Status</th>
+                    <th>Tracking</th>
+                    <th>Tarikh</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="vendor-order-list">
+                <tr><td colspan="10" class="text-center py-4 text-gray-500"><div class="loader mx-auto mb-2"></div>Memuatkan pesanan...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Empty State -->
+    <div id="no-orders" class="hidden text-center py-8 text-gray-500">
+        <i class="fas fa-inbox text-3xl mb-2 opacity-30"></i>
+        <p class="text-sm">Tiada pesanan untuk produk anda</p>
+    </div>
+</div>
+<!-- 🔼===== PASTE END: VENDOR ORDER MANAGEMENT TABLE =====🔼 -->
+<div id="content-profile" class="glass-panel p-4 mb-4 hidden">
+    <h3 class="font-semibold mb-4 text-sm md:text-base">⚙️ Maklumat Penjual</h3>
+    
+    <!-- Profile Fields -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Seller Name</label>
+            <input type="text" id="prof-seller" placeholder="Nama Penjual" class="input-glass text-sm">
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Business Name</label>
+            <input type="text" id="prof-business" placeholder="Nama Perniagaan" class="input-glass text-sm">
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Phone</label>
+            <input type="tel" id="prof-phone" placeholder="+60123456789" class="input-glass text-sm">
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-gray-700 mb-1">Email</label>
+            <input type="email" id="prof-email" placeholder="email@domain.com" class="input-glass text-sm" disabled>
+        </div>
+        <div class="md:col-span-2">
+            <label class="block text-xs font-medium text-gray-700 mb-1">Full Address</label>
+            <textarea id="prof-address" placeholder="No. Rumah, Jalan, Taman, Poskod, Negeri" class="input-glass text-sm min-h-[70px] resize-y"></textarea>
+        </div>
+        <div class="md:col-span-2">
+            <label class="block text-xs font-medium text-gray-700 mb-1">💳 Payment Info (Bank/QR)</label>
+            <textarea id="prof-payment" placeholder="Nama Pemegang, Bank, No. Akaun / Link QR DuitNow" class="input-glass text-sm min-h-[70px] resize-y"></textarea>
+        </div>
+    </div>
+    
+    <!-- Default Payment Settings (Auto-fill for new products) -->
+    <div class="mt-4 pt-4 border-t border-yellow-200">
+        <h4 class="text-xs font-bold text-gray-700 mb-2">⚙️ Default Payment Settings</h4>
+        <p class="text-[9px] text-gray-400 mb-2">*Maklumat ini akan auto-fill bila tambah produk baru</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <div class="md:col-span-2">
+                <label class="block text-[10px] font-medium text-gray-600 mb-1">🔗 Default Payment Link (Sociabuzz/Donate)</label>
+                <input type="url" id="prof-payment-link" placeholder="https://sociabuzz.com/yourname/give" class="input-glass text-xs">
             </div>
+            <div>
+                <label class="block text-[10px] font-medium text-gray-600 mb-1">🖼️ Default QR URL</label>
+                <input type="url" id="prof-qr-default" placeholder="https://i.postimg.cc/xxx/qr.jpg" class="input-glass text-xs">
+            </div>
+            <div>
+                <label class="block text-[10px] font-medium text-gray-600 mb-1">🏦 Default Bank</label>
+                <input type="text" id="prof-bank-default" placeholder="Maybank" class="input-glass text-xs">
+            </div>
+            <div class="md:col-span-2">
+                <label class="block text-[10px] font-medium text-gray-600 mb-1">🔢 Default Account No + Name</label>
+                <input type="text" id="prof-account-default" placeholder="123456789012 - AHMAD BIN ABDULLAH" class="input-glass text-xs font-mono">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Display -->
+    <div class="mt-5 p-3 bg-gradient-to-r from-yellow-50 to-cyan-50 rounded-xl border border-yellow-200">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+            <div><span class="text-gray-500 block">UAC</span><span id="disp-uac" class="font-mono font-medium text-cyan-700">-</span></div>
+            <div><span class="text-gray-500 block">VenID</span><span id="disp-venid" class="font-mono font-medium">-</span></div>
+            <div><span class="text-gray-500 block">Status</span><span id="disp-status" class="font-medium text-green-600">ACTIVE</span></div>
+            <div><span class="text-gray-500 block">Log Cache</span><span id="disp-logcache" class="text-[10px]">-</span></div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="mt-5 flex flex-wrap gap-2">
+        <button onclick="saveProfile(); playSound('click')" class="btn-glitter px-4 py-2 rounded-lg text-xs md:text-sm shadow" id="save-profile-btn">💾 Simpan</button>
+        <button onclick="changePassword(); playSound('click')" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 transition text-xs md:text-sm">🔑 Password</button>
+        <button onclick="deleteAccount(); playSound('click')" class="px-4 py-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition text-xs md:text-sm ml-auto">🗑️ Delete</button>
+    </div>
+</div>
 
             <!-- Chat -->
             <div id="content-chat" class="glass-panel p-0 mb-4 hidden overflow-hidden">
@@ -235,26 +316,101 @@
             </div>
 
             <!-- Admin -->
-            <div id="content-admin" class="glass-panel p-4 mb-4 hidden">
-                <h3 class="font-semibold mb-4 text-sm md:text-base text-purple-700 flex items-center gap-2"><i class="fas fa-crown"></i> 👑 Admin Management</h3>
-                <div class="p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl border border-purple-200 mb-4">
-                    <label class="text-xs font-medium text-gray-700 block mb-2">⚙️ Kadar Komisen (RM 0.01 - 5.00)</label>
-                    <div class="flex flex-col sm:flex-row gap-2">
-                        <input type="number" id="admin-rate" step="0.01" min="0.01" max="5" placeholder="1.00" class="input-glass text-sm w-24">
-                        <button onclick="updateCommission(); playSound('click')" class="btn-glitter px-4 py-1.5 rounded-lg text-xs whitespace-nowrap">Update</button>
-                        <div class="text-[10px] text-gray-500 self-center sm:self-auto">Semasa: <span id="curr-rate" class="font-medium text-purple-600">RM 1.00</span> / jualan</div>
-                    </div>                </div>
-                <div class="mb-5">
-                    <h4 class="font-medium text-gray-700 mb-2 text-sm">📊 Pengurusan Vendor</h4>
-                    <div class="table-container">
-                        <table class="custom-table">
-                            <thead><tr><th>UAC</th><th>Seller</th><th>Sales</th><th>Commission</th><th>Status</th><th>Aksi</th></tr></thead>
-                            <tbody id="admin-vendors"><tr><td colspan="6" class="text-center py-4"><div class="loader mx-auto"></div></td></tr></tbody>
-                        </table>
+<div id="content-admin" class="glass-panel p-4 mb-4 hidden">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-4 pb-3 border-b border-purple-200">
+        <h3 class="font-bold text-purple-700 text-sm flex items-center gap-2">
+            <i class="fas fa-crown"></i> 👑 Admin Management Center
+        </h3>
+        <span class="text-[10px] bg-purple-100 text-purple-700 px-2 py-1 rounded">Super Admin</span>
+    </div>
+
+    <!-- Admin Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+        <div class="bg-gradient-to-br from-yellow-50 to-orange-50 p-3 rounded-lg border border-yellow-200 text-center">
+            <div class="text-lg font-bold text-yellow-600" id="admin-stat-vendors">-</div>
+            <div class="text-[9px] text-gray-500">Total Vendors</div>
+        </div>
+        <div class="bg-gradient-to-br from-cyan-50 to-blue-50 p-3 rounded-lg border border-cyan-200 text-center">
+            <div class="text-lg font-bold text-cyan-600" id="admin-stat-orders">-</div>
+            <div class="text-[9px] text-gray-500">Total Orders</div>
+        </div>
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-3 rounded-lg border border-green-200 text-center">
+            <div class="text-lg font-bold text-green-600" id="admin-stat-revenue">RM -</div>
+            <div class="text-[9px] text-gray-500">Total Revenue</div>
+        </div>
+        <div class="bg-gradient-to-br from-red-50 to-pink-50 p-3 rounded-lg border border-red-200 text-center">
+            <div class="text-lg font-bold text-red-600" id="admin-stat-blocked">-</div>
+            <div class="text-[9px] text-gray-500">Blocked Vendors</div>
+        </div>
+    </div>
+
+    <!-- Admin Tabs -->
+    <div class="flex gap-1.5 mb-4 overflow-x-auto pb-1">
+        <button onclick="showAdminSection('vendors')" id="admin-tab-vendors" class="tab-btn active text-[10px] whitespace-nowrap">👥 Vendors</button>
+        <button onclick="showAdminSection('transactions')" id="admin-tab-transactions" class="tab-btn text-[10px] whitespace-nowrap">💰 Transactions</button>
+        <button onclick="showAdminSection('settings')" id="admin-tab-settings" class="tab-btn text-[10px] whitespace-nowrap">⚙️ Settings</button>
+    </div>
+
+    <!-- SECTION: VENDOR MANAGEMENT -->
+    <div id="admin-section-vendors">
+        <div class="flex justify-between items-center mb-3">
+            <h4 class="font-semibold text-xs text-gray-700">📋 Senarai Vendor</h4>
+            <input type="text" id="admin-vendor-search" placeholder="Cari vendor..." class="input-glass py-1 text-[10px] w-32" onkeyup="filterAdminVendors()">
+        </div>
+        <div class="table-container">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>UAC</th><th>Vendor</th><th>Email</th><th>Sales</th><th>Status</th><th>Joined</th><th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-vendor-list">
+                    <tr><td colspan="7" class="text-center py-4 text-gray-500"><div class="loader mx-auto"></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECTION: TRANSACTION MANAGEMENT -->
+    <div id="admin-section-transactions" class="hidden">
+        <div class="flex justify-between items-center mb-3">
+            <h4 class="font-semibold text-xs text-gray-700">📊 Semua Transaksi</h4>
+            <select id="admin-order-filter" onchange="filterAdminOrders(this.value)" class="input-glass py-1 text-[10px]">
+                <option value="all">Semua</option><option value="To Pay">To Pay</option><option value="Completed">Completed</option><option value="Cancelled">Cancelled</option>
+            </select>
+        </div>
+        <div class="table-container">
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th><th>Vendor</th><th>Customer</th><th>Item</th><th>Total</th><th>Status</th><th>Tarikh</th>
+                    </tr>
+                </thead>
+                <tbody id="admin-order-list">
+                    <tr><td colspan="7" class="text-center py-4 text-gray-500"><div class="loader mx-auto"></div></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SECTION: SETTINGS -->
+    <div id="admin-section-settings" class="hidden">
+        <div class="p-3 bg-yellow-50 rounded-lg border border-yellow-200 text-xs">
+            <h5 class="font-bold text-yellow-700 mb-2">⚙️ System Settings</h5>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span>Kadar Komisen Default:</span>
+                    <div class="flex items-center gap-2">
+                        <input type="number" id="admin-commission-rate" value="1.00" step="0.01" min="0" max="10" class="input-glass py-1 w-16 text-xs">
+                        <span class="text-[10px] text-gray-500">RM / jualan</span>
                     </div>
                 </div>
+                <button onclick="updateAdminSettings()" class="btn-glitter px-3 py-1.5 rounded text-[10px]">💾 Save Settings</button>
             </div>
-        </section>
+        </div>
+    </div>
+</div>
 
         <!-- Catalogue -->
         <section id="view-catalogue" class="hidden">
@@ -295,36 +451,29 @@
                     <div><label class="block text-xs font-medium text-gray-700 mb-1">Label/Tag</label><input type="text" id="prod-label" placeholder="Best Seller, New" class="input-glass text-sm"></div>                    <div><label class="block text-xs font-medium text-gray-700 mb-1">Event</label><input type="text" id="prod-event" placeholder="Raya Sale 2024" class="input-glass text-sm"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <!-- 🔽===== PASTE START: VENDOR PAYMENT INFO FIELDS =====🔽 -->
-<div class="mt-3 pt-3 border-t border-yellow-200">
+                    <!-- 🔽===== PASTE START: PAYMENT INFO - READ ONLY FROM PROFILE =====🔽 -->
+<div class="mt-3 pt-3 border-t border-yellow-200 bg-yellow-50/50 rounded-lg p-3">
     <h4 class="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1">
-        <i class="fas fa-credit-card"></i> 💳 Maklumat Pembayaran (Wajib)
+        <i class="fas fa-info-circle"></i> 💳 Payment Info (Auto dari Profile)
     </h4>
-    <div class="grid grid-cols-2 gap-2">
-        <div class="col-span-2">
-            <label class="block text-[10px] font-medium text-gray-600 mb-1">🖼️ QR Code URL</label>
-            <input type="url" id="prod-qr-url" placeholder="https://i.postimg.cc/xxx/qr.jpg" class="input-glass text-xs" required>
-            <p class="text-[9px] text-gray-400 mt-1">* Upload QR ke postimg.cc → Copy URL → Paste di sini</p>
-        </div>
-        <div>
-            <label class="block text-[10px] font-medium text-gray-600 mb-1">🏦 Bank</label>
-            <input type="text" id="prod-bank" placeholder="Maybank" class="input-glass text-xs">
-        </div>
-        <div>
-            <label class="block text-[10px] font-medium text-gray-600 mb-1">🔢 Akaun</label>
-            <input type="text" id="prod-account" placeholder="1234567890" class="input-glass text-xs font-mono">
-        </div>
-        <div class="col-span-2">
-            <label class="block text-[10px] font-medium text-gray-600 mb-1">👤 Nama Pemegang</label>
-            <input type="text" id="prod-holder" placeholder="AHMAD BIN ABDULLAH" class="input-glass text-xs">
-        </div>
-        <div class="col-span-2">
-            <label class="block text-[10px] font-medium text-gray-600 mb-1">📱 WhatsApp (Optional)</label>
-            <input type="tel" id="prod-wa" placeholder="60123456789" class="input-glass text-xs">
+    <p class="text-[9px] text-gray-500 mb-2">
+        * Payment info diambil automatik dari setting profile vendor.
+        * Jika nak ubah, pergi ke tab <strong>⚙️ Profil</strong> → <strong>Default Payment Settings</strong>.
+    </p>
+    <div class="grid grid-cols-2 gap-2 text-[10px]">
+        <div class="col-span-2 p-2 bg-white rounded border border-gray-200">
+            <span class="font-bold text-gray-600">QR/Bank:</span>
+            <span id="prod-payment-preview" class="text-gray-800 break-all">Loading...</span>
         </div>
     </div>
+    <!-- Hidden fields untuk simpan reference (tidak editable) -->
+    <input type="hidden" id="prod-qr-url">
+    <input type="hidden" id="prod-bank">
+    <input type="hidden" id="prod-account">
+    <input type="hidden" id="prod-holder">
+    <input type="hidden" id="prod-wa">
 </div>
-<!-- 🔼===== PASTE END: VENDOR PAYMENT INFO FIELDS =====🔼 -->
+<!-- 🔼===== PASTE END: PAYMENT INFO - READ ONLY FROM PROFILE =====🔼 -->
                     <div><label class="block text-xs font-medium text-gray-700 mb-1">Status</label><select id="prod-status" class="input-glass text-sm"><option value="Public">🟢 Public</option><option value="Private">🔒 Private</option><option value="Out of Stock">❌ Out of Stock</option></select></div>
                     <div><label class="block text-xs font-medium text-gray-700 mb-1">Variasi</label><input type="text" id="prod-variation" placeholder="S/M/L, Merah/Biru" class="input-glass text-sm"></div>
                 </div>
@@ -392,16 +541,25 @@
             history.replaceState(null, null, `#${v}`);
         }
         
-        function switchTab(t) {
-            playSound('click');
-            document.querySelectorAll('[id^="content-"]').forEach(e=>e.classList.add('hidden'));
-            document.getElementById(`content-${t}`).classList.remove('hidden');
-            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-            document.getElementById(`tab-${t}`).classList.add('active');
-            if(t==='chat') loadChats();
-            if(t==='admin' && profile?.role==='admin') loadAdmin();
-        }
-        
+        // 🔽===== PASTE START: FIX switchTab TO LOAD ORDERS =====🔽
+function switchTab(t) {
+    playSound('click');
+    document.querySelectorAll('[id^="content-"]').forEach(e => e.classList.add('hidden'));
+    document.getElementById(`content-${t}`).classList.remove('hidden');
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${t}`).classList.add('active');
+    
+    // 🔽 TAMBAH DALAM switchTab() - selepas if(t==='admin'...):
+if (t === 'admin' && profile?.role === 'admin') {
+    loadAdmin(); // existing
+    loadAdminStats(); // 🔥 NEW: load stats
+    loadAdminVendors(); // 🔥 NEW: load vendor list
+}
+    // 🔥 Load data based on tab
+    if (t === 'chat') loadChats();
+    if (t === 'orders') loadVendorOrders(); // 🔥 Load orders when tab switched
+    if (t === 'admin' && profile?.role === 'admin') loadAdmin();
+}
         function formatRM(n) { return 'RM ' + (parseFloat(n)||0).toFixed(2); }
         function formatTime(ts) { 
             if(!ts) return '-';
@@ -527,15 +685,23 @@
                         if(profile?.role==='admin') document.getElementById('tab-admin')?.classList.remove('hidden');
                         
                         // ✅ Safe form population
-                        const safeVal = (v,d='') => (v??d);
-                        document.getElementById('prof-seller').value = safeVal(profile?.sellerName,'');
-                        document.getElementById('prof-business').value = safeVal(profile?.businessName,'');
-                        document.getElementById('prof-phone').value = safeVal(profile?.phone,'');
-                        document.getElementById('prof-email').value = safeVal(profile?.email,'');
-                        document.getElementById('prof-address').value = safeVal(profile?.address,'');
-                        document.getElementById('prof-payment').value = safeVal(profile?.paymentInfo,'');
-                        document.getElementById('agent-status').value = safeVal(profile?.agentStatus,'Online');
-                        document.getElementById('curr-rate').textContent = formatRM(profile?.commissionRate??1);
+const safeVal = (v, d = '') => (v ?? d);
+document.getElementById('prof-seller').value = safeVal(profile?.sellerName, '');
+document.getElementById('prof-business').value = safeVal(profile?.businessName, '');
+document.getElementById('prof-phone').value = safeVal(profile?.phone, '');
+document.getElementById('prof-email').value = safeVal(profile?.email, '');
+document.getElementById('prof-address').value = safeVal(profile?.address, '');
+document.getElementById('prof-payment').value = safeVal(profile?.paymentInfo, '');
+
+// 🔽===== PASTE START: LOAD DEFAULT PAYMENT FIELDS =====🔽
+document.getElementById('prof-payment-link').value = safeVal(profile?.paymentInfo?.paymentLink, '');
+document.getElementById('prof-qr-default').value = safeVal(profile?.paymentInfo?.qrDefault, '');
+document.getElementById('prof-bank-default').value = safeVal(profile?.paymentInfo?.bankDefault, '');
+document.getElementById('prof-account-default').value = safeVal(profile?.paymentInfo?.accountDefault, '');
+// 🔼===== PASTE END: LOAD DEFAULT PAYMENT FIELDS =====🔼
+
+document.getElementById('agent-status').value = safeVal(profile?.agentStatus, 'Online');
+document.getElementById('curr-rate').textContent = formatRM(profile?.commissionRate ?? 1);
                     } else {
                         // ✅ Create profile if doesn't exist
                         console.log('Profile not found, creating...');
@@ -593,7 +759,42 @@
             document.getElementById('product-modal')?.classList.remove('hidden');
             if(pid) loadProductEdit(pid);
         }
-        
+       function openProductModal(pid = null) {
+    playSound('click');
+    editPid = pid;
+    imgBase64 = null;
+    document.querySelectorAll('#product-modal input:not([readonly]),#product-modal textarea,#product-modal select')?.forEach(i => { if (i?.value !== undefined) i.value = ''; });
+    document.getElementById('prod-preview')?.classList.add('hidden');
+    document.getElementById('modal-title').textContent = pid ? '✏️ Edit Produk' : '➕ Tambah Produk';
+    if (!pid) document.getElementById('prod-code').value = "ITEM-" + Date.now().toString(36).slice(-8).toUpperCase();
+    document.getElementById('product-modal')?.classList.remove('hidden');
+    
+   // 🔽===== AUTO-FILL PAYMENT PREVIEW (READ-ONLY) =====🔽
+if (!pid && profile?.paymentInfo && typeof profile.paymentInfo === 'object') {
+    const p = profile.paymentInfo;
+    // Update preview text
+    const preview = document.getElementById('prod-payment-preview');
+    if (preview) {
+        const qr = p.qrDefault || p.paymentLink || '-';
+        const bank = p.bankDefault || '-';
+        const acc = p.accountDefault || '-';
+        preview.textContent = `${bank} | ${acc} | QR: ${qr.substring(0,30)}...`;
+    }
+    // Set hidden fields for reference
+    if (p.qrDefault) document.getElementById('prod-qr-url').value = p.qrDefault;
+    if (p.bankDefault) document.getElementById('prod-bank').value = p.bankDefault;
+    if (p.accountDefault) document.getElementById('prod-account').value = p.accountDefault;
+    if (p.accountDefault?.includes(' - ')) {
+        const [acc, name] = p.accountDefault.split(' - ');
+        document.getElementById('prod-holder').value = name || '';
+    }
+    if (p.paymentLink && !p.qrDefault) {
+        document.getElementById('prod-qr-url').value = p.paymentLink;
+    }
+}
+// 🔼===== END AUTO-FILL PREVIEW =====🔼 
+    if (pid) loadProductEdit(pid);
+} // ← Function closes HERE
         function closeProductModal() { 
             playSound('click'); 
             document.getElementById('product-modal')?.classList.add('hidden'); 
@@ -619,13 +820,11 @@
                     safeSet('prod-event', p?.event);                    safeSet('prod-link', p?.link);
                     safeSet('prod-status', p?.status, 'Public');
                     safeSet('prod-variation', p?.variation);
-                    // 🔽===== PASTE START: LOAD PAYMENT INFO UNTUK EDIT =====🔽
 safeSet('prod-qr-url', p?.paymentInfo?.qrUrl);
 safeSet('prod-bank', p?.paymentInfo?.bank);
 safeSet('prod-account', p?.paymentInfo?.account);
 safeSet('prod-holder', p?.paymentInfo?.holder);
 safeSet('prod-wa', p?.paymentInfo?.whatsapp);
-// 🔼===== PASTE END: LOAD PAYMENT INFO UNTUK EDIT =====🔼
                     safeSet('prod-sold', p?.totalSold, 0);
                     safeSet('prod-rating', p?.rating, 0);
                     safeSet('prod-revenue', p?.revenue, 0);
@@ -666,15 +865,11 @@ safeSet('prod-wa', p?.paymentInfo?.whatsapp);
                 link: (document.getElementById('prod-link')?.value||'').trim(), 
                 status: document.getElementById('prod-status')?.value||'Public',
                 variation: (document.getElementById('prod-variation')?.value||'').trim(), 
-                // 🔽===== PASTE START: PAYMENT INFO DALAM SAVE PRODUCT =====🔽
-paymentInfo: {
-    qrUrl: (document.getElementById('prod-qr-url')?.value || '').trim(),
-    bank: (document.getElementById('prod-bank')?.value || '').trim(),
-    account: (document.getElementById('prod-account')?.value || '').trim(),
-    holder: (document.getElementById('prod-holder')?.value || '').trim(),
-    whatsapp: (document.getElementById('prod-wa')?.value || '').trim()
-},
-// 🔼===== PASTE END: PAYMENT INFO DALAM SAVE PRODUCT =====🔼
+                // 🔽===== PAYMENT INFO - RUJUK DARI VENDOR PROFILE (TAK SIMPAN DALAM PRODUCT) =====🔽
+// Nota: Payment info dirujuk dari vendor doc, bukan disimpan dalam setiap product
+// Ini jimat storage & senang maintain (ubah sekali dalam profile, semua produk update)
+vendorPaymentRef: user?.uid, // Reference ke vendor doc untuk fetch payment info
+// 🔼===== END PAYMENT REFERENCE =====🔼
                 imageUrl: imgBase64,
                 totalSold: parseInt(document.getElementById('prod-sold')?.value)||0,
                 rating: parseFloat(document.getElementById('prod-rating')?.value)||0,
@@ -821,13 +1016,22 @@ paymentInfo: {
             btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             
             const updateData = {
-                sellerName: (document.getElementById('prof-seller')?.value||'').trim(),
-                businessName: (document.getElementById('prof-business')?.value||'').trim(),
-                phone: (document.getElementById('prof-phone')?.value||'').trim(),
-                address: (document.getElementById('prof-address')?.value||'').trim(),
-                paymentInfo: (document.getElementById('prof-payment')?.value||'').trim(),
-                logCache: firebase.firestore.FieldValue.serverTimestamp()
-            };
+    sellerName: (document.getElementById('prof-seller')?.value || '').trim(),
+    businessName: (document.getElementById('prof-business')?.value || '').trim(),
+    phone: (document.getElementById('prof-phone')?.value || '').trim(),
+    address: (document.getElementById('prof-address')?.value || '').trim(),
+    
+    // ✅ Nest all payment-related fields inside paymentInfo object
+    paymentInfo: {
+        general: (document.getElementById('prof-payment')?.value || '').trim(),
+        paymentLink: (document.getElementById('prof-payment-link')?.value || '').trim(),
+        qrDefault: (document.getElementById('prof-qr-default')?.value || '').trim(),
+        bankDefault: (document.getElementById('prof-bank-default')?.value || '').trim(),
+        accountDefault: (document.getElementById('prof-account-default')?.value || '').trim()
+    },
+    
+    logCache: firebase.firestore.FieldValue.serverTimestamp()
+};
                         db.collection('vendors').doc(user.uid).update(updateData)
             .then(()=>{ 
                 showToast('✅ Profil dikemaskini','success'); 
@@ -1059,7 +1263,177 @@ paymentInfo: {
             })
             .catch(err=> showToast('❌ '+(err.message||''),'error'));
         }
+// 🔽===== PASTE START: ADMIN FUNCTIONS =====🔽
+// Switch admin section tabs
+window.showAdminSection = (section) => {
+    ['vendors','transactions','settings'].forEach(s => {
+        document.getElementById(`admin-section-${s}`).classList.add('hidden');
+        document.getElementById(`admin-tab-${s}`).classList.remove('active');
+    });
+    document.getElementById(`admin-section-${section}`).classList.remove('hidden');
+    document.getElementById(`admin-tab-${section}`).classList.add('active');
+    
+    if(section === 'vendors') loadAdminVendors();
+    if(section === 'transactions') loadAdminOrders();
+};
 
+// Load all vendors for admin
+async function loadAdminVendors() {
+    const tbody = document.getElementById('admin-vendor-list');
+    if(!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><div class="loader mx-auto"></div></td></tr>';
+    
+    try {
+        const snap = await db.collection('vendors').orderBy('createdAt','desc').get();
+        let html = '', total = 0, blocked = 0, totalRevenue = 0;
+        
+        snap.forEach(d => {
+            const v = d.data() || {};
+            total++;
+            if(v.status === 'BLOCKED') blocked++;
+            totalRevenue += v.totalSales || 0;
+            
+            const statusBadge = v.status === 'ACTIVE' ? 'success' : v.status === 'BLOCKED' ? 'danger' : 'warning';
+            
+            html += `<tr>
+                <td class="font-mono text-[9px]">${v.uac||'-'}</td>
+                <td class="text-xs font-medium">${v.sellerName||v.businessName||'-'}</td>
+                <td class="text-[10px] truncate max-w-[100px]">${v.email||'-'}</td>
+                <td class="text-xs font-bold text-yellow-600">${formatRM(v.totalSales||0)}</td>
+                <td><span class="badge badge-${statusBadge} text-[9px]">${v.status||'UNKNOWN'}</span></td>
+                <td class="text-[9px] text-gray-400">${v.createdAt?.toDate?.()?.toLocaleDateString('ms-MY')||'-'}</td>
+                <td class="text-center">
+                    ${v.status !== 'BLOCKED' 
+                        ? `<button onclick="blockVendor('${d.id}')" class="text-red-500 hover:text-red-700" title="Block"><i class="fas fa-ban"></i></button>` 
+                        : `<button onclick="unblockVendor('${d.id}')" class="text-green-500 hover:text-green-700" title="Unblock"><i class="fas fa-check"></i></button>`}
+                </td>
+            </tr>`;
+        });
+        
+        tbody.innerHTML = html || '<tr><td colspan="7" class="text-center py-4 text-gray-400 text-xs">Tiada vendor</td></tr>';
+                // Update stats
+        document.getElementById('admin-stat-vendors').textContent = total;
+        document.getElementById('admin-stat-blocked').textContent = blocked;
+        document.getElementById('admin-stat-revenue').textContent = formatRM(totalRevenue);
+        
+    } catch(err) {
+        console.error('Load admin vendors error:', err);
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-500 text-xs">⚠️ Gagal load</td></tr>';
+    }
+}
+
+// Filter admin vendor list
+window.filterAdminVendors = () => {
+    const kw = (document.getElementById('admin-vendor-search')?.value||'').toLowerCase();
+    const rows = document.querySelectorAll('#admin-vendor-list tr');
+    rows.forEach((row, i) => {
+        if(i === 0) return; // Skip header
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(kw) ? '' : 'none';
+    });
+};
+
+// Block/Unblock vendor
+window.blockVendor = async (vid) => {
+    if(!confirm('Block vendor ini? Mereka tidak boleh login atau jual produk.')) return;
+    try {
+        await db.collection('vendors').doc(vid).update({ status: 'BLOCKED', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        showToast('✅ Vendor diblock', 'success');
+        loadAdminVendors();
+    } catch(err) { showToast('❌ Gagal: '+err.message, 'error'); }
+};
+
+window.unblockVendor = async (vid) => {
+    if(!confirm('Unblock vendor ini?')) return;
+    try {
+        await db.collection('vendors').doc(vid).update({ status: 'ACTIVE', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        showToast('✅ Vendor diunblock', 'success');
+        loadAdminVendors();
+    } catch(err) { showToast('❌ Gagal: '+err.message, 'error'); }
+};
+
+// Load all orders for admin
+async function loadAdminOrders() {
+    const tbody = document.getElementById('admin-order-list');
+    if(!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><div class="loader mx-auto"></div></td></tr>';
+    
+    try {
+        const snap = await db.collection('orders').orderBy('createdAt','desc').limit(100).get();
+        let html = '', totalOrders = 0;        
+        snap.forEach(d => {
+            const o = d.data() || {};
+            totalOrders++;
+            const items = o.items?.map(i => i.name).join(', ') || '-';
+            const statusBadge = { 'To Pay':'warning', 'Completed':'success', 'Cancelled':'danger' }[o.status] || 'info';
+            
+            // Get vendor name
+            let vendorName = '-';
+            if(o.vendorId) {
+                // Could fetch vendor doc, but for simplicity show ID
+                vendorName = o.vendorUAC || o.vendorId.slice(0,8)+'...';
+            }
+            
+            html += `<tr>
+                <td class="font-mono text-[9px]">${o.orderId||'N/A'}</td>
+                <td class="text-[10px]">${vendorName}</td>
+                <td class="text-xs">${o.username||'-'}</td>
+                <td class="text-[10px] truncate max-w-[120px]" title="${items}">${items}</td>
+                <td class="font-bold text-yellow-600 text-xs">${formatRM(o.total||0)}</td>
+                <td><span class="badge badge-${statusBadge} text-[9px]">${o.status||'-'}</span></td>
+                <td class="text-[9px] text-gray-400">${o.createdAt?.toDate?.()?.toLocaleDateString('ms-MY')||'-'}</td>
+            </tr>`;
+        });
+        
+        tbody.innerHTML = html || '<tr><td colspan="7" class="text-center py-4 text-gray-400 text-xs">Tiada transaksi</td></tr>';
+        document.getElementById('admin-stat-orders').textContent = totalOrders;
+        
+    } catch(err) {
+        console.error('Load admin orders error:', err);
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-red-500 text-xs">⚠️ Gagal load</td></tr>';
+    }
+}
+
+// Filter admin orders
+window.filterAdminOrders = (status) => {
+    const rows = document.querySelectorAll('#admin-order-list tr');
+    rows.forEach((row, i) => {
+        if(i === 0) return;
+        const text = row.textContent;
+        row.style.display = status === 'all' || text.includes(status) ? '' : 'none';
+    });
+};
+
+// Update admin settings
+window.updateAdminSettings = () => {
+    const rate = parseFloat(document.getElementById('admin-commission-rate')?.value) || 1;
+    // Save to Firestore config document (create if not exists)
+    db.collection('config').doc('system').set({ defaultCommissionRate: rate, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, {merge:true})
+    .then(() => showToast('✅ Settings saved', 'success'))    .catch(err => showToast('❌ Gagal: '+err.message, 'error'));
+};
+
+// Load admin stats on section open
+async function loadAdminStats() {
+    try {
+        const [vendors, orders] = await Promise.all([
+            db.collection('vendors').get(),
+            db.collection('orders').get()
+        ]);
+        
+        const totalVendors = vendors.size;
+        const totalOrders = orders.size;
+        const totalRevenue = orders.docs.reduce((sum, d) => {
+            const o = d.data();
+            return o.status === 'Completed' ? sum + (o.total||0) : sum;
+        }, 0);
+        const blocked = vendors.docs.filter(d => d.data().status === 'BLOCKED').length;
+        
+        document.getElementById('admin-stat-vendors').textContent = totalVendors;
+        document.getElementById('admin-stat-orders').textContent = totalOrders;
+        document.getElementById('admin-stat-revenue').textContent = formatRM(totalRevenue);
+        document.getElementById('admin-stat-blocked').textContent = blocked;
+    } catch(err) { console.error('Stats load error:', err); }
+}
         // ===== SEARCH & CATALOGUE - FIXED =====
         function filterProducts(kw) {
             const grid = document.getElementById('product-grid');
@@ -1136,24 +1510,201 @@ paymentInfo: {
             switchTab('chat'); 
         }
         
-        function filterOrders(status) {
-            const tbody = document.getElementById('order-list');
-            if(!tbody) return;
-            const filtered = status==='all' ? orders : orders.filter(o=>o?.status===status);
-            if(!filtered?.length) { 
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500 text-xs">Tiada pesanan</td></tr>'; 
-                return; 
-            }
-            let html = '';
-            filtered.forEach(o => {
-                const items = o?.items?.map?.(i=>i?.name).join(', ')||'-';
-                const paymentBadge = o?.paymentStatus==='Verified'?'success':'warning';
-                const statusBadge = o?.status==='Completed'?'success':o?.status==='Cancelled'?'danger':'info';
-                html += `<tr><td class="font-mono text-[10px]">${o?.orderId||'N/A'}</td><td>${o?.username||'-'}</td><td class="truncate max-w-[120px]">${items}</td><td class="font-bold text-yellow-600">${formatRM(o?.total)}</td><td><span class="badge badge-${paymentBadge}">${o?.paymentStatus||'Pending'}</span></td><td><span class="badge badge-${statusBadge}">${o?.status||'New'}</span></td><td><button onclick="msgCustomer('${o?.userId}','${o?.orderId}')" class="text-cyan-600"><i class="fas fa-comment"></i></button></td></tr>`;
-            });
-            tbody.innerHTML = html;
-        }
+        // 🔽===== PASTE START: VENDOR ORDER MANAGEMENT FUNCTIONS =====🔽
 
+// Load vendor orders with real-time sync
+async function loadVendorOrders() {
+    if(!user) return;
+    const tbody = document.getElementById('vendor-order-list');
+    const noOrders = document.getElementById('no-orders');
+    if(!tbody) return;
+    
+    tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4"><div class="loader mx-auto"></div></td></tr>';
+    
+    try {
+        // 🔥 Query: Hanya order untuk vendor ini
+        const q = db.collection('orders')
+            .where('vendorId', '==', user.uid)
+            .orderBy('createdAt', 'desc')
+            .limit(50);
+        
+        q.onSnapshot(snap => {
+            orders = [];
+            let html = '';
+            
+            if(!snap?.empty) {
+                snap.forEach(d => {
+                    try {
+                        const o = d?.data() || {};
+                        orders.push({id: d?.id, ...o});
+                        
+                        const items = o?.items?.map(i => i?.name).join(', ') || '-';
+                        const totalQty = Object.values(o?.itemCounts || {}).reduce((a,b) => a+b, 0) || o?.items?.length || 1;
+                        const paymentBadge = o?.paymentStatus === 'Verified' ? 'success' : 'warning';
+                        const statusBadge = {
+                            'To Pay': 'warning', 'To Ship': 'info', 'To Receive': 'info',
+                            'Completed': 'success', 'Cancelled': 'danger'
+                        }[o?.status] || 'info';
+                        
+                        // 🔥 Vendor boleh update status & tracking
+                        const statusOptions = ['To Pay','To Ship','To Receive','Completed','Cancelled'].map(s => 
+                            `<option value="${s}" ${o?.status===s?'selected':''}>${s}</option>`).join('');
+                        
+                        html += `<tr class="hover:bg-yellow-50 transition">
+                            <td class="font-mono text-[10px]">${o?.orderId||'N/A'}</td>
+                            <td class="text-xs">${o?.username||'-'}</td>
+                            <td class="truncate max-w-[150px] text-xs" title="${items}">${items}</td>
+                            <td class="text-center text-xs">${totalQty}</td>
+                            <td class="font-bold text-yellow-600 text-xs">${formatRM(o?.total)}</td>
+                            <td><span class="badge badge-${paymentBadge} text-[10px]">${o?.paymentStatus||'Pending'}</span></td>
+                            <td>
+                                <select onchange="updateVendorOrderStatus('${d?.id}', this.value)" class="text-[10px] p-1 rounded border bg-white/80" ${o?.status==='Completed'||o?.status==='Cancelled'?'disabled':''}>
+                                    ${statusOptions}                                </select>
+                            </td>
+                            <td>
+                                <input type="text" value="${o?.trackingNo||''}" placeholder="Tracking..." 
+                                       onchange="updateVendorOrderField('${d?.id}','trackingNo',this.value)"
+                                       class="text-[10px] p-1 w-20 rounded border">
+                            </td>
+                            <td class="text-[10px] text-gray-500">${formatTime(o?.createdAt)}</td>
+                            <td class="text-center">
+                                <button onclick="msgCustomer('${o?.userId}','${o?.orderId}')" class="text-cyan-600 hover:text-cyan-800" title="Chat"><i class="fas fa-comment"></i></button>
+                                ${o?.status==='To Pay' ? `<button onclick="cancelVendorOrder('${d?.id}')" class="text-red-500 hover:text-red-700 ml-1" title="Cancel"><i class="fas fa-times"></i></button>` : ''}
+                            </td>
+                        </tr>`;
+                    } catch(e) { console.warn('Order render error:', e); }
+                });
+                tbody.innerHTML = html;
+                noOrders?.classList.add('hidden');
+            } else {
+                tbody.innerHTML = '';
+                noOrders?.classList.remove('hidden');
+            }
+            
+            // Update stats
+            const active = orders.filter(o => !['Completed','Cancelled'].includes(o?.status)).length;
+            document.getElementById('stat-orders').textContent = active;
+            
+        }, err => {
+            console.error('Vendor orders error:', err);
+            tbody.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-red-500 text-xs">⚠️ Gagal load pesanan</td></tr>`;
+        });
+        
+    } catch(err) {
+        console.error('Load vendor orders error:', err);
+        showToast('⚠️ Gagal akses data pesanan','warning');
+    }
+}
+
+// Filter vendor orders by status + search
+window.filterVendorOrders = (status) => {
+    const tbody = document.getElementById('vendor-order-list');
+    const search = (document.getElementById('order-search')?.value||'').toLowerCase();
+    const noOrders = document.getElementById('no-orders');
+    
+    const filtered = orders.filter(o => {
+        const matchStatus = status === 'all' || o?.status === status;
+        const matchSearch = !search || 
+            (o?.orderId?.toLowerCase?.()?.includes?.(search)) ||
+            (o?.username?.toLowerCase?.()?.includes?.(search)) ||
+            (o?.items?.some?.(i => i?.name?.toLowerCase?.()?.includes?.(search)));
+        return matchStatus && matchSearch;    });
+    
+    if(!filtered?.length) {
+        tbody.innerHTML = '';
+        noOrders?.classList.remove('hidden');
+        return;
+    }
+    noOrders?.classList.add('hidden');
+    
+    // Re-render filtered (same logic as loadVendorOrders but with filtered array)
+    let html = '';
+    filtered.forEach(o => {
+        const items = o?.items?.map(i => i?.name).join(', ') || '-';
+        const totalQty = Object.values(o?.itemCounts || {}).reduce((a,b) => a+b, 0) || o?.items?.length || 1;
+        const paymentBadge = o?.paymentStatus === 'Verified' ? 'success' : 'warning';
+        const statusBadge = {
+            'To Pay': 'warning', 'To Ship': 'info', 'To Receive': 'info',
+            'Completed': 'success', 'Cancelled': 'danger'
+        }[o?.status] || 'info';
+        
+        const statusOptions = ['To Pay','To Ship','To Receive','Completed','Cancelled'].map(s => 
+            `<option value="${s}" ${o?.status===s?'selected':''}>${s}</option>`).join('');
+        
+        html += `<tr class="hover:bg-yellow-50 transition">
+            <td class="font-mono text-[10px]">${o?.orderId||'N/A'}</td>
+            <td class="text-xs">${o?.username||'-'}</td>
+            <td class="truncate max-w-[150px] text-xs" title="${items}">${items}</td>
+            <td class="text-center text-xs">${totalQty}</td>
+            <td class="font-bold text-yellow-600 text-xs">${formatRM(o?.total)}</td>
+            <td><span class="badge badge-${paymentBadge} text-[10px]">${o?.paymentStatus||'Pending'}</span></td>
+            <td>
+                <select onchange="updateVendorOrderStatus('${orders.find(x=>x.orderId===o?.orderId)?.id||''}', this.value)" class="text-[10px] p-1 rounded border bg-white/80" ${o?.status==='Completed'||o?.status==='Cancelled'?'disabled':''}>
+                    ${statusOptions}
+                </select>
+            </td>
+            <td>
+                <input type="text" value="${o?.trackingNo||''}" placeholder="Tracking..." 
+                       onchange="updateVendorOrderField('${orders.find(x=>x.orderId===o?.orderId)?.id||''}','trackingNo',this.value)"
+                       class="text-[10px] p-1 w-20 rounded border">
+            </td>
+            <td class="text-[10px] text-gray-500">${formatTime(o?.createdAt)}</td>
+            <td class="text-center">
+                <button onclick="msgCustomer('${o?.userId}','${o?.orderId}')" class="text-cyan-600 hover:text-cyan-800" title="Chat"><i class="fas fa-comment"></i></button>
+                ${o?.status==='To Pay' ? `<button onclick="cancelVendorOrder('${orders.find(x=>x.orderId===o?.orderId)?.id||''}')" class="text-red-500 hover:text-red-700 ml-1" title="Cancel"><i class="fas fa-times"></i></button>` : ''}
+            </td>
+        </tr>`;
+    });
+    tbody.innerHTML = html;
+};
+// Update order status (vendor)
+window.updateVendorOrderStatus = async (orderId, newStatus) => {
+    if(!confirm(`Tukar status pesanan #${orderId?.slice?.(-6)||'...'} kepada ${newStatus}?`)) {
+        loadVendorOrders(); return;
+    }
+    try {
+        await db.collection('orders').doc(orderId).update({
+            status: newStatus,
+            category: newStatus,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast(`✅ Status: ${newStatus}`, 'success');
+    } catch(err) {
+        console.error('Update status error:', err);
+        showToast('❌ Gagal update: '+(err.message||''), 'error');
+    }
+};
+
+// Update order field (tracking, etc)
+window.updateVendorOrderField = async (orderId, field, value) => {
+    try {
+        await db.collection('orders').doc(orderId).update({
+            [field]: value,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    } catch(err) { console.error('Update field error:', err); }
+};
+
+// Cancel order (vendor)
+window.cancelVendorOrder = async (orderId) => {
+    if(!confirm('Batal pesanan ini? Pelanggan akan dimaklumkan.')) return;
+    try {
+        await db.collection('orders').doc(orderId).update({
+            status: 'Cancelled',
+            category: 'Cancelled',
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast('❌ Pesanan dibatalkan', 'warning');
+    } catch(err) { showToast('❌ Gagal: '+(err.message||''), 'error'); }
+};
+
+// Chat customer from order
+window.msgCustomer = (uid, oid) => {
+    showToast(`💬 Buka chat untuk order #${oid?.slice?.(-6)||'...'}`,'info');
+    switchTab('chat');
+    // Auto-open chat logic can be added here
+};
+// 🔼===== PASTE END: VENDOR ORDER MANAGEMENT FUNCTIONS =====🔼
         // ===== INIT =====
         document.addEventListener('DOMContentLoaded', () => {
             const h = location.hash.slice(1);
