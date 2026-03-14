@@ -511,8 +511,83 @@
 .adsbygoogle:empty {
     display: none !important;
 }
+/* ===== TRACKING SECTION STYLES ===== */
+.tracking-box {
+    background: linear-gradient(135deg, rgb(106, 13, 173), rgb(255, 105, 180));
+    border-radius: 15px;
+    box-shadow: rgba(255, 105, 180, 0.6) 0px 0px 20px;
+    font-family: Arial, sans-serif;
+    margin: 10px auto;
+    max-width: 500px;
+    padding: 20px;
+    text-align: center;
+}
+.tracking-box h2 {
+    color: white;
+    text-shadow: rgb(255, 105, 180) 0px 0px 10px;
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+}
+.tracking-box input[type="text"] {
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    margin-bottom: 10px;
+    outline: none;
+    padding: 10px 15px;
+    width: 70%;
+}
+.tracking-box input[type="button"] {
+    background: linear-gradient(45deg, rgb(255, 105, 180), rgb(106, 13, 173));
+    border-radius: 10px;
+    border: none;
+    box-shadow: rgb(255, 105, 180) 0px 0px 15px, rgb(106, 13, 173) 0px 0px 30px;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 10px 20px;
+    transition: 0.3s;
+}
+.tracking-box input[type="button"]:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #ff69b4, 0 0 40px #6a0dad;
+}
+#embedTrack {
+    background: linear-gradient(135deg, rgb(106, 13, 173), rgb(255, 105, 180));
+    border-radius: 15px;
+    box-shadow: rgba(255, 105, 180, 0.5) 0px 0px 25px;
+    margin: 15px auto;
+    max-width: 600px;
+    padding: 15px;
+}
     </style>
 </head>
+<!-- Tracking Script - Load AFTER DOM Ready -->
+<script src="//www.tracking.my/track-button.js" async></script>
+<script>
+    function inputTrack() {
+        var v = document.getElementById("TrackNo").value.trim();
+        if (v === "") {
+            alert("Sila masukkan nombor tracking");
+            return;
+        }
+        // Check if TrackButton is loaded
+        if (typeof TrackButton !== 'undefined') {
+            TrackButton.track({ tracking_number: v });
+            TrackButton.embed({ selector: "#embedTrack", tracking_number: v });
+        } else {
+            // Fallback: retry after 500ms if script not loaded yet
+            setTimeout(() => {
+                if (typeof TrackButton !== 'undefined') {
+                    TrackButton.track({ tracking_number: v });
+                    TrackButton.embed({ selector: "#embedTrack", tracking_number: v });
+                } else {
+                    alert("Loading tracking service... Sila cuba sebentar lagi.");
+                }
+            }, 500);
+        }
+    }
+</script>
 <body class="p-0 md:p-4">
 
     <!-- AUDIO EFFECTS -->
@@ -675,10 +750,14 @@
                             <select class="w-auto py-0 px-1 text-[10px] m-0 bg-white"><option>Home</option><option>Work</option></select>
                         </div>
                         <button onclick="updateProfile()" class="bg-purple-500 text-white px-3 py-1.5 rounded-lg text-xs w-full shadow hover:bg-purple-600 transition disabled:opacity-50" id="save-profile-btn">Save Changes</button>
+                        <!-- 🔽 TAMBAH: TRACK ORDER BUTTON -->
+<button onclick="openTrackingModal()" class="w-full mt-2 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg text-xs font-bold shadow hover:from-purple-600 hover:to-pink-600 transition flex items-center justify-center gap-2">
+    <i class="fas fa-truck"></i> 🔍 Track Order
+</button>
+<!-- 🔼 END TRACK ORDER BUTTON -->
                         <button onclick="deleteAccount()" class="bg-red-100 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-xs w-full mt-2 hover:bg-red-200 transition">Delete Account Permanently</button>
                     </div>
                 </div>
-                
                 <!-- Orders Section -->
                 <div class="glass-panel p-4 md:p-6 lg:col-span-3">
                     <h3 class="text-lg md:text-xl font-bold mb-4 flex justify-between items-center">                        <span>My Orders</span>
@@ -1668,8 +1747,14 @@ ${p.status === 'Public' ? `
     <button onclick="event.stopPropagation();openVendorChat('${p.vendorId||''}','${p.vendorUAC||''}','${(p.name||'Product').replace(/'/g,"\\'")}" class="flex-1 py-1.5 rounded-lg text-xs bg-cyan-100 text-cyan-700 hover:bg-cyan-200 transition flex items-center justify-center gap-1" title="Chat penjual">
         <i class="fas fa-comment"></i><span class="hidden sm:inline">Seller</span>
     </button>
-</div>` : `<button disabled class="w-full py-1.5 rounded-lg text-xs bg-gray-200 text-gray-400 cursor-not-allowed">${p.status==='Out of Stock'?'❌ Out of Stock':'🔒 Private'}</button>`}
-    </div>`;
+    <!-- 🔽 SHARE BUTTON - TAMBAH INI -->
+    <button onclick="event.stopPropagation();shareProduct('${p.id}', '${p.name?.replace(/'/g, "\\'")||'Product'}')" 
+            class="flex-1 py-1.5 rounded-lg text-xs bg-cyan-100 text-cyan-700 hover:bg-cyan-200 transition flex items-center justify-center gap-1" 
+            title="Share product link">
+        🔗
+    </button>
+    <!-- 🔼 END SHARE BUTTON -->
+</div>` : `<button disabled class="w-full py-1.5 rounded-lg text-xs bg-gray-200 text-gray-400 cursor-not-allowed">${p.status==='Out of Stock'?'❌ Out of Stock':'🔒 Private'}</button>`}</div>`
 }).join('');
         };
 
@@ -1715,79 +1800,74 @@ ${p.status === 'Public' ? `
             playSound('click');
         };
 
-        window.submitOrder = async () => {
-            if(!currentUser) {
-                showToast('❌ Sila login dahulu', 'error');
-                navTo('login');
-                return;
-            }
-            if(cart.length === 0) {
-                showToast('❌ Cart kosong', 'error');
-                return;
-            }
-            if(!userData?.address?.trim()) {
-                showToast('❌ Sila masukkan alamat di Dashboard dahulu', 'error');
-                navTo('dashboard');
-                return;            }
-            
-            const btn = document.getElementById('checkout-btn');
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
-            
-            try {
-                const total = cart.reduce((s,i) => s + parseFloat(i.priceSell || i.price || 0), 0);
-                const tracking = "TRK-" + Date.now().toString().substr(-8);
-                const orderId = "ORD-" + Date.now().toString().substr(-6);
-                const itemCounts = {};
-                cart.forEach(i => { itemCounts[i.id] = (itemCounts[i.id] || 0) + 1; });
-                
-                await addDoc(collection(db, "orders"), {
-                    userId: currentUser.uid, 
-                    uac: userData.uac, 
-                    username: userData.username, 
-                    items: cart, 
-                    itemCounts: itemCounts, 
-                    total: total, 
-                    address: userData.address,
-                    trackingNo: tracking, 
-                    orderId: orderId, 
-                    paymentMethod: "Manual Transfer", 
-                    paymentStatus: "Not Verified", 
-                    status: "To Pay", 
-                    deliveryStatus: "Pending",
-                    adminNote: "", 
-                    currentStatus: "Pending Payment - Menunggu pembayaran", 
-                    userRating: null, 
-                    createdAt: serverTimestamp(), 
-                    category: "To Pay",
-                    updatedAt: serverTimestamp()
-                });
-                
-                // Update product sold count (optional - can be done via Cloud Function)
-                cart.forEach(item => {
-                    updateDoc(doc(db, "products", item.id), {
-                        totalSold: (item.totalSold || 0) + 1
-                    }).catch(() => {}); // Silent fail
-                });
-                
-                cart = []; 
-                document.getElementById('cart-count').innerText = 0; 
-                toggleCartModal(); 
-                playSound('success');
-                showToast('✅ Pesanan berjaya! Sila buat pembayaran.', 'success', 5000);
-                
-                setTimeout(() => { 
-                    if(currentUser) loadUserData();                     navTo('dashboard'); 
-                }, 1000);
-                
-            } catch(e) { 
-                console.error('Order error:', e);
-                showToast('❌ Ralat: ' + (e.message || 'Unknown error'), 'error'); 
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>KONFIRM PESANAN';
-            }
-        };
+window.submitOrder = async () => {
+if(!currentUser) { showToast('❌ Sila login dahulu','error'); navTo('login'); return; }
+if(cart.length === 0) { showToast('❌ Cart kosong','error'); return; }
+if(!userData?.address?.trim()) { showToast('❌ Sila masukkan alamat di Dashboard dahulu','error'); navTo('dashboard'); return; }
+
+const btn = document.getElementById('checkout-btn');
+btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Processing...';
+
+try {
+const total = cart.reduce((s,i) => s + parseFloat(i.priceSell || i.price || 0), 0);
+const tracking = "TRK-" + Date.now().toString().substr(-8);
+const orderId = "ORD-" + Date.now().toString().substr(-6);
+const itemCounts = {};
+
+// 🔥 FIX: Kumpul vendorId dari semua produk dalam cart
+const vendorIds = [...new Set(cart.map(i => i.vendorId).filter(v => v))];
+const vendorId = vendorIds[0] || null; // Ambil vendorId pertama (untuk single vendor checkout)
+const vendorUAC = cart[0]?.vendorUAC || null;
+
+cart.forEach(i => { itemCounts[i.id] = (itemCounts[i.id] || 0) + 1; });
+
+await addDoc(collection(db, "orders"), {
+userId: currentUser.uid,
+uac: userData.uac,
+username: userData.username,
+vendorId: vendorId, // 🔥 FIX: TAMBAH vendorId
+vendorUAC: vendorUAC, // 🔥 FIX: TAMBAH vendorUAC
+items: cart,
+itemCounts: itemCounts,
+total: total,
+address: userData.address,
+trackingNo: tracking,
+orderId: orderId,
+paymentMethod: "Direct Vendor Transfer",
+paymentStatus: "Not Verified",
+status: "To Pay",
+deliveryStatus: "Pending",
+adminNote: "",
+currentStatus: "Pending Payment - Menunggu pembayaran",
+userRating: null,
+createdAt: serverTimestamp(),
+category: "To Pay",
+updatedAt: serverTimestamp()
+});
+
+// Update product sold count
+cart.forEach(item => {
+updateDoc(doc(db, "products", item.id), {
+totalSold: (item.totalSold || 0) + 1
+}).catch(() => {});
+});
+
+cart = [];
+document.getElementById('cart-count').innerText = 0;
+toggleCartModal();
+playSound('success');
+showToast('✅ Pesanan berjaya! Sila buat pembayaran kepada VENDOR.', 'success', 5000);
+
+setTimeout(() => { if(currentUser) loadUserData(); navTo('dashboard'); }, 1000);
+
+} catch(e) {
+console.error('Order error:', e);
+showToast('❌ Ralat: ' + (e.message || 'Unknown error'), 'error');
+} finally {
+btn.disabled = false;
+btn.innerHTML = '<i class="fas fa-check-circle mr-2"></i>KONFIRM PESANAN';
+}
+};
 
         // ==================== USER DASHBOARD ====================
         
@@ -1960,27 +2040,60 @@ if (avatarEl && userData.photoURL) {
 // 🔽===== PASTE START: VENDOR PAYMENT & DIRECT CHAT FUNCTIONS =====🔽
 
 // Load vendor payment info for cart items
+// 🔽===== PASTE START: LOAD VENDOR PAYMENT FROM VENDOR DOC =====🔽
 async function loadVendorPayment() {
     const [load, content, err] = ['pay-load','pay-content','pay-err'].map(id=>document.getElementById(id));
     if(!load||!content||!err) return;
     load.classList.remove('hidden'); content.classList.add('hidden'); err.classList.add('hidden');
+    
     try {
-        const prod = cart[0]; if(!prod?.vendorId) throw new Error('Vendor ID missing');
-        const snap = await getDoc(doc(db,"products",prod.id));
-        if(!snap.exists()) throw new Error('Product not found');
-        const p = snap.data(), pay = p?.paymentInfo;
-        if(!pay?.qrUrl) throw new Error('Payment info incomplete');
-        document.getElementById('v-qr').src = pay.qrUrl;
-        ['bank','account','holder'].forEach((f,i)=>{
-            const el = document.getElementById(`v-${f==='holder'?'name':f}`);
-            if(el) el.textContent = pay[f] || '-';
-        });
+        const prod = cart[0]; 
+        if(!prod?.vendorId) throw new Error('Vendor ID missing');
+        
+        // 🔥 FETCH PAYMENT INFO DARI VENDOR DOC (bukan product doc)
+        const vendorSnap = await getDoc(doc(db, "vendors", prod.vendorId));
+        if(!vendorSnap.exists()) throw new Error('Vendor not found');
+        
+        const vendor = vendorSnap.data();
+        const pay = vendor?.paymentInfo || {};
+        
+        // Handle paymentInfo structure (object or string fallback)
+        const payment = typeof pay === 'object' ? pay : { general: pay };
+        
+        if(!payment.qrDefault && !payment.paymentLink) throw new Error('Payment info incomplete');
+        
+        // Populate UI
+        const qrUrl = payment.qrDefault || payment.paymentLink;
+        document.getElementById('v-qr').src = qrUrl;
+        
+        // Auto-generate QR from link if needed
+        if(payment.paymentLink && !payment.qrDefault) {
+            document.getElementById('v-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payment.paymentLink)}`;
+            document.getElementById('qr-hint').innerHTML = '🔗 Klik untuk buka payment link';
+        }
+        
+        document.getElementById('v-bank').textContent = payment.bankDefault || '-';
+        document.getElementById('v-acc').textContent = payment.accountDefault?.split(' - ')?.[0] || '-';
+        document.getElementById('v-name').textContent = payment.accountDefault?.split(' - ')?.[1] || payment.holder || '-';
+        
+        // WhatsApp button
         const wa = document.getElementById('v-wa-btn');
-        if(pay.whatsapp) { wa.href = `https://wa.me/${pay.whatsapp.replace(/\D/g,'')}`; wa.classList.remove('hidden'); }
-        else wa.classList.add('hidden');
+        if(payment.whatsapp) { 
+            wa.href = `https://wa.me/${payment.whatsapp.replace(/\D/g,'')}`; 
+            wa.classList.remove('hidden'); 
+        } else {
+            wa.classList.add('hidden');
+        }
+        
         load.classList.add('hidden'); content.classList.remove('hidden');
-    } catch(e) { console.error('Payment load error:',e); load.classList.add('hidden'); err.classList.remove('hidden'); err.textContent = `❌ ${e.message}`; }
+    } catch(e) { 
+        console.error('Payment load error:',e); 
+        load.classList.add('hidden'); 
+        err.classList.remove('hidden'); 
+        err.textContent = `❌ ${e.message || 'Gagal load payment info'}`; 
+    }
 }
+// 🔼===== PASTE END: LOAD VENDOR PAYMENT FROM VENDOR DOC =====🔼
 
 // Override cart modal to load vendor payment
 const _origCart = window.toggleCartModal;
@@ -2025,54 +2138,53 @@ function clearChatCtx() { localStorage.removeItem('mfd_chat_ctx'); const b=docum
 // 🔼===== PASTE END: VENDOR PAYMENT & DIRECT CHAT FUNCTIONS =====🔼
 
         // ==================== ADMIN FUNCTIONS - PRODUCTION READY ====================
+   // 🔽===== PASTE START: FIX ADMIN LOAD ALL ORDERS =====🔽
+window.loadAdminData = async () => {
+    if (userData.role !== 'admin') {
+        showToast('❌ Akses ditolak', 'error');
+        return navTo('home');
+    }
+    
+    try {
+        const [usersSnap, ordersSnap, productsSnap] = await Promise.all([
+            getDocs(collection(db, "users")),
+            getDocs(collection(db, "orders")), // 🔥 Admin dapat SEMUA order
+            getDocs(collection(db, "products"))
+        ]);
         
-        window.loadAdminData = async () => {
-            if(userData.role !== 'admin') {
-                showToast('❌ Akses ditolak', 'error');
-                return navTo('home');
-            }
-            
-            // Load stats with error handling
-            try {
-                const [usersSnap, ordersSnap, productsSnap] = await Promise.all([
-                    getDocs(collection(db, "users")),
-                    getDocs(collection(db, "orders")),
-                    getDocs(collection(db, "products"))
-                ]);
-                
-                allUsers = usersSnap.docs.map(d => ({id: d.id, ...d.data()}));
-                const allOrders = ordersSnap.docs.map(d => ({id: d.id, ...d.data()}));
-                
-                // Update stats cards
-                document.getElementById('stat-total-users').innerText = allUsers.length;                document.getElementById('stat-total-orders').innerText = allOrders.length;
-                const revenue = allOrders.filter(o => o.status === 'Completed').reduce((sum, o) => sum + (o.total || 0), 0);
-                document.getElementById('stat-revenue').innerText = formatRM(revenue);
-                document.getElementById('stat-pending').innerText = allOrders.filter(o => o.status === 'To Pay').length;
-                
-            } catch(e) {
-                console.error('Stats load error:', e);
-                showToast('⚠️ Gagal memuat statistik', 'warning');
-            }
-            
-            // Real-time orders listener
-            if(unsubscribeOrders) unsubscribeOrders();
-            const q = query(collection(db, "orders"), orderBy("createdAt", "desc"), limit(100));
-            unsubscribeOrders = onSnapshot(q, (snap) => {
-                allAdminOrders = [];
-                snap.forEach(d => allAdminOrders.push({id: d.id, ...d.data()}));
-                filterVerifyOrders('all');
-                filterManageOrders();
-                renderAdminProducts();
-            });
-            
-            // Initial render
-            renderAdminUsers();
-            renderBlacklist();
-            if(document.getElementById('tab-chat')?.classList.contains('hidden-section') === false) {
-                loadChatList();
-            }
-        };
-
+        allUsers = usersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const allOrders = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        
+        // Update stats cards
+        document.getElementById('stat-total-users').innerText = allUsers.length;
+        document.getElementById('stat-total-orders').innerText = allOrders.length;
+        const revenue = allOrders.filter(o => o.status === 'Completed').reduce((sum, o) => sum + (o.total || 0), 0);
+        document.getElementById('stat-revenue').innerText = formatRM(revenue);
+        document.getElementById('stat-pending').innerText = allOrders.filter(o => o.status === 'To Pay').length;
+        
+    } catch (e) {
+        console.error('Stats load error:', e);
+        showToast('⚠️ Gagal memuat statistik', 'warning');
+    }
+    
+    // Real-time orders listener - Admin lihat SEMUA
+    if (unsubscribeOrders) unsubscribeOrders();
+    const q = query(collection(db, "orders"), orderBy("createdAt", "desc"), limit(100));
+    unsubscribeOrders = onSnapshot(q, (snap) => {
+        allAdminOrders = [];
+        snap.forEach(d => allAdminOrders.push({ id: d.id, ...d.data() }));
+        filterVerifyOrders('all');
+        filterManageOrders();
+        renderAdminProducts();
+    });
+    
+    renderAdminUsers();
+    renderBlacklist();
+    if (document.getElementById('tab-chat')?.classList.contains('hidden-section') === false) {
+        loadChatList();
+    }
+};
+// 🔼===== PASTE END: FIX ADMIN LOAD ALL ORDERS =====🔼
         // Render Admin Users Table
         function renderAdminUsers() {
             const tbody = document.getElementById('admin-user-list');
@@ -2940,7 +3052,102 @@ if (document.readyState === 'loading') {
 } else {
     renderAdsWidget();
 }
+
+window.shareProduct = async (productId, productName) => {
+    const baseUrl = window.location.href.split('#')[0];
+    const shareUrl = `${baseUrl}#product=${productId}`;
+    
+    try {
+        await navigator.clipboard.writeText(shareUrl);
+        showToast(`✅ Link copied: ${productName}`, 'success', 3000);
+        
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: productName,
+                    text: `Check out: ${productName} on MFD Store`,
+                    url: shareUrl
+                });
+            } catch (e) {}
+        }
+    } catch (err) {
+        prompt('Copy this link to share:', shareUrl);
+    }
+};
+// 🔼===== PASTE END: SHARE PRODUCT FUNCTION =====🔼  ← ✅ TAMBAH BARIS NI
+// 🔽===== TRACKING MODAL FUNCTIONS =====🔽
+window.openTrackingModal = () => {
+    const modal = document.getElementById('tracking-modal');
+    if (modal) {
+        modal.classList.remove('hidden-section');
+        document.body.style.overflow = 'hidden'; // Prevent background scroll
+        playSound('click');
+    }
+};
+
+window.closeTrackingModal = () => {
+    const modal = document.getElementById('tracking-modal');
+    if (modal) {
+        modal.classList.add('hidden-section');
+        document.body.style.overflow = '';
+        // Clear tracking input when closing
+        const input = document.getElementById('TrackNo');
+        const embed = document.getElementById('embedTrack');
+        if (input) input.value = '';
+        if (embed) embed.innerHTML = '';
+    }
+};
+
+// Close modal when clicking outside
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('tracking-modal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target.id === 'tracking-modal') closeTrackingModal();
+        });
+    }
+});
+// 🔼===== END TRACKING MODAL FUNCTIONS =====🔼
+
 // ==================== INIT ====================
+window.addEventListener('hashchange', () => {
+    const hash = location.hash.slice(1);
+    
+    if (hash.startsWith('product=')) {
+        const productId = hash.split('=')[1];
+        if (productId) {
+            if (!allProducts?.length) {
+                loadProducts().then(() => {
+                    setTimeout(() => openProductFromHash(productId), 300);
+                });
+            } else {
+                openProductFromHash(productId);
+            }
+        }
+    } else {
+        const h = hash || 'home';
+        navTo(h);
+    }
+});
+
+async function openProductFromHash(productId) {
+    if (document.getElementById('view-home')?.classList.contains('hidden-section')) {
+        navTo('home');
+    }
+    
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    const productCard = document.querySelector(`.product-card[onclick*="${productId}"]`);
+    if (productCard) {
+        productCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        productCard.classList.add('ring-4', 'ring-purple-400', 'ring-offset-2');
+        showToast('🎯 Product loaded', 'info', 2000);
+        setTimeout(() => productCard.classList.remove('ring-4', 'ring-purple-400', 'ring-offset-2'), 3000);
+    } else {
+        showToast('❌ Product not found', 'error');
+        navTo('home');
+    }
+}
 document.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('mfd_chat_id');
     const partner = localStorage.getItem('mfd_chat_partner');
@@ -3072,6 +3279,30 @@ document.addEventListener('keydown', e => { if(e.key==='Escape') hideContext(); 
             if(hint) { hint.innerHTML = '👆 Klik untuk jelas'; }
         });
     </script>
+    <!-- 🔽===== TRACKING MODAL - DASHBOARD ONLY =====🔽 -->
+<div id="tracking-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden-section flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-lg p-6 relative">
+        <button onclick="closeTrackingModal()" class="absolute top-4 right-4 text-2xl text-gray-500 hover:text-red-500 transition" aria-label="Close">&times;</button>
+        <h3 class="font-bold text-purple-700 mb-3 text-center">📦 Jejak Pesanan Fizikal</h3>
+        
+        <!-- Warning -->
+        <p class="text-[10px] text-center text-gray-500 bg-yellow-50 p-2 rounded mb-3">
+            ⚠️ Untuk barang yang menggunakan jasa POS/KURIER/LOGISTIK sahaja. Bukan untuk produk digital kerana ini untuk produk fizikal.
+        </p>
+        
+        <!-- Tracking Widget -->
+        <div class="tracking-box">
+            <h2>Parcel Tracking Online</h2>
+            <input id="TrackNo" maxlength="50" placeholder="Contoh: SPXMY065315469009" />
+            <br>
+            <input onclick="inputTrack()" type="button" value="TRACK" />
+        </div>
+        
+        <!-- Result Container -->
+        <div id="embedTrack" class="mt-4"></div>
+    </div>
+</div>
+<!-- 🔼===== END TRACKING MODAL =====🔼 -->
 </body>
     <amp-auto-ads type="adsense"
         data-ad-client="ca-pub-3180819938764995">
